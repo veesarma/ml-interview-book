@@ -45,17 +45,20 @@ def main() -> None:
 
     # right panel: the shape of the curve everyone is trying to move
     n = np.logspace(1, 6, 100)
-    sup = 1.0 - 0.72 * (np.log10(n) - 1) / 5
-    ssl = 1.0 - 0.72 * (np.log10(n * 30) - 1) / 5
-    ssl = np.clip(ssl, 0.18, 1.0)
+    sup = 1.0 - 0.72 * (np.log10(n) - 1) / 5          # error falls with log(labels)
+    gap = 0.30 * np.exp(-(np.log10(n) - 1) / 1.6)     # the pretraining advantage decays with labels
+    ssl = sup - gap
     ax2.plot(n, sup, color=colors[0], linewidth=1.8, label="train from scratch")
     ax2.plot(n, ssl, color=colors[2], linewidth=1.8, label="fine-tune an SSL backbone")
     ax2.fill_between(n, ssl, sup, color=colors[2], alpha=0.12)
     ax2.set_xscale("log")
     ax2.set_xlabel("labelled examples (log scale)")
     ax2.set_ylabel("error (arbitrary units)")
-    ax2.set_title("Pretraining shifts the curve left, it does not change its slope", fontsize=10)
-    ax2.annotate("the gap closes\nas labels grow", xy=(3e5, 0.27), xytext=(1.2e4, 0.13),
+    ax2.set_title("Pretraining buys labels, and the advantage decays as labels grow", fontsize=10)
+    ax2.annotate("at 100 labels the backbone\nis most of the model", xy=(1e2, 0.79), xytext=(2e2, 0.95),
+                 fontsize=8.5, color="#555555",
+                 arrowprops=dict(arrowstyle="->", color="#888888", linewidth=1.0))
+    ax2.annotate("the gap closes\nas labels grow", xy=(6e5, 0.30), xytext=(2e4, 0.52),
                  fontsize=8.5, color="#555555",
                  arrowprops=dict(arrowstyle="->", color="#888888", linewidth=1.0))
     ax2.legend(fontsize=8.5, frameon=False)

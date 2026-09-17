@@ -102,3 +102,41 @@ verify each one, add the link to the chapter, and tick the box.
 - [x] docs/part18-company-deep-dives/stripe-fintech.md | Coinbase, engineering writing on risk, fraud and account-takeover defence; model internals are not published
 - [x] docs/part18-company-deep-dives/stripe-fintech.md | Dal Pozzolo et al., "Credit Card Fraud Detection: A Realistic Modeling and a Novel Learning Strategy", IEEE Transactions on Neural Networks and Learning Systems, 2018 (delayed labels and verification latency)
 - [x] docs/part18-company-deep-dives/stripe-fintech.md | Dal Pozzolo et al., "Calibrating Probability with Undersampling for Unbalanced Classification", IEEE Symposium Series on Computational Intelligence, 2015
+
+## Notes from the 2026-09-17 pass
+
+All 97 lines are now resolved. Three lines are marked PARTIAL or carry a note
+because one item inside a multi-source line could not be resolved:
+
+* `airbnb.md` "Categorizing Listing Photos at Airbnb" (2018): no URL found in search
+  results. The chapter keeps it as title-and-year alongside the linked 2019, 2020,
+  2022 and 2023 posts.
+* `amazon.md` Amazon Bedrock documentation: the Nova announcement is linked; the
+  Bedrock docs root was not confirmed.
+* `apple.md` Live Text / Visual Look Up supported languages and categories: the
+  Vision framework and text-recognition pages are linked, but Apple publishes the
+  feature's language and category coverage only in user-facing documentation, and
+  no single developer page for it was found.
+* `netflix-spotify.md` "Foundation Model for Personalized Recommendation" (2025):
+  marked UNVERIFIABLE. Two searches returned only aggregators and third-party
+  write-ups, never the canonical netflixtechblog.com post URL.
+
+Claims corrected in the chapters during this pass:
+
+* `uber-doordash.md`: "Experimentation in a Ridesharing Marketplace" (2018) is a
+  **Lyft** Engineering series by Nicholas Chamandy and Adam Greenhall, not an Uber
+  post. The chapter attributed it to Uber in four places. It now cites Lyft for the
+  network-interference argument and Uber's own "Under the Hood of Uber's
+  Experimentation Platform" (2018) for the platform internals.
+* `uber-doordash.md`: DoorDash's "Things Not Strings" was published in **December
+  2020**, not 2022. Corrected in three places.
+* `pinterest.md`: the Homefeed realtime-actions engineering post is from **November
+  2022**, not 2023. Corrected in two places.
+* `netflix-spotify.md`: Gomez-Uribe & Hunt, ACM TMIS 6(4) Article 13, is dated
+  **December 2015**, not 2016.
+* `airbnb.md`: the Experiment Reporting Framework post is from **2014**; the 2017
+  post is "Scaling Airbnb's Experimentation Platform". "Building Airbnb Categories
+  with ML and Human-in-the-Loop" is **2023**, not 2022.
+* `amazon.md`: the wake-word line was attributed to "Soltau et al." The Amazon
+  Science wake-word publications found in search have different authors, so the
+  attribution was dropped and the papers are cited by title.
