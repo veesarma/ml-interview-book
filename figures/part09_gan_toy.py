@@ -60,7 +60,7 @@ def main() -> None:
     ax.axhline(np.log(4), color="#888888", linestyle="--", linewidth=1.0)
     ax.text(len(d_hist) * 0.75, np.log(4) + 0.05, "log 4: D at chance", fontsize=8, color="#555555")
     ax.set_xlabel("training step"); ax.set_ylabel("loss (50-step moving average)")
-    ax.set_title("Neither loss goes to zero. Read the samples, not the loss.", fontsize=10)
+    ax.set_title("The losses trade places and never settle", fontsize=10)
     ax.legend(fontsize=8, frameon=False)
 
     ax = fig.add_subplot(gs[1, 2:])
@@ -72,7 +72,7 @@ def main() -> None:
     im = ax.contourf(gx, gy, d_prob, levels=20, cmap="RdBu_r", vmin=0, vmax=1)
     ax.scatter(x[:600, 0], x[:600, 1], s=3, alpha=0.5, color="black")
     fig.colorbar(im, ax=ax, label="D(x) after training")
-    ax.set_title("D(x) hovers near 0.5 on the data: no free win left", fontsize=10)
+    ax.set_title("Near the data D(x) is mid-range. Away from both\ndistributions its value is arbitrary.", fontsize=10)
     ax.set_aspect("equal")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)

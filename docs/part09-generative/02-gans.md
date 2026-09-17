@@ -40,17 +40,20 @@ loss, the generator's loss, what $D(x)$ looks like across the plane, and where t
 ![GAN training on a 2-D mixture](../assets/figures/part09_gan_toy.png){ width="900" }
 
 The top row is the generator's samples at four points in training on eight Gaussians arranged on a
-circle. At step 0 they are a blob near the origin. By step 200 they have spread toward the ring.
-By step 4000 they cover the modes.
+circle. At step 0 they are a blob near the origin. By step 200 they have spread toward the ring, by
+step 1000 they sit on it, and by step 4000 they have concentrated on some modes and grown a stray
+filament through the middle. That non-monotonicity is the behaviour to expect: this run does not
+converge to a fixed point and settle, it keeps moving.
 
-The bottom-left panel is the thing to internalise. The discriminator loss does not go to zero, and
-it does not converge to a nice curve. It hovers, because every time $D$ gets better $G$ adapts, and
-vice versa. A discriminator loss falling to zero means $G$ has stopped fooling it, which is bad
-news, not progress. The dashed line at $\log 4$ is what the discriminator's loss would be if the
-two distributions matched exactly and $D$ could do no better than guess.
+The bottom-left panel is what that looks like in the losses. For 2000 steps the discriminator sits
+at $\log 4$, the value it would have if the two distributions matched and it could do no better
+than guess. Then it finds a signal, its loss drops, and the generator's loss climbs in response.
+Neither curve tells you whether the samples are good, which is why you look at samples.
 
-The bottom-right panel shows $D(x)$ over the plane at the end of training. Near the data it sits
-around $0.5$: the discriminator has no free win left there.
+The bottom-right panel shows $D(x)$ over the plane at the end of training. Where the data sits, $D$
+is mid-range, so there is no easy win left there. Away from both distributions its value is
+arbitrary: no gradient ever constrained it, which is the same observation that motivates the
+gradient penalty in section 2.5.
 
 ## 2. The math
 
