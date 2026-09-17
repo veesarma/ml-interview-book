@@ -121,6 +121,25 @@ never pad. The reader should be able to *teach* the topic after reading.
 * Never attribute a design choice to a company without a source. Mark inferences
   as inferences ("the public talk implies…").
 
+
+### When your search budget runs out
+
+Verifying links is the highest-value use of your WebSearch budget, because the
+reader asked specifically for proof that a real company applied each technique.
+Spend it on "In production" case studies and company claims first, and on generic
+textbook references last.
+
+If the budget runs out before you have verified everything, do not guess a URL.
+Cite by title and venue as above, and append one line per unverified source to
+`docs/_citations_todo/<your-part-dir>.md`:
+
+```
+- [ ] docs/part04-vision/04-detection.md | Focal Loss for Dense Object Detection | Lin et al., ICCV 2017 | believed arXiv:1708.02002
+```
+
+A later pass with fresh budget converts those into verified links. A source you
+silently leave unrecorded never gets one.
+
 ## 5. Figures and animations
 
 * Static figures: a matplotlib script in `figures/<part>_<name>.py` that writes
