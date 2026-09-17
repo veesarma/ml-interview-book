@@ -38,7 +38,7 @@ appear only inside tests, as references to check our implementations against.
 * [Tensors, shapes & broadcasting](../part01-math/07-tensor-shapes-broadcasting.md). the
   `(B, T, d) → (B, H, T, d_head)` reshape is the single most common interview slip.
 * [Backpropagation](../part03-neural-nets/02-backpropagation.md) and
- [Normalization](../part03-neural-nets/05-normalization.md), LayerNorm is assumed; RMSNorm
+  [Normalization](../part03-neural-nets/05-normalization.md). LayerNorm is assumed; RMSNorm
   is derived here.
 * [Softmax regression](../part02-classical/02-logistic-softmax-regression.md) for the softmax
   Jacobian $\diag(p) - pp^\top$, which reappears as the core of the attention backward.
@@ -92,5 +92,5 @@ mask until it runs clean. That single exercise is worth more than skimming all s
 3. **"Implement RoPE and show me the relative-position property."** Chapter 5.
 4. **"Implement BPE training and encoding."** Chapter 6.
 5. **"Why $\sqrt{d_k}$?"** / **"Why does the residual stream need Pre-LN at depth?"** /
- **"How many parameters is a 12-layer, 768-wide model?"**, the depth-round questions that
+   **"How many parameters is a 12-layer, 768-wide model?"**: the depth-round questions that
    separate recall from understanding. Chapters 3 and 4.

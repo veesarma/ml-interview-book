@@ -175,7 +175,7 @@ $$
 
 A model at 1.0 BPB with 4 bytes/token has per-token perplexity $2^4 = 16$; the same model evaluated with a
 tokenizer averaging 3 bytes/token would show $2^3 = 8$ without being any better. This is also the compression
-view: a language model at $b$ BPB, combined with arithmetic coding, compresses text to $b/8$ of its size, 
+view: a language model at $b$ BPB, combined with arithmetic coding, compresses text to $b/8$ of its size.
 Delétang et al. (2023) show LLMs are competitive compressors even of images and audio bytes.
 
 ### 2.7 How many bits does a 7B model need to store X?

@@ -122,16 +122,16 @@ claim of acceptable safety without a driver needs independent evidence paths.
 arXiv:1912.04838).
 
 !!! tip "How to say it in the interview"
-    "For a rider-only vehicle I would design perception around redundant modalities
-    with independent failure modes, because there is no human fallback; Waymo's
+    "For a rider-only vehicle I'd design perception around redundant modalities
+    with independent failure modes, because there's no human fallback; Waymo's
     6th-generation Driver post lays out the same rationale with overlapping cameras,
-    lidar, radar and audio. I would fuse at the feature level into a shared
+    lidar, radar and audio. I'd fuse at the feature level into a shared
     bird's-eye-view grid, with lidar supplying geometry and cameras semantics, but I
     would keep a lidar-only detection path alive as an independent evidence source
-    for the safety case. The alternative I would reject is camera-only; it is the
+    for the safety case. I'd rule out camera-only; it's the
     right bet for a consumer fleet with a driver, not for a driverless one. The
-    trade-off is cost and calibration burden, so I would invest in automatic
-    calibration monitoring and time-sync checks as production alarms. I would
+    trade-off is cost and calibration burden, so I'd invest in automatic
+    calibration monitoring and time-sync checks as production alarms. I'd
     evaluate with the Open Dataset's conventions: 3D AP by range and class, tracking
     MOTA with identity switches, and a degraded-sensor slice where each modality is
     ablated at test time."
@@ -183,18 +183,18 @@ arXiv:2309.16534); Ettinger et al., "Large Scale Interactive Motion Forecasting 
 Autonomous Driving: The Waymo Open Motion Dataset" (ICCV 2021, arXiv:2104.10133).
 
 !!! tip "How to say it in the interview"
-    "I would model prediction as joint, autoregressive generation over discrete
+    "I'd model prediction as joint, autoregressive generation over discrete
     motion tokens for all agents, the design in Waymo's MotionLM paper (ICCV 2023),
     because the planner needs futures that are consistent between agents and because
-    a plain next-token loss scales without anchors or latent-variable tricks. I would
+    a plain next-token loss scales without anchors or latent-variable tricks. I'd
     keep a Wayformer-style scene encoder underneath, with latent queries so cost does
     not grow with the number of map and agent elements, which is what that paper
-    (ICRA 2023) shows. The alternative I would reject as the primary model is
+    (ICRA 2023) shows. The alternative I'd reject as the primary model is
     per-agent Gaussian mixtures with interaction heuristics on top; MotionLM's own
-    motivation is that those give inconsistent joint futures. The trade-off is
-    inference cost, since I would need many sampled rollouts, so I would cache the
-    encoder and batch rollouts, and I would distil to a cheaper marginal head for
-    latency-critical paths. I would evaluate with the Open Motion Dataset interactive
+    motivation is that those give inconsistent joint futures. The cost is
+    inference cost, since I'd need many sampled rollouts, so I'd cache the
+    encoder and batch rollouts, and I'd distil to a cheaper marginal head for
+    latency-critical paths. I'd evaluate with the Open Motion Dataset interactive
     metrics, minADE, miss rate and the joint mAP, and with a calibration check on mode
     probabilities, because a planner that trusts an over-confident mode is worse
     than one with a wider distribution."
@@ -238,18 +238,18 @@ GitHub); Montali et al., "The Waymo Open Sim Agents Challenge" (arXiv:2305.12032
 Feb 2026); Tancik et al., "Block-NeRF" (CVPR 2022, arXiv:2202.05263).
 
 !!! tip "How to say it in the interview"
-    "I would build evaluation in three tiers and make closed-loop simulation the
+    "I'd build evaluation in three tiers and make closed-loop simulation the
     middle one: log replay for cheap regression, a reactive simulator for compounding
     behaviour, and real rider-only miles as the final evidence. Waymo's Waymax paper
-    (NeurIPS 2023) is the pattern I would follow for the simulator, a data-driven
+    (NeurIPS 2023) is the pattern I'd follow for the simulator, a data-driven
     environment built from logged scenarios where other agents can be replayed or
-    controlled by learned policies, and the Sim Agents challenge is how I would score
+    controlled by learned policies, and the Sim Agents challenge is how I'd score
     those agents, by distributional realism rather than trajectory error. The
-    alternative I would reject is replay-only evaluation; it cannot see that a new
-    planner changes what other agents do. The trade-off is the sim-to-real gap, and I
+    alternative I'd reject is replay-only evaluation; it can't see that a new
+    planner changes what other agents do. What this costs is the sim-to-real gap, and I
     would attack it on both sides: realism metrics for agents and neural rendering
     from real logs for sensors, the direction of SimulationCity and the 2026 World
-    Model post. I would validate the simulator itself by checking that its ranking
+    Model post. I'd validate the simulator itself by checking that its ranking
     of candidate planners agrees with shadow-mode and real-mile outcomes on the same
     scenario slices."
 
@@ -287,19 +287,19 @@ you deploy it?".
 blog, June 2025).
 
 !!! tip "How to say it in the interview"
-    "I would use a multimodal foundation model where it earns its place, as an
-    offline teacher and a long-tail reasoner, and I would not put it in the
+    "I'd use a multimodal foundation model where it earns its place, as an
+    offline teacher and a long-tail reasoner, and I'd not put it in the
     latency-critical loop without the missing modalities. Waymo's EMMA paper (2024)
     is my evidence for both halves: co-training trajectories, objects and road graph
     as text improves each task, and the same paper states that it lacks lidar and
-    radar, uses few frames and is compute-heavy, so it is research rather than the
-    production driver. I would justify investing in scale with Waymo's 2025 scaling-law
+    radar, uses few frames and is compute-heavy, so it's research rather than the
+    production driver. I'd justify investing in scale with Waymo's 2025 scaling-law
     report, which shows power-law gains in forecasting and planning on half a million
-    hours of driving that carry into closed-loop metrics. The alternative I would
+    hours of driving that carry into closed-loop metrics. The alternative I'd
     reject is a modular stack frozen at today's interfaces; the scaling result says
-    learned components keep improving. The trade-off is auditability, so I would
+    learned components keep improving. The price is auditability, so I'd
     distil the large model into a smaller onboard model and keep independent safety
-    checks. I would evaluate on closed-loop planning metrics in Waymax-style
+    checks. I'd evaluate on closed-loop planning metrics in Waymax-style
     simulation, on a rare-scenario slice where language reasoning should help, and on
     latency at the onboard budget."
 
@@ -337,19 +337,19 @@ significantly safer than human-driven ones, says new research led by Swiss Re"
 (Waymo blog, 2023); Safety Data Hub launch (2024); independent audits (2025).
 
 !!! tip "How to say it in the interview"
-    "I would make the safety claim as a matched-rate comparison with confidence
+    "I'd make the safety claim as a matched-rate comparison with confidence
     intervals, by crash type and injury severity, against human benchmarks from the
     same geographies and adjusted for under-reporting, which is the design of Waymo's
     peer-reviewed comparison at 56.7 million rider-only miles (Traffic Injury
-    Prevention, 2025) and of its Safety Impact hub. I would reject a single
+    Prevention, 2025) and of its Safety Impact hub. I'd reject a single
     fleet-wide crashes-per-mile ratio, because exposure differs by road type and the
-    denominators are not comparable. I would add an independent data source, as
+    denominators aren't comparable. I'd add an independent data source, as
     Waymo did with Swiss Re's liability claims, because self-reported crash data
     invites doubt. The trade-off is release speed: a safety case demands evidence
-    for every change, so I would tie the evidence to scenario slices in simulation
-    and to rider-only outcomes. I would report power explicitly: for serious injuries
+    for every change, so I'd tie the evidence to scenario slices in simulation
+    and to rider-only outcomes. I'd report power explicitly: for serious injuries
     at the rates involved, the confidence interval at tens of millions of miles is
-    wide, and I would say so rather than over-claim."
+    wide, and I'd say so rather than over-claim."
 
 ### 3.6 Operating a rider-only fleet: Fleet Response
 
@@ -367,12 +367,12 @@ request marks a scene the model found hard). See [Uncertainty & reliability](../
 for calibration and abstention.
 
 !!! tip "How to say it in the interview"
-    "I would design remote assistance as guidance rather than control, exactly the
+    "I'd design remote assistance as guidance rather than control, exactly the
     distinction Waymo's Fleet Response post draws, because a remote-driving loop
     would put network latency inside the safety case. The trigger for asking would
     be a calibrated uncertainty signal from the planner with a hard time budget,
     and every request would be logged as a hard-scene example for training. The
-    alternative I would reject is teleoperation. I would measure requests per
+    alternative I'd reject is teleoperation. I'd measure requests per
     thousand miles, time-to-resolution, and the share of requests that later became
     autonomous decisions after retraining."
 
@@ -387,12 +387,12 @@ for calibration and abstention.
     [Sensor fusion](../part11-perception-autonomy/03-sensor-fusion.md), [AV perception design](../part17-ml-system-design/05-perception-system-av.md).
 
     !!! tip "How to say it in the interview"
-        "I would fuse at the feature level into a shared BEV and keep an
+        "I'd fuse at the feature level into a shared BEV and keep an
         independent lidar-only path, because the 6th-generation Driver post frames
         the suite around redundancy and a safety case needs independent evidence. I
         would reject late fusion of per-sensor boxes as the primary route; it
-        discards complementary evidence before the decision. The trade-off is
-        calibration burden, which I would monitor in production. I would evaluate
+        discards complementary evidence before the decision. The cost is
+        calibration burden, which I'd monitor in production. I'd evaluate
         with Open Dataset-style 3D AP by range and class and an ablation slice per
         modality, so I can quantify what each sensor buys."
 
@@ -404,12 +404,12 @@ for calibration and abstention.
     metrics and calibration. Link: [Prediction & planning](../part11-perception-autonomy/06-prediction-planning.md).
 
     !!! tip "How to say it in the interview"
-        "I would go joint for interacting agents and marginal for the rest, and I
+        "I'd go joint for interacting agents and marginal for the rest, and I
         would build the joint model as MotionLM does: motion tokens, one autoregressive
         decoder over all agents, a plain next-token loss. The rejected alternative is
         marginal mixtures with interaction heuristics, which the MotionLM paper
-        identifies as producing inconsistent futures. The trade-off is rollout cost;
-        I would batch and cache. I would evaluate on the Open Motion Dataset
+        identifies as producing inconsistent futures. Joint decoding costs rollouts;
+        I'd batch and cache. I'd evaluate on the Open Motion Dataset
         interactive split with joint metrics and a calibration check."
 
 !!! interview "Q3. Explain how you would tokenise continuous motion and what you lose."
@@ -419,14 +419,14 @@ for calibration and abstention.
     sampling, conditional rollouts. Compare with Gaussian-mixture heads.
 
     !!! tip "How to say it in the interview"
-        "I would quantise per-step motion deltas into a small vocabulary at a fixed
+        "I'd quantise per-step motion deltas into a small vocabulary at a fixed
         rate, as MotionLM does, because it turns forecasting into next-token
-        prediction with sampling and conditioning for free. I would name the loss:
-        resolution and smoothness, which I would recover with a finer vocabulary or a
+        prediction with sampling and conditioning for free. I'd name the loss:
+        resolution and smoothness, which I'd recover with a finer vocabulary or a
         continuous refinement head. The alternative is a Gaussian-mixture decoder,
         which is smoother but needs anchors or latent-variable tricks for
-        multimodality. I would evaluate minADE at the vocabulary's resolution limit
-        to make sure quantisation is not the bottleneck."
+        multimodality. I'd evaluate minADE at the vocabulary's resolution limit
+        to make sure quantisation isn't the bottleneck."
 
 !!! interview "Q4. Design the closed-loop evaluation system for a planner change."
     **Answer sketch.** Scenario bank mined from logs and synthesised; reactive sim
@@ -436,12 +436,12 @@ for calibration and abstention.
     check that sim rankings predict real outcomes. Link: [Evaluation](../part13-retrieval-eval-reliability/02-evaluation.md).
 
     !!! tip "How to say it in the interview"
-        "I would run every planner change through paired closed-loop scenarios in a
+        "I'd run every planner change through paired closed-loop scenarios in a
         Waymax-style simulator with sim agents validated by Sim Agents-style realism
-        metrics, then shadow mode, then rider-only miles. I would reject replay as the
-        gate. The trade-off is sim-to-real; I would measure it by whether the
+        metrics, then shadow mode, then rider-only miles. I'd reject replay as the
+        gate. The price is the sim-to-real gap; I'd measure it by whether the
         simulator's ranking of candidates matches real outcomes on shared scenario
-        slices, and I would treat a disagreement as a simulator bug to fix before
+        slices, and I'd treat a disagreement as a simulator bug to fix before
         trusting the next result."
 
 !!! interview "Q5. How do you measure whether learned sim agents are realistic enough?"
@@ -452,10 +452,10 @@ for calibration and abstention.
     weaknesses? Link: [World models](../part11-perception-autonomy/07-world-models.md).
 
     !!! tip "How to say it in the interview"
-        "I would score sim agents by distributional realism, kinematics,
+        "I'd score sim agents by distributional realism, kinematics,
         interaction statistics and map compliance against logged behaviour, which is
         the framing of the Waymo Open Sim Agents Challenge, rather than by trajectory
-        error, since many futures are valid. I would add an exploitation check: if a
+        error, since many futures are valid. I'd add an exploitation check: if a
         planner's sim score improves while its shadow-mode disagreement worsens, the
         agents are exploitable."
 
@@ -466,12 +466,12 @@ for calibration and abstention.
     sensor coverage improve. Link: [VLM architecture](../part08-multimodal/04-vlm-architecture.md).
 
     !!! tip "How to say it in the interview"
-        "Not in the latency-critical loop, and I would use Waymo's own EMMA paper as
+        "Not in the latency-critical loop, and I'd use Waymo's own EMMA paper as
         the reason: it lacks lidar and radar, uses few frames and is compute-heavy,
-        and the authors present it as research. I would deploy it offline as a
+        and the authors present it as research. I'd deploy it offline as a
         teacher and labeller and distil onboard. The trade-off is the loss of
-        language-level reasoning at runtime, which I would partially recover by
-        distilling rationales into the onboard model's auxiliary targets. I would
+        language-level reasoning at runtime, which I'd partially recover by
+        distilling rationales into the onboard model's auxiliary targets. I'd
         evaluate on the rare-scenario slice where the paper's co-training gains
         showed up."
 
@@ -482,11 +482,11 @@ for calibration and abstention.
     [Scaling laws](../part06-llm-training/02-scaling-laws.md).
 
     !!! tip "How to say it in the interview"
-        "I would run a sweep of small models to fit power laws, then allocate
-        compute between parameters and data along the fitted frontier, and I would
+        "I'd run a sweep of small models to fit power laws, then allocate
+        compute between parameters and data along the fitted frontier, and I'd
         only trust the plan if closed-loop metrics track the open-loop loss, which is
         the check Waymo's 2025 report makes. The alternative, scaling one model until
-        the budget runs out, wastes compute on the wrong axis. I would report the
+        the budget runs out, wastes compute on the wrong axis. I'd report the
         irreducible-loss estimate, because part of driving is genuinely uncertain and
         no model closes it."
 
@@ -497,12 +497,12 @@ for calibration and abstention.
     claims about rarer outcomes need far more miles. Link: [Statistics](../part01-math/04-statistics.md).
 
     !!! tip "How to say it in the interview"
-        "I would model crashes as Poisson counts, form the rate ratio against a
+        "I'd model crashes as Poisson counts, form the rate ratio against a
         matched human benchmark, and compute the interval; the width is set by the
         expected human count at that exposure, not by the AV count. That is why
         Waymo's peer-reviewed comparison reports by crash type and severity with
-        intervals. I would be explicit that for the rarest outcomes the interval
-        remains wide at tens of millions of miles, and I would not claim more than
+        intervals. I'd be explicit that for the rarest outcomes the interval
+        remains wide at tens of millions of miles, and I'd not claim more than
         the data supports."
 
 !!! interview "Q9. Design the data engine for a fleet with no driver interventions."
@@ -513,12 +513,12 @@ for calibration and abstention.
     Link: [Weak supervision & auto-labelling](../part10-self-supervised/03-weak-supervision-and-auto-labeling.md).
 
     !!! tip "How to say it in the interview"
-        "With no driver, I would treat Fleet Response requests, calibrated planner
+        "With no driver, I'd treat Fleet Response requests, calibrated planner
         uncertainty and near-miss detectors as the trigger signals, since Waymo's
         Fleet Response post shows those requests mark exactly the scenes the driver
-        found hard. I would mine logs offline with large models and synthesise rare
+        found hard. I'd mine logs offline with large models and synthesise rare
         cases in simulation. The alternative, waiting for real crashes, is
-        unacceptable and statistically hopeless. I would measure the engine by the
+        unacceptable and statistically hopeless. I'd measure the engine by the
         drop in requests per mile on the scenarios it targeted."
 
 !!! interview "Q10. Waymo relies on HD maps. How do you detect that the map is wrong, and what does the driver do?"
@@ -529,11 +529,11 @@ for calibration and abstention.
     not public. Link: [Multi-camera & BEV](../part11-perception-autonomy/02-multi-camera-bev.md).
 
     !!! tip "How to say it in the interview"
-        "I would run online map inference from perception and compare it with the
+        "I'd run online map inference from perception and compare it with the
         prior, treating disagreement as a change-detection problem with conservative
-        fallback behaviour, and aggregate confirmed changes across the fleet. I would
-        say that Waymo's mapping internals are not public, so this is my design, not
-        theirs. The trade-off is false alarms causing over-cautious driving, so I would
+        fallback behaviour, and aggregate confirmed changes across the fleet. I'd
+        say that Waymo's mapping internals aren't public, so this is my design, not
+        theirs. The cost is false alarms causing over-cautious driving, so I'd
         tune the detector on injected changes and measure both miss rate and
         comfort impact."
 
@@ -544,10 +544,10 @@ for calibration and abstention.
     scene with crossings. Reference: [Tracking](../part11-perception-autonomy/04-tracking.md).
 
     !!! tip "How to say it in the interview"
-        "I would write the predict step, a gated cost matrix, and Hungarian
-        assignment, then the track lifecycle, and I would test on two crossing
+        "I'd write the predict step, a gated cost matrix, and Hungarian
+        assignment, then the track lifecycle, and I'd test on two crossing
         objects, which is where identity switches happen. The rejected shortcut is
-        greedy nearest-neighbour matching; it fails at crossings. I would evaluate
+        greedy nearest-neighbour matching; it fails at crossings. I'd evaluate
         with MOTA and identity switches, the Open Dataset tracking conventions."
 
 !!! interview "Q12. Weather: lidar in heavy rain and cameras at night. How does the stack degrade and how do you validate it?"
@@ -557,12 +557,12 @@ for calibration and abstention.
     blog states the new sensor suite targets more weather.
 
     !!! tip "How to say it in the interview"
-        "I would make degradation explicit: per-modality health estimates feed the
+        "I'd make degradation explicit: per-modality health estimates feed the
         fusion and an operational-domain classifier that can pause service, because a
-        rider-only vehicle must know when it is outside its envelope. Waymo's
+        rider-only vehicle must know when it's outside its envelope. Waymo's
         6th-generation post states the suite was designed for more weather, so I
         would validate on weather-sliced metrics and modality ablations. The
-        trade-off is availability versus risk, and I would report both."
+        trade-off is availability versus risk, and I'd report both."
 
 !!! interview "Q13. What would you take from Waymo's publications into a perception team elsewhere?"
     **Answer sketch.** The evaluation culture: public datasets with range-binned
@@ -574,7 +574,7 @@ for calibration and abstention.
     !!! tip "How to say it in the interview"
         "The evaluation discipline: Waymo's papers ship with the metric that would
         expose their weakness, EMMA lists its limitations, the safety papers report
-        intervals, and Waymax makes closed-loop testing a public artefact. I would
+        intervals, and Waymax makes closed-loop testing a public artefact. I'd
         bring that culture before any architecture."
 
 ## 5. What to bring from your background

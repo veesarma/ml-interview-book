@@ -825,7 +825,7 @@ queries.
     passages; ANN recall against exact search), generation (faithfulness and answer
     relevance from a judge validated against human labels; citation precision), product
     (task success, escalation rate). When faithfulness drops, first check retrieval
-    recall on the same queries, most "hallucinations" are missing context. If retrieval
+    recall on the same queries; most "hallucinations" are missing context. If retrieval
     is fine, check context assembly (truncation, ordering; put the best chunk first and
     last), then the prompt (instruction to abstain), then the model version. Add
     unanswerable queries to the eval so you measure abstention.

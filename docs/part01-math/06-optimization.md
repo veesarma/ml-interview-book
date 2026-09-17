@@ -391,7 +391,7 @@ The `+ 1e-6` in the denominator mirrors `torch.nn.utils.clip_grad_norm_` and avo
 produces exactly zero gradients (a fully masked batch).
 
 **How you'd test it.** Every optimizer is checked twice: (1) it converges to the analytic optimum of an
-ill-conditioned quadratic; (2) it matches its `torch.optim` counterpart step-for-step to $10^{-10}$ in float64, 
+ill-conditioned quadratic; (2) it matches its `torch.optim` counterpart step-for-step to $10^{-10}$ in float64,
 including `Adam(weight_decay=)` vs `AdamW(weight_decay=)`, whose *difference* is also asserted, so a regression that
 silently coupled the decay would fail. `warmup_cosine`'s post-warmup branch is compared against
 `torch.optim.lr_scheduler.CosineAnnealingLR`; `clip_grad_norm` against `torch.nn.utils.clip_grad_norm_` including the
@@ -530,7 +530,7 @@ step, negligible FLOPs but non-trivial time at scale (a few percent), which is w
 ## 6. Interview questions and strong answers
 
 !!! interview "Derive Adam's bias correction. What breaks without it?"
-    $m_t = (1-\beta_1)\sum_{k\le t}\beta_1^{t-k}g_k$, so for stationary gradients $\E[m_t] = \E[g](1-\beta_1^t)$, 
+    $m_t = (1-\beta_1)\sum_{k\le t}\beta_1^{t-k}g_k$, so for stationary gradients $\E[m_t] = \E[g](1-\beta_1^t)$ by
     the geometric sum. Same for $v$ with $\beta_2$. Dividing by $(1-\beta_1^t)$ and $(1-\beta_2^t)$ debiases them.
     Without correction the two moments are shrunk by *different* factors, so the ratio $m/\sqrt v$ is wrong by
     $\sqrt{1-\beta_2^t}/(1-\beta_1^t)$, about $0.32$ at $t=1$; with $\beta_2 = 0.999$ it takes hundreds of steps
@@ -556,8 +556,8 @@ step, negligible FLOPs but non-trivial time at scale (a few percent), which is w
     $\beta_2$ so the variance estimate adapts faster.
 
 !!! interview "Your 30B run's loss spikes at step 12,000 and never recovers. Walk me through the debug."
-    First check whether it *is* recoverable: restart from the last good checkpoint and skip the offending batches, 
-    if the loss returns to trend, the batch was the cause; if it spikes again at the same step, it is deterministic
+    First check whether it *is* recoverable: restart from the last good checkpoint and skip the offending batches.
+    If the loss returns to trend, the batch was the cause; if it spikes again at the same step, it is deterministic
     (data or a schedule boundary). Look at the logged pre-clip gradient norm around the spike: a single $100\times$
     spike means a bad document; a slow climb over hundreds of steps means the LR is too high for the current curvature.
     Check for logit growth (attention or output logits drifting up), which is the OLMo 2 failure mode, fixed with

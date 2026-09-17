@@ -116,7 +116,7 @@ $$
 $$
 
 The second form is a linear layer: the weight has no batch axes, so it broadcasts over every batch and
-token. A weight of shape $(1, H, d, d)$ against activations $(B, H, T, d)$ broadcasts over $B$ for free, 
+token. A weight of shape $(1, H, d, d)$ against activations $(B, H, T, d)$ broadcasts over $B$ for free:
 per-head weights with no replication. FLOPs are $2\cdot\prod(\text{batch dims})\cdot T\cdot S\cdot d$;
 memory for the output is the product of the output shape, which is where $T^2$ bites.
 
@@ -138,8 +138,8 @@ inputs but **not** in the output are summed over; letters in the output are kept
 
 `d` appears in both inputs and not in the output → it is contracted (summed): the result is
 $S_{b,h,t,s} = \sum_d Q_{b,h,t,d}K_{b,h,s,d}$, i.e. $QK^\top$ per batch and head. The second half of
-attention is `"bhts,bhsd->bhtd"`: contract over the key position $s$, keeping the value dimension $d$, 
-a weighted average of value rows. Other one-liners worth recognising:
+attention is `"bhts,bhsd->bhtd"`: contract over the key position $s$, keeping the value dimension $d$,
+which is a weighted average of value rows. Other one-liners worth recognising:
 
 | Spec | Meaning |
 |---|---|
@@ -463,7 +463,7 @@ $O(T^2)$ attention memory that FlashAttention exists to avoid ([Part VI](../part
     the first operand's third axis (queries) and `s` the second's (keys); both appear in the output, so they are
     kept. `d` appears in both inputs and not in the output, so it is summed: that is the contraction. Net:
     $S_{bhts} = \sum_d Q_{bhtd}K_{bhsd}$, i.e. $QK^\top$ per head. **Staff follow-up:** *what is the
-    corresponding backward?* `dQ = einsum("bhts,bhsd->bhtd", dS, K)` and `dK = einsum("bhts,bhtd->bhsd", dS, Q)`, 
+    corresponding backward?* `dQ = einsum("bhts,bhsd->bhtd", dS, K)` and `dK = einsum("bhts,bhtd->bhsd", dS, Q)`,
     swap which index is contracted; it matches the $dQ = dS\,K$, $dK = dS^\top Q$ of
     [chapter 02](02-calculus-matrix-calculus.md).
 

@@ -13,7 +13,7 @@
 
 - Seq2seq (Sutskever 2014, Cho 2014): an encoder RNN compresses the source into a **single fixed
   vector** $c = h_{T_{src}}$; a decoder RNN generates from it. Quality collapses as source length
- grows, everything must fit in $d$ numbers regardless of $T$.
+  grows, everything must fit in $d$ numbers regardless of $T$.
 - Attention (Bahdanau 2015) removes the bottleneck: keep *all* encoder states and let the decoder
   build a **fresh context vector per output step**:
   $e_{t,j} = \text{score}(s_t, h_j)$, $\alpha_t = \softmax(e_t)$, $c_t = \sum_j \alpha_{t,j}h_j$.
@@ -23,7 +23,7 @@
 - Attention is a **soft dictionary lookup**: query $s_t$, keys $h_j$, values $h_j$. Hard lookup
   returns $V[\argmax_j \text{score}]$; softmax makes it differentiable and returns a weighted
   average. Self-attention is the same operation with queries, keys and values all derived from *one*
- sequence. That is the bridge to [chapter 3](03-attention-mathematics.md).
+  sequence. That is the bridge to [chapter 3](03-attention-mathematics.md).
 - **Teacher forcing**: at training time feed the *gold* prefix, not the model's own output, so all
   $T$ steps can be computed with known inputs (and, for a Transformer, in parallel).
 - **Exposure bias**: at inference the model consumes its own outputs, a distribution it never
@@ -118,7 +118,7 @@ stating in an interview:
    $\lVert c\rVert \le \max_j\lVert v_j\rVert$ regardless of $n$. Nothing explodes as the source
    gets longer.
 2. It is **permutation-equivariant** in the keys/values: shuffle the pairs and the output is
- unchanged. Position must be supplied through the keys themselves, which in a seq2seq model it is,
+   unchanged. Position must be supplied through the keys themselves, which in a seq2seq model it is,
    because $h_j$ was built by a recurrence, and which in a Transformer it is not, hence
    [positional encodings](05-positional-encodings.md).
 3. It is a **kernel smoother**: with $\text{sim} = \langle q,k\rangle$, this is Nadaraya–Watson
@@ -205,7 +205,7 @@ them is the strongest possible answer to "how did we get from seq2seq to Transfo
    $O(T)$ sequential bottleneck of [chapter 1](01-rnn-lstm-gru.md) §2.8.
 2. **Path length between any two positions is 1.** In an RNN, information from position $i$ reaches
    position $j$ through $|i - j|$ steps, each attenuating the gradient. In self-attention it is one
- hop, so the gradient path length is $O(1)$ instead of $O(T)$, which is why Transformers learn
+    hop, so the gradient path length is $O(1)$ instead of $O(T)$, which is why Transformers learn
    long-range dependencies that RNNs cannot.
 3. **Cost flips from $O(Td^2)$ sequential to $O(T^2d)$ parallel.** That quadratic term is the price,
    and it is the subject of most of [Part VI chapter 4](../part06-llm-training/04-efficient-attention-kv-cache.md).
@@ -490,7 +490,7 @@ caches, which is why beam search is expensive to serve and why chat products use
 !!! production "Bahdanau, Cho & Bengio: attention invented to fix a measured bottleneck (2015)"
     The paper's core claim is architectural, and its evidence is a plot: an encoder-decoder with a
     fixed context vector degrades sharply on longer source sentences, while the attention model's
- BLEU stays flat with length. The alternative they rejected was making the fixed vector bigger, 
+    BLEU stays flat with length. The alternative they rejected was making the fixed vector bigger, 
     which does not fix the asymptotics, only moves the crossover. They also showed the learned
     $\alpha$ matrix recovers linguistically sensible word alignments (including the reordering of
     French adjective-noun pairs) with no alignment supervision, which is the origin of attention
@@ -502,7 +502,7 @@ caches, which is why beam search is expensive to serve and why chat products use
     and 8-layer LSTM decoder with attention, residual connections, and wordpiece tokenisation
     ([chapter 6](06-tokenization.md)). Reported: ~60% average reduction in translation errors versus
     the phrase-based production system on isolated simple sentences. The engineering choices are the
- interesting part, attention is connected from the *bottom* decoder layer to the *top* encoder
+    interesting part, attention is connected from the *bottom* decoder layer to the *top* encoder
     layer specifically to allow decoder layers to be pipelined across GPUs, and inference uses
     reduced-precision arithmetic plus a length-normalised beam search with a coverage penalty. It is
     a good example of an architecture chosen partly for its parallelisation properties. Source:
@@ -512,7 +512,7 @@ caches, which is why beam search is expensive to serve and why chat products use
     LAS applies the same encoder-decoder-with-attention pattern to speech: a pyramidal BiLSTM
     "listener" encodes filterbank frames (downsampling by 2 per layer so the decoder attends over a
     manageable number of positions), and an attention decoder spells out characters with no
- independence assumption between them, the key advance over CTC. Reported 14.1% WER on a Google
+    independence assumption between them, the key advance over CTC. Reported 14.1% WER on a Google
     voice-search subset without a language model, 10.3% with LM rescoring over the top 32 beams. The
     production trade-off: LAS must encode the whole utterance before decoding, so
     it cannot stream, which is why the on-device system in [chapter 1](01-rnn-lstm-gru.md) uses
@@ -533,13 +533,13 @@ caches, which is why beam search is expensive to serve and why chat products use
 !!! interview "Why was attention invented?"
     To remove a fixed-size bottleneck. The 2014 encoder-decoder compresses the entire source into
     one vector, so the bits available per source token fall as $1/T_{src}$ and quality degrades with
- length, Bahdanau et al. measured exactly that. Attention keeps all encoder states and computes
+    length, Bahdanau et al. measured exactly that. Attention keeps all encoder states and computes
     a *different* convex combination of them for each decoder step, with weights produced by a
     learned scoring function of the decoder state. Capacity now grows with the input, and as a bonus
     the gradient path from the loss to any encoder state is one hop instead of $T$ recurrent steps,
     so the vanishing-gradient problem on the source side largely disappears too.
 
- **Staff-level follow-up, "couldn't you just make the context vector bigger?"** It moves the
+    **Staff-level follow-up, "couldn't you just make the context vector bigger?"** It moves the
     crossover point without changing the asymptotics: for any fixed $d$ there is a length past which
     the compression is lossy, and you pay the $d$ cost on every sentence including the short ones.
     Attention makes the representation size scale with the input, which is the right dependency.
@@ -551,13 +551,13 @@ caches, which is why beam search is expensive to serve and why chat products use
     output becomes $\sum_j \alpha_j v_j$ with $\alpha = \softmax(\text{scores})$, a convex
     combination of all values, smooth in every input. Temperature (or the $\sqrt{d_k}$ scale)
     controls how close it is to hard lookup. Queries and keys live in one space (matching), values in
- another (content), which is why they are separate projections. The model can learn to match on
+    another (content), which is why they are separate projections. The model can learn to match on
     one criterion and retrieve something else.
 
- **Staff-level follow-up, "what breaks if you use hard attention instead?"** You lose gradients
+    **Staff-level follow-up, "what breaks if you use hard attention instead?"** You lose gradients
     through the selection and need REINFORCE or a Gumbel relaxation to train, which adds variance and
     hyperparameters. Hard attention was tried (Xu et al.'s image captioning) and gives interpretable,
- cheaper inference (you touch one value, not $n$) but soft attention trains far more reliably,
+    cheaper inference (you touch one value, not $n$) but soft attention trains far more reliably,
     which is why it won. Sparse-attention routing in MoE is the modern place where hard-ish selection
     returns, and it needs exactly those tricks plus a load-balancing loss.
 
@@ -566,11 +566,11 @@ caches, which is why beam search is expensive to serve and why chat products use
     bilinear form $sWh^\top$. Additive handles different query and key dimensions without a separate
     projection and is numerically forgiving because the $\tanh$ bounds the pre-activation, so no
     scaling correction is needed. Dot-product is one matmul, which means it maps to a single BLAS
- call and batches across positions and heads (decisive on a GPU) but the scores have variance
+    call and batches across positions and heads (decisive on a GPU) but the scores have variance
     $d_k$ for unit-variance inputs, so it needs the $1/\sqrt{d_k}$ scale or the softmax saturates.
     At scale, always scaled dot-product; additive only for small models or unusual shapes.
 
- **Staff-level follow-up, "is the expressiveness different?"** In principle the MLP scorer can
+    **Staff-level follow-up, "is the expressiveness different?"** In principle the MLP scorer can
     represent similarity functions that a bilinear form cannot. In practice the difference is
     swamped by having multiple heads and multiple layers: the composition of several bilinear
     attentions with MLPs between them covers what you need, and Vaswani et al. report no quality
@@ -579,16 +579,16 @@ caches, which is why beam search is expensive to serve and why chat products use
 
 !!! interview "What is teacher forcing, and what problem does it create?"
     At training time, condition each prediction on the gold prefix rather than the model's own
- output. Two reasons: the optimisation is better conditioned, and (for a Transformer) 
+    output. Two reasons: the optimisation is better conditioned, and (for a Transformer) 
     all positions can be computed in parallel because every input is known ahead of time, which is
     the entire reason a causal mask works. The problem is exposure bias: at inference the model
     conditions on its own generations, a distribution it never trained on, so one bad token pushes it
     off-manifold and errors compound. It is a covariate-shift problem, the same one DAgger addresses
     in imitation learning.
 
- **Staff-level follow-up, "why isn't scheduled sampling standard in LLM training?"** Two reasons.
- It destroys the parallel teacher-forced forward pass, you must actually generate to know what to
- feed, which multiplies training cost by the sequence length. And Huszár showed the objective is
+    **Staff-level follow-up, "why isn't scheduled sampling standard in LLM training?"** Two reasons.
+    It destroys the parallel teacher-forced forward pass, you must actually generate to know what to
+    feed, which multiplies training cost by the sequence length. And Huszár showed the objective is
     biased: the procedure does not converge to the data distribution. Modern practice attacks the
     same problem differently: sample rather than greedily decode, and post-train on the model's own
     outputs with a preference or verifiable signal, which is exactly RLHF/RLVR.
@@ -597,15 +597,15 @@ caches, which is why beam search is expensive to serve and why chat products use
     That is the beam search curse, and it means the model's highest-likelihood sequences are bad.
     With $k=4$ the search is weak enough that it never finds them; with $k=50$ it does, and returns
     an empty, repetitive or generic output. The root cause is that maximum likelihood training puts
- non-trivial mass on degenerate modes (especially repetition) and length-unnormalised scoring
+    non-trivial mass on degenerate modes (especially repetition) and length-unnormalised scoring
     compounds it by preferring short sequences. Diagnose by looking at the score of the returned
     hypothesis versus a human reference: if the model assigns the degenerate output *higher*
     probability, it is a modelling/decoding-objective mismatch, not a search bug. Fixes in order of
     preference: length normalisation with $\alpha\approx0.6$, a coverage penalty for translation, or
     switching to top-$p$ sampling if the task is open-ended.
 
- **Staff-level follow-up, "when is beam search still right?"** When the conditional distribution
- is genuinely peaked, translation, ASR, OCR, constrained structured output. There the mode is the
+    **Staff-level follow-up, "when is beam search still right?"** When the conditional distribution
+    is genuinely peaked, translation, ASR, OCR, constrained structured output. There the mode is the
     answer the user wants, and sampling just injects errors. The rule of thumb: if two fluent humans
     would produce nearly the same output, beam search; if they would produce different outputs,
     sample.
@@ -613,7 +613,7 @@ caches, which is why beam search is expensive to serve and why chat products use
 !!! interview "How do you get from Bahdanau attention to self-attention?"
     Bahdanau attention has queries from the decoder and keys/values from the encoder: cross-attention
     between two sequences. Two changes produce the Transformer. First, replace the MLP scorer with a
- scaled dot product so the whole thing is matmuls. Second (the conceptual jump) apply the same
+    scaled dot product so the whole thing is matmuls. Second (the conceptual jump) apply the same
     operation *within* one sequence: derive $Q$, $K$ and $V$ all from $X$, so each position builds
     its representation from every position, itself included. The recurrence is then unnecessary,
     because nothing in $\softmax(QK^\top/\sqrt{d_k})V$ requires position $j-1$ before position $j$.
@@ -629,8 +629,8 @@ source length 5, 10, 20, 40.
 
 ??? success "Solution"
     The fixed-vector model is fine to ~10 and degrades steeply beyond; the attention model is
- approximately flat. The degradation is not a capacity limit of the decoder, increasing $d$ shifts
- the curve right but does not flatten it, which is the point: the failure is in what the encoder
+    approximately flat. The degradation is not a capacity limit of the decoder, increasing $d$ shifts
+    the curve right but does not flatten it, which is the point: the failure is in what the encoder
     can represent in a fixed budget, and attention changes the budget's scaling.
 
 **★ 2. Mask polarity.** Remove the `mask` argument from `AdditiveAttention.forward` and train on
@@ -638,7 +638,7 @@ batches with heavy padding. What happens, and why is the effect batch-dependent?
 
 ??? success "Solution"
     Attention puts non-zero weight on padding embeddings, so the context vector is contaminated by a
- vector that carries no information but *is* consistent, so the model partly learns to use it as a
+    vector that carries no information but *is* consistent, so the model partly learns to use it as a
     bias. Quality now depends on how much padding a batch happens to contain, so the same example
     scores differently in different batches, and evaluation with batch size 1 disagrees with batched
     evaluation. That inconsistency is the tell for a missing mask in production.
@@ -673,11 +673,11 @@ global attention.
 
 ??? success "Solution"
     The Gaussian is applied *after* the softmax over the window (Luong's formulation), so weights no
- longer sum to 1 exactly. That is intended: it is a soft window. It learns the reversal task
+    longer sum to 1 exactly. That is intended: it is a soft window. It learns the reversal task
     because the alignment is monotone-ish (anti-diagonal) and $p_t$ can track it. Attention entropy
     drops substantially versus global attention, which is the mechanism: the Gaussian prior removes
     probability mass from distant positions that the scoring function has not yet learned to
- suppress. The lesson generalises. This is the ancestor of every windowed/sparse attention
+    suppress. The lesson generalises. This is the ancestor of every windowed/sparse attention
     pattern in [Part VI ch. 3](../part06-llm-training/03-large-model-architecture.md), and it works
     precisely when the alignment is local, which is why it helps in translation and hurts in tasks
     needing long-range retrieval.
@@ -690,7 +690,7 @@ the recurrent model, and why is it exactly what a Transformer decoder does?
 ??? success "Solution"
     Broadcasting gives `W_q(S).unsqueeze(2) + W_k(H).unsqueeze(1)` of shape
     `(B, T_tgt, T_src, d_att)`, then `v` reduces the last axis. You cannot use it in the recurrent
- model because $s_t$ depends on $c_{t-1}$, which depends on $s_{t-1}$, the decoder states are not
+    model because $s_t$ depends on $c_{t-1}$, which depends on $s_{t-1}$, the decoder states are not
     available in advance, so there is nothing to batch. A Transformer decoder has no recurrent state:
     with teacher forcing, all decoder positions are computed from the (known) gold prefix in one
     parallel pass, so exactly this batched form is what cross-attention computes. Realising *why* the

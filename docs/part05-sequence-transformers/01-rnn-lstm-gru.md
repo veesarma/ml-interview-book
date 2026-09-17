@@ -21,7 +21,7 @@
 - Exploding is the *easy* one: clip the global gradient norm ($g \leftarrow g\cdot c/\lVert g\rVert$
   when $\lVert g\rVert > c$). Vanishing is architectural: you cannot clip your way out of it.
 - LSTM adds a **cell state** with an additive update $c_t = f_t\odot c_{t-1} + i_t\odot g_t$, so
- $\partial c_t/\partial c_{t-1} = \diag(f_t)$, a gate-controlled identity path, the *constant
+  $\partial c_t/\partial c_{t-1} = \diag(f_t)$, a gate-controlled identity path, the *constant
   error carousel*. With $f_t\approx 1$ error flows hundreds of steps unattenuated.
 - Gates: forget $f$, input $i$, output $o$ (all sigmoid), candidate $g$ (tanh);
   $h_t = o_t \odot \tanh(c_t)$. Initialise the forget bias to 1 so the carousel starts open.
@@ -32,7 +32,7 @@
   for streaming or causal generation.
 - The fatal flaw is not accuracy, it is **$O(T)$ sequential steps**: step $t$ cannot start until
   $t-1$ finishes, so a GPU runs $T$ tiny, memory-bound kernels. A Transformer layer does the
- same job in one big batched matmul: same FLOPs, an order of magnitude more throughput. That is the
+  same job in one big batched matmul: same FLOPs, an order of magnitude more throughput. That is the
   motivation for [attention mathematics](03-attention-mathematics.md).
 - Still shipping in production: streaming ASR (RNN-T on-device), tiny always-on models, and
   systems where per-step state must be $O(1)$ in memory rather than growing like a KV cache.
@@ -147,7 +147,7 @@ where $\gamma = \max_s \lVert \diag(1-h_s^2)\rVert \le 1$ because $\tanh'\in(0,1
 
 * If $\sigma_{\max}(W_h) < 1/\gamma$, the bound is a geometric decay: **vanishing gradients**. The
   loss at step $T$ carries essentially no information about $h_t$ for $T - t \gtrsim 20$, so
- long-range dependencies are unlearnable, not learned slowly, but *invisible*, drowned by the
+  long-range dependencies are unlearnable, not learned slowly, but *invisible*, drowned by the
   short-range terms in the same sum.
 * If the smallest singular value satisfies $\sigma_{\min}(W_h)\gamma > 1$, the product grows
   geometrically: **exploding gradients**. A single long sequence produces an enormous update that
@@ -248,7 +248,7 @@ long-term storage separate from the exposed state.
 !!! note "Where the reset gate sits"
     PyTorch applies $r_t$ *after* the hidden projection: $r_t \odot (h_{t-1}W_{hn} + b_{hn})$, not
     $(r_t\odot h_{t-1})W_{hn}$. The two differ, and matching PyTorch matters when you check your
- implementation against `nn.GRU`, our test does exactly that.
+    implementation against `nn.GRU`, our test does exactly that.
 
 ### 2.7 Bidirectionality
 
@@ -660,7 +660,7 @@ last one.
     replacing a server-side pipeline of separate acoustic, pronunciation and language models.
     The business problem was latency and offline availability: a round trip to a datacentre costs
     hundreds of milliseconds and fails with no network. The architectural reason a recurrent model
- was chosen over an attention encoder-decoder is streaming, RNN-T emits symbols as audio
+    was chosen over an attention encoder-decoder is streaming, RNN-T emits symbols as audio
     arrives, whereas an attention decoder like Listen-Attend-Spell needs the full utterance
     encoded before it can attend. The cost was fitting the model into an 80 MB on-device budget via
     parameter quantisation. Source: Google Research, ["An All-Neural On-Device Speech
@@ -692,7 +692,7 @@ last one.
 
 !!! production "Karpathy: char-RNN and what a hidden unit learns (2015)"
     The blog post that put RNNs in front of a generation of engineers trained character-level
- LSTMs on Shakespeare, Linux source and LaTeX, and (more usefully for interviews) visualised
+    LSTMs on Shakespeare, Linux source and LaTeX, and (more usefully for interviews) visualised
     individual cell units that track quote nesting, indentation depth and line position. It is
     the best available intuition for "the cell state is a set of latches the network learns to
     open and close". Source: ["The Unreasonable Effectiveness of Recurrent Neural
@@ -710,7 +710,7 @@ last one.
     $\partial L/\partial b = \sum_t \alpha_t$. The sums are the whole point: shared weights mean every
     time step contributes to the same gradient.
 
- **Staff-level follow-up, "what is the memory cost and how would you bound it?"** Every
+    **Staff-level follow-up, "what is the memory cost and how would you bound it?"** Every
     intermediate $h_t$ must be kept for the backward pass, so $O(BTd)$ per layer. Bound it with
     truncated BPTT (detach the state at chunk boundaries; you lose gradients for dependencies
     longer than the chunk) or gradient checkpointing (recompute activations inside the chunk,
@@ -718,7 +718,7 @@ last one.
 
 !!! interview "Why do gradients vanish, and why doesn't the LSTM have the problem?"
     The gradient through $k$ steps is a *product* of $k$ Jacobians $\diag(1-h^2)W_h^\top$, so its
- norm is bounded by $(\gamma\sigma_{\max}(W_h))^k$, exponential in $k$, with $\gamma\le 1$ from
+    norm is bounded by $(\gamma\sigma_{\max}(W_h))^k$, exponential in $k$, with $\gamma\le 1$ from
     $\tanh'$. Anything other than a spectral radius of exactly $1/\gamma$ decays or explodes
     geometrically. The LSTM changes the *shape* of the path: $c_t = f_t\odot c_{t-1} + i_t\odot g_t$
     gives $\partial c_t/\partial c_{t-1} = \diag(f_t)$, a diagonal of gate values rather than a
@@ -726,25 +726,25 @@ last one.
     a value indefinitely, so the decay rate is content-dependent and learned rather than a fixed
     property of the weights.
 
- **Staff-level follow-up, "so LSTMs never vanish?"** They can. If the task makes the model
+    **Staff-level follow-up, "so LSTMs never vanish?"** They can. If the task makes the model
     learn $f\approx 0.9$, the half-life is ~7 steps. And the gates themselves depend on $h_{t-1}$,
     so there are non-carousel paths that vanish exactly like an RNN's. The guarantee is that an
     *unattenuated* path exists and is reachable, not that gradients cannot decay. This is the same
     argument as for residual connections in ResNets
- ([Part IV ch. 3](../part04-vision/03-cnn-architectures.md)), an identity path that the
+    ([Part IV ch. 3](../part04-vision/03-cnn-architectures.md)), an identity path that the
     optimiser may use, not must use.
 
 !!! interview "Why did Transformers replace RNNs? Answer in terms of hardware."
- Not FLOPs and not accuracy in isolation, parallelism. An RNN's $T$ steps are sequentially
+    Not FLOPs and not accuracy in isolation, parallelism. An RNN's $T$ steps are sequentially
     dependent, so training a length-1024 sequence means 1024 dependent kernel launches, each a
     small $(B, d)\times(d, d)$ matmul with arithmetic intensity around $B$: memory-bound and
     latency-bound, with the GPU mostly idle. Self-attention computes all positions in one
- $(BT, d)\times(d, d)$ matmul plus two batched $T\times T$ matmuls, one sequential step,
+    $(BT, d)\times(d, d)$ matmul plus two batched $T\times T$ matmuls, one sequential step,
     compute-bound, near peak utilisation. Same asymptotic FLOPs at $T\approx d$, an order of
     magnitude more throughput. Scaling laws then convert throughput into quality, so the
     architecture that trains faster wins on quality too, at equal cost.
 
- **Staff-level follow-up, "when does the comparison flip?"** At inference, and at very long
+    **Staff-level follow-up, "when does the comparison flip?"** At inference, and at very long
     context. A Transformer decode step costs $O(T d)$ in memory traffic because it must read a KV
     cache that grows with context, while an RNN step is $O(d)$ with constant state. That is why
     streaming ASR still uses recurrence, why SSMs are being revisited, and why serving-side work
@@ -753,7 +753,7 @@ last one.
 !!! interview "You are training an LSTM and the loss goes to NaN on some batches. Debug it."
     First, confirm it is the gradient and not the data: log $\lVert g\rVert$ per step and the input
     statistics; an unnormalised outlier feature is as likely a culprit as the recurrence. If
- $\lVert g\rVert$ spikes by orders of magnitude on the NaN step, the cause is exploding gradients:
+    $\lVert g\rVert$ spikes by orders of magnitude on the NaN step, the cause is exploding gradients:
     apply global-norm clipping at 1–5, which rescales the whole gradient vector and keeps its
     direction. Check whether the spiking batches are the long ones; if so, bucket by length so a
     single 2000-step sequence does not dominate. Also check the loss itself for $\log 0$ (clamp
@@ -761,7 +761,7 @@ last one.
     stabilises it, keep it and move on; if the model then stalls, you have a vanishing problem
     hiding behind the exploding one.
 
- **Staff-level follow-up, "why global norm rather than clipping each parameter?"** Per-parameter
+    **Staff-level follow-up, "why global norm rather than clipping each parameter?"** Per-parameter
     clipping changes the direction of the update, effectively applying a different learning rate
     per tensor and biasing the step towards parameters with small gradients. Global-norm clipping
     is a pure rescale, so the descent direction is preserved and only the step length is bounded.
@@ -773,10 +773,10 @@ last one.
     Transformer would carry a KV cache that grows with the utterance. Same argument for always-on
     keyword spotting and for fixed-rate sensor fusion on an embedded budget. I would also consider a
     recurrent or state-space *decoder* behind a Transformer encoder when the encoder does the
- representational work and decode latency dominates, Google Translate's hybrid is the
+    representational work and decode latency dominates, Google Translate's hybrid is the
     production precedent.
 
- **Staff-level follow-up, "how do you train such a model efficiently?"** Train in a parallel
+    **Staff-level follow-up, "how do you train such a model efficiently?"** Train in a parallel
     form and deploy in a recurrent form. That is exactly the SSM trick (parallel scan / convolution
     for training, recurrence for inference); for RNN-T, train with the full-sequence lattice on GPU
     and run the recurrence only at deploy time.
@@ -802,7 +802,7 @@ norm crosses $10^{-7}$ (fp32's useful floor relative to 1). Explain why $\rho = 
     $\rho=0.5$, 150 for $\rho=0.9$, and never for $\rho = 1.1$ (it grows). $\rho = 1.0$ still decays
     because the bound carries the $\tanh'$ factor $\gamma = \max(1 - h^2) < 1$ whenever any unit is
     away from zero: the effective multiplier is $\rho\gamma < 1$. Only a linear (or near-linear)
- recurrence with $\rho = 1$ preserves gradient norm exactly, which is what the LSTM cell path
+    recurrence with $\rho = 1$ preserves gradient norm exactly, which is what the LSTM cell path
     is.
 
 **★ 2. Forget-bias ablation.** Initialise `LSTM` with $b_f \in \{-2, 0, 1, 3\}$ and compute the
@@ -822,8 +822,8 @@ $k \in \{5, 25, T\}$. Which $k$ can learn it?
 
 ??? success "Solution"
     Only $k = T$ (or any $k$ greater than the dependency length) learns it. With $k = 5$ the
- gradient at the final step never reaches the input at $t=0$, the backward pass is cut at the
- chunk boundary, so the parameters that would encode the bit receive no signal at all. The
+    gradient at the final step never reaches the input at $t=0$, the backward pass is cut at the
+    chunk boundary, so the parameters that would encode the bit receive no signal at all. The
     forward state still carries information across chunks, which is why the loss may drift slightly
     below chance. The model is memorising the marginal, not learning the dependency. The lesson is
     the general one: **truncation length is a hard ceiling on the dependency length you can learn.**
@@ -851,7 +851,7 @@ with the same finite-difference harness as
     for the output peephole, `grads["p_o"] += da["o"] * C[t]`, and crucially `dc` gains
     `da["o"] * p_o` because $c_t$ now influences $o_t$ directly *within the same step*. The
     $c_{t-1}$ peepholes add `da["f"] * p_f + da["i"] * p_i` to `dc_next`. The finite-difference
- test will fail loudly if you forget either of those two coupling terms, which is the point of
+    test will fail loudly if you forget either of those two coupling terms, which is the point of
     the exercise: peepholes create a within-step cycle between $c$ and the gates that is easy to
     miss when reading the equations.
 

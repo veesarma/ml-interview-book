@@ -54,22 +54,9 @@ def main() -> None:
     axes[0].set_title("Rectified flow: near-straight paths", fontsize=10)
     axes[0].legend(fontsize=7.5, frameon=False, loc="upper right")
 
-    # panel 2: diffusion probability-flow (DDIM, eta = 0) trajectories, recorded step by step
+    # panel 2: diffusion probability-flow (DDIM, eta = 0) trajectories, x0 clamped to the data range
     torch.manual_seed(1)
-    n_steps = 60
-    taus = torch.linspace(0, sched.T - 1, n_steps).round().long()
-    xt = torch.randn(40, 2)
-    path = [xt.clone()]
-    with torch.no_grad():
-        for i in reversed(range(n_steps)):
-            t = taus[i].repeat(40)
-            ab = sched.alpha_bar[taus[i]]
-            ab_prev = sched.alpha_bar[taus[i - 1]] if i > 0 else torch.tensor(1.0)
-            e = eps_model(xt, t)
-            x0_hat = (xt - (1 - ab).sqrt() * e) / ab.sqrt()
-            xt = ab_prev.sqrt() * x0_hat + (1 - ab_prev).clamp(min=0).sqrt() * e
-            path.append(xt.clone())
-    path_t = torch.stack(path)
+    path_t = D.sample_ddim(eps_model, sched, n=40, d=2, n_steps=60, clip_x0=3.0, return_trajectory=True)
     axes[1].scatter(x[:800, 0], x[:800, 1], s=3, alpha=0.18, color="#999999")
     for i in range(path_t.shape[1]):
         axes[1].plot(path_t[:, i, 0], path_t[:, i, 1], linewidth=0.8, alpha=0.7, color=colors[1])
@@ -86,7 +73,8 @@ def main() -> None:
     fm_q, dd_q = [], []
     for n in nfe:
         fm_q.append(distance_to_mixture_modes(FM.sample_euler(flow, 400, 2, n), N_MODES).median().item())
-        dd_q.append(distance_to_mixture_modes(D.sample_ddim(eps_model, sched, 400, 2, n), N_MODES).median().item())
+        dd_q.append(distance_to_mixture_modes(
+            D.sample_ddim(eps_model, sched, 400, 2, n, clip_x0=3.0), N_MODES).median().item())
     axes[2].plot(nfe, fm_q, "o-", color=colors[0], label="flow matching, Euler")
     axes[2].plot(nfe, dd_q, "s-", color=colors[1], label="diffusion, DDIM")
     axes[2].set_xscale("log", base=2); axes[2].set_yscale("log")

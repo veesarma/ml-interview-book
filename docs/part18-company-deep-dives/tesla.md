@@ -119,18 +119,18 @@ auto-labelling pipeline in §3.3 exists.
 (why radar was removed and how vision replaced it).
 
 !!! tip "How to say it in the interview"
-    "I would fuse the eight cameras into a single bird's-eye-view feature grid with a
+    "I'd fuse the eight cameras into a single bird's-eye-view feature grid with a
     cross-attention view transform, and predict everything downstream in that frame.
-    Tesla's AI Day 2021 perception talk shows why: per-camera detections cannot be
+    Tesla's AI Day 2021 perception talk shows why: per-camera detections can't be
     stitched consistently across camera seams, and a BEV raster gives the planner one
-    coordinate system. I would rectify each car's cameras into a virtual camera first,
+    coordinate system. I'd rectify each car's cameras into a virtual camera first,
     as that talk describes, so one model serves a fleet with calibration variation.
-    The alternative I would reject is per-camera monocular 3D detection with a
-    hand-written association step; it is easier to debug but it breaks exactly on the
-    seams and occlusions that matter. The trade-off is that BEV fusion needs 3D
-    supervision for the whole scene, so I would budget for an offline auto-labelling
-    pipeline from day one. I would evaluate in BEV with range-binned AP and with a
-    per-camera-seam slice, because that is where the previous approach failed, and I
+    I'd rule out per-camera monocular 3D detection with a
+    hand-written association step; it's easier to debug but it breaks exactly on the
+    seams and occlusions that matter. The cost is that BEV fusion needs 3D
+    supervision for the whole scene, so I'd budget for an offline auto-labelling
+    pipeline from day one. I'd evaluate in BEV with range-binned AP and with a
+    per-camera-seam slice, because that's where the previous approach failed, and I
     would track the temporal module separately with an occlusion-recall slice."
 
 ### 3.2 Occupancy networks: from boxes to volumes
@@ -170,17 +170,17 @@ vocabulary, was rejected because the long tail of shapes is unbounded.
 the same idea: Occ3D (Tian et al., 2023) and the occupancy benchmarks in Part XI.
 
 !!! tip "How to say it in the interview"
-    "For a planner that must avoid arbitrary obstacles, I would make the primary
+    "For a planner that must avoid arbitrary obstacles, I'd make the primary
     perception output a volumetric occupancy grid with flow, not a set of boxes.
-    Tesla's CVPR'22 WAD keynote makes the argument I would make: boxes need a class,
-    and the objects that hurt you are the ones with no class. I would keep a box and
+    Tesla's CVPR'22 WAD keynote makes the argument I'd make: boxes need a class,
+    and the objects that hurt you are the ones with no class. I'd keep a box and
     tracking head for interacting agents, because occupancy carries no identity and
     prediction needs identity. The rejected alternative is expanding the detector's
-    class list; that chases an unbounded tail. The trade-off is memory and resolution:
-    voxel grids grow cubically, so I would use a coarser far-field resolution and
+    class list; that chases an unbounded tail. What this costs is memory and resolution:
+    voxel grids grow cubically, so I'd use a coarser far-field resolution and
     quantize the head aggressively, which is consistent with the in-car budget the AI
-    Day 2022 talk emphasises. For supervision I would build dense geometry offline
-    from multi-trip reconstruction rather than hand-label voxels. I would evaluate
+    Day 2022 talk emphasises. For supervision I'd build dense geometry offline
+    from multi-trip reconstruction rather than hand-label voxels. I'd evaluate
     with voxel IoU stratified by distance and by object class where a class exists,
     and with a downstream metric: planner collisions in replay on the unknown-object
     slice."
@@ -220,20 +220,20 @@ vendor-labelled 2D boxes at scale, cannot supervise a BEV/occupancy model at all
 simulation); Tesla AI Day 2022 (auto-labelling for lanes, data engine example).
 
 !!! tip "How to say it in the interview"
-    "I would treat the fleet as a sampler and the offline labeller as the teacher.
-    On the car I would run a small library of triggers, model disagreement,
+    "I'd treat the fleet as a sampler and the offline labeller as the teacher.
+    On the car I'd run a small library of triggers, model disagreement,
     driver intervention, head-versus-head inconsistency, and novelty, and upload
     only the clips that fire; Tesla's CVPR'21 WAD keynote and AI Day 2021 describe
-    exactly this trigger catalogue, and it is the only way to keep upload bandwidth
-    proportional to information rather than to miles. Offline, I would reconstruct
+    exactly this trigger catalogue, and it's the only way to keep upload bandwidth
+    proportional to information rather than to miles. Offline, I'd reconstruct
     multi-trip clips into a single 4D scene and derive labels for every frame from it,
-    as AI Day 2021 and 2022 show for lanes and moving objects, and I would spend
+    as AI Day 2021 and 2022 show for lanes and moving objects, and I'd spend
     human time reviewing auto-labels on the disagreement slice instead of drawing
-    boxes. The alternative I would reject is sampling miles uniformly and paying a
-    vendor for 2D boxes: uniform sampling never sees the tail, and 2D boxes cannot
-    supervise a BEV model. The risk I would name is correlated label error from the
-    reconstruction, so I would hold out a small human-labelled gold set per scenario
-    and gate every labeller change on it. I would measure the engine by
+    boxes. The alternative I'd pass on is sampling miles uniformly and paying a
+    vendor for 2D boxes: uniform sampling never sees the tail, and 2D boxes can't
+    supervise a BEV model. The risk I'd name is correlated label error from the
+    reconstruction, so I'd hold out a small human-labelled gold set per scenario
+    and gate every labeller change on it. I'd measure the engine by
     time-from-trigger-to-deployed-fix on a named scenario, not by label volume."
 
 ### 3.4 Lanes as language, planning as search, and the move to end-to-end
@@ -272,19 +272,19 @@ and [Prediction & planning](../part11-perception-autonomy/06-prediction-planning
 framed as end-to-end).
 
 !!! tip "How to say it in the interview"
-    "If the product cannot rely on HD maps, I would decode the lane graph as a token
+    "If the product can't rely on HD maps, I'd decode the lane graph as a token
     sequence, the way Tesla's AI Day 2022 lanes talk does, because topology through an
-    intersection is a graph-structured output that a mask cannot express. For planning
-    I would start with a learned proposal-and-scoring planner inside an explicit
+    intersection is a graph-structured output that a mask can't express. For planning
+    I'd start with a learned proposal-and-scoring planner inside an explicit
     search, again as AI Day 2022 describes, before moving to end-to-end control; the
     search gives me an auditable decision and a place to put hard constraints while
-    the learned parts absorb the human-likeness. I would say plainly that Tesla's
-    Q4 2023 letter describes V12 as end-to-end, but that the architecture is not
-    public, so I would not claim to know how the modular heads are used. The trade-off
-    I would commit to is: interpretability and constraint-enforcement in the modular
+    the learned parts absorb the human-likeness. I'd say plainly that Tesla's
+    Q4 2023 letter describes V12 as end-to-end, but that the architecture isn't
+    public, so I'd not claim to know how the modular heads are used. The trade-off
+    I'd commit to is: interpretability and constraint-enforcement in the modular
     planner versus the ceiling on human-likeness that hand-written interfaces impose.
-    I would evaluate any planner change with closed-loop replay on scenario slices and
-    shadow-mode disagreement against the shipped policy, and I would treat
+    I'd evaluate any planner change with closed-loop replay on scenario slices and
+    shadow-mode disagreement against the shipped policy, and I'd treat
     intervention rate as the north-star metric while tracking its exposure mix."
 
 ### 3.5 Dojo and training infrastructure: why build a chip, and when not to
@@ -320,7 +320,7 @@ Tesla's Exa-Scale Computer" and "Super-Compute System Scaling for ML Training"; 
 "Tesla Dojo Technology" whitepaper (CFloat8).
 
 !!! tip "How to say it in the interview"
-    "Before proposing custom silicon I would write down the roofline for the actual
+    "Before proposing custom silicon I'd write down the roofline for the actual
     workload: video decode, augmentation, and multi-camera batching are I/O- and
     bandwidth-bound, and at fleet scale the interconnect and data loader dominate.
     Tesla's AI Day 2021 Dojo section and the Hot Chips 34 talks describe a design that
@@ -328,10 +328,10 @@ Tesla's Exa-Scale Computer" and "Super-Compute System Scaling for ML Training"; 
     protocol, and their CFloat8 whitepaper shows they were willing to change numerics
     for throughput. My default decision, though, would be GPUs with a well-engineered
     video pipeline, because the software ecosystem and kernels are where most of the
-    speedup lives, and I would reserve custom hardware for a bottleneck that vendors
-    will not fix in time. I would note that press reports in 2025 describe Dojo being
-    wound down; there is no public post-mortem, so I would not speculate beyond the
-    trade-off. I would measure the infrastructure by model-FLOP utilisation and by
+    speedup lives, and I'd reserve custom hardware for a bottleneck that vendors
+    won't fix in time. I'd note that press reports in 2025 describe Dojo being
+    wound down; there's no public post-mortem, so I'd not speculate beyond the
+    trade-off. I'd measure the infrastructure by model-FLOP utilisation and by
     samples per second end-to-end from storage, not by peak TFLOPS."
 
 ### 3.6 Optimus: the same stack, a different body
@@ -358,18 +358,18 @@ never produced, so the bottleneck moves to demonstration collection and to
 sim-to-real.
 
 !!! tip "How to say it in the interview"
-    "For a humanoid programme I would reuse the vehicle perception stack and
+    "For a humanoid programme I'd reuse the vehicle perception stack and
     training infrastructure, as Tesla said it did at AI Day 2022, and put the new
     investment into demonstration data: teleoperation rigs, a data engine that
-    triggers on policy failures, and simulation for the contact-rich skills. I would
-    start with behaviour cloning on demonstrations because it is the fastest way to a
-    policy that does anything, and I would be explicit about its failure mode,
-    compounding error away from the demonstration distribution, which is why I would
-    add on-policy data collection with human correction. The alternative I would
+    triggers on policy failures, and simulation for the contact-rich skills. I'd
+    start with behaviour cloning on demonstrations because it's the fastest way to a
+    policy that does anything, and I'd be explicit about its failure mode,
+    compounding error away from the demonstration distribution, which is why I'd
+    add on-policy data collection with human correction. The alternative I'd
     reject at the start is reinforcement learning from scratch on hardware; the
-    sample cost is prohibitive without a good prior. I would evaluate with task
+    sample cost is prohibitive without a good prior. I'd evaluate with task
     success rate under distribution shift (new objects, new lighting) and intervention
-    rate per hour, and I would state that Tesla has not published the policy
+    rate per hour, and I'd state that Tesla has not published the policy
     architecture, so my design would draw on the public GR00T N1 and Gemini Robotics
     reports for the model class."
 
@@ -389,17 +389,17 @@ sim-to-real.
     [AV perception design](../part17-ml-system-design/05-perception-system-av.md).
 
     !!! tip "How to say it in the interview"
-        "I would decide on a single BEV feature grid built by cross-attention from all
+        "I'd decide on a single BEV feature grid built by cross-attention from all
         eight cameras, with multi-task heads on top, because Tesla's AI Day 2021
         perception talk shows that per-camera detection fails at seams and that a
         shared backbone with many heads is how you fit a growing output list into a
-        fixed in-car budget. I would reject explicit per-pixel depth as the primary
+        fixed in-car budget. I'd reject explicit per-pixel depth as the primary
         route; Lift-Splat-Shoot-style depth is more interpretable, but it commits to
         a depth bin early and the attention route lets context resolve ambiguity.
-        The trade-off is supervision: BEV outputs need 3D labels, so I would pair the
-        model with an offline auto-labelling pipeline. I would gate releases on
+        The price is supervision: BEV outputs need 3D labels, so I'd pair the
+        model with an offline auto-labelling pipeline. I'd gate releases on
         range-stratified BEV AP, an occlusion-recall slice for the temporal module,
-        and closed-loop replay of planner behaviour, and I would track calibration
+        and closed-loop replay of planner behaviour, and I'd track calibration
         drift as a first-class monitoring signal."
 
 !!! interview "Q2. Why did Tesla move from 3D boxes to occupancy, and what does the planner lose?"
@@ -412,12 +412,12 @@ sim-to-real.
     along the planned trajectory)?
 
     !!! tip "How to say it in the interview"
-        "I would explain the move as a representational fix: the CVPR'22 WAD keynote
+        "I'd explain the move as a representational fix: the CVPR'22 WAD keynote
         argues that the objects that hurt you have no class, so the primary output
-        became a volumetric occupancy and flow grid. I would keep boxes and tracks for
+        became a volumetric occupancy and flow grid. I'd keep boxes and tracks for
         agents whose intent matters, because occupancy has no identity. The cost I
-        would name is memory: the grid grows cubically, so I would go sparse or use an
-        implicit decoder queried only where the planner needs it. I would evaluate with
+        would name is memory: the grid grows cubically, so I'd go sparse or use an
+        implicit decoder queried only where the planner needs it. I'd evaluate with
         voxel IoU by distance and with the planner's collision rate on an
         unknown-object slice."
 
@@ -431,13 +431,13 @@ sim-to-real.
     change or a training gain, and time-to-fix per scenario.
 
     !!! tip "How to say it in the interview"
-        "I would build a trigger library on the car and treat uploads as a budgeted
+        "I'd build a trigger library on the car and treat uploads as a budgeted
         priority queue; Tesla's CVPR'21 WAD keynote and AI Day 2021 describe a
-        catalogue of triggers and campaigns, and I would add embedding-based
-        de-duplication on both ends so a common scenario cannot dominate. The
+        catalogue of triggers and campaigns, and I'd add embedding-based
+        de-duplication on both ends so a common scenario can't dominate. The
         alternative, uniform sampling of miles, never reaches the tail. The trade-off
-        is bias: trigger-selected data is not the driving distribution, so I would
-        keep a small uniformly sampled stream for calibration and evaluation. I would
+        is bias: trigger-selected data isn't the driving distribution, so I'd
+        keep a small uniformly sampled stream for calibration and evaluation. I'd
         measure the system by the yield of uploaded clips, the share that changed a
         label or moved a metric, and by time from trigger to deployed fix."
 
@@ -451,11 +451,11 @@ sim-to-real.
     Link: [Weak supervision & auto-labelling](../part10-self-supervised/03-weak-supervision-and-auto-labeling.md).
 
     !!! tip "How to say it in the interview"
-        "I would reconstruct the scene once from every trip through it and project
+        "I'd reconstruct the scene once from every trip through it and project
         labels back to each frame, because AI Day 2021 and 2022 show that a 4D offline
-        reconstruction gives geometry and kinematics no annotator can draw. I would
-        reject per-frame human 3D annotation as the primary source; it is too slow and
-        inconsistent across frames. The trade-off is correlated error, so I would hold
+        reconstruction gives geometry and kinematics no annotator can draw. I'd
+        reject per-frame human 3D annotation as the primary source; it's too slow and
+        inconsistent across frames. The trade-off is correlated error, so I'd hold
         gold sets per scenario, run consistency checks across trips, and route human
         time to disagreement. My acceptance metric is downstream: does the retrained
         model improve on the held-out gold slice without regressing others."
@@ -471,15 +471,15 @@ sim-to-real.
     Links: [Imitation learning](../part12-rl/05-imitation-learning.md), [Evaluation](../part13-retrieval-eval-reliability/02-evaluation.md).
 
     !!! tip "How to say it in the interview"
-        "I would ship an end-to-end policy only through a three-layer evaluation
+        "I'd ship an end-to-end policy only through a three-layer evaluation
         stack: replay for cheap regression, closed-loop simulation for compounding
         error, and shadow mode on the fleet for the real distribution, which is the
-        loop Tesla's AI Day talks describe. I would reject relying on open-loop
-        imitation loss; it does not predict closed-loop behaviour. The trade-off with
-        end-to-end is the loss of auditable intermediate decisions, so I would keep
-        hard-constraint checkers outside the policy. I would gate on intervention rate
+        loop Tesla's AI Day talks describe. I'd reject relying on open-loop
+        imitation loss; it doesn't predict closed-loop behaviour. The trade-off with
+        end-to-end is the loss of auditable intermediate decisions, so I'd keep
+        hard-constraint checkers outside the policy. I'd gate on intervention rate
         per scenario slice, not fleet-wide, because a fleet-wide average hides
-        regressions in rare slices, and I would track the exposure mix."
+        regressions in rare slices, and I'd track the exposure mix."
 
 !!! interview "Q6. Explain shadow mode. What can it tell you and what can it not?"
     **Answer sketch.** A candidate model runs on the car without control authority;
@@ -490,12 +490,12 @@ sim-to-real.
     candidate would have encountered. Combine with closed-loop simulation.
 
     !!! tip "How to say it in the interview"
-        "Shadow mode is how I would get real-world disagreement at scale without
-        risk, as Tesla's AI Day 2021 data-engine section describes, but I would be
-        explicit that it is open-loop: the world never reacts to the candidate, so it
-        cannot measure compounding behaviour. I would use it to mine disagreement
-        clips and to bound regression, and I would pair it with closed-loop
-        simulation for interactive scenarios. The trade-off is cost and realism; I
+        "Shadow mode is how I'd get real-world disagreement at scale without
+        risk, as Tesla's AI Day 2021 data-engine section describes, but I'd be
+        explicit that it's open-loop: the world never reacts to the candidate, so it
+        can't measure compounding behaviour. I'd use it to mine disagreement
+        clips and to bound regression, and I'd pair it with closed-loop
+        simulation for interactive scenarios. Simulation costs money and realism; I
         would evaluate the pairing by whether simulation disagreement predicts
         shadow-mode disagreement on the same slices."
 
@@ -508,13 +508,13 @@ sim-to-real.
     [3D perception](../part04-vision/07-3d-perception.md).
 
     !!! tip "How to say it in the interview"
-        "I would get scale from ego-motion and the overlapping cameras, and I would
+        "I'd get scale from ego-motion and the overlapping cameras, and I'd
         let the BEV transform learn depth implicitly rather than regress it per pixel,
         following the direction of Tesla's AI Day 2021 fusion design and Karpathy's
-        CVPR'21 argument that vision could replace radar for range. I would reject a
-        monocular depth head as the sole source because scale is ambiguous. I would
+        CVPR'21 argument that vision could replace radar for range. I'd reject a
+        monocular depth head as the sole source because scale is ambiguous. I'd
         validate against offline reconstruction, sliced by range and by weather, and
-        I would keep a radar-comparison slice from cars that still had radar as a
+        I'd keep a radar-comparison slice from cars that still had radar as a
         sanity check on far-range bias."
 
 !!! interview "Q8. Latency: the car runs one FSD computer. How do you fit occupancy, lanes, agents and planning?"
@@ -525,12 +525,12 @@ sim-to-real.
     [Hardware, memory & roofline](../part14-systems/04-hardware-memory-roofline.md).
 
     !!! tip "How to say it in the interview"
-        "I would share one backbone across every task, the HydraNet pattern from
+        "I'd share one backbone across every task, the HydraNet pattern from
         AI Day 2021, and spend the budget on heads, because backbone FLOPs dominate.
-        Then I would quantize to INT8 with fleet-data calibration, tier resolution by
-        range, and run slow-changing heads like lanes at a lower rate. I would reject
-        separate per-task networks; they multiply cost. I would profile with a
-        roofline to find memory-bound layers, and I would gate on p99 latency at
+        Then I'd quantize to INT8 with fleet-data calibration, tier resolution by
+        range, and run slow-changing heads like lanes at a lower rate. I'd reject
+        separate per-task networks; they multiply cost. I'd profile with a
+        roofline to find memory-bound layers, and I'd gate on p99 latency at
         thermal limits, not on mean latency."
 
 !!! interview "Q9. Would you build a training chip? Argue from Dojo."
@@ -545,13 +545,13 @@ sim-to-real.
     !!! tip "How to say it in the interview"
         "My default would be no: buy GPUs and engineer the video pipeline, because
         most of the speedup at this scale is in kernels, data loading and
-        parallelism strategy. I would justify that against Dojo's own public design:
+        parallelism strategy. I'd justify that against Dojo's own public design:
         the Hot Chips 34 talks show it attacking real bottlenecks, SRAM near compute,
         a mesh fabric, and a custom transport protocol, and the CFloat8 whitepaper
         shows how far they went on numerics, but press reports in 2025 describe the
-        programme being wound down and there is no public post-mortem. The trade-off
-        is ecosystem versus fit. I would measure by end-to-end samples per second and
-        model-FLOP utilisation, and I would revisit only if a vendor roadmap could not
+        programme being wound down and there's no public post-mortem. The trade-off
+        is ecosystem versus fit. I'd measure by end-to-end samples per second and
+        model-FLOP utilisation, and I'd revisit only if a vendor roadmap could not
         meet a bottleneck I could quantify."
 
 !!! interview "Q10. Coding: implement a camera-to-BEV feature projection and explain the shapes."
@@ -564,12 +564,12 @@ sim-to-real.
     [Multi-camera & BEV](../part11-perception-autonomy/02-multi-camera-bev.md).
 
     !!! tip "How to say it in the interview"
-        "I would write the geometric version first, sampling image features at the
-        projection of each BEV cell's 3D anchors, because it is testable against a
+        "I'd write the geometric version first, sampling image features at the
+        projection of each BEV cell's 3D anchors, because it's testable against a
         synthetic scene, and then explain how Tesla's AI Day 2021 design replaces the
-        fixed projection with learned attention. I would reject writing the attention
-        version first; it is harder to unit test. The trade-off is flexibility versus
-        verifiability, and I would test both with a scene where a single object should
+        fixed projection with learned attention. I'd reject writing the attention
+        version first; it's harder to unit test. I'm trading flexibility against
+        verifiability, and I'd test both with a scene where a single object should
         land in a known cell from two cameras."
 
 !!! interview "Q11. The long tail: how do you know your coverage is improving, not just your average metrics?"
@@ -580,11 +580,11 @@ sim-to-real.
     stream. Link: [Evaluation](../part13-retrieval-eval-reliability/02-evaluation.md).
 
     !!! tip "How to say it in the interview"
-        "I would define a scenario taxonomy and make the release metric the worst
-        slice, not the mean, and I would let novelty triggers propose new slices, which
+        "I'd define a scenario taxonomy and make the release metric the worst
+        slice, not the mean, and I'd let novelty triggers propose new slices, which
         is the data-engine loop from Tesla's AI Day 2021. For slices too rare to
-        collect I would synthesise them, as the AI Day simulation sections describe,
-        while keeping a frozen uniformly sampled stream so I cannot fool myself. I
+        collect I'd synthesise them, as the AI Day simulation sections describe,
+        while keeping a frozen uniformly sampled stream so I can't fool myself. I
         would reject a single fleet-wide safety number as the gate because it hides
         regressions in rare slices."
 
@@ -597,10 +597,10 @@ sim-to-real.
     Link: [DETR & set prediction](../part08-multimodal/02-detr.md).
 
     !!! tip "How to say it in the interview"
-        "I would decode lanes as a token sequence, as Tesla's AI Day 2022 lanes talk
-        does, because the planner needs connectivity and a mask cannot express it. I
+        "I'd decode lanes as a token sequence, as Tesla's AI Day 2022 lanes talk
+        does, because the planner needs connectivity and a mask can't express it. I
         would reject mask plus post-processing; it breaks at intersections. The
-        trade-off is sequential latency and exposure bias, so I would cap sequence
+        trade-off is sequential latency and exposure bias, so I'd cap sequence
         length by range and evaluate with connectivity precision and recall against
         auto-labelled graphs, not pixel IoU."
 
@@ -612,12 +612,12 @@ sim-to-real.
     the Waymo human-benchmark studies. Link: [Statistics](../part01-math/04-statistics.md).
 
     !!! tip "How to say it in the interview"
-        "I would say the report is a ratio of crashes per mile with and without
+        "I'd say the report is a ratio of crashes per mile with and without
         Autopilot, and that the comparison is confounded by where Autopilot is used;
-        highway miles are the safest miles. I would propose matching on road type and
+        highway miles are the safest miles. I'd propose matching on road type and
         conditions and reporting confidence intervals, which is the design Waymo's
-        peer-reviewed benchmark comparisons use. The trade-off is that a matched
-        analysis needs exposure data Tesla does not publish."
+        peer-reviewed benchmark comparisons use. The price is that a matched
+        analysis needs exposure data Tesla doesn't publish."
 
 !!! interview "Q14. Optimus: design the data pipeline for a manipulation policy in a factory."
     **Answer sketch.** Teleoperation rigs for demonstrations; automatic segmentation
@@ -627,13 +627,13 @@ sim-to-real.
     success under shift. Link: [Imitation learning](../part12-rl/05-imitation-learning.md).
 
     !!! tip "How to say it in the interview"
-        "I would start with teleoperated demonstrations and behaviour cloning,
+        "I'd start with teleoperated demonstrations and behaviour cloning,
         because Tesla said at AI Day 2022 that Optimus reuses the FSD perception and
-        infrastructure, so the missing piece is control data, and I would add
-        on-policy corrections to fight compounding error. I would reject RL from
-        scratch on hardware. I would evaluate by success rate on held-out objects and
-        by interventions per hour, and I would cite GR00T N1 and Gemini Robotics as
-        the public reference points for the policy class, since Tesla's is not
+        infrastructure, so the missing piece is control data, and I'd add
+        on-policy corrections to fight compounding error. I'd reject RL from
+        scratch on hardware. I'd evaluate by success rate on held-out objects and
+        by interventions per hour, and I'd cite GR00T N1 and Gemini Robotics as
+        the public reference points for the policy class, since Tesla's isn't
         published."
 
 ## 5. What to bring from your background

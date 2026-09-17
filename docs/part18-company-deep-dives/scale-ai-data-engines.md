@@ -10,7 +10,7 @@
 
 ## TL;DR: the interview card
 
-- The product is a loop rather than a workforce. Task design, a labelling interface, a model
+- The product is a loop, and the workforce is one stage in it. Task design, a labelling interface, a model
   in the loop that pre-labels, human review concentrated on the hard cases, quality
   control by consensus and gold sets, and delivery back into training.
 - **AV labelling** wants 3D and 4D output (boxes, tracks, lanes, semantic point
@@ -56,13 +56,13 @@ others.
 Understanding the business matters for the interview because it explains the technical
 emphasis. A vendor's margin comes from automating its own labour, so the interesting
 engineering is model-in-the-loop labelling, quality control that avoids
-double-labelling everything, and pricing that tracks difficulty rather than volume.
+double-labelling everything, and pricing that tracks difficulty instead of volume.
 
 ## The ML problems that define the business
 
 | Problem | Why it is hard | Public evidence |
 |---|---|---|
-| **Labelling 3D and 4D scenes** | Humans are poor at drawing consistent 3D boxes across a sequence; the label the model needs is a reconstruction rather than a drawing. | Scale's AV data-engine product pages; Tesla AI Day 2021/2022 auto-labelling; Uber ATG's Auto4D (arXiv:2101.06586). |
+| **Labelling 3D and 4D scenes** | Humans are poor at drawing consistent 3D boxes across a sequence; the label the model needs is a reconstruction, and a drawing is a poor approximation of one. | Scale's AV data-engine product pages; Tesla AI Day 2021/2022 auto-labelling; Uber ATG's Auto4D (arXiv:2101.06586). |
 | **Automating your own labour** | Pre-labelling shifts human effort from drawing to review, but a wrong pre-label biases the reviewer (anchoring). | Scale data-engine product materials; weak-supervision literature. |
 | **Quality control without double-labelling** | Consensus is the obvious answer and it doubles cost; gold sets are cheap but only measure what they cover. | Standard practice; Anthropic's HH dataset paper documents annotator disagreement rates in preference data. |
 | **Preference data that a reward model can learn from** | Annotators disagree, prefer longer answers, and cannot judge expert domains. | InstructGPT (arXiv:2203.02155); Anthropic HH (arXiv:2204.05862). |
@@ -102,7 +102,7 @@ flowchart LR
 of the product (labelling, RLHF data, evaluation, model-assisted annotation) are public.
 The internal quality-control machinery, the pricing model, and how much of any given
 delivery is model-generated are not; the QC box above describes standard practice in
-the field rather than a documented Scale pipeline, and the sampling box is shaded
+the field; it is not a documented Scale pipeline. The sampling box is shaded
 because which data a customer chooses to send is the customer's decision.
 
 ## 3. Deep dives
@@ -180,7 +180,7 @@ with the result to adjudicate. The human corrects an object, not a frame. This i
 makes the label a *4D* label: one consistent object across the whole sequence.
 
 The same restructuring applies to lane and map labels, which are graphs with topology
-rather than pixels, and where the value of the label is the connectivity a single frame
+instead of pixels, and where the value of the label is the connectivity a single frame
 never shows. See
 [Multi-camera & BEV](../part11-perception-autonomy/02-multi-camera-bev.md),
 [Tracking](../part11-perception-autonomy/04-tracking.md) and
@@ -189,13 +189,13 @@ never shows. See
 **The trade-off.** Sequence-level labelling produces supervision that per-frame
 annotation cannot, and it is much cheaper per frame. It needs a reconstruction pipeline
 that works, and when the reconstruction is wrong the error is systematic across the
-entire clip rather than confined to one frame.
+entire clip instead of staying confined to one frame.
 
 !!! tip "How to say it in the interview"
     "For driving data I'd never price or design this per frame. The unit is the clip.
     You solve the ego trajectory, accumulate the point cloud, split static from
     dynamic, fit each object once and propagate it with a motion model, and then the
-    annotator adjudicates objects rather than frames. That's the structure Tesla
+    annotator adjudicates whole objects. That's the structure Tesla
     described at AI Day and it's what the Auto4D paper formalises for sequential point
     clouds. The reason isn't only cost. Per-frame boxes jitter in size and swap
     identities, and that teaches the model that cars change dimensions, so per-frame
@@ -231,7 +231,7 @@ are paying for scarcity: a working oncologist or a competitive programmer costs 
 of magnitude more per hour than a general annotator, and the tasks take longer. That
 pushes the design toward extracting maximum signal per expert hour: have the expert
 write the hard part and a cheaper annotator format it, have the expert adjudicate
-model-generated candidates rather than author from scratch, and reuse each expert item
+model-generated candidates instead of authoring from scratch, and reuse each expert item
 across multiple training uses (SFT target, preference pair, eval item).
 
 **The trade-off.** Buying preference data is fast and scales with budget. It couples
@@ -251,7 +251,7 @@ is the alternative path: generate the comparisons from an explicit written spec.
     artefact looks like and for how much annotators disagree on it. The failure I'd
     watch for is length bias and fluency bias: rushed or non-expert annotators reward
     long confident answers, and then the reward model does too, and then the policy
-    does. For expert domains I'd restructure the task rather than pay for more hours,
+    does. For expert domains I'd restructure the task before paying for more hours,
     have the expert adjudicate model-generated candidates instead of authoring from
     scratch, and reuse each item as an SFT target, a preference pair and an eval
     question. And I'd keep a portion of expert time for evaluation only, never training,
@@ -274,7 +274,7 @@ carrying information. Humanity's Last Exam, built with the Center for AI Safety,
 response: thousands of expert-written questions across many subjects, commissioned
 specifically to be hard for current frontier models, with a public leaderboard. The
 design cost is that the questions must be genuinely answerable and verifiable, which is
-why the collection process ran through expert review rather than crowd submission
+why the collection process ran through expert review instead of crowd submission
 alone.
 
 **Realism.** Static question-answering says little about whether a model can do work.
@@ -454,7 +454,7 @@ commercial one.
 
 !!! interview "Q2. Design the quality-control system for a 3D labelling pipeline, without double-labelling everything."
     **Answer sketch.** Layers: gold tasks injected at a known rate and scored per
-    annotator; consensus on a stratified sample rather than everything; reviewer
+    annotator; consensus on a stratified sample instead of everything; reviewer
     hierarchy with escalation for disagreement; automated consistency checks (box
     dimensions stable across a track, physically implausible velocities, objects
     inside other objects); annotator scoring that routes hard tasks to better
@@ -479,7 +479,7 @@ commercial one.
     correlated error now baked into more of the dataset; annotators learning to accept
     rather than adjudicate. Detection: perturbed pre-label probes, no-pre-label
     control tasks, gold sets refreshed and expanded when the pre-labeller changes, and
-    comparing accuracy against gold before and after rather than throughput.
+    comparing accuracy against gold before and after, with throughput ignored.
 
     !!! tip "How to say it in the interview"
         "Throughput doubling is exactly what I'd expect if reviewers stopped reviewing.
@@ -501,11 +501,10 @@ commercial one.
     difficulty, not by frame count. Risks: reconstruction failures corrupt whole clips.
 
     !!! tip "How to say it in the interview"
-        "I'd quote per clip rather than per frame, because the unit of work is the clip. The
+        "I'd quote per clip, because the unit of work is the clip and not the frame. The
         pipeline reconstructs first: solve the ego trajectory, accumulate the cloud,
         split static from dynamic, fit each object once and propagate with a motion
-        model, and only then does a human touch it, adjudicating objects rather than
-        frames. That's the Auto4D structure and it's what Tesla described. Most of the
+        model, and only then does a human touch it, adjudicating whole objects. That's the Auto4D structure and it's what Tesla described. Most of the
         human cost lands on dynamic objects and long occlusions, so I'd price clips on the count of dynamic tracks and not on duration. The risk I'd put in the
         contract is that a failed reconstruction corrupts an entire clip, so I'd
         include a per-clip QC gate and a re-do allowance."
@@ -519,7 +518,7 @@ commercial one.
     Link: [Reward models & preferences](../part07-post-training/02-reward-models.md).
 
     !!! tip "How to say it in the interview"
-        "I'd test the reward model directly rather than argue about the guideline. Take
+        "I'd test the reward model directly instead of arguing about the guideline. Take
         a set of responses, pad them with content-free but fluent text, and see whether
         the reward goes up. If it does, I have a length bias and I know its magnitude.
         On the data side I'd regress preference on length and report the win rate at
@@ -531,7 +530,7 @@ commercial one.
 
 !!! interview "Q6. Design a contamination check for a benchmark you suspect is in the training data."
     **Answer sketch.** Build a distribution-matched replica after the model's cut-off
-    (GSM1k design) and compare accuracies; look for the gap rather than the level.
+    (GSM1k design) and compare accuracies; look at the gap between the two, and ignore the absolute level.
     Supporting probes: canary strings, n-gram overlap against available corpora,
     performance on perturbed versions of the same questions (renamed entities, changed
     numbers), and ordering effects. Report the delta with confidence intervals.
@@ -623,7 +622,7 @@ commercial one.
     completed task, and hold out a private set.
 
     !!! tip "How to say it in the interview"
-        "I'd buy tasks with checkers rather than questions with answers. The SWE-bench Pro
+        "I'd buy tasks with checkers, and skip questions with answer keys. The SWE-bench Pro
         design is the model: real repository-level problems where the verification is
         running the tests, and the Remote Labor Index extends it to whole freelance
         projects with deliverables. Rubric-scored transcripts measure my judge, so I'd
@@ -640,7 +639,7 @@ commercial one.
     and any drift is invisible. Keep an unassisted gold stream permanently.
 
     !!! tip "How to say it in the interview"
-        "At that point the product is triage and evaluation rather than labelling.
+        "At that point the product is triage and evaluation. Labelling is the commodity.
         The engineering moves to uncertainty estimation and mining, finding the 5% that
         deserve a human, and to the gold data, which never automates. The risk is that
         my dataset quality is now just my model quality with extra steps, and if the
@@ -680,7 +679,7 @@ commercial one.
         slice, and cut spend where the curve is flat, which in a mature dataset is most
         of it. Then deduplication, because near-identical items are common in
         continuously collected data and they cost full price. Then quality tiering:
-        consensus only where the gold scores say it's needed rather than everywhere.
+        consensus only where the gold scores say it's needed, and nowhere else.
         What I wouldn't touch is gold and evaluation spend, because that's how I'll
         prove the 40% cut didn't hurt anything, and the proof is a training run on the
         reduced dataset compared against the current model on the same slices."

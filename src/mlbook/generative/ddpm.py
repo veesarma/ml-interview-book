@@ -244,8 +244,12 @@ def predict_eps_cfg(model: EpsMLP, x_t: torch.Tensor, t: torch.Tensor, y: torch.
 
 @torch.no_grad()
 def sample_ancestral(model: EpsMLP, sched: NoiseSchedule, n: int, d: int, y: torch.Tensor | None = None,
-                     guidance_scale: float = 0.0) -> torch.Tensor:
+                     guidance_scale: float = 0.0, clip_x0: float | None = None) -> torch.Tensor:
     """DDPM sampling: for t = T−1 … 0,  x_{t−1} = μ̃_t(x_t, x̂_0) + sqrt(β̃_t) z.
+
+    ``clip_x0`` clamps the implied x̂_0 to ``[−clip_x0, clip_x0]`` at every step.  At large t,
+    ᾱ_t is tiny and x̂_0 = (x_t − sqrt(1−ᾱ_t) ε̂)/sqrt(ᾱ_t) divides by a number near zero, so a
+    small error in ε̂ becomes a huge x̂_0.  Image models clamp to [−1, 1] for exactly this reason.
 
     Returns:
         x_0: (N, d).
@@ -255,6 +259,8 @@ def sample_ancestral(model: EpsMLP, sched: NoiseSchedule, n: int, d: int, y: tor
         t = torch.full((n,), step, dtype=torch.long)                              # (N,)
         eps_hat = predict_eps_cfg(model, x, t, y, guidance_scale)                 # (N, d)
         x0_hat = eps_to_x0(sched, x, t, eps_hat)                                  # (N, d)
+        if clip_x0 is not None:
+            x0_hat = x0_hat.clamp(-clip_x0, clip_x0)                              # (N, d)
         mean, var = posterior_mean_variance(sched, x, x0_hat, t)                  # (N, d), (N, 1)
         noise = torch.randn_like(x) if step > 0 else torch.zeros_like(x)          # (N, d)  no noise at t = 0
         x = mean + var.sqrt() * noise                                             # (N, d)
@@ -263,7 +269,8 @@ def sample_ancestral(model: EpsMLP, sched: NoiseSchedule, n: int, d: int, y: tor
 
 @torch.no_grad()
 def sample_ddim(model: EpsMLP, sched: NoiseSchedule, n: int, d: int, n_steps: int, eta: float = 0.0,
-                y: torch.Tensor | None = None, guidance_scale: float = 0.0) -> torch.Tensor:
+                y: torch.Tensor | None = None, guidance_scale: float = 0.0,
+                clip_x0: float | None = None, return_trajectory: bool = False) -> torch.Tensor:
     """DDIM sampling on a sub-sequence of ``n_steps`` timesteps (η = 0 is deterministic).
 
     x_{τ_{i−1}} = sqrt(ᾱ_{τ_{i−1}}) x̂_0 + sqrt(1 − ᾱ_{τ_{i−1}} − σ²) ε̂ + σ z,
@@ -274,17 +281,21 @@ def sample_ddim(model: EpsMLP, sched: NoiseSchedule, n: int, d: int, n_steps: in
     """
     taus = torch.linspace(0, sched.T - 1, n_steps).round().long()                 # (S,) increasing
     x = torch.randn(n, d)                                                         # (N, d)
+    traj = [x.clone()]
     for i in reversed(range(n_steps)):
         t = taus[i].repeat(n)                                                     # (N,)
         ab = sched.alpha_bar[taus[i]]                                             # scalar
         ab_prev = sched.alpha_bar[taus[i - 1]] if i > 0 else torch.tensor(1.0)    # scalar
         eps_hat = predict_eps_cfg(model, x, t, y, guidance_scale)                 # (N, d)
         x0_hat = (x - (1 - ab).sqrt() * eps_hat) / ab.sqrt()                      # (N, d)
+        if clip_x0 is not None:
+            x0_hat = x0_hat.clamp(-clip_x0, clip_x0)                              # (N, d)
         sigma = eta * ((1 - ab_prev) / (1 - ab)).sqrt() * (1 - ab / ab_prev).sqrt()  # scalar
         dir_xt = (1 - ab_prev - sigma ** 2).clamp(min=0.0).sqrt() * eps_hat       # (N, d)  "direction pointing to x_t"
         noise = sigma * torch.randn_like(x) if i > 0 else torch.zeros_like(x)     # (N, d)
         x = ab_prev.sqrt() * x0_hat + dir_xt + noise                              # (N, d)
-    return x
+        traj.append(x.clone())
+    return torch.stack(traj, dim=0) if return_trajectory else x                  # (S+1, N, d) or (N, d)
 
 
 def score_from_eps(sched: NoiseSchedule, eps_hat: torch.Tensor, t: torch.Tensor) -> torch.Tensor:

@@ -64,7 +64,7 @@ def main() -> None:
     anc = D.sample_ancestral(model, sched, n=400, d=2)
     ax.axhline(distance_to_mixture_modes(anc, n_modes=N_MODES).median().item(),
                color=colors[2], linestyle="--", label="ancestral DDPM, all 200 steps")
-    ax.set_xscale("log"); ax.set_xlabel("DDIM sampling steps")
+    ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xlabel("DDIM sampling steps")
     ax.set_ylabel("median distance to nearest mode")
     ax.set_title("DDIM buys back most of the quality in 10 to 20 steps", fontsize=10)
     ax.legend(fontsize=8, frameon=False)

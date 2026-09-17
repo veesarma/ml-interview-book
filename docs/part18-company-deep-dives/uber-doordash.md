@@ -20,7 +20,7 @@ Uber matches riders with drivers and eaters with couriers and restaurants; DoorD
 | Fraud and safety | Adversaries adapt; payments, promo abuse, account takeovers; humans in the loop | "Project RADAR: Intelligent Early Fraud Detection System with Humans in the Loop" (Uber, 2022); DoorDash fraud posts |
 | Identity and document verification | Driver onboarding requires licences, insurance; selfie verification; OCR on noisy phone photos | Uber "Real-Time ID Check" (product, 2016 onward); Uber's document verification is product-level public, model details **inference** |
 | Eats / search / recommendations | Cold-start restaurants, geo-constrained candidates, dish-level intent | "Food Discovery with Uber Eats: Using Graph Learning to Power Recommendations" (2019); "Innovative Recommendation Applications Using Two Tower Embeddings at Uber" (2023); "Things Not Strings: Understanding Search Intent with Better Recall" (DoorDash, 2022) |
-| ML platform | Feature store with online/offline parity, model registry, low-latency serving | "Meet Michelangelo" (2017); "Scaling Machine Learning at Uber with Michelangelo" (2018); "From Predictive to Generative – How Michelangelo Accelerates Uber's AI Journey" (2024); "Meet Sibyl" (DoorDash, 2020); "Building a Gigascale ML Feature Store with Redis…" (DoorDash, 2020); Fabricator and Riviera posts (2021–2022) |
+| ML platform | Feature store with online/offline parity, model registry, low-latency serving | "Meet Michelangelo" (2017); "Scaling Machine Learning at Uber with Michelangelo" (2018); "From Predictive to Generative: How Michelangelo Accelerates Uber's AI Journey" (2024); "Meet Sibyl" (DoorDash, 2020); "Building a Gigascale ML Feature Store with Redis…" (DoorDash, 2020); Fabricator and Riviera posts (2021–2022) |
 
 ## 3. The stack as publicly described
 
@@ -194,7 +194,7 @@ flowchart LR
 
 **Uber**
 
-* Uber Engineering, "Meet Michelangelo: Uber's Machine Learning Platform", 2017; "Scaling Machine Learning at Uber with Michelangelo", 2018; "From Predictive to Generative – How Michelangelo Accelerates Uber's AI Journey", 2024.
+* Uber Engineering, "Meet Michelangelo: Uber's Machine Learning Platform", 2017; "Scaling Machine Learning at Uber with Michelangelo", 2018; "From Predictive to Generative: How Michelangelo Accelerates Uber's AI Journey", 2024.
 * Uber Engineering, "DeepETA: How Uber Predicts Arrival Times Using Deep Learning", February 2022.
 * Uber Engineering, "Experimentation in a Ridesharing Marketplace", 2018, and its 2018 post describing the internals of the experimentation platform.
 * Uber Engineering, "Forecasting at Uber: An Introduction", 2018; "Engineering Extreme Event Forecasting at Uber with Recurrent Neural Networks", 2017.
@@ -207,6 +207,6 @@ flowchart LR
 
 * DoorDash Engineering, "Next-Generation Optimization for Dasher Dispatch at DoorDash", 2020; "Using ML and Optimization to Solve DoorDash's Dispatch Problem", 2021.
 * DoorDash Engineering, "Switchback Tests and Randomized Experimentation Under Network Effects at DoorDash", 2018; "Analyzing Switchback Experiments by Cluster Robust Standard Error to Prevent False Positive Results", 2019.
-* DoorDash Engineering, "Meet Sibyl – DoorDash's New Prediction Service", 2020; "Building a Gigascale ML Feature Store with Redis, Binary Serialization, String Hashing, and Compression", 2020; "Building Riviera: A Declarative Real-Time Feature Engineering Framework", 2021; "Introducing Fabricator: A Declarative Feature Engineering Framework", 2022.
+* DoorDash Engineering, "Meet Sibyl: DoorDash's New Prediction Service", 2020; "Building a Gigascale ML Feature Store with Redis, Binary Serialization, String Hashing, and Compression", 2020; "Building Riviera: A Declarative Real-Time Feature Engineering Framework", 2021; "Introducing Fabricator: A Declarative Feature Engineering Framework", 2022.
 * DoorDash Engineering, "Things Not Strings: Understanding Search Intent with Better Recall", 2022.
 * DoorDash Engineering, posts on ETA prediction for long-tail events (2023) and on multi-task, probabilistic ETA models (2024); "Path to high-quality LLM-based Dasher support automation", 2024.

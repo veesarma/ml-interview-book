@@ -418,9 +418,9 @@ wrong `axis` in softmax (normalising over the batch instead of over classes) tra
     you will write and the shapes you will debug: $(N, d_{in})(d_{in}, d_{out})$.
     Mathematically the gradients transpose: in row convention $dW = X^\top dZ$; in
     column convention $dW = dZ\, X^\top$. If you mix them you get a shape error at
-    best and a silently transposed weight at worst. **Staff follow-up:** PyTorch's
-    `nn.Linear` stores `weight` as $(d_{out}, d_{in})$ and computes `x @ weight.T`,
-    why? Answer: it makes each output unit's weights a contiguous row, which is
+    best and a silently transposed weight at worst. **Staff follow-up:** why does PyTorch's
+    `nn.Linear` store `weight` as $(d_{out}, d_{in})$ and compute `x @ weight.T`?
+    Storing it that way makes each output unit's weights a contiguous row, which is
     convenient for per-unit operations and matches cuBLAS's preferred layout when
     the batch is the leading dimension.
 

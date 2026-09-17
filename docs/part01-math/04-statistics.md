@@ -357,7 +357,7 @@ then deployed under shift; treating a Bayesian posterior with a flat prior on a 
     KDD 2013; A. Deng, Y. Xu, R. Kohavi & T. Walker, "Improving the Sensitivity of Online Controlled Experiments by
     Utilizing Pre-Experiment Data", WSDM 2013 (the CUPED paper); R. Kohavi, D. Tang & Y. Xu, *Trustworthy Online
     Controlled Experiments*, Cambridge University Press, 2020. Bing ran thousands of concurrent experiments; CUPED
-    with a pre-period version of the same metric was reported to cut variance by roughly half on key metrics, 
+    with a pre-period version of the same metric was reported to cut variance by roughly half on key metrics,
     equivalent to doubling traffic. The KDD paper's rules of thumb (sample-ratio-mismatch checks, the surprising
     frequency of "flat" results, Twyman's law for too-good results) are the checklist interviewers expect you to know.
     *Rejected alternative:* more traffic or longer runs, which cost real product velocity.
@@ -431,7 +431,7 @@ then deployed under shift; treating a Bayesian posterior with a flat prior on a 
     Accuracy is meaningless at that base rate (predicting "never fraud" gets 99%). Ask for precision/recall at the
     operating threshold, the PR curve, calibration of the scores (the threshold is a cost decision that needs
     calibrated probabilities), and the CI on recall given the tiny number of positives ($\approx$ 50 fraud cases in
-    5k gives a recall SE of $\sim 7$ points). **Staff follow-up:** *the training set was rebalanced to 50/50, 
+    5k gives a recall SE of $\sim 7$ points). **Staff follow-up:** *the training set was rebalanced to 50/50;
     what happened to calibration?* Scores are shifted by $\log$ of the prior ratio; correct with the
     prior-shift formula or re-fit a temperature/bias on unbalanced validation data.
 

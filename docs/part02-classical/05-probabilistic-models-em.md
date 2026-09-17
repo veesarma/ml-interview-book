@@ -47,8 +47,8 @@ points, repeat. Every round the data becomes more probable under the model.
 ![GMM contours and EM log-likelihood](../assets/figures/part02_gmm_contours.png){ width="720" }
 
 *Figure. Left: density contours of a 2-component GMM fitted by EM and each point's
-responsibility for component 2 (colour): points between the blobs are genuinely
-uncertain, which k-means cannot express. Right: log-likelihood per EM iteration,
+responsibility for component 2 (colour): points between the blobs sit near $r = 0.5$,
+a state k-means cannot represent. Right: log-likelihood per EM iteration,
 non-decreasing as proven in §2.4.*
 
 ## 2. The math

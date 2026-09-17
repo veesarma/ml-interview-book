@@ -1,6 +1,6 @@
 # Probability
 
-> **Why this matters at staff level.** Every model you ship is a probability distribution, 
+> **Why this matters at staff level.** Every model you ship is a probability distribution:
 > a softmax over tokens, a Gaussian over box offsets, a Bernoulli over "will click", and every
 > loss is a negative log-probability. Interviewers probe this at three depths: can you state
 > Bayes' rule and *why the denominator is the hard part*; can you condition and marginalise a

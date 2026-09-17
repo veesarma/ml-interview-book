@@ -136,18 +136,18 @@ retrofits too, but shipped the purpose-built vehicle.
 2025); Zoox testing announcements (Seattle 2021, Austin and Miami 2024).
 
 !!! tip "How to say it in the interview"
-    "If I own the vehicle design, I would design the sensor rig for the perception
+    "If I own the vehicle design, I'd design the sensor rig for the perception
     problem rather than the other way round: symmetric corner pods with overlapping
     fields of view so that one model serves both driving directions and every corner
     is covered twice, which is the layout Zoox describes for its bidirectional
-    robotaxi. I would fuse at the feature level and treat thermal as an extra camera
-    modality with different physics, useful at night and for pedestrians. I would
+    robotaxi. I'd fuse at the feature level and treat thermal as an extra camera
+    modality with different physics, useful at night and for pedestrians. I'd
     keep an independent geometric collision-avoidance layer beneath the learned
-    stack, as Zoox's safety materials describe, so the safety argument does not rest
-    entirely on a neural network. The alternative I would reject is a retrofit
-    layout with a forward bias; it is faster to market but inherits the driver's blind
-    spots. The trade-off is the time and cost of certifying a vehicle with no manual
-    controls. I would evaluate perception with per-corner ablations, because
+    stack, as Zoox's safety materials describe, so the safety argument doesn't rest
+    entirely on a neural network. I'd rule out a retrofit
+    layout with a forward bias; it's faster to market but inherits the driver's blind
+    spots. What this costs is the time and money to certify a vehicle with no manual
+    controls. I'd evaluate perception with per-corner ablations, because
     redundancy is only real if the metrics survive losing a pod, and with a
     night-and-thermal slice."
 
@@ -176,14 +176,14 @@ availability and still leaves the boundary case.
 **Source.** Zoox journal post on sensor staleness (details as published in the post).
 
 !!! tip "How to say it in the interview"
-    "I would make timing a first-class model input and a first-class augmentation,
+    "I'd make timing a first-class model input and a first-class augmentation,
     which is the approach Zoox describes in its sensor-staleness post: give the
     network per-sensor timestamps and train with synthetically delayed streams so it
-    learns to discount stale evidence instead of trusting it. The alternative I would
+    learns to discount stale evidence instead of trusting it. The alternative I'd
     reject is a hard freshness gate; it trades availability for a boundary that still
-    fails at the threshold. The trade-off is a small accuracy cost on clean data and
-    more complex data loaders. I would evaluate with a staleness sweep, accuracy as a
-    function of injected delay per modality, and I would monitor real per-sensor
+    fails at the threshold. I pay a small accuracy cost on clean data and
+    more complex data loaders. I'd evaluate with a staleness sweep, accuracy as a
+    function of injected delay per modality, and I'd monitor real per-sensor
     latency in production so the augmentation matches the fleet's actual
     distribution."
 
@@ -203,13 +203,13 @@ same line. The ML content is the *request* policy: a calibrated uncertainty sign
 decides when to ask, and every request is a labelled hard case for the data engine.
 
 !!! tip "How to say it in the interview"
-    "I would keep humans as advisors, not drivers, which is the design Zoox calls
+    "I'd keep humans as advisors, not drivers, which is the design Zoox calls
     TeleGuidance and Waymo calls Fleet Response: the vehicle asks for a suggested
-    path or interpretation and remains responsible for executing it safely. I would
+    path or interpretation and remains responsible for executing it safely. I'd
     reject teleoperation because it puts network latency and human reaction time
     inside the safety case. The request policy would be a calibrated uncertainty
     threshold with a time budget, and every request would become a training example.
-    I would measure requests per thousand miles, time-to-resolution, and the fraction
+    I'd measure requests per thousand miles, time-to-resolution, and the fraction
     that stop being requests after the next model release."
 
 ### 3.4 Nuro: a licensable, AI-first driver: CIMRL, unified perception, and a compiler
@@ -244,19 +244,19 @@ Safe Autonomous Driving" and the paper (arXiv:2406.08878); Nuro blog, "Unified
 Perception Model"; Nuro blog, "FTL Model Compiler Framework".
 
 !!! tip "How to say it in the interview"
-    "For a planner that has to be safe in closed loop, I would start from an
+    "For a planner that has to be safe in closed loop, I'd start from an
     imitation prior and add reinforcement learning with explicit safety constraints
     on top, letting RL select and refine among imitation-proposed behaviours, which
-    is the structure of Nuro's CIMRL paper (2024). I would reject pure behaviour
+    is the structure of Nuro's CIMRL paper (2024). I'd reject pure behaviour
     cloning because it compounds error and copies human mistakes, and pure RL because
-    reward engineering for driving is where projects die. The trade-off is
-    dependence on the simulator and on the prior's coverage, so I would validate the
+    reward engineering for driving is where projects die. The price is
+    dependence on the simulator and on the prior's coverage, so I'd validate the
     simulator against logged outcomes and keep the imitation data broad. For a
-    licensable driver I would also consolidate perception into one multi-task model
+    licensable driver I'd also consolidate perception into one multi-task model
     and invest in a compiler path to partner hardware, as Nuro's unified-perception
-    and model-compiler posts describe, because portability is the product. I would
+    and model-compiler posts describe, because portability is the product. I'd
     evaluate with closed-loop safety metrics, collisions and constraint violations,
-    on scenario slices, alongside human-likeness metrics, and I would report both
+    on scenario slices, alongside human-likeness metrics, and I'd report both
     because they trade off."
 
 ### 3.5 Aurora: long-range FMCW lidar for trucks
@@ -282,17 +282,17 @@ frame; the rejected alternative is off-the-shelf time-of-flight lidar with veloc
 inferred from tracking, which is adequate for city speeds but late at highway range.
 
 !!! tip "How to say it in the interview"
-    "For highway trucking I would prioritise range and per-point velocity over point
+    "For highway trucking I'd prioritise range and per-point velocity over point
     density, which is why Aurora's FirstLight FMCW lidar is the reference point: it
     returns Doppler velocity for every point and the company states a range beyond
-    450 metres. I would use the velocity channel directly in the detector so moving
+    450 metres. I'd use the velocity channel directly in the detector so moving
     objects at range are separable from clutter without waiting for several frames.
-    The alternative I would reject is time-of-flight lidar plus tracking-derived
+    The alternative I'd pass on is time-of-flight lidar plus tracking-derived
     velocity; at truck stopping distances the extra frames cost time. The trade-off
-    is a proprietary sensor programme and sparser returns, so I would fuse with radar
-    and long-focal cameras for classification at range. I would evaluate detection
-    recall as a function of range and time-to-collision, at night and in rain, which
-    is the metric that matters for a truck."
+    is a proprietary sensor programme and sparser returns, so I'd fuse with radar
+    and long-focal cameras for classification at range. I'd evaluate detection
+    recall as a function of range and time-to-collision, at night and in rain. A truck
+    that detects at 200 metres has already run out of stopping distance."
 
 ### 3.6 Aurora: Verifiable AI and the Safety Case Framework
 
@@ -329,16 +329,16 @@ Bagnell, "AI Alignment: Ensuring the Aurora Driver is Safe and Human-Like" (2024
 night operations (2025).
 
 !!! tip "How to say it in the interview"
-    "I would structure the driver so that a safety case can attach evidence to it:
+    "I'd structure the driver so that a safety case can attach evidence to it:
     learned perception and prediction, learned proposals in planning, but explicit
     interfaces and constraints where requirements must be verified, which is what
     Aurora's Verifiable AI post (2024) argues and what its public Safety Case
     Framework, with claims like proficient, fail-safe and resilient, is built to
-    consume. I would reject a single end-to-end policy for driverless freight, not
-    because it cannot drive well, but because I could not attach evidence to its
+    consume. I'd reject a single end-to-end policy for driverless freight, not
+    because it can't drive well, but because I could not attach evidence to its
     decisions for a regulator or insurer. The trade-off is a ceiling on
     human-likeness and slower iteration at the interfaces, which Aurora's alignment
-    post addresses by learning from human driving inside the bounds. I would evaluate
+    post addresses by learning from human driving inside the bounds. I'd evaluate
     each safety-case claim with its own evidence stream: scenario-sliced closed-loop
     metrics for proficiency, fault-injection tests for fail-safe, and release-over-release
     trend lines for continuous improvement."
@@ -353,12 +353,12 @@ night operations (2025).
     frame; verify pod calibration continuously. Links: [Sensor fusion](../part11-perception-autonomy/03-sensor-fusion.md), [AV perception design](../part17-ml-system-design/05-perception-system-av.md).
 
     !!! tip "How to say it in the interview"
-        "I would canonicalise everything into the vehicle frame so one model serves
-        both directions, and I would use the symmetry as augmentation, mirroring and
+        "I'd canonicalise everything into the vehicle frame so one model serves
+        both directions, and I'd use the symmetry as augmentation, mirroring and
         rotating pod assignments, which is the advantage Zoox's four-corner layout
-        gives. I would reject direction-specific models; they halve the data. The
+        gives. I'd reject direction-specific models; they halve the data. The
         trade-off is that a calibration error at one pod now contaminates both
-        directions, so I would gate on per-pod ablations and monitor calibration
+        directions, so I'd gate on per-pod ablations and monitor calibration
         continuously."
 
 !!! interview "Q2. (Zoox) One lidar stream is arriving 150 ms late intermittently. What happens to your detector and what do you change?"
@@ -369,10 +369,10 @@ night operations (2025).
     [Occupancy & temporal perception](../part11-perception-autonomy/05-occupancy-temporal.md).
 
     !!! tip "How to say it in the interview"
-        "The failure is silent misalignment, ghosts and misplaced boxes, so I would
+        "The failure is silent misalignment, ghosts and misplaced boxes, so I'd
         do what Zoox's staleness post describes: feed timestamps, train with
-        synthetic delay, and evaluate with a delay sweep. I would reject dropping the
-        frame set; availability matters. The trade-off is a small clean-data cost."
+        synthetic delay, and evaluate with a delay sweep. I'd reject dropping the
+        frame set; availability matters. It costs a little accuracy on clean data."
 
 !!! interview "Q3. (Zoox / Nuro / Waymo) Design remote assistance for a driverless fleet. What is the interface, and what must it never do?"
     **Answer sketch.** Guidance not control; calibrated request policy; time budget
@@ -381,8 +381,8 @@ night operations (2025).
 
     !!! tip "How to say it in the interview"
         "It must never drive. Zoox's TeleGuidance and Waymo's Fleet Response both
-        keep the vehicle responsible and the human advisory, and I would follow that
-        line so network latency stays out of the safety case. I would evaluate
+        keep the vehicle responsible and the human advisory, and I'd follow that
+        line so network latency stays out of the safety case. I'd evaluate
         requests per mile and resolution time, and treat every request as a labelled
         hard case."
 
@@ -393,12 +393,12 @@ night operations (2025).
     report safety and human-likeness separately. Link: [Imitation learning](../part12-rl/05-imitation-learning.md).
 
     !!! tip "How to say it in the interview"
-        "I would keep the imitation prior and add constrained RL that selects and
+        "I'd keep the imitation prior and add constrained RL that selects and
         refines among its proposals in simulation, which is Nuro's CIMRL design,
         because it targets exactly the closed-loop gap without hand-written rewards.
-        I would first verify the simulator is not the culprit. The trade-off is
-        simulator dependence, so I would validate against logs, and I would report
-        safety and human-likeness as separate metrics."
+        Before any of that I'd check the simulator isn't the culprit. The cost of
+        this design is that I now depend on the simulator, so I'd validate it against
+        logged outcomes, and I'd report safety and human-likeness separately."
 
 !!! interview "Q5. (Nuro) You license the driver to a partner with a different sensor set and compute. What has to be true of your stack?"
     **Answer sketch.** Sensor-abstracted perception interfaces; a unified multi-task
@@ -407,11 +407,11 @@ night operations (2025).
     suite. Link: [ML platform](../part17-ml-system-design/12-ml-platform-feature-store-monitoring.md).
 
     !!! tip "How to say it in the interview"
-        "Portability is the product, so I would consolidate perception into one
-        multi-task model that is retrained per sensor rig behind a stable interface,
-        and I would own a compiler path to partner hardware, which is what Nuro's
-        unified-perception and model-compiler posts describe. I would reject
-        per-partner forks of the stack. I would evaluate with the same scenario suite
+        "Portability is the product, so I'd consolidate perception into one
+        multi-task model that's retrained per sensor rig behind a stable interface,
+        and I'd own a compiler path to partner hardware, which is what Nuro's
+        unified-perception and model-compiler posts describe. I'd reject
+        per-partner forks of the stack. I'd evaluate with the same scenario suite
         on every platform and gate on parity."
 
 !!! interview "Q6. (Aurora) Why does per-point velocity from FMCW lidar matter for a truck, and what does it not solve?"
@@ -423,8 +423,8 @@ night operations (2025).
     !!! tip "How to say it in the interview"
         "Doppler velocity lets me separate a moving object at 400 metres in one
         frame, which is the stopping-distance argument behind Aurora's FirstLight;
-        it does not classify, and it only sees radial velocity, so I would fuse
-        long-focal cameras for class and use tracking for lateral motion. I would
+        it doesn't classify, and it only sees radial velocity, so I'd fuse
+        long-focal cameras for class and use tracking for lateral motion. I'd
         evaluate recall by range and time-to-collision."
 
 !!! interview "Q7. (Aurora) Write the top level of a safety case for a driverless truck lane and say what evidence each claim needs."
@@ -436,12 +436,12 @@ night operations (2025).
     versioned. Link: [Safety & failure modes](../part15-interpretability-safety/02-safety-failure-modes.md).
 
     !!! tip "How to say it in the interview"
-        "I would decompose the safety claim the way Aurora's public Safety Case
+        "I'd decompose the safety claim the way Aurora's public Safety Case
         Framework does, proficient, fail-safe, continuously improving, resilient and
         trustworthy, and attach a measurable evidence stream to each: scenario-sliced
         closed-loop results, fault-injection tests, release trends, adverse-condition
-        tests and operational audits. I would reject a single aggregate safety metric
-        because it cannot support the argument's structure."
+        tests and operational audits. I'd reject a single aggregate safety metric
+        because it can't support the argument's structure."
 
 !!! interview "Q8. (Aurora) 'Verifiable AI' versus end-to-end: where would you draw the line in the architecture?"
     **Answer sketch.** Learned perception and prediction with measurable interfaces;
@@ -450,11 +450,11 @@ night operations (2025).
     transparency (Bagnell's transparency post). Name what is lost.
 
     !!! tip "How to say it in the interview"
-        "I would let learning own perception, prediction and trajectory proposals,
+        "I'd let learning own perception, prediction and trajectory proposals,
         and keep constraint enforcement and the minimal-risk fallback outside the
         learned policy, which is how I read Aurora's Verifiable AI post and its
-        transparency post. I would reject a monolithic end-to-end driver for freight
-        because I could not attach evidence to it. The trade-off is a ceiling on
+        transparency post. I'd reject a monolithic end-to-end driver for freight
+        because I could not attach evidence to it. The price is a ceiling on
         human-likeness, which the alignment post addresses by learning from human
         driving within bounds."
 
@@ -465,10 +465,10 @@ night operations (2025).
     first, then at night in August 2025).
 
     !!! tip "How to say it in the interview"
-        "I would launch night operations as a separate release with its own
+        "I'd launch night operations as a separate release with its own
         evidence, night-sliced perception metrics and closed-loop night scenarios,
         which is the staging Aurora followed, going driverless by day in May 2025
-        and at night in August 2025. I would lean on the modality that carries
+        and at night in August 2025. I'd lean on the modality that carries
         night, thermal or long-range lidar, and evaluate recall by range at low
         illumination."
 
@@ -480,7 +480,7 @@ night operations (2025).
     [Tracking](../part11-perception-autonomy/04-tracking.md).
 
     !!! tip "How to say it in the interview"
-        "Radial velocity is non-linear in the state, so I would write an extended
+        "Radial velocity is non-linear in the state, so I'd write an extended
         Kalman update with the Jacobian of the measurement, and test on a synthetic
         track where the true velocity is known. That is the measurement an FMCW lidar
         like Aurora's provides per point, and the reason it helps tracking
@@ -495,10 +495,10 @@ night operations (2025).
 
     !!! tip "How to say it in the interview"
         "Zoox bet on the vehicle, Nuro on portability, Aurora on a domain where
-        range and a public safety case decide. For an urban robotaxi I would copy
+        range and a public safety case decide. For an urban robotaxi I'd copy
         redundant symmetric sensing from Zoox, the imitation-plus-constrained-RL
         planner from Nuro's CIMRL, and the claims-and-evidence safety structure from
-        Aurora, and I would say plainly which parts are my inference."
+        Aurora, and I'd say plainly which parts are my inference."
 
 !!! interview "Q12. (All) Design the evaluation that decides a new city is ready."
     **Answer sketch.** Map and ODD definition; scenario bank mined from local
@@ -507,10 +507,10 @@ night operations (2025).
     claims. Link: [Evaluation](../part13-retrieval-eval-reliability/02-evaluation.md).
 
     !!! tip "How to say it in the interview"
-        "I would define the operational domain, mine a city-specific scenario bank,
-        run closed-loop simulation on it, then supervised miles, and I would gate on
+        "I'd define the operational domain, mine a city-specific scenario bank,
+        run closed-loop simulation on it, then supervised miles, and I'd gate on
         safety-case claims with city-matched human benchmarks, the way Waymo's safety
-        hub reports by geography. I would reject reusing another city's numbers as
+        hub reports by geography. I'd reject reusing another city's numbers as
         evidence."
 
 !!! interview "Q13. (All) What is the single most common failure in perception teams you have seen, and how do these companies' write-ups address it?"
@@ -520,7 +520,7 @@ night operations (2025).
     published answers.
 
     !!! tip "How to say it in the interview"
-        "Silent shift hidden by averages. I would answer it the way the public posts
+        "Silent shift hidden by averages. I'd answer it the way the public posts
         do: widen the training distribution to include the failure, as Zoox does for
         staleness, define the operating envelope explicitly, as Aurora does with
         range and night, and gate on slices rather than means."

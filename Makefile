@@ -8,9 +8,11 @@ test:
 
 style:
 	python scripts/check_style.py
+	python scripts/check_markdown.py
 
 fix-style:
 	@for d in docs/part*; do python scripts/fix_style.py $$d; done
+	python scripts/fix_indentation.py
 
 serve:
 	mkdocs serve

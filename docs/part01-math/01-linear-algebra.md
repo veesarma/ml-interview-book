@@ -206,8 +206,8 @@ A = \softmax_{\text{rows}}(S), \qquad
 Y = AV \in \R^{T\times d_v}.
 $$
 
-* $QK^\top$ is a **cross-Gram matrix**: entry $(i, j)$ is the inner product of query $i$ with key $j$, 
-  similarity, not distance. If $Q = K$ it is exactly a Gram matrix and is PSD.
+* $QK^\top$ is a **cross-Gram matrix**: entry $(i, j)$ is the inner product of query $i$ with key $j$:
+  a similarity, not a distance. If $Q = K$ it is exactly a Gram matrix and is PSD.
 * The **$\sqrt{d_k}$ scaling**: if the entries of $q$ and $k$ are independent with zero mean and unit
   variance, $q^\top k$ has variance $d_k$. Dividing by $\sqrt{d_k}$ keeps the scores $O(1)$ so the softmax
   is not saturated at initialisation (saturated softmax $\Rightarrow$ vanishing gradients, see

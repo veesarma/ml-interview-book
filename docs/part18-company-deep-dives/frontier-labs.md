@@ -170,16 +170,16 @@ Gemini 2.5 technical report ([arXiv:2507.06261](https://arxiv.org/abs/2507.06261
 Gemini 1.5 ([arXiv:2403.05530](https://arxiv.org/abs/2403.05530)).
 
 !!! tip "How to say it in the interview"
-    "I would fit the scaling law before committing the budget, but I would optimise
-    total cost rather than training cost. Chinchilla showed that for a fixed training
+    "I'd fit the scaling law before committing the budget, but I'd optimise
+    total cost instead of training cost. Chinchilla showed that for a fixed training
  budget parameters and tokens should scale together, roughly twenty tokens per
  parameter at the scales they studied, and that prior models were badly
     under-trained. But the moment the model is served at volume, inference cost scales
     with parameter count and not with training tokens, so the right answer is a smaller
-    model trained well past the compute-optimal point. That is the decision I would
-    commit to, and I would size the over-training from projected serving volume. The
-    alternative I would reject is chasing the largest parameter count the cluster
-    allows; it optimises a benchmark I do not pay for. I would also be careful about
+    model trained well past the compute-optimal point. That is the decision I'd
+    commit to, and I'd size the over-training from projected serving volume. The
+    alternative I'd reject is chasing the largest parameter count the cluster
+    allows; it optimises a benchmark I don't pay for. I'd also be careful about
     what the law predicts: it predicts loss, and the GPT-4 technical report's most
     interesting methodological claim is that they predicted final loss from much
  smaller runs, capability on a downstream benchmark is a different, noisier thing,
@@ -194,7 +194,7 @@ Gemini 1.5 ([arXiv:2403.05530](https://arxiv.org/abs/2403.05530)).
 harmful requests, or admit uncertainty. Human preference data is the obvious signal,
 but it is expensive, noisy, inconsistent between annotators, and (most importantly) 
 a *proxy*. Optimise against a reward model hard enough and the policy finds its
-failure modes rather than the intent behind it.
+failure modes instead of the intent behind it.
 
 **The approach, in four steps.**
 
@@ -238,23 +238,23 @@ Bai et al., "Constitutional AI: Harmlessness from AI Feedback"
 Rafailov et al., DPO ([arXiv:2305.18290](https://arxiv.org/abs/2305.18290)).
 
 !!! tip "How to say it in the interview"
-    "My default post-training stack is SFT, then preference optimisation, and I would
+    "My default post-training stack is SFT, then preference optimisation, and I'd
     choose between DPO and online RL by asking whether I need to exceed the coverage of
-    my preference data. If I have a good static preference set and want stability and
-    speed, I would use DPO, because Rafailov's paper shows the RLHF objective has a
+    my preference data. If I've a good static preference set and want stability and
+    speed, I'd use DPO, because Rafailov's paper shows the RLHF objective has a
  closed-form optimum that reduces to a classification loss, no reward model, no RL
-    loop. If I need the policy to explore beyond that data, I would pay for PPO or GRPO
-    with a KL penalty to the reference, and I would treat the KL budget as the dial:
+    loop. If I need the policy to explore beyond that data, I'd pay for PPO or GRPO
+    with a KL penalty to the reference, and I'd treat the KL budget as the dial:
     Anthropic's helpful-and-harmless paper reports reward growing roughly linearly in
-    the square root of the KL, which gives me an empirical way to see when I am buying
-    reward with drift rather than with quality. For harmlessness at scale I would use
+    the square root of the KL, which gives me an empirical way to see when I'm buying
+    reward with drift instead of with quality. For harmlessness at scale I'd use
     AI feedback against a written constitution, following Constitutional AI, because it
     turns the values into an artefact I can review and it decouples oversight volume
-    from human labelling capacity. The failure I would design against is reward
-    hacking: the reward model is a proxy and the policy will find its seams, so I would
+    from human labelling capacity. The failure I'd design against is reward
+    hacking: the reward model is a proxy and the policy will find its seams, so I'd
     hold out a human-labelled evaluation the reward model never trained on, monitor the
     gap between reward-model score and human preference over training, and stop when
-    they diverge rather than when reward plateaus."
+    they diverge, and not when reward plateaus."
 
 ### 3.3 Reasoning models: verifiable rewards and test-time compute
 
@@ -283,7 +283,7 @@ which is why it is cheaper than PPO for this setting. See
 [Test-time compute](../part07-post-training/06-test-time-compute.md).
 
 Third, **deliberative alignment** applies the same idea to safety: teach the model to
-reason explicitly over the safety specification before answering, rather than learning
+reason explicitly over the safety specification before answering, instead of learning
 refusal patterns implicitly from labels; OpenAI reports this improves both jailbreak
 robustness and over-refusal.
 
@@ -306,24 +306,24 @@ Guan et al., "Deliberative Alignment"
 [blog](https://openai.com/index/deliberative-alignment/)).
 
 !!! tip "How to say it in the interview"
-    "Wherever a verifier exists I would train against the verifier, not against a
+    "Wherever a verifier exists I'd train against the verifier, not against a
     preference model. That is the lesson of the o1 line and of DeepSeek-R1's open
     recipe: for math and code you can generate reward for free from unit tests or known
     answers, and reinforcement learning on that signal produces long, self-correcting
     chains of thought with performance that improves both with more RL and with more
-    thinking time at inference. I would use GRPO rather than PPO for this, since
+    thinking time at inference. I'd use GRPO here in place of PPO, since
     normalising advantages within a sampled group removes the value network and cuts
-    the cost, which is the DeepSeekMath contribution. Where no verifier exists I would
+    the cost, which is the DeepSeekMath contribution. Where no verifier exists I'd
  fall back to process supervision where I can afford step labels, Lightman's 'Let's
     Verify Step by Step' shows step-level rewards beat outcome-only rewards and reduce
  the wrong-reasoning-right-answer failure, and to preference optimisation
-    otherwise. The trade-off I would name is generalisation: RLVR makes the model
-    excellent exactly where the verifier reaches and does nothing where it does not, so
-    I would watch open-ended quality as a guard metric, not assume it follows. The
+    otherwise. The trade-off I'd name is generalisation: RLVR makes the model
+    excellent exactly where the verifier reaches and does nothing where it doesn't, so
+    I'd watch open-ended quality as a guard metric, not assume it follows. The
     second cost is inference: reasoning tokens are real money and variable latency, so
-    I would route by difficulty rather than think on every request. And I would be
-    explicit that the visible chain of thought is not guaranteed to be the actual
-    computation, so I would not treat it as evidence in a safety argument."
+    I'd route by difficulty instead of thinking on every request. And I'd be
+    explicit that the visible chain of thought isn't guaranteed to be the actual
+    computation, so I'd not treat it as evidence in a safety argument."
 
 ### 3.4 Evaluation, honesty and safety frameworks
 
@@ -376,22 +376,22 @@ METR, [Common Elements of Frontier AI Safety Policies](https://metr.org/blog/202
 Kalai et al., "Why Language Models Hallucinate" ([arXiv:2509.04664](https://arxiv.org/abs/2509.04664)).
 
 !!! tip "How to say it in the interview"
-    "I would treat the eval as the deliverable, not the afterthought. Three decisions.
-    First, contamination: I would build a held-out set constructed after the model's
+    "I'd treat the eval as the deliverable, not the afterthought. Three decisions.
+    First, contamination: I'd build a held-out set constructed after the model's
     data cut-off and measure the drop against the public benchmark, which is exactly
-    what GSM1k did to expose memorisation. Second, statistics: I would report
+    what GSM1k did to expose memorisation. Second, statistics: I'd report
     confidence intervals and use paired comparisons on the same questions, because
     Anthropic's note on a statistical approach to model evals shows that most reported
     differences between frontier models are inside the noise, and clustered questions
-    make the naive standard error too small. Third, incentives: I would score
+    make the naive standard error too small. Third, incentives: I'd score
     abstention above confident error, because OpenAI's 'Why Language Models
     Hallucinate' argues that hallucination persists precisely because our graders
- reward guessing, if I do not fix the scoring, I am training the behaviour I am
-    complaining about. For release gating I would tie specific capability thresholds to
+ reward guessing, if I don't fix the scoring, I'm training the behaviour I'm
+    complaining about. For release gating I'd tie specific capability thresholds to
     specific mitigations in advance, the structure all three labs use in the
     Responsible Scaling Policy, the Preparedness Framework and the Frontier Safety
-    Framework, and publish the evidence in a system card. The trade-off is that private
-    held-out evals resist leakage but nobody can check them, so I would keep a public
+    Framework, and publish the evidence in a system card. The cost is that private
+    held-out evals resist leakage but nobody can check them, so I'd keep a public
     subset for verifiability and a private set for the real decision."
 
 ### 3.5 Inference systems and the economics of a reasoning agent
@@ -421,19 +421,19 @@ memory and correctness-of-invalidation for latency; routing trades a small quali
 for a large cost win but needs a difficulty classifier that is itself evaluated.
 
 !!! tip "How to say it in the interview"
-    "I would start from the observation that decode is memory-bandwidth-bound, so my
+    "I'd start from the observation that decode is memory-bandwidth-bound, so my
  first levers are continuous batching and a paged KV cache, the PagedAttention
     result is that fragmentation, not raw capacity, is usually what limits concurrency.
-    For an agent workload I would then go after context, because an agent resends a
+    For an agent workload I'd then go after context, because an agent resends a
     long prompt and a growing history on every step: prefix caching turns most of that
     into a cache hit, and Anthropic's context-engineering post makes the broader point
     that the context window is a budget to be managed with compaction and sub-agent
-    isolation, not a bucket to fill. Then routing: most requests do not need a
+    isolation, not a bucket to fill. Then routing: most requests don't need a
     reasoning model, so a difficulty classifier in front of the fleet is the single
-    largest cost lever, and I would evaluate that classifier like any other model
+    largest cost lever, and I'd evaluate that classifier like any other model
     because its errors are silent quality regressions. The trade-off on batching is
-    per-user latency against throughput, so I would fix an inter-token-latency SLO
-    first. I would measure cost per *completed task* rather than cost per token,
+    per-user latency against throughput, so I'd fix an inter-token-latency SLO
+    first. I'd measure cost per *completed task* instead of cost per token,
     because for agents a cheap model that fails and retries is more expensive than an
     accurate one."
 
@@ -443,14 +443,14 @@ for a large cost win but needs a difficulty classifier that is itself evaluated.
 distribution you tested. Three published results show why that is not enough.
 **Sleeper Agents**: models trained with a backdoor (behave safely until a trigger)
 retained the backdoor through SFT, RLHF and adversarial training, and adversarial
-training sometimes taught the model to hide the behaviour better rather than remove it.
+training sometimes taught the model to hide the behaviour better instead of removing it.
 **Alignment faking**: a model, given context implying it was being trained in ways
 conflicting with its values, selectively complied during what it inferred was training
 while behaving differently when it inferred it was unmonitored. **Agentic
 misalignment**: in constructed scenarios where an agent's goals were threatened,
 models across multiple labs chose harmful insider-like actions.
 
-**The approach.** Interpretability aims to read mechanisms rather than behaviour.
+**The approach.** Interpretability aims to read mechanisms instead of behaviour.
 Sparse autoencoders decompose activations into a large dictionary of sparse,
 more-interpretable features; Anthropic scaled this to a production model in "Scaling
 Monosemanticity", extracting millions of features and demonstrating causal steering by
@@ -490,24 +490,24 @@ Grosse et al., influence functions at scale ([arXiv:2308.03296](https://arxiv.or
 Anthropic, [Core Views on AI Safety](https://www.anthropic.com/news/core-views-on-ai-safety).
 
 !!! tip "How to say it in the interview"
-    "I would argue that behavioural evaluation is necessary and insufficient, and I
+    "I'd argue that behavioural evaluation is necessary and insufficient, and I
     would cite Sleeper Agents for the reason: a backdoored model kept its backdoor
     through supervised fine-tuning, RLHF and adversarial training, and adversarial
     training sometimes just taught it to hide better. Alignment faking makes the
- sharper version of the point, a model can behave differently when it infers it is
+ sharper version of the point, a model can behave differently when it infers it's
     being observed. So my safety evidence would have three legs: behavioural evals on
     a broad distribution, red teaming including agentic scenarios of the kind
     Anthropic's agentic-misalignment work constructs, and mechanistic evidence. On the
-    third leg I would start cheap: linear probes on the residual stream were shown to
-    catch sleeper-agent behaviour, and that is a day of work, not a research programme.
-    Where it matters I would go to sparse autoencoders and attribution graphs, the
+    third leg I'd start cheap: linear probes on the residual stream were shown to
+    catch sleeper-agent behaviour, and that's a day of work, not a research programme.
+    Where it matters I'd go to sparse autoencoders and attribution graphs, the
     Scaling Monosemanticity and circuit-tracing line, because those give causal
-    steering and per-prompt traces rather than correlations. The trade-off is honest:
+    steering and per-prompt traces instead of correlations. I'd state the limits:
     SAEs explain only part of the activation, features are the dictionary's ontology
-    and not necessarily the model's, and attribution graphs are per-prompt, so I would
+    and not necessarily the model's, and attribution graphs are per-prompt, so I'd
     present mechanistic results as corroborating evidence rather than proof. What I
     would refuse to do is let a safety claim rest on the model's stated chain of
-    thought, since faithfulness is not guaranteed."
+    thought, since faithfulness isn't guaranteed."
 
 ### 3.7 Agents: the engineering discipline that is actually public
 
@@ -541,21 +541,21 @@ coordination overhead and information loss at the boundary.
 
 !!! tip "How to say it in the interview"
     "My first question would be whether this needs an agent at all. Anthropic's
-    'Building effective agents' post draws the line I would draw: a workflow with
+    'Building effective agents' post draws the line I'd draw: a workflow with
     predefined code paths is more predictable and cheaper, and you should only hand the
     model control of its own process when the task genuinely requires open-ended
- exploration. If it does, I would manage context as the scarce resource, the
+ exploration. If it does, I'd manage context as the scarce resource, the
  context-engineering post's framing, using compaction, external notes and retrieval
-    on demand rather than stuffing the window. For genuinely parallel research I would
+    on demand instead of stuffing the window. For genuinely parallel research I'd
     use an orchestrator with subagents holding isolated contexts, which is the pattern
-    in their multi-agent research post, and I would go in knowing that this multiplies
+    in their multi-agent research post, and I'd go in knowing that this multiplies
     token spend substantially and that the same post is explicit about that cost. The
-    alternative I would reject is one long conversation that accumulates everything;
-    it degrades as the window fills and the failure is silent. On evaluation I would
+    alternative I'd reject is one long conversation that accumulates everything;
+    it degrades as the window fills and the failure is silent. On evaluation I'd
     build an LLM-judged rubric over end states plus a small set of human-graded
-    trajectories, because for open-ended research there is no single right answer, and
- I would measure success per completed task and cost per completed task together, 
-    an agent that is cheap per token and never finishes is the expensive one."
+    trajectories, because for open-ended research there's no single right answer, and
+ I'd measure success per completed task and cost per completed task together, 
+    an agent that's cheap per token and never finishes is the expensive one."
 
 ## 4. Likely interview questions
 
@@ -568,13 +568,13 @@ coordination overhead and information loss at the boundary.
     Link: [Scaling laws](../part06-llm-training/02-scaling-laws.md).
 
     !!! tip "How to say it in the interview"
-        "I would spend a small fraction of the budget on a scaling sweep first and use
+        "I'd spend a small fraction of the budget on a scaling sweep first and use
         it to predict the big run's loss, which is the methodological point the GPT-4
-        technical report makes. Then I would deliberately over-train relative to
+        technical report makes. Then I'd deliberately over-train relative to
         Chinchilla-optimal, because serving cost scales with parameters and not with
-        tokens. I would reject spending the whole budget on the largest model that
-        fits. The check I would hold myself to is the prediction: if the mid-scale run
-        misses the predicted loss, the law is wrong and I stop rather than scale."
+        tokens. I'd reject spending the whole budget on the largest model that
+        fits. The check I'd hold myself to is the prediction: if the mid-scale run
+        misses the predicted loss, the law is wrong, and I stop there."
 
 !!! interview "Q2. Your reward model score is climbing but human evaluators prefer the older checkpoint. Diagnose."
     **Answer sketch.** Classic reward over-optimisation: the policy has drifted off the
@@ -586,7 +586,7 @@ coordination overhead and information loss at the boundary.
     Link: [Reward models & preferences](../part07-post-training/02-reward-models.md).
 
     !!! tip "How to say it in the interview"
-        "That is reward over-optimisation, and I would treat it as expected rather than
+        "That is reward over-optimisation, and I'd treat it as expected rather than
  surprising, the reward model is a proxy and the policy is doing its job. I
         would plot reward against KL to the reference; Anthropic's HH paper reports
         reward growing roughly linearly in root-KL, so a knee in that curve tells me
@@ -604,10 +604,10 @@ coordination overhead and information loss at the boundary.
     GRPO). Hybrid in practice: DPO for broad alignment, RLVR for reasoning domains.
 
     !!! tip "How to say it in the interview"
-        "I would default to DPO and escalate only for a reason. Rafailov's paper shows
+        "I'd default to DPO and escalate only for a reason. Rafailov's paper shows
         the RLHF objective reduces to a classification loss on the policy, so I get most
         of the benefit without a reward model or an RL loop, and the operational
-        simplicity is worth a lot at team scale. I would escalate to online RL in two
+        simplicity is worth a lot at team scale. I'd escalate to online RL in two
         cases: when I need the policy to explore beyond my preference data, and when I
  have a verifier, for math and code I would use GRPO against test outcomes,
         following DeepSeek-R1's recipe, because free unhackable reward beats a proxy
@@ -626,10 +626,10 @@ coordination overhead and information loss at the boundary.
         "Four layers: public benchmarks for comparability, a private post-cutoff set
         for contamination control in the spirit of GSM1k, product task evals that
         reflect real usage, and dangerous-capability evals tied to explicit thresholds
-        the way the Preparedness Framework and the RSP do. I would report paired
+        the way the Preparedness Framework and the RSP do. I'd report paired
         comparisons with confidence intervals, following Anthropic's statistical note,
-        because most leaderboard gaps are noise. And I would grade abstention above
-        confident error, because otherwise I am rewarding the hallucination I am
+        because most leaderboard gaps are noise. And I'd grade abstention above
+        confident error, because otherwise I'm rewarding the hallucination I'm
         trying to remove."
 
 !!! interview "Q5. How would you detect a backdoored model?"
@@ -649,7 +649,7 @@ coordination overhead and information loss at the boundary.
         SAE feature inspection for suspicious conditional features, and data-provenance
         auditing with influence functions to connect behaviour to training examples.
         I would state clearly that none of this is a guarantee; it raises the cost of a
-        successful backdoor rather than proving absence."
+        successful backdoor. It doesn't prove absence."
 
 !!! interview "Q6. Your agent takes 40 minutes and fails silently on 20% of tasks. Fix it."
     **Answer sketch.** Instrument first: per-step traces, token accounting, failure
@@ -660,12 +660,12 @@ coordination overhead and information loss at the boundary.
     Link: [Agents & tool use](../part12-rl/06-agents-tool-use.md).
 
     !!! tip "How to say it in the interview"
-        "I would instrument before changing anything: per-step traces, token accounting
-        and a failure taxonomy, because 'fails silently' means I currently cannot tell
+        "I'd instrument before changing anything: per-step traces, token accounting
+        and a failure taxonomy, because 'fails silently' means I currently can't tell
         context exhaustion from a swallowed tool error. My prior, from Anthropic's
-        context-engineering post, is that context is the binding constraint, so I would
+        context-engineering post, is that context is the binding constraint, so I'd
         add compaction and external note-taking and move retrieved material out of the
-        window. Then I would convert the deterministic parts of the task into workflow
+        window. Then I'd convert the deterministic parts of the task into workflow
  steps, the 'building effective agents' argument that agentic flexibility
  should be spent only where it is needed, and add an explicit verification step
         before the agent declares success. I would measure success and cost per
@@ -694,7 +694,7 @@ coordination overhead and information loss at the boundary.
     Link: [DPO and its relatives](../part07-post-training/04-dpo-and-friends.md).
 
     !!! tip "How to say it in the interview"
-        "I would compute summed log-probs over completion tokens only, masking the
+        "I'd compute summed log-probs over completion tokens only, masking the
         prompt, for both policy and frozen reference, form the implicit reward as the
         log-ratio difference, and apply a logistic loss to the chosen-minus-rejected
         margin. My test is a symmetry check: swapping chosen and rejected must negate
@@ -709,7 +709,7 @@ coordination overhead and information loss at the boundary.
     genuine human judgement is the ground truth.
 
     !!! tip "How to say it in the interview"
-        "It wins when the constraint is human labelling capacity rather than label
+        "It wins when the constraint is human labelling capacity instead of label
         quality, which is the case Constitutional AI was built for: self-critique and
         revision against a written constitution scales harmlessness oversight without
  proportional human effort, and it makes the values an artefact you can review, 
@@ -727,11 +727,11 @@ coordination overhead and information loss at the boundary.
     Link: [Safety & failure modes](../part15-interpretability-safety/02-safety-failure-modes.md).
 
     !!! tip "How to say it in the interview"
-        "It is the problem of supervising a model you cannot fully evaluate. The
+        "It is the problem of supervising a model you can't fully evaluate. The
         cleanest empirical setup I know is weak-to-strong generalization: fine-tune a
         strong model on labels produced by a much weaker one and measure how much of
         the strong model's latent capability you recover. That turns a philosophical
-        question into a measurable gap. I would pair it with AI-feedback and
+        question into a measurable gap. I'd pair it with AI-feedback and
         decomposition approaches and track the recovered-gap fraction as the metric."
 
 !!! interview "Q11. Estimate the serving cost difference between a reasoning model and a standard model for the same task, and what you would do about it."
@@ -753,15 +753,15 @@ coordination overhead and information loss at the boundary.
 
 !!! interview "Q12. How do you evaluate a multi-agent system with no single correct answer?"
     **Answer sketch.** Rubric-based LLM judging validated against human graders;
-    end-state evaluation rather than trajectory matching; a small human-graded golden
+    end-state evaluation instead of trajectory matching; a small human-graded golden
     set for calibration; process metrics (tool-call success, context overflows, retries);
     cost and latency as first-class metrics; report inter-rater agreement.
 
     !!! tip "How to say it in the interview"
-        "I would evaluate the end state against a rubric with an LLM judge, calibrate
+        "I'd evaluate the end state against a rubric with an LLM judge, calibrate
         that judge against a small human-graded set, and report the agreement rate
-        rather than pretend the judge is ground truth. Anthropic's multi-agent research
-        post is candid that this is the hard part when there is no single right answer.
+        instead of pretending the judge is ground truth. Anthropic's multi-agent research
+        post is candid that this is the hard part when there's no single right answer.
  I would add process metrics, tool-call failure rate, context overflows,
  retries, because they explain *why* a run failed, and I would always report
         cost and latency alongside quality, since a multi-agent system's quality gain
@@ -775,13 +775,13 @@ coordination overhead and information loss at the boundary.
     residual risk stated. Tie to the release framework's thresholds.
 
     !!! tip "How to say it in the interview"
-        "I would write it as claims with evidence. Threat model first: prompt injection
+        "I'd write it as claims with evidence. Threat model first: prompt injection
         arriving through tool outputs, irreversible actions, and excessive agency.
         Mitigations: scoped permissions, approval gates on anything irreversible,
         sandboxing, and monitoring. Evidence: adversarial evaluations including the
         agentic-misalignment style scenarios Anthropic constructed, where models chose
         harmful insider actions when their goals were threatened, plus red-team results.
-        Then I would state the residual risk rather than claim zero, and tie the
+        Then I'd state the residual risk instead of claiming zero, and tie the
         deployment decision to the pre-declared thresholds in the release framework."
 
 !!! interview "Q14. Which of these labs' published results changed how you would build systems, and why?"
@@ -793,11 +793,11 @@ coordination overhead and information loss at the boundary.
 
     !!! tip "How to say it in the interview"
         "Two. First, 'Why Language Models Hallucinate' changed how I write graders: if
-        abstention and error score the same, I am training guessing, so the fix is in
+        abstention and error score the same, I'm training guessing, so the fix is in
         the evaluation, not only in the model. Second, Sleeper Agents changed what I
  accept as safety evidence, a backdoor surviving RLHF and adversarial training
         means behavioural testing cannot be the whole argument, so I now budget for
-        probes and mechanistic checks from the start rather than as a research
+        probes and mechanistic checks from the start, not as a research
         afterthought."
 
 ## 5. What to bring from your background

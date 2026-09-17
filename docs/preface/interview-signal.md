@@ -126,7 +126,7 @@ dot-product attention with a causal mask".
     "The follow-ups you would ask are a KV cache for decoding, where the mask becomes
     a single row and $K, V$ are appended per step, and memory at long context, where
     the $T^2$ scores never need to be materialised if you compute softmax online in
- tiles, that is what FlashAttention does. Which one would you like?"
+    tiles, that is what FlashAttention does. Which one would you like?"
 
 The staff answer is not longer because it says more things; it is longer because
 each thing it says is a decision with a reason.
@@ -213,7 +213,7 @@ KV-cache memory?"
 !!! example "Staff answer"
     "Start from the number: per sequence the cache is
     $2 \cdot L \cdot H_{kv} \cdot d_\text{head} \cdot T \cdot \text{bytes}$, so the levers are
- the number of KV heads, the precision, and the sequence length, and the fourth,
+    the number of KV heads, the precision, and the sequence length, and the fourth,
     hidden lever is *how many sequences you hold at once*, because the cache is what
     caps batch size and therefore throughput in the memory-bound decode regime.
     Reducing $H_{kv}$ (GQA, or MQA in the limit) is a *training-time* decision: it
@@ -225,7 +225,7 @@ KV-cache memory?"
     the asymptotics, but they change the model's behaviour, so they need an
     evaluation on tasks that require long-range recall. Paging does not reduce bytes;
     it reduces waste from fragmentation and pre-allocation, and it is what lets you
- run larger batches, so if the goal is throughput rather than fitting one long
+    run larger batches, so if the goal is throughput rather than fitting one long
     sequence, paging plus continuous batching is what I would do first because it
     has no quality cost. My decision depends on which constraint we are actually
     hitting: if it is one sequence not fitting, quantise then window; if it is
@@ -294,8 +294,8 @@ perception system for a delivery robot that operates on sidewalks".
     on vulnerable road users by range, lighting and occlusion; a scenario-based
     closed-loop test in simulation because open-loop mAP does not predict freezing
     behaviour; a shadow-mode deployment before any behaviour change ships. Then the
- bottleneck at 10×: "at ten cities the long tail is city-specific, curb
- geometry, signage, weather, and the labelling budget, not the model, becomes the
+    bottleneck at 10×: "at ten cities the long tail is city-specific, curb
+    geometry, signage, weather, and the labelling budget, not the model, becomes the
     constraint, so I would build the slice-based triage now rather than later."
 
 **Common failure patterns.**
@@ -351,7 +351,7 @@ time your model underperformed in production".
     volume. That was my system and my monitoring design, so the first thing I owned
     was the detection gap, not the model. I made two decisions. Short term, I had us
     fine-tune on a few thousand labelled examples of the new type, which recovered
- accuracy in a week. Long term, I argued for (and got) per-document-type
+    accuracy in a week. Long term, I argued for (and got) per-document-type
     accuracy slices with alerting on any slice above a volume threshold, and a rule
     that a new document type cannot onboard without a labelled evaluation slice. That
     second decision slowed onboarding by about a week per type and the product team
