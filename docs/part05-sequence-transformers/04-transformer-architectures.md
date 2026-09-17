@@ -615,8 +615,11 @@ class GPT(nn.Module):
 The two lines that carry the cache logic:
 
 ```python
-offset = 0 if cache is None else cache.length   # absolute position of idx[:, 0]
-mask = causal_mask(T, ...) if cache is None else causal_mask_with_cache(T, offset + T, ...)
+offset = 0 if cache is None else cache.length  # absolute position of idx[:, 0]
+if cache is None:
+    mask = causal_mask(T, idx.device)                        # (1, 1, T, T)
+else:
+    mask = causal_mask_with_cache(T, offset + T, idx.device)  # (1, 1, T, offset + T)
 ```
 
 `offset` is what makes positional encoding correct during decode: the new token is at absolute

@@ -533,7 +533,7 @@ class WordPieceTokenizer:
 The scoring line is the whole difference from BPE:
 
 ```python
-best = max(pair_counts, key=lambda p: (pair_counts[p] / (sym_counts[p[0]] * sym_counts[p[1]]), p))
+best: Pair = max(pair_counts, key=lambda p: (pair_counts[p] / (sym_counts[p[0]] * sym_counts[p[1]]), p))
 ```
 
 `tokenize_word` is greedy longest-match: try the longest prefix in the vocabulary, emit it, continue

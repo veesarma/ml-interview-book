@@ -714,7 +714,8 @@ queries.
     query, with coarse quantisation plus PQ tuned for recall/latency and later stages
     retrained to consume embedding features. **Why.** Embedding retrieval alone lost the
     precision of exact term constraints; hybrid inside one engine kept both. Paper:
-    "Embedding-based Retrieval in Facebook Search", arXiv:2006.11632.
+    ["Embedding-based Retrieval in Facebook Search"](https://arxiv.org/abs/2006.11632),
+    KDD 2020, arXiv:2006.11632.
 
 !!! production "Google / YouTube: two-tower retrieval with sampling-bias correction (Yi et al., RecSys 2019)"
     **Problem.** Training a softmax over hundreds of millions of items is impossible;
@@ -724,8 +725,9 @@ queries.
     appearances of item $j$ in the stream (a streaming frequency estimator). Retrieval is
     a dot product over item embeddings with an ANN index. **Why.** The correction makes
     the cheap in-batch estimator approximate the full softmax and stopped popular items
-    from being pushed away as false negatives. Paper: "Sampling-Bias-Corrected Neural
-    Modeling for Large Corpus Item Recommendations", RecSys 2019.
+    from being pushed away as false negatives. Paper:
+    ["Sampling-Bias-Corrected Neural Modeling for Large Corpus Item Recommendations"](https://research.google/pubs/sampling-bias-corrected-neural-modeling-for-large-corpus-item-recommendations/),
+    RecSys 2019.
 
 !!! production "Meta: Faiss (Johnson, Douze & Jégou 2017; Douze et al. 2024)"
     **Problem.** Billion-scale similarity search for images and embeddings with
@@ -735,8 +737,12 @@ queries.
     bound rather than sort bound. The 2024 paper describes the design principles: every
     index is a point in the (recall, latency, memory, build time) space and the library
     exposes the knobs explicitly. **Why.** No single index wins; a library that makes the
-    trade-off explicit lets each product pick its point. Papers: "Billion-scale
-    similarity search with GPUs", arXiv:1702.08734; "The Faiss library", arXiv:2401.08281.
+    trade-off explicit lets each product pick its point. Papers:
+    ["Billion-scale similarity search with GPUs"](https://arxiv.org/abs/1702.08734),
+    arXiv:1702.08734, and ["The Faiss library"](https://arxiv.org/abs/2401.08281),
+    arXiv:2401.08281; release post:
+    ["Faiss: A library for efficient similarity search"](https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/),
+    Engineering at Meta, March 2017.
 
 !!! production "Google: ScaNN (Guo et al., ICML 2020)"
     **Problem.** Serve MIPS at scale with quantised vectors without the recall loss that
@@ -745,9 +751,11 @@ queries.
     changes inner products with likely queries) more than the orthogonal component, plus
     a partitioning stage and a re-scoring stage. **Why.** For MIPS, minimising *total*
     reconstruction error is the wrong objective; minimising the error that affects the
-    ranking gives better recall at the same bits. Paper: "Accelerating Large-Scale
-    Inference with Anisotropic Vector Quantization", arXiv:1908.10396; Google AI blog post
-    "Announcing ScaNN: Efficient Vector Similarity Search" (July 2020).
+    ranking gives better recall at the same bits. Paper:
+    ["Accelerating Large-Scale Inference with Anisotropic Vector Quantization"](https://arxiv.org/abs/1908.10396),
+    ICML 2020, arXiv:1908.10396; Google Research blog post
+    ["Announcing ScaNN: Efficient Vector Similarity Search"](https://research.google/blog/announcing-scann-efficient-vector-similarity-search/)
+    (July 2020).
 
 !!! production "Anthropic: contextual retrieval (September 2024)"
     **Problem.** Chunks lose their context when embedded in isolation ("revenue grew
@@ -759,7 +767,8 @@ queries.
     BM25 reduced the top-20-chunk retrieval failure rate by 49 % relative to the baseline,
     and 67 % when combined with reranking. **Why.** Hybrid retrieval and reranking are
     complementary to better chunk representations; each addresses a different loss of
-    recall. Post: "Introducing Contextual Retrieval", anthropic.com news, 2024.
+    recall. Post: ["Introducing Contextual Retrieval"](https://www.anthropic.com/engineering/contextual-retrieval),
+    Anthropic, September 2024.
 
 ## 6. Interview questions and strong answers
 
@@ -941,56 +950,64 @@ each one moves.
 
 ## References
 
-URLs are omitted in this build because they could not be verified; search the exact
-title.
-
-* Bachrach et al., "Speeding up the Xbox recommender system using a Euclidean
-  transformation for inner-product spaces", RecSys 2014.
-* Shrivastava & Li, "Asymmetric LSH (ALSH) for Sublinear Time Maximum Inner Product
-  Search (MIPS)", NeurIPS 2014, arXiv:1405.5869.
-* Robertson & Zaragoza, "The Probabilistic Relevance Framework: BM25 and Beyond",
-  Foundations and Trends in IR, 2009.
-* Formal, Piwowarski & Clinchant, "SPLADE: Sparse Lexical and Expansion Model for
-  First Stage Ranking", SIGIR 2021, arXiv:2107.05720.
-* Karpukhin et al., "Dense Passage Retrieval for Open-Domain Question Answering",
-  EMNLP 2020, arXiv:2004.04906.
-* Khattab & Zaharia, "ColBERT: Efficient and Effective Passage Search via Contextualized
-  Late Interaction over BERT", SIGIR 2020, arXiv:2004.12832.
-* Kusupati et al., "Matryoshka Representation Learning", NeurIPS 2022, arXiv:2205.13147.
-* Jégou, Douze & Schmid, "Product Quantization for Nearest Neighbor Search", IEEE TPAMI 2011.
-* Ge, He, Ke & Sun, "Optimized Product Quantization", CVPR 2013.
-* Malkov & Yashunin, "Efficient and robust approximate nearest neighbor search using
-  Hierarchical Navigable Small World graphs", IEEE TPAMI 2018, arXiv:1603.09320.
-* Johnson, Douze & Jégou, "Billion-scale similarity search with GPUs", arXiv:1702.08734.
-* Douze et al., "The Faiss library", 2024, arXiv:2401.08281.
-* Guo et al., "Accelerating Large-Scale Inference with Anisotropic Vector Quantization",
-  ICML 2020, arXiv:1908.10396; Google AI Blog, "Announcing ScaNN", 2020.
-* Subramanya et al., "DiskANN: Fast Accurate Billion-point Nearest Neighbor Search on a
-  Single Node", NeurIPS 2019.
-* Gollapudi et al., "Filtered-DiskANN: Graph Algorithms for Approximate Nearest Neighbor
-  Search with Filters", WWW 2023.
-* Patel et al., "ACORN: Performant and Predicate-Agnostic Search Over Vector Embeddings
-  and Structured Data", SIGMOD 2024, arXiv:2403.04871.
-* Ootomo et al., "CAGRA: Highly Parallel Graph Construction and Approximate Nearest
-  Neighbor Search for GPUs", arXiv:2308.15136.
-* Cormack, Clarke & Buettcher, "Reciprocal Rank Fusion outperforms Condorcet and
-  individual Rank Learning Methods", SIGIR 2009.
-* Huang et al., "Embedding-based Retrieval in Facebook Search", KDD 2020, arXiv:2006.11632.
-* Yi et al., "Sampling-Bias-Corrected Neural Modeling for Large Corpus Item
-  Recommendations", RecSys 2019.
-* Lewis et al., "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
-  NeurIPS 2020, arXiv:2005.11401.
-* Gao et al., "Precise Zero-Shot Dense Retrieval without Relevance Labels" (HyDE),
-  arXiv:2212.10496.
-* Asai et al., "Self-RAG: Learning to Retrieve, Generate, and Critique through
-  Self-Reflection", arXiv:2310.11511.
-* Edge et al., "From Local to Global: A Graph RAG Approach to Query-Focused
-  Summarization", arXiv:2404.16130.
-* Liu et al., "Lost in the Middle: How Language Models Use Long Contexts", TACL 2024,
-  arXiv:2307.03172.
-* Es et al., "RAGAS: Automated Evaluation of Retrieval Augmented Generation",
-  arXiv:2309.15217.
-* Anthropic, "Introducing Contextual Retrieval", 2024 (anthropic.com news).
+* Bachrach et al., ["Speeding up the Xbox recommender system using a Euclidean
+  transformation for inner-product spaces"](https://dl.acm.org/doi/10.1145/2645710.2645741), RecSys 2014.
+* Shrivastava & Li, ["Asymmetric LSH (ALSH) for Sublinear Time Maximum Inner Product
+  Search (MIPS)"](https://arxiv.org/abs/1405.5869), NeurIPS 2014, arXiv:1405.5869.
+* Robertson & Zaragoza, ["The Probabilistic Relevance Framework: BM25 and
+  Beyond"](https://www.nowpublishers.com/article/Details/INR-019), Foundations and
+  Trends in IR, 2009.
+* Formal, Piwowarski & Clinchant, ["SPLADE: Sparse Lexical and Expansion Model for
+  First Stage Ranking"](https://arxiv.org/abs/2107.05720), SIGIR 2021, arXiv:2107.05720.
+* Karpukhin et al., ["Dense Passage Retrieval for Open-Domain Question
+  Answering"](https://arxiv.org/abs/2004.04906), EMNLP 2020, arXiv:2004.04906.
+* Khattab & Zaharia, ["ColBERT: Efficient and Effective Passage Search via Contextualized
+  Late Interaction over BERT"](https://arxiv.org/abs/2004.12832), SIGIR 2020, arXiv:2004.12832.
+* Kusupati et al., ["Matryoshka Representation Learning"](https://arxiv.org/abs/2205.13147),
+  NeurIPS 2022, arXiv:2205.13147.
+* Jégou, Douze & Schmid, ["Product Quantization for Nearest Neighbor
+  Search"](https://dl.acm.org/doi/10.1109/TPAMI.2010.57), IEEE TPAMI 33(1), 2011.
+* Ge, He, Ke & Sun, ["Optimized Product Quantization for Approximate Nearest Neighbor
+  Search"](https://www.cv-foundation.org/openaccess/content_cvpr_2013/html/Ge_Optimized_Product_Quantization_2013_CVPR_paper.html), CVPR 2013.
+* Malkov & Yashunin, ["Efficient and robust approximate nearest neighbor search using
+  Hierarchical Navigable Small World graphs"](https://arxiv.org/abs/1603.09320), IEEE
+  TPAMI 2018, arXiv:1603.09320.
+* Johnson, Douze & Jégou, ["Billion-scale similarity search with
+  GPUs"](https://arxiv.org/abs/1702.08734), 2017, arXiv:1702.08734; Engineering at Meta,
+  ["Faiss: A library for efficient similarity search"](https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/), 2017.
+* Douze et al., ["The Faiss library"](https://arxiv.org/abs/2401.08281), 2024, arXiv:2401.08281.
+* Guo et al., ["Accelerating Large-Scale Inference with Anisotropic Vector
+  Quantization"](https://arxiv.org/abs/1908.10396), ICML 2020, arXiv:1908.10396; Google
+  Research blog, ["Announcing ScaNN: Efficient Vector Similarity
+  Search"](https://research.google/blog/announcing-scann-efficient-vector-similarity-search/), 2020.
+* Subramanya et al., ["DiskANN: Fast Accurate Billion-point Nearest Neighbor Search on a
+  Single Node"](https://www.microsoft.com/en-us/research/publication/diskann-fast-accurate-billion-point-nearest-neighbor-search-on-a-single-node/), NeurIPS 2019.
+* Gollapudi et al., ["Filtered-DiskANN: Graph Algorithms for Approximate Nearest Neighbor
+  Search with Filters"](https://dl.acm.org/doi/10.1145/3543507.3583552), WWW 2023.
+* Patel et al., ["ACORN: Performant and Predicate-Agnostic Search Over Vector Embeddings
+  and Structured Data"](https://arxiv.org/abs/2403.04871), SIGMOD 2024, arXiv:2403.04871.
+* Ootomo et al., ["CAGRA: Highly Parallel Graph Construction and Approximate Nearest
+  Neighbor Search for GPUs"](https://arxiv.org/abs/2308.15136), arXiv:2308.15136.
+* Cormack, Clarke & Buettcher, ["Reciprocal Rank Fusion outperforms Condorcet and
+  individual Rank Learning Methods"](https://research.google/pubs/reciprocal-rank-fusion-outperforms-condorcet-and-individual-rank-learning-methods/), SIGIR 2009.
+* Huang et al., ["Embedding-based Retrieval in Facebook
+  Search"](https://arxiv.org/abs/2006.11632), KDD 2020, arXiv:2006.11632.
+* Yi et al., ["Sampling-Bias-Corrected Neural Modeling for Large Corpus Item
+  Recommendations"](https://research.google/pubs/sampling-bias-corrected-neural-modeling-for-large-corpus-item-recommendations/), RecSys 2019.
+* Lewis et al., ["Retrieval-Augmented Generation for Knowledge-Intensive NLP
+  Tasks"](https://arxiv.org/abs/2005.11401), NeurIPS 2020, arXiv:2005.11401.
+* Gao et al., ["Precise Zero-Shot Dense Retrieval without Relevance
+  Labels"](https://arxiv.org/abs/2212.10496) (HyDE), ACL 2023, arXiv:2212.10496.
+* Asai et al., ["Self-RAG: Learning to Retrieve, Generate, and Critique through
+  Self-Reflection"](https://arxiv.org/abs/2310.11511), ICLR 2024, arXiv:2310.11511.
+* Edge et al., ["From Local to Global: A Graph RAG Approach to Query-Focused
+  Summarization"](https://arxiv.org/abs/2404.16130), arXiv:2404.16130.
+* Liu et al., ["Lost in the Middle: How Language Models Use Long
+  Contexts"](https://arxiv.org/abs/2307.03172), TACL 2024, arXiv:2307.03172.
+* Es et al., ["RAGAS: Automated Evaluation of Retrieval Augmented
+  Generation"](https://arxiv.org/abs/2309.15217), EACL 2024 demos, arXiv:2309.15217.
+* Anthropic, ["Introducing Contextual
+  Retrieval"](https://www.anthropic.com/engineering/contextual-retrieval), September 2024.
 * Weaviate, Milvus and Pinecone documentation pages on filtered vector search (titles:
   "Filtered search" / "Metadata filtering"), consulted for the pre-/post-/in-filter
   descriptions in §4.2.

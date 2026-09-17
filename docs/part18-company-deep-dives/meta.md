@@ -3,7 +3,7 @@
 > **Why this matters at staff level.** Meta interviews for ranking, ads, integrity and Reality Labs roles are graded on whether you can reason about *their* funnel: billions of candidates, a strict per-request compute budget, multi-task objectives that trade engagement against integrity and advertiser value, and models that must retrain continuously. Strong signal is naming the published design (DLRM, the Instagram Explore funnel, HSTU, Few-Shot Learner, SAM/DINOv2), saying what trade-off it encodes, and committing to a decision with an evaluation plan.
 
 !!! warning "Sources in this chapter"
-    Every claim below is tied to a public Meta paper, engineering post or talk, cited by exact title, venue and year in [Sources](#sources). URLs are omitted where they could not be verified in the build environment (STYLE.md §4); search the exact title. Anything not in a public source is marked **inference**.
+    Every claim below is tied to a public Meta paper, engineering post or talk, cited by exact title, venue and year in [Sources](#sources), with a link to the primary source wherever that link could be verified (STYLE.md §4). Where a source carries no link, search the exact title. Anything not in a public source is marked **inference**.
 
 ## 1. The business in one paragraph
 
@@ -55,7 +55,7 @@ flowchart LR
 
 **The problem.** Recommendation models are dominated by sparse categorical features (user IDs, post IDs, page IDs) that must be embedded; the dense MLP part is small. That makes them memory- and bandwidth-bound rather than FLOP-bound, and it makes naïve "scale the transformer" recipes fail.
 
-**The approach.** DLRM (2019) fixed the template: embedding tables for sparse features, a bottom MLP for dense features, explicit pairwise feature interactions (dot products between embeddings), and a top MLP producing $p(\text{click})$. Training is a hybrid of model parallelism for the embedding tables (sharded across devices) and data parallelism for the MLPs, connected by an all-to-all exchange of embedding lookups. The ISCA 2022 paper on ZionEX describes the co-designed training platform for trillion-parameter-scale DLRMs, where the communication pattern is the design constraint. HSTU ("Actions Speak Louder than Words", ICML 2024) reframed ranking and retrieval as *generative* sequential transduction over a user's action sequence: a modified attention block (pointwise, no softmax normalisation, with relative time/position bias) that scales to long sequences and reports scaling behaviour with compute in a way DLRM-style models do not, plus an inference algorithm (M-FALCON) that amortises attention across candidates. The paper reports online metric wins on Meta surfaces and deployment at trillion-parameter scale.
+**The approach.** DLRM (2019, [arXiv:1906.00091](https://arxiv.org/abs/1906.00091)) fixed the template: embedding tables for sparse features, a bottom MLP for dense features, explicit pairwise feature interactions (dot products between embeddings), and a top MLP producing $p(\text{click})$. Training is a hybrid of model parallelism for the embedding tables (sharded across devices) and data parallelism for the MLPs, connected by an all-to-all exchange of embedding lookups. The ISCA 2022 paper on ZionEX ([arXiv:2104.05158](https://arxiv.org/abs/2104.05158)) describes the co-designed training platform for trillion-parameter-scale DLRMs, where the communication pattern is the design constraint. HSTU ("Actions Speak Louder than Words", ICML 2024, [arXiv:2402.17152](https://arxiv.org/abs/2402.17152)) reframed ranking and retrieval as *generative* sequential transduction over a user's action sequence: a modified attention block (pointwise, no softmax normalisation, with relative time/position bias) that scales to long sequences and reports scaling behaviour with compute in a way DLRM-style models do not, plus an inference algorithm (M-FALCON) that amortises attention across candidates. The paper reports online metric wins on Meta surfaces and deployment at trillion-parameter scale.
 
 **Math link.** The feature-interaction layer computes $z_{ij} = \langle e_i, e_j \rangle$ for embeddings $e_i \in \R^{d}$, a factorization-machine term; see [attention mathematics](../part05-sequence-transformers/03-attention-mathematics.md) for the HSTU-style sequence encoder, and [distributed training](../part14-systems/01-distributed-training.md) for the all-to-all pattern.
 
@@ -68,9 +68,9 @@ flowchart LR
 
 ### 4.2 The Instagram Explore funnel: retrieval, distillation, multi-task ranking
 
-**The problem.** Explore recommends unconnected content: no social-graph prior, billions of candidates, mostly fresh Reels. Meta's 2023 post describes a four-stage funnel and explains why each stage exists.
+**The problem.** Explore recommends unconnected content: no social-graph prior, billions of candidates, mostly fresh Reels. Meta's [2023 post on scaling the Instagram Explore recommendations system](https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/) describes a four-stage funnel and explains why each stage exists.
 
-**The approach (as published).** Retrieval uses several sources, including *two-tower* neural networks (a user tower and an item tower trained so that the dot product predicts engagement) with the item tower's embeddings indexed for ANN search, plus "user interactions history" sources that expand from things the user recently engaged with. The first-stage ranker is deliberately lightweight: a two-tower model *distilled* from the heavier second-stage model so it can score thousands of candidates cheaply and stay aligned with the final ranker. The second-stage ranker is a multi-task multi-label (MTML) neural network predicting several engagement events (the post lists actions such as like, save, share and see-less); an *expected value* formula combines the predicted probabilities with per-action weights into a single score. A final re-ranking stage applies business and integrity rules (diversity, de-duplication, "see less"/integrity filters). The 2019 "Powered by AI" post describes the earlier system: account embeddings ("ig2vec", trained word2vec-style on account-interaction sequences) for retrieval and a distilled lightweight ranker before the heavy model.
+**The approach (as published).** Retrieval uses several sources, including *two-tower* neural networks (a user tower and an item tower trained so that the dot product predicts engagement) with the item tower's embeddings indexed for ANN search, plus "user interactions history" sources that expand from things the user recently engaged with. The first-stage ranker is deliberately lightweight: a two-tower model *distilled* from the heavier second-stage model so it can score thousands of candidates cheaply and stay aligned with the final ranker. The second-stage ranker is a multi-task multi-label (MTML) neural network predicting several engagement events (the post lists actions such as like, save, share and see-less); an *expected value* formula combines the predicted probabilities with per-action weights into a single score. A final re-ranking stage applies business and integrity rules (diversity, de-duplication, "see less"/integrity filters). The 2019 ["Powered by AI" post](https://instagram-engineering.com/powered-by-ai-instagrams-explore-recommender-system-7ca901d2a882) describes the earlier system: account embeddings ("ig2vec", trained word2vec-style on account-interaction sequences) for retrieval and a distilled lightweight ranker before the heavy model.
 
 **Math link.** Two-tower retrieval is [in-batch contrastive learning](../part08-multimodal/03-clip-contrastive.md) with sampling-bias correction; the value model is $\text{score} = \sum_k w_k\, p_k(\text{action}_k \mid u, i)$; see [feed ranking design](../part17-ml-system-design/01-recommendation-feed-ranking.md).
 
@@ -85,7 +85,7 @@ flowchart LR
 
 **The problem.** Ads ranking predicts $p(\text{click})$ and $p(\text{conversion})$ whose *calibration* matters, because they multiply a bid in an auction. Conversion labels arrive late (hours to days) and, since iOS App Tracking Transparency, are often missing or aggregated.
 
-**The approach.** The ADKDD 2014 paper ("Practical Lessons from Predicting Clicks on Ads at Facebook") is the canonical account of the earlier stack: boosted decision trees used as a feature transformer whose leaf indices feed an online-learned logistic regression, with the finding that feature freshness and data freshness matter more than model tweaks, plus negative down-sampling with re-calibration. A decade later, Meta's 2024 "Sequence learning" post describes the modern direction: replacing hand-engineered features with event sequences of user behaviour consumed by transformer-style encoders, with custom attention modules and serving optimisations to hit ads latency budgets. The 2023 "Lattice" post describes a large multi-surface, multi-objective ads architecture intended to consolidate many separate models.
+**The approach.** The [ADKDD 2014 paper](https://ai.meta.com/research/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/) ("Practical Lessons from Predicting Clicks on Ads at Facebook") is the canonical account of the earlier stack: boosted decision trees used as a feature transformer whose leaf indices feed an online-learned logistic regression, with the finding that feature freshness and data freshness matter more than model tweaks, plus negative down-sampling with re-calibration. A decade later, Meta's [2024 engineering post on sequence learning for ads](https://engineering.fb.com/2024/11/19/data-infrastructure/sequence-learning-personalized-ads-recommendations/) describes the modern direction: replacing hand-engineered features with event sequences of user behaviour consumed by transformer-style encoders, with custom attention modules and serving optimisations to hit ads latency budgets. The 2023 [post introducing the Meta Lattice architecture](https://ai.meta.com/blog/ai-ads-performance-efficiency-meta-lattice/) describes a large multi-surface, multi-objective ads architecture intended to consolidate many separate models.
 
 **Math link.** Calibration under down-sampling: if negatives are sampled at rate $w$, the corrected probability is $q = p / (p + (1-p)/w)$, derive it from Bayes' rule; see [ads CTR design](../part17-ml-system-design/03-ads-ctr-prediction.md) and [evaluation](../part13-retrieval-eval-reliability/02-evaluation.md) for normalised entropy.
 
@@ -100,7 +100,7 @@ flowchart LR
 
 **The problem.** Harmful content is adversarial and policy-defined; a new policy (say, a new type of misinformation) cannot wait months for a labelled dataset. Text is often inside images and videos; content is multilingual.
 
-**The approach.** Meta's 2018 "Rosetta" post describes a large-scale OCR system (Faster R-CNN-style text detection plus a CTC-trained recognition model) used to extract text from images and video frames for policy classification and search, which is a direct analogue of a production OCR pipeline (see [OCR & document understanding](../part17-ml-system-design/09-ocr-document-understanding.md)). The 2021 Few-Shot Learner post describes a multimodal model pretrained on general text (and, per the post, integrity data), fine-tuned with policy text as input so that a *new policy can be enforced with few or zero labelled examples*, with the policy description conditioning the classifier. Earlier posts describe "Whole Post Integrity Embeddings" combining text, image and comment signals. Enforcement is reported in the quarterly Community Standards Enforcement Report (prevalence, proactive rate, appeals).
+**The approach.** Meta's 2018 [Rosetta post](https://engineering.fb.com/2018/09/11/ai-research/rosetta-understanding-text-in-images-and-videos-with-machine-learning/) describes a large-scale OCR system (Faster R-CNN-style text detection plus a CTC-trained recognition model) used to extract text from images and video frames for policy classification and search, which is a direct analogue of a production OCR pipeline (see [OCR & document understanding](../part17-ml-system-design/09-ocr-document-understanding.md)). The 2021 [Few-Shot Learner post](https://ai.meta.com/blog/harmful-content-can-evolve-quickly-our-new-ai-system-adapts-to-tackle-it/) describes a multimodal model pretrained on general text (and, per the post, integrity data), fine-tuned with policy text as input so that a *new policy can be enforced with few or zero labelled examples*, with the policy description conditioning the classifier. Earlier posts describe "Whole Post Integrity Embeddings" combining text, image and comment signals. Enforcement is reported in the quarterly Community Standards Enforcement Report (prevalence, proactive rate, appeals).
 
 **The trade-off.** A single policy-conditioned model generalises across violation types faster than one classifier per violation, but is harder to calibrate per policy and to explain to reviewers; Meta keeps humans in the loop and reports prevalence as the outcome metric, not classifier accuracy.
 
@@ -113,7 +113,7 @@ flowchart LR
 
 **The problem.** Reality Labs needs perception that works on always-on wearable cameras (Ray-Ban Meta glasses, Quest passthrough, Orion), from a first-person viewpoint, under tight thermal and privacy budgets. FAIR's vision foundation models supply the backbones.
 
-**The approach.** "Segment Anything" (ICCV 2023) introduced a promptable segmentation model trained with a data engine (model-assisted annotation in loops) on a billion-mask dataset; SAM 2 (2024) extended it to video with a streaming memory. DINOv2 (2023) showed that self-supervised ViTs trained on a curated 142M-image dataset yield features that transfer without fine-tuning to depth, segmentation and retrieval. Ego4D (CVPR 2022) and Project Aria provide the egocentric data and the research glasses; Aria's public documentation describes multi-camera rigs with eye tracking and IMU. The Ray-Ban Meta glasses' multimodal assistant ("look and ask", 2024) sends camera frames to a Llama-based model, the product level is public; the on-device/cloud split of the pipeline is not fully disclosed (**inference**: a lightweight on-device capture/pre-processing step and cloud VLM inference, consistent with the glasses' compute).
+**The approach.** "Segment Anything" (ICCV 2023, [arXiv:2304.02643](https://arxiv.org/abs/2304.02643)) introduced a promptable segmentation model trained with a data engine (model-assisted annotation in loops) on a billion-mask dataset; SAM 2 (2024, [arXiv:2408.00714](https://arxiv.org/abs/2408.00714)) extended it to video with a streaming memory. DINOv2 (2023, [arXiv:2304.07193](https://arxiv.org/abs/2304.07193)) showed that self-supervised ViTs trained on a curated 142M-image dataset yield features that transfer without fine-tuning to depth, segmentation and retrieval. Ego4D (CVPR 2022, [arXiv:2110.07058](https://arxiv.org/abs/2110.07058)) and [Project Aria](https://www.projectaria.com/) provide the egocentric data and the research glasses; Aria's public documentation describes multi-camera rigs with eye tracking and IMU. The Ray-Ban Meta glasses' multimodal assistant ("look and ask", 2024) sends camera frames to a Llama-based model, the product level is public; the on-device/cloud split of the pipeline is not fully disclosed (**inference**: a lightweight on-device capture/pre-processing step and cloud VLM inference, consistent with the glasses' compute).
 
 **Math link.** [Perception foundation models](../part11-perception-autonomy/01-perception-foundation-models.md), [ViTs](../part08-multimodal/01-vision-transformers.md), [self-supervised learning](../part10-self-supervised/01-self-supervised-learning.md), [segmentation](../part04-vision/05-segmentation.md).
 
@@ -124,7 +124,7 @@ flowchart LR
 
 ### 4.6 Infrastructure: FBLearner, PyTorch, ZionEX, MTIA
 
-**What is public.** FBLearner Flow (2016) is the workflow engine: reusable pipeline operators, experiment management, a model repository; the post reports it being used by a large fraction of engineers. PyTorch (NeurIPS 2019) is the framework; TorchRec is the open-source sharded-embedding library. ZionEX (ISCA 2022) is the training platform for DLRM with a dedicated high-bandwidth network for all-to-all. MTIA (2023, 2024 posts) is Meta's in-house inference accelerator designed for ranking and recommendation workloads, with the second generation reporting higher compute and memory bandwidth targeted at those models.
+**What is public.** [FBLearner Flow](https://engineering.fb.com/2016/05/09/core-infra/introducing-fblearner-flow-facebook-s-ai-backbone/) (2016) is the workflow engine: reusable pipeline operators, experiment management, a model repository; the post reports it being used by a large fraction of engineers. PyTorch (NeurIPS 2019) is the framework; TorchRec is the open-source sharded-embedding library. ZionEX (ISCA 2022) is the training platform for DLRM with a dedicated high-bandwidth network for all-to-all. MTIA ([2023](https://ai.meta.com/blog/meta-training-inference-accelerator-AI-MTIA/) and [2024](https://ai.meta.com/blog/next-generation-meta-training-inference-accelerator-AI-MTIA/) posts) is Meta's in-house inference accelerator designed for ranking and recommendation workloads, with the second generation reporting higher compute and memory bandwidth targeted at those models.
 
 **Why it matters in interviews.** Meta expects candidates to know that recommendation inference is bound by embedding lookups and memory bandwidth, so an accelerator built for dense matmuls alone is a poor fit, which is the rationale the MTIA posts give for custom silicon.
 
@@ -216,38 +216,38 @@ flowchart LR
 
 **Ranking and recommendation**
 
-* Naumov et al., "Deep Learning Recommendation Model for Personalization and Recommendation Systems", arXiv 1906.00091, 2019.
-* Zhai et al., "Actions Speak Louder than Words: Trillion-Parameter Sequential Transducers for Generative Recommendations", ICML 2024 (arXiv 2402.17152).
-* Meta Engineering, "Scaling the Instagram Explore recommendations system", August 2023.
-* Meta AI, "Powered by AI: Instagram's Explore recommender system", 2019.
-* Mudigere et al., "Software-Hardware Co-design for Fast and Scalable Training of Deep Learning Recommendation Models", ISCA 2022 (arXiv 2104.05158).
-* Huang et al., "Embedding-based Retrieval in Facebook Search", KDD 2020 (arXiv 2006.11632).
-* Liu et al., "Que2Search: Fast and Accurate Query and Document Understanding for Search at Facebook", KDD 2021.
-* Zhang et al., "Wukong: Towards a Scaling Law for Large-Scale Recommendation", 2024 (arXiv 2403.02545).
+* Naumov et al., "Deep Learning Recommendation Model for Personalization and Recommendation Systems", 2019. [arXiv:1906.00091](https://arxiv.org/abs/1906.00091)
+* Zhai et al., "Actions Speak Louder than Words: Trillion-Parameter Sequential Transducers for Generative Recommendations", ICML 2024. [arXiv:2402.17152](https://arxiv.org/abs/2402.17152) · [PMLR proceedings](https://proceedings.mlr.press/v235/zhai24a.html)
+* Meta Engineering, "Scaling the Instagram Explore recommendations system", August 2023. [engineering.fb.com](https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/)
+* Meta AI, "Powered by AI: Instagram's Explore recommender system", 2019. [instagram-engineering.com](https://instagram-engineering.com/powered-by-ai-instagrams-explore-recommender-system-7ca901d2a882)
+* Mudigere et al., "Software-Hardware Co-design for Fast and Scalable Training of Deep Learning Recommendation Models", ISCA 2022. [arXiv:2104.05158](https://arxiv.org/abs/2104.05158)
+* Huang et al., "Embedding-based Retrieval in Facebook Search", KDD 2020. [arXiv:2006.11632](https://arxiv.org/abs/2006.11632)
+* Liu et al., "Que2Search: Fast and Accurate Query and Document Understanding for Search at Facebook", KDD 2021. [ACM DL](https://dl.acm.org/doi/abs/10.1145/3447548.3467127)
+* Zhang et al., "Wukong: Towards a Scaling Law for Large-Scale Recommendation", 2024. [arXiv:2403.02545](https://arxiv.org/abs/2403.02545)
 
 **Ads**
 
-* He et al., "Practical Lessons from Predicting Clicks on Ads at Facebook", ADKDD 2014.
-* Meta Engineering, post on sequence learning for personalized ads recommendations, 2024.
-* Meta Engineering, post introducing the "Lattice" ads model architecture, 2023.
+* He et al., "Practical Lessons from Predicting Clicks on Ads at Facebook", ADKDD 2014. [ai.meta.com](https://ai.meta.com/research/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/) · [ACM DL](https://dl.acm.org/doi/10.1145/2648584.2648589)
+* Meta Engineering, post on sequence learning for personalized ads recommendations, November 2024. [engineering.fb.com](https://engineering.fb.com/2024/11/19/data-infrastructure/sequence-learning-personalized-ads-recommendations/)
+* Meta AI, post introducing the "Meta Lattice" ads model architecture, 2023. [ai.meta.com](https://ai.meta.com/blog/ai-ads-performance-efficiency-meta-lattice/)
 
 **Integrity**
 
-* Facebook Engineering, "Rosetta: Understanding text in images and videos with machine learning", 2018.
-* Meta AI, "Harmful content can evolve quickly. Our new AI system adapts to tackle it" (Few-Shot Learner), December 2021.
-* Meta, Community Standards Enforcement Reports (quarterly).
+* Facebook Engineering, "Rosetta: Understanding text in images and videos with machine learning", 2018. [engineering.fb.com](https://engineering.fb.com/2018/09/11/ai-research/rosetta-understanding-text-in-images-and-videos-with-machine-learning/)
+* Meta AI, "Harmful content can evolve quickly. Our new AI system adapts to tackle it" (Few-Shot Learner), December 2021. [ai.meta.com](https://ai.meta.com/blog/harmful-content-can-evolve-quickly-our-new-ai-system-adapts-to-tackle-it/)
+* Meta, Community Standards Enforcement Reports. [transparency.meta.com](https://transparency.meta.com/reports/community-standards-enforcement/)
 
 **Foundation models and perception**
 
-* Kirillov et al., "Segment Anything", ICCV 2023 (arXiv 2304.02643); Ravi et al., "SAM 2: Segment Anything in Images and Videos", 2024 (arXiv 2408.00714).
-* Oquab et al., "DINOv2: Learning Robust Visual Features without Supervision", 2023 (arXiv 2304.07193).
-* Llama Team, "The Llama 3 Herd of Models", 2024 (arXiv 2407.21783).
-* Grauman et al., "Ego4D: Around the World in 3,000 Hours of Egocentric Video", CVPR 2022.
-* Meta Reality Labs, Project Aria documentation; Meta Connect 2024 (Orion prototype; Ray-Ban Meta multimodal AI).
+* Kirillov et al., "Segment Anything", ICCV 2023. [arXiv:2304.02643](https://arxiv.org/abs/2304.02643) · Ravi et al., "SAM 2: Segment Anything in Images and Videos", 2024. [arXiv:2408.00714](https://arxiv.org/abs/2408.00714)
+* Oquab et al., "DINOv2: Learning Robust Visual Features without Supervision", 2023. [arXiv:2304.07193](https://arxiv.org/abs/2304.07193)
+* Llama Team, "The Llama 3 Herd of Models", 2024. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783)
+* Grauman et al., "Ego4D: Around the World in 3,000 Hours of Egocentric Video", CVPR 2022. [arXiv:2110.07058](https://arxiv.org/abs/2110.07058)
+* Meta Reality Labs, Project Aria ([projectaria.com](https://www.projectaria.com/)); Ray-Ban Meta multimodal AI rollout, April 2024 ([about.fb.com](https://about.fb.com/news/2024/04/new-ray-ban-meta-smart-glasses-styles-and-meta-ai-updates/)); Meta Connect 2024 (Orion prototype).
 
 **Infrastructure**
 
-* Facebook Engineering, "Introducing FBLearner Flow: Facebook's AI backbone", 2016.
-* Paszke et al., "PyTorch: An Imperative Style, High-Performance Deep Learning Library", NeurIPS 2019.
-* Meta Engineering, "MTIA v1: Meta's first-generation AI inference accelerator", 2023; "Our next-generation Meta Training and Inference Accelerator", 2024.
-* TorchRec (open-source library for sharded embeddings), Meta, 2022.
+* Facebook Engineering, "Introducing FBLearner Flow: Facebook's AI backbone", 2016. [engineering.fb.com](https://engineering.fb.com/2016/05/09/core-infra/introducing-fblearner-flow-facebook-s-ai-backbone/)
+* Paszke et al., "PyTorch: An Imperative Style, High-Performance Deep Learning Library", NeurIPS 2019. [arXiv:1912.01703](https://arxiv.org/abs/1912.01703)
+* Meta AI, "MTIA v1: Meta's first-generation AI inference accelerator", 2023 ([ai.meta.com](https://ai.meta.com/blog/meta-training-inference-accelerator-AI-MTIA/)); "Our next-generation Meta Training and Inference Accelerator", 2024 ([ai.meta.com](https://ai.meta.com/blog/next-generation-meta-training-inference-accelerator-AI-MTIA/)).
+* TorchRec (open-source library for sharded embeddings), Meta, 2022. [pytorch.org/blog](https://pytorch.org/blog/introducing-torchrec/) · [github.com/meta-pytorch/torchrec](https://github.com/meta-pytorch/torchrec)

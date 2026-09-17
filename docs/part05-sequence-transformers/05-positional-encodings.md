@@ -471,13 +471,13 @@ splitting heads and before the cache update, so cached keys are stored already r
 **How you'd test it.** The property that defines RoPE is testable numerically:
 
 ```python
-def score(m, n):
+def score(m: int, n: int) -> float:
     cos_m, sin_m = rope(1, offset=m)
     cos_n, sin_n = rope(1, offset=n)
     return (apply_rotary(q, cos_m, sin_m) * apply_rotary(k, cos_n, sin_n)).sum().item()
 
-assert math.isclose(score(3, 1), score(103, 101), rel_tol=1e-4)   # same offset
-assert not math.isclose(score(3, 1), score(3, 2), rel_tol=1e-3)   # different offset
+assert math.isclose(score(3, 1), score(103, 101), rel_tol=1e-4)  # same offset, same score
+assert not math.isclose(score(3, 1), score(3, 2), rel_tol=1e-3)  # different offset
 ```
 
 That is `test_rope_relative_position_property`, and it is the check an interviewer will ask for

@@ -3,7 +3,7 @@
 > **Why this matters at staff level.** Video is where the token arithmetic of the previous
 > chapters stops being an optimisation and becomes the design constraint: one minute at 1 fps
 > already fills half a 32k context. Interviewers use video to test whether you can derive a
-> cost model and then choose an architecture from it, rather than reaching for the biggest
+> cost model and then choose an architecture from it instead of reaching for the biggest
 > model. Strong signal is deriving factorised space-time attention from the joint version,
 > saying exactly what it gives up, and naming the compression you would apply first for a
 > given latency budget.
@@ -144,8 +144,8 @@ compared, which also allows initialising the spatial half from an image ViT.
 
 Model 2 is the cheapest because the temporal encoder sees $T'$ vectors rather than $T' hw$
 tokens, and it is the right default when the task is clip-level classification. Model 3 keeps
-per-location temporal detail, which matters for temporal localisation and for anything
-requiring where-and-when rather than what.
+per-location temporal detail, so it can answer where-and-when questions that a pooled frame
+embedding has already thrown away.
 
 ### 2.5 The degenerate cases
 
@@ -173,7 +173,7 @@ retrieval.
 *Joint video encoder.* Tubelets and factorised space-time attention end to end, as in section
 2.3. The most capable and the most expensive, and it needs video-scale pretraining to pay off.
 
-VideoCLIP-style work adds two ingredients worth naming: overlapping positive clips rather than
+VideoCLIP-style work adds two ingredients worth naming: overlapping positive clips in place of
 exact temporal alignment, since narration lags the action it describes, and retrieval-based
 hard negatives, clips from other videos that are semantically close, because random negatives
 from a batch are too easy for video.
@@ -256,7 +256,7 @@ class TubeletEmbed(nn.Module):
 The permutation puts the three grid axes first and the content axes $(C, t, P, P)$ last, in
 the order a `Conv3d` weight expects, so the same weight-reshape trick from
 [chapter 1](01-vision-transformers.md) applies. Keeping the output as a `(B, T', h, w, d)`
-grid rather than a flat sequence is what makes the factorised block a pair of reshapes.
+grid, instead of a flat sequence, is what makes the factorised block a pair of reshapes.
 
 ### 3.2 The factorised block
 
@@ -334,8 +334,8 @@ $t = 2$ gives $T' = 16$ and $hw = 196$, so $N = 3{,}136$ tokens. Joint attention
 costs $2N^2d \approx 15$ GFLOPs per layer in the quadratic term alone, against 0.5 GFLOPs
 factorised. For a VLM consuming video, the number that matters is what reaches the LLM: at 576
 tokens per frame with no compression, 32 frames is 18,432 tokens, which is 2.4 GB of KV cache
-on the 8B model of [chapter 4](04-vlm-architecture.md). Compression is not optional at that
-point; it is the difference between a feature that ships and one that does not.
+on the 8B model of [chapter 4](04-vlm-architecture.md). At that point compression decides
+whether the feature ships.
 
 **Memory during training.** Activations scale with $N$ per layer, and video clips are large
 before any attention happens. Gradient checkpointing on the spatial attention, mixed
@@ -411,7 +411,7 @@ data problem: people describe an action before, during or after doing it.
     space with a learned 3-D encoder, decomposing that latent into spacetime patches, and
     training a diffusion Transformer over them. Patches are chosen as the representation
     because they let one model train on video of varying duration, resolution and aspect ratio
-    rather than resizing everything to a fixed shape, and because scaling behaviour with
+    instead of resizing everything to a fixed shape, and because scaling behaviour with
     training compute was observed to be favourable. The report is a technical blog post rather
     than a peer-reviewed paper and does not give architecture sizes or data details. Source:
     *Video generation models as world simulators*, OpenAI, February 2024. The diffusion
