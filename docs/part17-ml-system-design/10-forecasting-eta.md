@@ -178,7 +178,7 @@ $$
 \widehat{\text{ETA}} = \text{routing}(o, d, t) + f_\theta(x),
 $$
 
-where $f_\theta$ predicts the correction. Uber's DeepETA post describes exactly this
+where $f_\theta$ predicts the correction. Uber's [DeepETA post](https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/) describes exactly this
 hybrid design, using machine learning to predict the residual between the routing
 engine's ETA and the observed outcome, which they call ETA post-processing.
 
@@ -243,12 +243,12 @@ chosen by experiment, with the model supplying a calibrated distribution.
   support quantile loss directly. Weak on high-cardinality categorical features
   (millions of merchants, millions of cells) and on sequences.
 - **Neural networks with embeddings** handle the high-cardinality spatial and merchant
-  features, which is where they earn their place. Uber's DeepETA post reports that an
+  features, which is where they earn their place. Uber's [DeepETA post](https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/) reports that an
   encoder-decoder architecture with self-attention over the feature set gave them the
   best accuracy among the architectures they tried, under a hard latency constraint.
 - **Graph networks** over the road network, where segments are nodes and the model
-  propagates congestion along the graph. DeepMind and Google described using graph
-  neural networks over route "supersegments" to improve ETA accuracy in Google Maps,
+  propagates congestion along the graph. DeepMind and Google [described using graph
+  neural networks over route "supersegments"](https://deepmind.google/blog/traffic-prediction-with-advanced-graph-neural-networks/) to improve ETA accuracy in Google Maps,
   reporting improvements in several cities.
 - **Sequence models over the trip so far**, updating the ETA as the trip progresses,
   which turns a one-shot prediction into a filtering problem.
@@ -295,7 +295,7 @@ features so the forecast is explicitly conditional.
 
 Aggregate error metrics are dominated by the common case, while customer complaints
 come from the tail: the order that took three times the estimate. DoorDash's
-engineering writing on improving ETA accuracy for long-tail events describes a
+[engineering writing on improving ETA accuracy for long-tail events](https://doordash.engineering/2021/04/28/improving-eta-prediction-accuracy-for-long-tail-events/) describes a
 combination of real-time features, historical features designed to capture sparse
 patterns around tail events, and a custom loss function that targets accuracy when
 large deviations occur. The general principle: if you want tail accuracy, put it in
@@ -324,7 +324,7 @@ a city's error jumps. Demand models retrain daily with a rolling window.
    that regresses one city is a launch blocker.
 
 **Serving.** ETA is called constantly, so the model is one of the highest-QPS services
-in the company, and Uber's DeepETA post says theirs is the highest-QPS model at Uber.
+in the company, and Uber's [DeepETA post](https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/) says theirs is the highest-QPS model at Uber.
 That drives the architecture: a tight latency budget (a few milliseconds of model
 time), feature fetching that is mostly precomputed and cached, integer-quantised or
 small models, and heavy use of batching where the caller allows it.
@@ -429,8 +429,8 @@ observed outcome, with an architecture chosen under the latency constraint. *Ser
 a very high QPS prediction service with a hard latency ceiling and a fallback to the
 routing estimate. *Evaluate*: offline error by segment, then online.
 
-**What the source says.** Uber's engineering post "DeepETA: How Uber Predicts Arrival
-Times Using Deep Learning" (February 2022) describes a routing engine that predicts
+**What the source says.** Uber's engineering post ["DeepETA: How Uber Predicts Arrival
+Times Using Deep Learning"](https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/) (February 2022) describes a routing engine that predicts
 ETA as a sum of segment traversal times along the best path, an ML model that predicts
 the residual between that estimate and the observed outcome (which they call ETA post
 processing), features including origin, destination, request time, real-time traffic
@@ -441,7 +441,7 @@ highest-QPS model at Uber.
 !!! tip "How to say it in the interview: learn the residual, keep the physics"
     "I'd keep the routing engine and train the model to predict its residual, instead
     of learning arrival time end to end from coordinates. Uber published this design
-    as DeepETA in 2022: the routing engine sums segment traversal times along the
+    as [DeepETA](https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/) in 2022: the routing engine sums segment traversal times along the
     best path using map data and live traffic, and the ML model predicts the
     difference between that and what actually happened. The alternative, an
     end-to-end model from raw inputs, would have to rediscover the road network and
@@ -467,12 +467,12 @@ windows. *Model*: keep the structure, change the loss to penalise large deviatio
 and add the features that carry tail signal. *Serve*: same path. *Evaluate*: tail
 metrics explicitly, not just MAE.
 
-**What the source says.** DoorDash's engineering post "Improving ETA Prediction
-Accuracy for Long-tail Events" (April 2021) describes a three-part approach: adding
+**What the source says.** DoorDash's engineering post ["Improving ETA Prediction
+Accuracy for Long-tail Events"](https://doordash.engineering/2021/04/28/improving-eta-prediction-accuracy-for-long-tail-events/) (April 2021) describes a three-part approach: adding
 real-time features to the model, using historical features that help the model learn
 sparse patterns around tail events, and a custom loss function that optimises for
 accuracy when large deviations occur. Their later engineering writing describes
-multi-task models and probabilistic forecasts for ETAs.
+[multi-task models and probabilistic forecasts for ETAs](https://careersatdoordash.com/blog/improving-etas-with-multi-task-models-deep-learning-and-probabilistic-forecasts/).
 
 !!! tip "How to say it in the interview: put the tail in the loss"
     "If the complaints are about large over-runs, I'd change the loss before I change
@@ -480,7 +480,7 @@ multi-task models and probabilistic forecasts for ETAs.
     distribution and will happily trade away the tail, so I'd move to quantile loss
     at a high tau, or an explicitly asymmetric cost that matches what a late delivery
     costs us in refunds and support contacts. DoorDash described exactly this in
-    their 2021 post on long-tail ETA accuracy: real-time features, historical
+    their [2021 post on long-tail ETA accuracy](https://doordash.engineering/2021/04/28/improving-eta-prediction-accuracy-for-long-tail-events/): real-time features, historical
     features aimed at sparse tail patterns, and a custom loss targeting large
     deviations. The alternative is to keep the loss and add a bigger buffer, which
     fixes the on-time rate and costs conversion on every single order, including the
@@ -542,16 +542,16 @@ network. *Serve*: precompute over commonly travelled groupings of segments to ke
 query-time cost bounded. *Evaluate*: ETA accuracy per city, since road networks and
 traffic behaviour differ.
 
-**What the sources say.** DeepMind and Google published a description of using graph
-neural networks to improve ETA predictions in Google Maps, operating over
+**What the sources say.** DeepMind and Google published a [description of using graph
+neural networks to improve ETA predictions in Google Maps](https://deepmind.google/blog/traffic-prediction-with-advanced-graph-neural-networks/), operating over
 "supersegments" (sequences of adjacent road segments) so the model can account for
 connectivity, and reported improvements in real-time ETA accuracy across a number of
 cities.
 
 !!! tip "How to say it in the interview: graph structure when you own the network"
     "If congestion propagation is the dominant error source, I'd model the route as a
-    graph instead of a sum of independent segments. DeepMind and Google described
-    doing this for Google Maps, using graph neural networks over supersegments,
+    graph instead of a sum of independent segments. DeepMind and Google [described
+    doing this for Google Maps](https://deepmind.google/blog/traffic-prediction-with-advanced-graph-neural-networks/), using graph neural networks over supersegments,
     sequences of adjacent road segments, and reported improved real-time ETA accuracy
     across a number of cities. The alternative, my segment-sum baseline with traffic
     features, is far cheaper and cannot express 'this segment will be slow in five
@@ -580,8 +580,8 @@ conditionally, and use switchback experiments to estimate the policy response ra
 than reading it off observational data.
 
 **What the sources say.** The switchback experimental design used to handle exactly
-this kind of interference in marketplaces is described in DoorDash's engineering
-writing on switchback testing and in the causal-inference literature on experiments
+this kind of interference in marketplaces is described in DoorDash's [engineering
+writing on switchback testing](https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/) and in the causal-inference literature on experiments
 under interference; the design details are covered in the
 [experimentation chapter](11-notifications-uplift-experimentation.md).
 
@@ -595,7 +595,7 @@ under interference; the design details are covered in the
     only priced high when we predicted high demand, so price and demand are
     confounded. That has to come from randomisation, and in a marketplace the unit
     has to be region-time instead of user, because supply is shared. DoorDash has
-    written about switchback experiments for this reason. The trade-off is that
+    [written about switchback experiments](https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/) for this reason. The trade-off is that
     switchbacks are noisy and need long run times, so I'd use them to estimate the
     response curve occasionally instead of continuously."
 
@@ -726,10 +726,10 @@ under interference; the design details are covered in the
 
 ## References
 
-- Uber Engineering. "DeepETA: How Uber Predicts Arrival Times Using Deep Learning." February 2022.
-- DoorDash Engineering. "Improving ETA Prediction Accuracy for Long-tail Events." April 2021; and subsequent DoorDash posts on multi-task models and probabilistic forecasts for ETAs.
+- Uber Engineering. "DeepETA: How Uber Predicts Arrival Times Using Deep Learning." February 2022 ([uber.com](https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/)).
+- DoorDash Engineering. "Improving ETA Prediction Accuracy for Long-tail Events." April 2021 ([doordash.engineering](https://doordash.engineering/2021/04/28/improving-eta-prediction-accuracy-for-long-tail-events/)); "Improving ETAs with multi-task models, deep learning, and probabilistic forecasts" ([careersatdoordash.com](https://careersatdoordash.com/blog/improving-etas-with-multi-task-models-deep-learning-and-probabilistic-forecasts/)); "Switchback Tests and Randomized Experimentation Under Network Effects at DoorDash" ([careersatdoordash.com](https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/)).
 - Salinas, D., Flunkert, V., Gasthaus, J. "DeepAR: Probabilistic Forecasting with Autoregressive Recurrent Networks." 2017 ([arXiv:1704.04110](https://arxiv.org/abs/1704.04110)); published in the International Journal of Forecasting, 2020.
-- DeepMind and Google. "Traffic prediction with advanced Graph Neural Networks" (graph neural networks over supersegments for Google Maps ETAs), 2020.
+- DeepMind and Google. "Traffic prediction with advanced Graph Neural Networks" (graph neural networks over supersegments for Google Maps ETAs), 2020 ([deepmind.google](https://deepmind.google/blog/traffic-prediction-with-advanced-graph-neural-networks/)).
 - Wickramasuriya, S. L., Athanasopoulos, G., Hyndman, R. J. "Optimal Forecast Reconciliation for Hierarchical and Grouped Time Series Through Trace Minimization." JASA 2019.
 - Hyndman, R. J., Athanasopoulos, G. "Forecasting: Principles and Practice." Online textbook (hierarchical forecasting, backtesting, evaluation).
 - Koenker, R., Bassett, G. "Regression Quantiles." Econometrica 1978.

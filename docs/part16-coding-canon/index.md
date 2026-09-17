@@ -285,6 +285,12 @@ slice `logits[:, N_q - 1 : N_q - 1 + T]` undoes both offsets at once. Getting th
 wrong shifts the loss by one token, and the model still trains, just to the wrong
 thing.
 
+![The spliced sequence with its position ids, attention mask, and the row showing which text token each logit scores, with the two supervised assistant positions marked](../assets/figures/part16_token_splice_manim.png){ width="820" }
+
+Read the bottom row of the figure against the top one. The logit at the `:` cell is
+the one that scores the answer token, and the two red cells are the only positions
+the SFT loss touches.
+
 **The mask value.** `causal_padding_bias` fills disallowed positions with `-1e9`
 rather than `-inf`. A right-padded batch has query rows whose every key is masked,
 and `softmax` of an all-`-inf` row returns `NaN`, which then propagates through the

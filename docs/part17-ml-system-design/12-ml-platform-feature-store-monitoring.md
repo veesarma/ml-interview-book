@@ -122,11 +122,11 @@ one and a mean in the other, and the model degrades in a way that no offline met
 shows. This is training-serving skew, and it is the single most common source of the
 "great offline, flat online" result that this part keeps returning to.
 
-Uber's Michelangelo Palette is built explicitly around this: a centralised feature
+Uber's [Michelangelo](https://www.uber.com/us/en/blog/michelangelo-machine-learning-platform/) [Palette](https://www.uber.com/us/en/blog/palette-meta-store-journey/) is built explicitly around this: a centralised feature
 store organised by entities and feature groups, with an offline store for historical
 data and an online store for low-latency retrieval, and a transformation framework
 that executes the same feature logic in offline pipelines and online serving. Airbnb's
-Chronon (open-sourced in 2024, originally named Zipline) is described the same way: a
+[Chronon](https://medium.com/airbnb-engineering/chronon-airbnbs-ml-feature-platform-is-now-open-source-d9c4dba859e8) (open-sourced in 2024, originally named Zipline) is described the same way: a
 platform where practitioners define feature transformations once and apply them
 consistently in offline batch backfills and low-latency online serving.
 
@@ -188,7 +188,7 @@ working).
 
 Every feature has expectations: type, range, null rate, cardinality, and a
 distribution. Validate them at ingestion and at serving. Google's TFX data-validation
-work (Breck et al., "Data Validation for Machine Learning", MLSys 2019) describes
+work (Breck et al., ["Data Validation for Machine Learning", MLSys 2019](https://proceedings.mlsys.org/paper_files/paper/2019/hash/928f1160e52192e3e0017fb63ab65391-Abstract.html)) describes
 schema-based validation of training and serving data to catch errors early, and the
 practical value is that most model incidents start as data incidents that a schema
 check catches in minutes, long before they surface as accuracy regressions.
@@ -197,9 +197,9 @@ check catches in minutes, long before they surface as accuracy regressions.
 
 **Training orchestration.** A workflow system runs dataset build, training, evaluation
 and registration as a versioned DAG. Two philosophies, both defensible: a
-workflow-first platform where the pipeline is the unit (FBLearner Flow, TFX), and a
+workflow-first platform where the pipeline is the unit ([FBLearner Flow](https://engineering.fb.com/2016/05/09/core-infra/introducing-fblearner-flow-facebook-s-ai-backbone/), [TFX](https://research.google/pubs/tfx-a-tensorflow-based-production-scale-machine-learning-platform/)), and a
 library-first platform where the data scientist writes Python and the platform handles
-infrastructure (Netflix's Metaflow, which is explicitly designed to let scientists work
+infrastructure ([Netflix's Metaflow](https://netflixtechblog.com/open-sourcing-metaflow-a-human-centric-framework-for-data-science-fa72e04a5d9), which is explicitly designed to let scientists work
 in familiar code while the platform manages compute, data and versioning). The
 library-first approach wins adoption where the users are researchers; the
 workflow-first approach wins governance where the users are many teams shipping to
@@ -259,7 +259,7 @@ never been exercised is a rollback path that does not work.
 (a prediction should not change when an irrelevant field changes), directional tests
 (risk should increase with velocity), performance tests on a golden set, and a
 behavioural regression suite of cases the model previously got wrong. Breck et al.'s
-"ML Test Score" (IEEE Big Data 2017) is a usable checklist for what to test in features,
+["ML Test Score" (IEEE Big Data 2017)](https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/) is a usable checklist for what to test in features,
 model development, infrastructure and monitoring.
 
 ## 5. Monitoring
@@ -325,7 +325,7 @@ exist (Feast and Tecton in the feature-store space, several vendors elsewhere). 
 honest decision rule: buy where your requirements are ordinary, build where your
 requirements are load-bearing and unusual. For most companies the feature store's
 *integration* with their existing event bus and warehouse is the hard part, which is
-why open-source projects like Chronon (Airbnb, with Stripe as a co-maintainer) get
+why open-source projects like [Chronon](https://medium.com/airbnb-engineering/chronon-airbnbs-ml-feature-platform-is-now-open-source-d9c4dba859e8) (Airbnb, with Stripe as a co-maintainer) get
 adopted and extended instead of used as-is.
 
 **What to centralise.** Centralise the things where inconsistency is expensive:
@@ -404,7 +404,7 @@ the same logic in the Spark pipeline and the serving path, plus the dual store.
 sync. *Evaluate*: consistency checks that sample production requests, recompute the
 features offline, and compare.
 
-**What the sources say.** Uber's engineering writing on Michelangelo and Palette
+**What the sources say.** Uber's engineering writing on [Michelangelo](https://www.uber.com/us/en/blog/michelangelo-machine-learning-platform/) and [Palette](https://www.uber.com/us/en/blog/palette-meta-store-journey/)
 describes a centralised feature store organised by entities and feature groups, with
 offline storage for historical data and a low-latency online store, three ways to
 create features (batch via Hive and Spark, near-real-time via Flink streaming, and
@@ -415,7 +415,7 @@ training-serving consistency.
 !!! tip "How to say it in the interview: one definition, two materialisations"
     "The feature platform's contract is that a feature is defined once and the platform
     produces both materialisations: the historical values for training and the current
-    value for serving. Uber's Michelangelo Palette is built this way, with an offline
+    value for serving. Uber's [Michelangelo Palette](https://www.uber.com/us/en/blog/palette-meta-store-journey/) is built this way, with an offline
     store and an online store behind one definition, and a transformer framework that
     runs the same transformation logic in the offline Spark pipeline and in the serving
     path. The alternative is what most teams have: a SQL query for training and
@@ -439,8 +439,8 @@ with point-in-time semantics built into the backfill rather than left to the aut
 *Serve*: low-latency online serving from the same definition. *Evaluate*: time to a
 usable feature, and the absence of leakage in generated backfills.
 
-**What the sources say.** Airbnb's engineering blog post announcing that Chronon,
-their ML feature platform, is now open source (2024) describes a platform that
+**What the sources say.** Airbnb's engineering blog post announcing that [Chronon,
+their ML feature platform, is now open source](https://medium.com/airbnb-engineering/chronon-airbnbs-ml-feature-platform-is-now-open-source-d9c4dba859e8) (2024) describes a platform that
 transforms raw data into ML-ready features, handling batch and streaming compute,
 low-latency serving, and observability, and lets practitioners define transformations
 once and apply them consistently in offline backfills and online serving; the project
@@ -450,7 +450,7 @@ co-maintainer.
 !!! tip "How to say it in the interview: put point-in-time semantics in the tool"
     "The backfill is where correctness gets lost, so I'd make point-in-time semantics
     a property of the platform rather than something each author has to implement.
-    Airbnb's Chronon, which they open-sourced in 2024 and which was originally Zipline,
+    Airbnb's [Chronon](https://medium.com/airbnb-engineering/chronon-airbnbs-ml-feature-platform-is-now-open-source-d9c4dba859e8), which they open-sourced in 2024 and which was originally Zipline,
     is built around defining a transformation once and getting both the offline
     backfill and the low-latency online serving from it. The alternative is a library
     of helper functions and a code-review culture, which works until the first tired
@@ -473,14 +473,14 @@ data access, dependency management and the ability to move a step to a large mac
 to the cloud without changing the code. *Serve*: the same artefacts run in production
 scheduling. *Evaluate*: how often a prototype becomes production without a rewrite.
 
-**What the sources say.** Netflix's technology blog describes Metaflow as a
-human-centric framework for data science, designed so that scientists write ordinary
+**What the sources say.** Netflix's technology blog describes [Metaflow as a
+human-centric framework](https://netflixtechblog.com/open-sourcing-metaflow-a-human-centric-framework-for-data-science-fa72e04a5d9) for data science, designed so that scientists write ordinary
 Python while the framework handles infrastructure concerns including versioning,
 data access, compute scaling and deployment; it was open-sourced in 2019.
 
 !!! tip "How to say it in the interview: adoption is a platform metric"
     "I'd optimise the platform for adoption, which means meeting scientists in Python
-    rather than in a workflow DSL. Netflix built Metaflow on that premise: scientists
+    rather than in a workflow DSL. Netflix built [Metaflow](https://netflixtechblog.com/open-sourcing-metaflow-a-human-centric-framework-for-data-science-fa72e04a5d9) on that premise: scientists
     write normal Python and the framework supplies versioning, data access, scaling to
     bigger machines and deployment. The alternative is a workflow-first platform like
     TFX or FBLearner, where the pipeline is the unit and the structure is enforced,
@@ -505,11 +505,11 @@ data and the serving data against it and alarm on violations. *Serve*: validatio
 the ingestion path and sampled validation at serving. *Evaluate*: time to detection
 for injected data faults, which is a testable property.
 
-**What the sources say.** Breck et al., "Data Validation for Machine Learning" (MLSys
+**What the sources say.** Breck et al., ["Data Validation for Machine Learning"](https://proceedings.mlsys.org/paper_files/paper/2019/hash/928f1160e52192e3e0017fb63ab65391-Abstract.html) (MLSys
 2019) describes a data-validation system deployed at Google as part of TFX, based on
 inferring and enforcing a schema over the data feeding ML pipelines, catching errors
-in training and serving data before they degrade models. Google's "Rules of Machine
-Learning" (Zinkevich) makes the related operational point about logging the features
+in training and serving data before they degrade models. Google's ["Rules of Machine
+Learning"](https://developers.google.com/machine-learning/guides/rules-of-ml) (Zinkevich) makes the related operational point about logging the features
 used at serving time and training on them.
 
 !!! tip "How to say it in the interview: a schema per feature, enforced both sides"
@@ -517,7 +517,7 @@ used at serving time and training on them.
     metric. I'd infer a schema per feature from a healthy window, types, ranges, null
     rates and cardinality, then enforce it on both the training data and a sample of
     serving traffic, and alarm on violations. Google described exactly this system in
-    'Data Validation for Machine Learning' at MLSys 2019, deployed as part of TFX to
+    'Data Validation for Machine Learning' at [MLSys 2019](https://proceedings.mlsys.org/paper_files/paper/2019/hash/928f1160e52192e3e0017fb63ab65391-Abstract.html), deployed as part of TFX to
     catch data errors before they degrade models. The alternative is monitoring
     accuracy, which is what we do today and which is why it took three weeks: accuracy
     moves slowly, it is confounded by seasonality, and in many domains the labels
@@ -540,15 +540,15 @@ its own training data, pipeline jungles, and configuration debt, then map each t
 platform capability that contains it. *Evaluate*: incident counts, time to ship, and
 the number of models a team maintains per engineer.
 
-**What the source says.** Sculley et al., "Hidden Technical Debt in Machine Learning
-Systems" (NeurIPS 2015) catalogues these failure patterns, including entanglement
+**What the source says.** Sculley et al., ["Hidden Technical Debt in Machine Learning
+Systems"](https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems) (NeurIPS 2015) catalogues these failure patterns, including entanglement
 ("changing anything changes everything"), correction cascades, undeclared consumers,
 data dependencies, feedback loops, pipeline jungles and configuration debt, and argues
 that the ML code is a small fraction of a real production ML system.
 
 !!! tip "How to say it in the interview: name the debt the platform prevents"
-    "I'd make the case in the language of the 2015 'Hidden Technical Debt in Machine
-    Learning Systems' paper, because it names the failures precisely: entanglement,
+    "I'd make the case in the language of the [2015 'Hidden Technical Debt in Machine
+    Learning Systems' paper](https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems), because it names the failures precisely: entanglement,
     undeclared consumers, hidden feedback loops, pipeline jungles, configuration debt,
     and the observation that the model code is a small fraction of the real system.
     Each of those maps to a platform capability. Undeclared consumers are contained by
@@ -691,19 +691,19 @@ that the ML code is a small fraction of a real production ML system.
 - **Predictive to generative.** The platform extends rather than being replaced:
   prompts and indexes join features and weights as versioned artefacts, evaluation
   suites join metric gates, and per-request cost joins the monitoring stack. Uber's own
-  writing describes Michelangelo extending from predictive to generative AI workloads
+  writing describes [Michelangelo extending from predictive to generative AI workloads](https://www.uber.com/us/en/blog/from-predictive-to-generative-ai/)
   along these lines, which is the pattern to expect.
 
 ## References
 
-- Uber Engineering. "Meet Michelangelo: Uber's Machine Learning Platform"; "Michelangelo Palette: A Feature Engineering Platform at Uber"; "From Predictive to Generative: How Michelangelo Accelerates Uber's AI Journey".
-- Airbnb Engineering. "Chronon, Airbnb's ML Feature Platform, Is Now Open Source." 2024 (the project was originally named Zipline).
-- Netflix Technology Blog. "Open-Sourcing Metaflow, a Human-Centric Framework for Data Science." 2019.
-- Meta Engineering. "Introducing FBLearner Flow: Facebook's AI backbone." 2016.
-- Baylor, D. et al. "TFX: A TensorFlow-Based Production-Scale Machine Learning Platform." KDD 2017.
-- Breck, E. et al. "Data Validation for Machine Learning." MLSys 2019.
-- Breck, E. et al. "The ML Test Score: A Rubric for ML Production Readiness and Technical Debt Reduction." IEEE Big Data 2017.
-- Sculley, D. et al. "Hidden Technical Debt in Machine Learning Systems." NeurIPS 2015.
-- Zinkevich, M. "Rules of Machine Learning: Best Practices for ML Engineering." Google Developers guide.
+- Uber Engineering. "Meet Michelangelo: Uber's Machine Learning Platform" ([uber.com](https://www.uber.com/us/en/blog/michelangelo-machine-learning-platform/)); "Palette Meta Store Journey" ([uber.com](https://www.uber.com/us/en/blog/palette-meta-store-journey/)) and the recorded talk "Michelangelo Palette: A Feature Engineering Platform at Uber" ([infoq.com](https://www.infoq.com/presentations/michelangelo-palette-uber/)); "From Predictive to Generative: How Michelangelo Accelerates Uber's AI Journey" ([uber.com](https://www.uber.com/us/en/blog/from-predictive-to-generative-ai/)).
+- Airbnb Engineering. "Chronon, Airbnb's ML Feature Platform, Is Now Open Source." 2024, the project was originally named Zipline ([medium.com/airbnb-engineering](https://medium.com/airbnb-engineering/chronon-airbnbs-ml-feature-platform-is-now-open-source-d9c4dba859e8)).
+- Netflix Technology Blog. "Open-Sourcing Metaflow, a Human-Centric Framework for Data Science." 2019 ([netflixtechblog.com](https://netflixtechblog.com/open-sourcing-metaflow-a-human-centric-framework-for-data-science-fa72e04a5d9)).
+- Meta Engineering. "Introducing FBLearner Flow: Facebook's AI backbone." 2016 ([engineering.fb.com](https://engineering.fb.com/2016/05/09/core-infra/introducing-fblearner-flow-facebook-s-ai-backbone/)).
+- Baylor, D. et al. "TFX: A TensorFlow-Based Production-Scale Machine Learning Platform." KDD 2017 ([research.google](https://research.google/pubs/tfx-a-tensorflow-based-production-scale-machine-learning-platform/)).
+- Breck, E. et al. "Data Validation for Machine Learning." MLSys 2019 ([proceedings.mlsys.org](https://proceedings.mlsys.org/paper_files/paper/2019/hash/928f1160e52192e3e0017fb63ab65391-Abstract.html)).
+- Breck, E. et al. "The ML Test Score: A Rubric for ML Production Readiness and Technical Debt Reduction." IEEE Big Data 2017 ([research.google](https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/)).
+- Sculley, D. et al. "Hidden Technical Debt in Machine Learning Systems." NeurIPS 2015 ([papers.nips.cc](https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems)).
+- Zinkevich, M. "Rules of Machine Learning: Best Practices for ML Engineering." Google Developers guide ([developers.google.com](https://developers.google.com/machine-learning/guides/rules-of-ml)).
 - Feast and Tecton documentation (open-source and managed feature stores).
 - Book cross-references: [distributed training](../part14-systems/01-distributed-training.md), [training systems](../part14-systems/02-training-systems.md), [inference systems](../part14-systems/03-inference-systems.md), [evaluation](../part13-retrieval-eval-reliability/02-evaluation.md), [LLM assistant with RAG](08-llm-product-rag-assistant.md), [fraud & anomaly detection](04-fraud-anomaly-detection.md), [forecasting & ETA](10-forecasting-eta.md).
