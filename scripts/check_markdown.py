@@ -151,7 +151,7 @@ def main() -> int:
     args = ap.parse_args()
     roots = [Path(p) for p in args.paths] if args.paths else [DOCS]
     files = sorted(f for r in roots for f in ([r] if r.is_file() else r.rglob("*.md")))
-    files = [f for f in files if f.name != "STYLE.md" and "_citations_todo" not in f.parts]
+    files = [f for f in files if f.name != "STYLE.md" and "citations-todo" not in f.parts]
 
     total = 0
     for f in files:

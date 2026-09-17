@@ -91,7 +91,7 @@ def main() -> int:
 
     roots = [Path(p) for p in args.paths] if args.paths else [ROOT / "docs"]
     files = sorted(f for r in roots for f in ([r] if r.is_file() else r.rglob("*.md")))
-    files = [f for f in files if "_citations_todo" not in f.parts]
+    files = [f for f in files if "citations-todo" not in f.parts]
 
     ids: Counter = Counter()
     total = sum(process(f, args.dry_run or args.list_ids, ids) for f in files)

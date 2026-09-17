@@ -278,14 +278,25 @@ $$
 
 computed backwards along the trajectory, with $\hat A_{T} = 0$ past the end of an episode.
 
+One more property decides how to read the bias axis. The policy gradient is unchanged by
+any state-dependent baseline (§2.3), so a critic that is wrong by a *constant per state*
+costs nothing: its error is absorbed as a baseline. At $\lambda = 1$ the estimate is
+$G_t - V(s_t)$, and the critic enters only as that constant, so the gradient is unbiased no
+matter how bad the critic is. For $\lambda < 1$ the critic's error enters through the
+bootstrap terms $\gamma V(s_{t+l+1})$, which depend on where the *action* took you, and that
+part does bias the gradient.
+
 ![Bias and variance of the GAE advantage at the start state as lambda varies, with an exact critic and with a deliberately biased critic.](../assets/figures/part12_gae_lambda.png){ width="820" }
 
-The figure measures both panels against the true advantage $Q^\pi(s_0,a_0) - V^\pi(s_0)$
-computed by dynamic programming. With an exact critic, bias is zero for every $\lambda$ and
-only variance moves. With a biased critic ($0.7V^\pi$), the bias shrinks toward zero as
-$\lambda \to 1$, because bootstrapping is what lets the critic's error in, and variance
-climbs. Typical settings are $\lambda \in [0.9, 0.97]$, which sit where the two curves
-cross over.
+The left panel plots exactly that quantity: the error of $\E[\hat A_0 \mid s_0,a]$ against
+the dynamic-programming advantage, after removing the policy-weighted mean over actions,
+computed in closed form rather than sampled. With an exact critic it is zero at every
+$\lambda$. With the critic scaled to $0.7V^\pi$ it sits near $4.3\times10^{-3}$ until
+$\lambda \approx 0.8$ and then falls to exactly zero at $\lambda = 1$. The right panel is
+the price: the variance of the per-episode estimate rises by about three orders of
+magnitude from $\lambda = 0$ to $\lambda = 1$ (note the log axis). Typical settings are
+$\lambda \in [0.9, 0.97]$, which take most of the bias reduction before the variance
+becomes steep.
 
 ### 2.6 Why you cannot just take a big step: TRPO in one page
 

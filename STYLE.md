@@ -131,7 +131,7 @@ textbook references last.
 
 If the budget runs out before you have verified everything, do not guess a URL.
 Cite by title and venue as above, and append one line per unverified source to
-`docs/_citations_todo/<your-part-dir>.md`:
+`citations-todo/<your-part-dir>.md`:
 
 ```
 - [ ] docs/part04-vision/04-detection.md | Focal Loss for Dense Object Detection | Lin et al., ICCV 2017 | believed arXiv:1708.02002

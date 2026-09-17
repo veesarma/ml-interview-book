@@ -55,6 +55,17 @@
     small draft model proposes tokens that the large model verifies in parallel,
     cutting latency without changing the output distribution.
 
+    The levers, by what each one actually spends:
+
+    | Lever | Cuts | Spends | Reach for it when |
+    |---|---|---|---|
+    | Quantization | bytes moved, and math on supporting hardware | accuracy, and engineering time on calibration | you are memory-bandwidth-bound, which is most decode and most edge inference |
+    | Structured pruning | FLOPs and parameters | accuracy, and a retraining cycle | you are compute-bound and the architecture is over-provisioned |
+    | Distillation | FLOPs, parameters, bytes | a full training run, and a quality ceiling set by the teacher | you can afford offline training and need a permanent win |
+    | Fusion and compilation | kernel launches, intermediate traffic | portability and build complexity | always, before you touch the model |
+    | Speculative decoding | wall-clock per token | extra memory for the draft model, and nothing in quality | decode latency dominates and acceptance rates are high |
+    | Caching | repeated compute | memory, and freshness | the input distribution is skewed |
+
     !!! interview "Staff move"
         Profile before you optimise, and say which axis you are spending. "First I
         find the actual bottleneck: compute, memory bandwidth, or data movement and
