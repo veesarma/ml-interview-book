@@ -60,7 +60,8 @@ runs past 100 seconds, cut the stakeholder list, never the numbers.
     cross-attention head into an 847-way classifier. Both backbones frozen, which meant zero
     European regression by construction and a head-only backfill.
 
-    Every North American regulatory cluster gained between 17 and 30 points of recall, Europe
+    Every text-discriminated North American cluster gained between 17 and 30 points of
+    recall, the pictogram-strong ones moved a little, Europe
     held within seed variance, marginal latency was 1.8 milliseconds of P95, and the backfill
     over 6 petabytes finished in 4.2 weeks inside a 6-week window. It also introduced two
     regressions that I can walk you through, both caused by trusting OCR more than it

@@ -489,7 +489,7 @@ retrain), how to notify, and what goes into the postmortem.
     vulnerability into a design checklist. The recurring conclusion across years of examples is
     that filtering the prompt does not work and the fix has to constrain what the system can do.
     *Source: Simon Willison's weblog, the [`prompt-injection` series](https://simonwillison.net/series/prompt-injection/)
-    and the [June 2025 post naming the three ingredients](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/).*
+    and the [June 2025 lethal-trifecta post](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/).*
 
 !!! production "Meta: Llama Guard and Purple Llama (2023 onward)"
     Problem: applications need a policy-configurable classifier for inputs and outputs, separate
@@ -697,7 +697,7 @@ retrain), how to notify, and what goes into the postmortem.
 * Google. [*Secure AI Framework (SAIF)*](https://saif.google/) and the
   [announcement post](https://blog.google/innovation-and-ai/technology/safety-security/introducing-googles-secure-ai-framework/), 2023.
 * Willison, S. [*Prompt injection* post series](https://simonwillison.net/series/prompt-injection/) and
-  [the post naming the three ingredients that make an agent exploitable](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/),
+  [the June 2025 lethal-trifecta post](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/),
   simonwillison.net.
 * [ISO 26262:2018, *Road vehicles: Functional safety*](https://www.iso.org/publication/PUB200262.html);
   [ISO 21448:2022, *Road vehicles: Safety of the intended functionality (SOTIF)*](https://www.iso.org/standard/77490.html).

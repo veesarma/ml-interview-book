@@ -298,7 +298,7 @@ round. Two to three minutes, then stop.
     "The clearest one is from StreetSmart. I led a change that added a text modality to our
     sign classifier: we fused the OCR transcription that was already being computed on every
     crop into the classifier through a cross-attention head. It worked, and the North
-    American regulatory clusters gained between 17 and 30 points of recall. It also caused
+    American text-discriminated clusters gained between 17 and 30 points of recall. It also caused
     two regressions, and both were mine.
 
     The first was on pictogram-strong classes. On something like a generic stop sign, where
@@ -481,7 +481,7 @@ general rule.
     The part that usually goes missing under time pressure is the bound: candidates give the
     loss without the gain it sat against, which makes the story sound worse than it was, or
     the gain without the loss, which makes it sound rehearsed. Say both, in one sentence,
-    early: "1.1 points on one cluster, against 17 to 30 across five."
+    early: "1.1 points on one cluster, against 17 to 30 points across six."
 
 ## References
 

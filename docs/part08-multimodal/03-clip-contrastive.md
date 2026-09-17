@@ -386,8 +386,7 @@ query-balanced curation without a model in the loop for that reason.
     embedding is cheaper to serve and keeps surfaces consistent, at the cost of per-surface
     tuning. Sources: *Learning a Unified Embedding for Visual Search at Pinterest*, Zhai et
     al., KDD 2019 ([arXiv:1908.01707](https://arxiv.org/abs/1908.01707)); *OmniSearchSage: Multi-Task Multi-Entity Embeddings for
-    Pinterest Search*, Agarwal et al., 2024 ([arXiv:2404.16260](https://arxiv.org/abs/2404.16260)); Pinterest Engineering's
-    own write-up,
+    Pinterest Search*, Agarwal et al., 2024 ([arXiv:2404.16260](https://arxiv.org/abs/2404.16260)); and the Pinterest Engineering post
     [*Unifying visual embeddings for visual search at Pinterest*](https://medium.com/pinterest-engineering/unifying-visual-embeddings-for-visual-search-at-pinterest-74ea7ea103f0),
     2019. See the
     [visual search system design](../part17-ml-system-design/06-visual-search-image-retrieval.md)

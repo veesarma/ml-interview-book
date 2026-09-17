@@ -7,7 +7,7 @@ docs/assets/figures/part07_rlhf_pipeline_manim.png
 """
 from manim import (
     BLUE, GREEN, ORANGE, PURPLE, RED, WHITE, DOWN, LEFT, RIGHT, UP,
-    Arrow, CurvedArrow, Rectangle, Scene, Text, VGroup, config,
+    Arrow, Line, Rectangle, Scene, Text, VGroup, config,
 )
 
 config.background_color = WHITE
@@ -71,13 +71,19 @@ class RLHFPipeline(Scene):
                        font_size=15, color=PURPLE)
         kl_note.next_to(ref, DOWN, buff=0.34, aligned_edge=LEFT)
 
-        # Feedback arrow routed around the right edge, clear of every box.
-        back = CurvedArrow(update.get_right() + RIGHT * 0.05,
-                           policy.get_top() + UP * 0.05,
-                           angle=-1.15, color=RED, stroke_width=3, tip_length=0.22)
+        # Feedback routed along a clear lane above the top row: up, left, then down.
+        lane_y = 2.62
+        up_stub = Line(update.get_top(), [update.get_center()[0], lane_y, 0],
+                       color=RED, stroke_width=3)
+        across = Line([update.get_center()[0], lane_y, 0], [policy.get_center()[0], lane_y, 0],
+                      color=RED, stroke_width=3)
+        down_arrow = Arrow([policy.get_center()[0], lane_y, 0], policy.get_top(),
+                           buff=0.02, color=RED, stroke_width=3,
+                           max_tip_length_to_length_ratio=0.35)
+        back = VGroup(up_stub, across, down_arrow)
         back_label = Text("new theta (per-token ratio clipped to 1 +/- eps)",
                           font_size=15, color=RED)
-        back_label.next_to(heading, DOWN, buff=0.16)
+        back_label.next_to(across, UP, buff=0.10)
 
         foot = VGroup(
             Text("Four networks in memory: policy and critic are trained; reference and reward model are frozen.",
