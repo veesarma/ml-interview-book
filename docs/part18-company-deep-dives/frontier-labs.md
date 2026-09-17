@@ -55,12 +55,12 @@
 All three labs sell (or fund) frontier model capability, but with different centres of
 gravity. **OpenAI** ships consumer and developer products (ChatGPT, the API, agentic
 products) and treats model capability plus distribution as the business; its public
-artefacts are product-shaped, system cards per launch, a Preparedness Framework, an
-eval repo. **Anthropic** sells Claude through an API and enterprise/coding products and
-positions safety research as inseparable from the product; its public artefacts are
-research-shaped, Constitutional AI, interpretability on `transformer-circuits.pub`, a
-Responsible Scaling Policy that gates deployment, and unusually detailed engineering
-posts about agents. **Google DeepMind** sits inside Google, so its models (Gemini) ship
+artefacts are product-shaped: a system card per launch, a Preparedness Framework, an
+eval repo. **Anthropic** sells Claude through an API and enterprise and coding products,
+and positions safety research as inseparable from the product; its public artefacts are
+research-shaped. Constitutional AI, the interpretability work published on
+`transformer-circuits.pub`, a Responsible Scaling Policy that gates deployment, and
+unusually detailed engineering posts about agents. **Google DeepMind** sits inside Google, so its models (Gemini) ship
 into products with a billion users while the research arm also pursues scientific
 targets (AlphaFold, GNoME, GraphCast, AlphaProof) and world models (Genie); its public
 artefacts span *Nature*/*Science* papers, technical reports, and a Frontier Safety
