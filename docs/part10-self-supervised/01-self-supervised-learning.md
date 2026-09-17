@@ -236,6 +236,11 @@ interpolating neighbours, which teaches texture and nothing about objects. At 90
 too little context. He et al. report 75 percent as the balance for ImageNet, much higher than BERT's
 15 percent for text, because image patches are far more redundant than word tokens.
 
+The bottom-left bar chart carries a second lesson. On the synthetic image used here, which is
+globally predictable from any few patches, reconstruction error hardly moves with the mask ratio.
+Reconstruction loss measures how hard the pretext task is on this data, and it does not measure
+whether the features are useful. Only a downstream probe does that.
+
 Two consequences for practice. MAE features are strong after fine-tuning and weaker under a linear
 probe than contrastive or DINO features, because the objective optimises reconstruction rather than
 linear separability. And the recipe transfers across modalities with the patching changed: video
@@ -639,10 +644,11 @@ cases.
 synthetic images and plot masked-patch MSE after a fixed number of steps.
 
 ??? success "Solution"
-    `figures/part10_mae_masking.py` does this. The loss rises with the ratio, which is the task
-    getting harder, and that alone does not tell you which ratio makes the best features. To
-    evaluate features you need a downstream probe, which is the point: reconstruction loss is not a
-    representation-quality metric.
+    `figures/part10_mae_masking.py` does this. On the synthetic stripes the loss barely moves with
+    the ratio, because the pattern is recoverable from a handful of patches at any ratio. On real
+    images the loss does rise with the ratio. Either way the number does not tell you which ratio
+    makes the best features, because reconstruction loss is not a representation-quality metric. To
+    rank ratios you need a downstream probe.
 
 **★★★ 6. A queue for the toy contrastive setup.** Implement MoCo's queue and momentum encoder on
 top of the existing `info_nce_loss`: maintain a `(Q, d)` buffer of normalised keys, enqueue the

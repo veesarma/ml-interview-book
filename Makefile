@@ -1,4 +1,4 @@
-.PHONY: install test style fix-style serve build figures deploy
+.PHONY: install test style fix-style serve build figures references deploy
 
 install:
 	pip install -r requirements.txt && pip install -e .
@@ -19,6 +19,9 @@ serve:
 
 build:
 	mkdocs build --strict
+
+references:
+	python scripts/build_references.py
 
 figures:
 	@for f in figures/*.py; do echo "→ $$f"; python $$f || exit 1; done

@@ -66,7 +66,7 @@ def main() -> None:
             final.append(float(torch.stack([model(imgs)[0] for _ in range(5)]).mean()))
     ax.bar([f"{int(r * 100)}%" for r in RATIOS], final, color=[colors[i] for i in range(4)], alpha=0.85)
     ax.set_xlabel("mask ratio"); ax.set_ylabel("masked-patch MSE after 300 steps")
-    ax.set_title("More masking is a harder task, and the loss says so", fontsize=10)
+    ax.set_title("On a globally predictable image the ratio barely moves the loss.\nReconstruction error is not a measure of feature quality.", fontsize=9.5)
 
     ax = fig.add_subplot(gs[1, 2:])
     ax.axis("off")
