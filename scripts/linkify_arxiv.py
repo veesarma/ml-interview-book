@@ -24,8 +24,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 # modern (0704.0001 onward) and legacy (math/0211159) identifiers
+# "arXiv:1234.56789", "arXiv 1234.56789" and "arXiv, 1234.56789" all occur in the
+# book; authors were not given a single convention. Keep the matched prefix so the
+# link text reads exactly as the chapter wrote it.
 ARXIV = re.compile(
-    r"arXiv:\s?((?:\d{4}\.\d{4,5}(?:v\d+)?)|(?:[a-z-]+(?:\.[A-Z]{2})?/\d{7}(?:v\d+)?))",
+    r"(arXiv)[:\s,]\s?((?:\d{4}\.\d{4,5}(?:v\d+)?)|(?:[a-z-]+(?:\.[A-Z]{2})?/\d{7}(?:v\d+)?))",
     re.I,
 )
 FENCE = re.compile(r"^\s*(```|~~~)")
@@ -64,9 +67,10 @@ def process(path: Path, dry_run: bool, ids: Counter) -> int:
                 continue
 
             def repl(m: re.Match) -> str:
-                ident = m.group(1)
+                prefix, ident = m.group(1), m.group(2)
                 ids[ident.split("v")[0]] += 1
-                return f"[arXiv:{ident}](https://arxiv.org/abs/{ident})"
+                sep = m.group(0)[len(prefix) : -len(ident)]
+                return f"[{prefix}{sep}{ident}](https://arxiv.org/abs/{ident})"
 
             new_piece, n = ARXIV.subn(repl, piece)
             if n:

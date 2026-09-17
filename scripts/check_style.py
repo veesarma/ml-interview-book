@@ -205,6 +205,12 @@ TABLE_ROW = re.compile(r"^\s*\|")
 # Clause-shape rules read a table row as prose: "| Part VI ...; Part VII ... |"
 # looks like mirrored symmetry but is a list of cells. Skip them for those rules.
 CLAUSE_RULES = {"MCS", "AE", "CR"}
+# A double-quoted span is someone else's words: a real paper or post title. We do
+# not get to ban vocabulary inside a title we are citing, so the vocabulary rules
+# skip quoted spans. The rhetorical and formatting rules still apply everywhere,
+# because the sentence around the quote is ours.
+QUOTED = re.compile(r'"[^"]{3,200}"|\u201c[^\u201d]{3,200}\u201d')
+VOCAB_RULES = {"VOC-mkt", "VOC-int", "VOC-tic", "VOC-trans"}
 
 COMPILED = [
     (code, name, re.compile(rx, re.I), sev, budget, fix)
@@ -238,10 +244,12 @@ def check_file(path: Path):
     errors, density = [], defaultdict(list)
     for lineno, line in lines:
         is_table = bool(TABLE_ROW.match(line))
+        unquoted = QUOTED.sub(" ", line)
         for code, name, rx, sev, budget, fix in COMPILED:
             if is_table and code in CLAUSE_RULES:
                 continue
-            for m in rx.finditer(line):
+            target = unquoted if code in VOCAB_RULES else line
+            for m in rx.finditer(target):
                 hit = (lineno, code, name, m.group(0).strip()[:60], fix)
                 (errors if sev == ERROR else density[code]).append(hit)
     over = []

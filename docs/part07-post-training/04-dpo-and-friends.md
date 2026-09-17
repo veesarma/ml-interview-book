@@ -231,10 +231,10 @@ Check with `pytest tests/test_posttrain_dpo.py -q`. Per-symbol tests: `test_dpo_
     Constitutional AI produced its harmlessness preference pairs by asking a model which of two responses better follows a principle; the paper trained a preference model and ran RL. The same AI-labelled pairs are exactly what later open recipes (Zephyr, Tülu) fed to DPO instead, because the pair format is method-agnostic. Source: Bai et al., 2022, [arXiv:2212.08073](https://arxiv.org/abs/2212.08073).
 
 !!! production "Allen AI: Tülu 3: length-normalised DPO, then RLVR"
-    Tülu 3's recipe is SFT → DPO on on-policy pairs (responses sampled from the SFT model and other models, judged by GPT-4-class models) → RLVR. They report choosing *length-normalised* DPO after comparing variants (DPO, SimPO, length-normalised DPO), finding it the best trade-off on their evaluation suite, and that on-policy pairs mattered. Source: Lambert et al., *Tülu 3: Pushing Frontiers in Open Language Model Post-Training*, 2024 (arXiv 2411.15124).
+    Tülu 3's recipe is SFT → DPO on on-policy pairs (responses sampled from the SFT model and other models, judged by GPT-4-class models) → RLVR. They report choosing *length-normalised* DPO after comparing variants (DPO, SimPO, length-normalised DPO), finding it the best trade-off on their evaluation suite, and that on-policy pairs mattered. Source: Lambert et al., *Tülu 3: Pushing Frontiers in Open Language Model Post-Training*, 2024 ([arXiv 2411.15124](https://arxiv.org/abs/2411.15124)).
 
 !!! production "Hugging Face: Zephyr: DPO on AI-labelled pairs"
-    Zephyr-7B applied DPO on the UltraFeedback dataset (responses from many models, scored by GPT-4, chosen = best score, rejected = random other) after SFT on distilled dialogues, reaching strong MT-Bench scores for its size without human labels. Source: Tunstall et al., *Zephyr: Direct Distillation of LM Alignment*, 2023 (arXiv 2310.16944).
+    Zephyr-7B applied DPO on the UltraFeedback dataset (responses from many models, scored by GPT-4, chosen = best score, rejected = random other) after SFT on distilled dialogues, reaching strong MT-Bench scores for its size without human labels. Source: Tunstall et al., *Zephyr: Direct Distillation of LM Alignment*, 2023 ([arXiv 2310.16944](https://arxiv.org/abs/2310.16944)).
 
 ## 6. Interview questions and strong answers
 
@@ -285,16 +285,16 @@ Check with `pytest tests/test_posttrain_dpo.py -q`. Per-symbol tests: `test_dpo_
 
 ## References
 
-- Rafailov et al. (2023). *Direct Preference Optimization: Your Language Model is Secretly a Reward Model*. arXiv 2305.18290; NeurIPS 2023.
-- Azar et al. (2023). *A General Theoretical Paradigm to Understand Learning from Human Preferences* (IPO). arXiv 2310.12036.
-- Hong, Lee and Thorne (2024). *ORPO: Monolithic Preference Optimization without Reference Model*. arXiv 2403.07691.
-- Ethayarajh et al. (2024). *KTO: Model Alignment as Prospect Theoretic Optimization*. arXiv 2402.01306.
-- Meng, Xia and Chen (2024). *SimPO: Simple Preference Optimization with a Reference-Free Reward*. arXiv 2405.14734.
-- Pang et al. (2024). *Iterative Reasoning Preference Optimization* (DPO + NLL). arXiv 2404.19733.
-- Razin et al. (2024). *Unintentional Unalignment: Likelihood Displacement in Direct Preference Optimization*. arXiv 2410.08847.
-- Guo et al. (2024). *Direct Language Model Alignment from Online AI Feedback* (online DPO). arXiv 2402.04792.
+- Rafailov et al. (2023). *Direct Preference Optimization: Your Language Model is Secretly a Reward Model*. [arXiv 2305.18290](https://arxiv.org/abs/2305.18290); NeurIPS 2023.
+- Azar et al. (2023). *A General Theoretical Paradigm to Understand Learning from Human Preferences* (IPO). [arXiv 2310.12036](https://arxiv.org/abs/2310.12036).
+- Hong, Lee and Thorne (2024). *ORPO: Monolithic Preference Optimization without Reference Model*. [arXiv 2403.07691](https://arxiv.org/abs/2403.07691).
+- Ethayarajh et al. (2024). *KTO: Model Alignment as Prospect Theoretic Optimization*. [arXiv 2402.01306](https://arxiv.org/abs/2402.01306).
+- Meng, Xia and Chen (2024). *SimPO: Simple Preference Optimization with a Reference-Free Reward*. [arXiv 2405.14734](https://arxiv.org/abs/2405.14734).
+- Pang et al. (2024). *Iterative Reasoning Preference Optimization* (DPO + NLL). [arXiv 2404.19733](https://arxiv.org/abs/2404.19733).
+- Razin et al. (2024). *Unintentional Unalignment: Likelihood Displacement in Direct Preference Optimization*. [arXiv 2410.08847](https://arxiv.org/abs/2410.08847).
+- Guo et al. (2024). *Direct Language Model Alignment from Online AI Feedback* (online DPO). [arXiv 2402.04792](https://arxiv.org/abs/2402.04792).
 - Grattafiori et al. (2024). *The Llama 3 Herd of Models*. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783).
 - Bai et al. (2022). *Constitutional AI: Harmlessness from AI Feedback*. [arXiv:2212.08073](https://arxiv.org/abs/2212.08073).
-- Lambert et al. (2024). *Tülu 3: Pushing Frontiers in Open Language Model Post-Training*. arXiv 2411.15124.
-- Tunstall et al. (2023). *Zephyr: Direct Distillation of LM Alignment*. arXiv 2310.16944.
+- Lambert et al. (2024). *Tülu 3: Pushing Frontiers in Open Language Model Post-Training*. [arXiv 2411.15124](https://arxiv.org/abs/2411.15124).
+- Tunstall et al. (2023). *Zephyr: Direct Distillation of LM Alignment*. [arXiv 2310.16944](https://arxiv.org/abs/2310.16944).
 - Hugging Face, *TRL* documentation, `DPOTrainer` (loss variants: sigmoid, ipo, kto_pair, simpo via `loss_type`).

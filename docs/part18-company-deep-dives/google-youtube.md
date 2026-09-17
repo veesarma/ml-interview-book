@@ -236,7 +236,7 @@ flowchart LR
 * Lee et al., "FormNet: Structural Encoding beyond Sequential Modeling in Form Document Information Extraction", ACL 2022. [ACL Anthology](https://aclanthology.org/2022.acl-long.260/) · [arXiv:2203.08411](https://arxiv.org/abs/2203.08411)
 * Lee et al., "Pix2Struct: Screenshot Parsing as Pretraining for Visual Language Understanding", 2022. [arXiv:2210.03347](https://arxiv.org/abs/2210.03347) · Baechler et al., "ScreenAI: A Vision-Language Model for UI and Infographics Understanding", 2024. [arXiv:2402.04615](https://arxiv.org/abs/2402.04615)
 * Chen et al., "PaLI: A Jointly-Scaled Multilingual Language-Image Model", 2022 (ICLR 2023). [arXiv:2209.06794](https://arxiv.org/abs/2209.06794)
-* Google Cloud Document AI documentation; Google Lens product pages.
+* Google Cloud Document AI documentation ([cloud.google.com/document-ai](https://cloud.google.com/document-ai), [overview](https://docs.cloud.google.com/document-ai/docs/overview)); Google Lens ([lens.google](https://lens.google), [blog.google on Lens shopping results](https://blog.google/products-and-platforms/products/shopping/visual-search-lens-shopping/)).
 
 **Infrastructure and practice**
 

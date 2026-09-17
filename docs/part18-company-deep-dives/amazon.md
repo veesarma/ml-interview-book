@@ -220,7 +220,7 @@ flowchart LR
 
 **Search and recommendations**
 
-* Nigam et al., "Semantic Product Search", KDD 2019 (arXiv 1907.00937).
+* Nigam et al., "Semantic Product Search", KDD 2019 ([arXiv 1907.00937](https://arxiv.org/abs/1907.00937)).
 * Sorokina & Cantu-Paz, "Amazon Search: The Joy of Ranking Products", SIGIR 2016 (industry track).
 * Linden, Smith & York, "Amazon.com Recommendations: Item-to-Item Collaborative Filtering", IEEE Internet Computing, 2003.
 * Smith & Linden, "Two Decades of Recommender Systems at Amazon.com", IEEE Internet Computing, 2017.
@@ -229,13 +229,13 @@ flowchart LR
 **Forecasting**
 
 * Salinas, Flunkert, Gasthaus & Januschowski, "DeepAR: Probabilistic Forecasting with Autoregressive Recurrent Networks", International Journal of Forecasting, 2020. [arXiv:1704.04110](https://arxiv.org/abs/1704.04110)
-* Wen et al., "A Multi-Horizon Quantile Recurrent Forecaster", 2017 (arXiv 1711.11053).
+* Wen et al., "A Multi-Horizon Quantile Recurrent Forecaster", 2017 ([arXiv 1711.11053](https://arxiv.org/abs/1711.11053)).
 * Alexandrov et al., "GluonTS: Probabilistic and Neural Time Series Modeling in Python", JMLR, 2020.
 
 **Speech, assistants and foundation models**
 
 * Soltau et al. / Alexa Science publications on wake-word detection and on-device ASR (Amazon Science).
-* Soltan et al., "AlexaTM 20B: Few-Shot Learning Using a Large-Scale Multilingual Seq2Seq Model", 2022 (arXiv 2208.01448).
+* Soltan et al., "AlexaTM 20B: Few-Shot Learning Using a Large-Scale Multilingual Seq2Seq Model", 2022 ([arXiv 2208.01448](https://arxiv.org/abs/2208.01448)).
 * Amazon, Rufus shopping assistant announcements and Amazon Science posts, 2024.
 * Amazon Nova family of foundation models, announced at AWS re:Invent 2024; Amazon Bedrock documentation.
 

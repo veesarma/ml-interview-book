@@ -246,6 +246,16 @@ exempt. In body prose, replace "This matters because the KV cache dominates memo
 long context" with "The KV cache dominates memory at long context." The consequence
 is the point; the announcement is padding.
 
+
+### Citing a title that contains banned vocabulary
+
+A double-quoted span is someone else's words. The vocabulary rules (marketing
+words, empty intensifiers, lexical tics, overused connectives) skip quoted spans,
+so you may cite Uber's "Under the Hood of Uber's Experimentation Platform" by its
+real title. The rhetorical and formatting rules still apply everywhere, including
+inside quotes, because a quoted em dash still renders as an em dash. If a title
+carries one, describe the post instead of quoting it.
+
 ### Also avoid, though the linter cannot catch them
 
 * **Forced triads.** Three parallel items because three sounds complete. Use two if

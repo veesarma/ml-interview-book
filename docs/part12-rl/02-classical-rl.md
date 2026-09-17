@@ -190,10 +190,14 @@ and in practice it usually beats UCB on Bernoulli problems, as the figure below 
 
 ![Cumulative regret for epsilon-greedy at two epsilon values, UCB1 and Thompson sampling, mean plus/minus one standard deviation over 20 seeds, on linear and log-x axes.](../assets/figures/part12_bandit_regret.png){ width="820" }
 
-The log-x panel is the one to read: UCB and Thompson curves bend over (the signature of
-$\log T$), while both $\varepsilon$-greedy curves keep climbing at a constant rate. At
-$T=5000$ with these gaps, Thompson's regret is roughly a tenth of $\varepsilon$-greedy's
-at $\varepsilon = 0.1$.
+On the log-$x$ axis, a $\log T$ regret is a straight line and a linear regret curves
+upward, which is what separates the green and red curves from the blue one. Over 20 seeds
+at $T = 5000$ the totals are: $\varepsilon$-greedy at $\varepsilon=0.1$, $208 \pm 14$;
+$\varepsilon$-greedy at $\varepsilon=0.01$, $187 \pm 197$; UCB1, $92 \pm 15$; Thompson,
+$11 \pm 4$. The second row is the interesting one: its mean is fine and its standard
+deviation is larger than its mean, because with so little exploration the algorithm
+sometimes locks onto a suboptimal arm and never recovers. Averages hide that; plot the
+spread.
 
 ### 2.4 Contextual bandits
 

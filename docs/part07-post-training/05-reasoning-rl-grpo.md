@@ -307,10 +307,10 @@ The trade you are making: PPO pays for a critic to get a per-token baseline from
 ## 5. In production
 
 !!! production "DeepSeek, R1-Zero and R1: GRPO with rule-based rewards"
-    R1-Zero applies GRPO to a base model with no SFT, using answer-correctness and format rewards and no learned reward model. The report describes reasoning benchmark scores climbing over training, response length growing without being asked for, and self-correction behaviour appearing. Readability problems (language mixing, unformatted output) motivated the full R1 pipeline: cold-start SFT on long chain-of-thought data, reasoning RL with a language-consistency reward, rejection sampling into a second SFT round, then a final RL stage. They also report that distilling R1 outputs into smaller dense models by SFT outperformed running the same RL on those models. GRPO itself was introduced in DeepSeekMath. Sources: DeepSeek-AI, *DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning*, 2025 (arXiv 2501.12948); Shao et al., *DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models*, 2024 (arXiv 2402.03300).
+    R1-Zero applies GRPO to a base model with no SFT, using answer-correctness and format rewards and no learned reward model. The report describes reasoning benchmark scores climbing over training, response length growing without being asked for, and self-correction behaviour appearing. Readability problems (language mixing, unformatted output) motivated the full R1 pipeline: cold-start SFT on long chain-of-thought data, reasoning RL with a language-consistency reward, rejection sampling into a second SFT round, then a final RL stage. They also report that distilling R1 outputs into smaller dense models by SFT outperformed running the same RL on those models. GRPO itself was introduced in DeepSeekMath. Sources: DeepSeek-AI, *DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning*, 2025 ([arXiv 2501.12948](https://arxiv.org/abs/2501.12948)); Shao et al., *DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models*, 2024 ([arXiv 2402.03300](https://arxiv.org/abs/2402.03300)).
 
 !!! production "Allen AI, Tülu 3: RLVR as a named pipeline stage"
-    Tülu 3's post-training runs SFT, then length-normalised DPO, then a stage they call RLVR: RL where the reward is 1 only if a verifier accepts the answer, applied to math (exact answer match), instruction following with checkable constraints (IFEval-style), and other tasks with programmatic checks. They report RLVR improving the targeted capabilities without the general regressions that a learned RM can introduce, and they released the data and code. Source: Lambert et al., *Tülu 3: Pushing Frontiers in Open Language Model Post-Training*, 2024 (arXiv 2411.15124).
+    Tülu 3's post-training runs SFT, then length-normalised DPO, then a stage they call RLVR: RL where the reward is 1 only if a verifier accepts the answer, applied to math (exact answer match), instruction following with checkable constraints (IFEval-style), and other tasks with programmatic checks. They report RLVR improving the targeted capabilities without the general regressions that a learned RM can introduce, and they released the data and code. Source: Lambert et al., *Tülu 3: Pushing Frontiers in Open Language Model Post-Training*, 2024 ([arXiv 2411.15124](https://arxiv.org/abs/2411.15124)).
 
 !!! production "Anthropic, Constitutional AI: principles to critique to revision to preference learning"
     The supervised phase samples a response, asks the model to critique it against a principle sampled from a written constitution, asks for a revision, and fine-tunes on the revisions. The RL phase asks a model which of two responses better follows a principle, trains a preference model on those labels, and runs RL against it. The paper reports the resulting assistant engages with harmful queries by explaining its objections rather than refusing flatly, and that chain-of-thought reasoning in the AI labeller improves both performance and the transparency of the labelling decision. Source: Bai et al., 2022, [arXiv:2212.08073](https://arxiv.org/abs/2212.08073).
@@ -378,17 +378,17 @@ The trade you are making: PPO pays for a critic to get a per-token baseline from
 
 ## References
 
-- Shao et al. (2024). *DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models* (introduces GRPO). arXiv 2402.03300.
-- DeepSeek-AI (2025). *DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning*. arXiv 2501.12948.
-- Yu et al. (2025). *DAPO: An Open-Source LLM Reinforcement Learning System at Scale*. arXiv 2503.14476.
-- Liu et al. (2025). *Understanding R1-Zero-Like Training: A Critical Perspective* (Dr. GRPO). arXiv 2503.20783.
-- Lambert et al. (2024). *Tülu 3: Pushing Frontiers in Open Language Model Post-Training*. arXiv 2411.15124.
-- Lightman et al. (2023). *Let's Verify Step by Step* (PRM800K, process supervision). arXiv 2305.20050.
-- Wang et al. (2023). *Math-Shepherd: Verify and Reinforce LLMs Step-by-step without Human Annotations*. arXiv 2312.08935.
-- Cobbe et al. (2021). *Training Verifiers to Solve Math Word Problems* (GSM8K, outcome verifiers). arXiv 2110.14168.
+- Shao et al. (2024). *DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models* (introduces GRPO). [arXiv 2402.03300](https://arxiv.org/abs/2402.03300).
+- DeepSeek-AI (2025). *DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning*. [arXiv 2501.12948](https://arxiv.org/abs/2501.12948).
+- Yu et al. (2025). *DAPO: An Open-Source LLM Reinforcement Learning System at Scale*. [arXiv 2503.14476](https://arxiv.org/abs/2503.14476).
+- Liu et al. (2025). *Understanding R1-Zero-Like Training: A Critical Perspective* (Dr. GRPO). [arXiv 2503.20783](https://arxiv.org/abs/2503.20783).
+- Lambert et al. (2024). *Tülu 3: Pushing Frontiers in Open Language Model Post-Training*. [arXiv 2411.15124](https://arxiv.org/abs/2411.15124).
+- Lightman et al. (2023). *Let's Verify Step by Step* (PRM800K, process supervision). [arXiv 2305.20050](https://arxiv.org/abs/2305.20050).
+- Wang et al. (2023). *Math-Shepherd: Verify and Reinforce LLMs Step-by-step without Human Annotations*. [arXiv 2312.08935](https://arxiv.org/abs/2312.08935).
+- Cobbe et al. (2021). *Training Verifiers to Solve Math Word Problems* (GSM8K, outcome verifiers). [arXiv 2110.14168](https://arxiv.org/abs/2110.14168).
 - Bai et al. (2022). *Constitutional AI: Harmlessness from AI Feedback*. [arXiv:2212.08073](https://arxiv.org/abs/2212.08073).
-- Lee et al. (2023). *RLAIF: Scaling Reinforcement Learning from Human Feedback with AI Feedback*. arXiv 2309.00267.
+- Lee et al. (2023). *RLAIF: Scaling Reinforcement Learning from Human Feedback with AI Feedback*. [arXiv 2309.00267](https://arxiv.org/abs/2309.00267).
 - OpenAI (2024). *Learning to reason with LLMs*; OpenAI (2024). *o1 System Card*.
 - Grattafiori et al. (2024). *The Llama 3 Herd of Models*. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783).
 - Schulman, J. (2020). *Approximating KL Divergence* (the $k_1$, $k_2$, $k_3$ estimators), blog post.
-- Amodei et al. (2016). *Concrete Problems in AI Safety* (reward hacking taxonomy). arXiv 1606.06565.
+- Amodei et al. (2016). *Concrete Problems in AI Safety* (reward hacking taxonomy). [arXiv 1606.06565](https://arxiv.org/abs/1606.06565).

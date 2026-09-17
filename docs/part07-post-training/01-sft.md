@@ -265,7 +265,7 @@ Check with `pytest tests/test_posttrain_sft.py tests/test_posttrain_chat_templat
     Llama 3's post-training loop is SFT → rejection sampling → DPO, repeated six times. SFT data came from human demonstrations *and* from rejection-sampled model outputs scored by a reward model, plus synthetic data for code, math and tools, with the mixture weights tuned per capability. They report ablations on data quality filtering and on using model-based classifiers to prune low-quality samples. Source: Grattafiori et al., *The Llama 3 Herd of Models*, 2024, [arXiv:2407.21783](https://arxiv.org/abs/2407.21783).
 
 !!! production "DeepSeek: R1: cold-start SFT before reasoning RL"
-    DeepSeek-R1-Zero applied RL directly to the base model and produced strong reasoning with poor readability and language mixing. The R1 recipe adds a short *cold-start* SFT phase on a few thousand long chain-of-thought examples so that RL starts from a readable, well-formatted policy, then a second SFT round on rejection-sampled RL outputs mixed with general data. Source: DeepSeek-AI, *DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning*, 2025 (arXiv 2501.12948).
+    DeepSeek-R1-Zero applied RL directly to the base model and produced strong reasoning with poor readability and language mixing. The R1 recipe adds a short *cold-start* SFT phase on a few thousand long chain-of-thought examples so that RL starts from a readable, well-formatted policy, then a second SFT round on rejection-sampled RL outputs mixed with general data. Source: DeepSeek-AI, *DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning*, 2025 ([arXiv 2501.12948](https://arxiv.org/abs/2501.12948)).
 
 ## 6. Interview questions and strong answers
 
@@ -325,9 +325,9 @@ Check with `pytest tests/test_posttrain_sft.py tests/test_posttrain_chat_templat
 - Ouyang et al. (2022). *Training language models to follow instructions with human feedback* (InstructGPT). [arXiv:2203.02155](https://arxiv.org/abs/2203.02155).
 - Touvron et al. (2023). *Llama 2: Open Foundation and Fine-Tuned Chat Models*. [arXiv:2307.09288](https://arxiv.org/abs/2307.09288).
 - Grattafiori et al. (2024). *The Llama 3 Herd of Models*. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783).
-- Wang et al. (2022). *Self-Instruct: Aligning Language Models with Self-Generated Instructions*. arXiv 2212.10560.
-- Xu et al. (2023). *WizardLM: Empowering Large Language Models to Follow Complex Instructions* (Evol-Instruct). arXiv 2304.12244.
-- Zhou et al. (2023). *IFEval: Instruction-Following Evaluation for Large Language Models*. arXiv 2311.07911.
-- Zheng et al. (2023). *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena*. arXiv 2306.05685.
-- DeepSeek-AI (2025). *DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning*. arXiv 2501.12948.
+- Wang et al. (2022). *Self-Instruct: Aligning Language Models with Self-Generated Instructions*. [arXiv 2212.10560](https://arxiv.org/abs/2212.10560).
+- Xu et al. (2023). *WizardLM: Empowering Large Language Models to Follow Complex Instructions* (Evol-Instruct). [arXiv 2304.12244](https://arxiv.org/abs/2304.12244).
+- Zhou et al. (2023). *IFEval: Instruction-Following Evaluation for Large Language Models*. [arXiv 2311.07911](https://arxiv.org/abs/2311.07911).
+- Zheng et al. (2023). *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena*. [arXiv 2306.05685](https://arxiv.org/abs/2306.05685).
+- DeepSeek-AI (2025). *DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning*. [arXiv 2501.12948](https://arxiv.org/abs/2501.12948).
 - Hugging Face, *TRL* documentation, `SFTTrainer` (assistant-only loss and packing options).

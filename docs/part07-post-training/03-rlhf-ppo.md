@@ -319,14 +319,14 @@ Against ~16 bytes/param for pretraining, RLHF-PPO is $\gtrsim 2.2\times$ the sta
 
 ## References
 
-- Schulman et al. (2017). *Proximal Policy Optimization Algorithms*. arXiv 1707.06347.
-- Schulman et al. (2015). *High-Dimensional Continuous Control Using Generalized Advantage Estimation*. arXiv 1506.02438.
-- Schulman et al. (2015). *Trust Region Policy Optimization*. arXiv 1502.05477.
-- Ziegler et al. (2019). *Fine-Tuning Language Models from Human Preferences*. arXiv 1909.08593 (the origin of the per-token KL reward and the adaptive controller).
-- Stiennon et al. (2020). *Learning to summarize from human feedback*. arXiv 2009.01325.
+- Schulman et al. (2017). *Proximal Policy Optimization Algorithms*. [arXiv 1707.06347](https://arxiv.org/abs/1707.06347).
+- Schulman et al. (2015). *High-Dimensional Continuous Control Using Generalized Advantage Estimation*. [arXiv 1506.02438](https://arxiv.org/abs/1506.02438).
+- Schulman et al. (2015). *Trust Region Policy Optimization*. [arXiv 1502.05477](https://arxiv.org/abs/1502.05477).
+- Ziegler et al. (2019). *Fine-Tuning Language Models from Human Preferences*. [arXiv 1909.08593](https://arxiv.org/abs/1909.08593) (the origin of the per-token KL reward and the adaptive controller).
+- Stiennon et al. (2020). *Learning to summarize from human feedback*. [arXiv 2009.01325](https://arxiv.org/abs/2009.01325).
 - Ouyang et al. (2022). *Training language models to follow instructions with human feedback*. [arXiv:2203.02155](https://arxiv.org/abs/2203.02155).
 - Touvron et al. (2023). *Llama 2: Open Foundation and Fine-Tuned Chat Models*. [arXiv:2307.09288](https://arxiv.org/abs/2307.09288).
 - Bai et al. (2022). *Constitutional AI: Harmlessness from AI Feedback*. [arXiv:2212.08073](https://arxiv.org/abs/2212.08073).
 - Grattafiori et al. (2024). *The Llama 3 Herd of Models*. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783).
-- Huang et al. (2024). *The N+ Implementation Details of RLHF with PPO: A Case Study on TL;DR Summarization*. arXiv 2403.17031.
+- Huang et al. (2024). *The N+ Implementation Details of RLHF with PPO: A Case Study on TL;DR Summarization*. [arXiv 2403.17031](https://arxiv.org/abs/2403.17031).
 - Hugging Face, *TRL* documentation, `PPOTrainer`.

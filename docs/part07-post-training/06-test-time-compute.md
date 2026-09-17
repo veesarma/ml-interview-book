@@ -241,16 +241,16 @@ The last row connects back to chapter 1: rejection sampling is best-of-N used of
 ## 5. In production
 
 !!! production "Google, self-consistency: majority voting over sampled chains"
-    Wang et al. replaced greedy decoding of a single chain of thought with sampling a diverse set of chains and taking the most consistent final answer. They report large gains on arithmetic and commonsense reasoning benchmarks across several model families, with accuracy rising as the number of sampled paths grows and then saturating. The method needs no extra training and no verifier, which is why it became a default baseline. Source: Wang et al., *Self-Consistency Improves Chain of Thought Reasoning in Language Models*, 2022 (arXiv 2203.11171).
+    Wang et al. replaced greedy decoding of a single chain of thought with sampling a diverse set of chains and taking the most consistent final answer. They report large gains on arithmetic and commonsense reasoning benchmarks across several model families, with accuracy rising as the number of sampled paths grows and then saturating. The method needs no extra training and no verifier, which is why it became a default baseline. Source: Wang et al., *Self-Consistency Improves Chain of Thought Reasoning in Language Models*, 2022 ([arXiv 2203.11171](https://arxiv.org/abs/2203.11171)).
 
 !!! production "OpenAI, verifiers on GSM8K: reranking beats fine-tuning"
-    Cobbe et al. trained a verifier to judge the correctness of sampled solutions, then sampled many candidates at test time and ranked by verifier score. They report that this outperformed fine-tuning the generator alone at equivalent scale, with the gap widening as more samples were drawn. This is the original demonstration that a checker plus sampling substitutes for parameters. Source: Cobbe et al., *Training Verifiers to Solve Math Word Problems*, 2021 (arXiv 2110.14168).
+    Cobbe et al. trained a verifier to judge the correctness of sampled solutions, then sampled many candidates at test time and ranked by verifier score. They report that this outperformed fine-tuning the generator alone at equivalent scale, with the gap widening as more samples were drawn. This is the original demonstration that a checker plus sampling substitutes for parameters. Source: Cobbe et al., *Training Verifiers to Solve Math Word Problems*, 2021 ([arXiv 2110.14168](https://arxiv.org/abs/2110.14168)).
 
 !!! production "OpenAI, process supervision: PRMs outperform ORMs for reranking"
-    Lightman et al. collected step-level human labels (PRM800K) and trained a process reward model, then used it to rerank solutions to MATH problems. The PRM outperformed an outcome-only reward model at the same number of samples, and the gap grew with the number of candidates, because step-level scoring identifies solutions that reached a right answer through wrong reasoning. Source: Lightman et al., *Let's Verify Step by Step*, 2023 (arXiv 2305.20050).
+    Lightman et al. collected step-level human labels (PRM800K) and trained a process reward model, then used it to rerank solutions to MATH problems. The PRM outperformed an outcome-only reward model at the same number of samples, and the gap grew with the number of candidates, because step-level scoring identifies solutions that reached a right answer through wrong reasoning. Source: Lightman et al., *Let's Verify Step by Step*, 2023 ([arXiv 2305.20050](https://arxiv.org/abs/2305.20050)).
 
 !!! production "Google DeepMind and Berkeley, compute-optimal test-time scaling"
-    Snell et al. compared sequential revision against parallel sampling with search, under a fixed budget, and found the better strategy depends on prompt difficulty. Allocating per-prompt using a difficulty estimate reached baseline best-of-N accuracy with about $4\times$ less compute, and in the regimes they measured a smaller model with extra inference compute outperformed a roughly $14\times$ larger model in a single pass. They also report that this advantage disappears for problems the base model cannot approach. Source: Snell et al., *Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters*, 2024 (arXiv 2408.03314).
+    Snell et al. compared sequential revision against parallel sampling with search, under a fixed budget, and found the better strategy depends on prompt difficulty. Allocating per-prompt using a difficulty estimate reached baseline best-of-N accuracy with about $4\times$ less compute, and in the regimes they measured a smaller model with extra inference compute outperformed a roughly $14\times$ larger model in a single pass. They also report that this advantage disappears for problems the base model cannot approach. Source: Snell et al., *Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters*, 2024 ([arXiv 2408.03314](https://arxiv.org/abs/2408.03314)).
 
 !!! production "OpenAI, o1: inference-time thinking as a scaling axis"
     OpenAI describes o1 as improving along two separate axes, more RL training compute and more time spent thinking at inference, and reports benchmark accuracy rising with both. The chain of thought is kept private and a summary is shown to the user, which has a serving consequence: billed reasoning tokens are generated but not returned. Source: OpenAI, *Learning to reason with LLMs*, 2024.
@@ -315,17 +315,17 @@ The last row connects back to chapter 1: rejection sampling is best-of-N used of
 
 ## References
 
-- Wei et al. (2022). *Chain-of-Thought Prompting Elicits Reasoning in Large Language Models*. arXiv 2201.11903.
-- Wang et al. (2022). *Self-Consistency Improves Chain of Thought Reasoning in Language Models*. arXiv 2203.11171.
-- Cobbe et al. (2021). *Training Verifiers to Solve Math Word Problems*. arXiv 2110.14168.
-- Lightman et al. (2023). *Let's Verify Step by Step*. arXiv 2305.20050.
-- Snell et al. (2024). *Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters*. arXiv 2408.03314.
-- Wu et al. (2024). *Inference Scaling Laws: An Empirical Analysis of Compute-Optimal Inference*. arXiv 2408.00724.
-- Yao et al. (2023). *Tree of Thoughts: Deliberate Problem Solving with Large Language Models*. arXiv 2305.10601.
-- Madaan et al. (2023). *Self-Refine: Iterative Refinement with Self-Feedback*. arXiv 2303.17651.
-- Gao, L., Schulman, J. and Hilton, J. (2022). *Scaling Laws for Reward Model Overoptimization*. arXiv 2210.10760.
-- Beirami et al. (2024). *Theoretical guarantees on the best-of-n alignment policy*. arXiv 2401.01879.
-- Stiennon et al. (2020). *Learning to summarize from human feedback* (the $\log N - (N-1)/N$ result appears here). arXiv 2009.01325.
+- Wei et al. (2022). *Chain-of-Thought Prompting Elicits Reasoning in Large Language Models*. [arXiv 2201.11903](https://arxiv.org/abs/2201.11903).
+- Wang et al. (2022). *Self-Consistency Improves Chain of Thought Reasoning in Language Models*. [arXiv 2203.11171](https://arxiv.org/abs/2203.11171).
+- Cobbe et al. (2021). *Training Verifiers to Solve Math Word Problems*. [arXiv 2110.14168](https://arxiv.org/abs/2110.14168).
+- Lightman et al. (2023). *Let's Verify Step by Step*. [arXiv 2305.20050](https://arxiv.org/abs/2305.20050).
+- Snell et al. (2024). *Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters*. [arXiv 2408.03314](https://arxiv.org/abs/2408.03314).
+- Wu et al. (2024). *Inference Scaling Laws: An Empirical Analysis of Compute-Optimal Inference*. [arXiv 2408.00724](https://arxiv.org/abs/2408.00724).
+- Yao et al. (2023). *Tree of Thoughts: Deliberate Problem Solving with Large Language Models*. [arXiv 2305.10601](https://arxiv.org/abs/2305.10601).
+- Madaan et al. (2023). *Self-Refine: Iterative Refinement with Self-Feedback*. [arXiv 2303.17651](https://arxiv.org/abs/2303.17651).
+- Gao, L., Schulman, J. and Hilton, J. (2022). *Scaling Laws for Reward Model Overoptimization*. [arXiv 2210.10760](https://arxiv.org/abs/2210.10760).
+- Beirami et al. (2024). *Theoretical guarantees on the best-of-n alignment policy*. [arXiv 2401.01879](https://arxiv.org/abs/2401.01879).
+- Stiennon et al. (2020). *Learning to summarize from human feedback* (the $\log N - (N-1)/N$ result appears here). [arXiv 2009.01325](https://arxiv.org/abs/2009.01325).
 - OpenAI (2024). *Learning to reason with LLMs*.
 - Touvron et al. (2023). *Llama 2: Open Foundation and Fine-Tuned Chat Models*. [arXiv:2307.09288](https://arxiv.org/abs/2307.09288).
 - Grattafiori et al. (2024). *The Llama 3 Herd of Models*. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783).

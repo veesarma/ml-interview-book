@@ -262,8 +262,8 @@ Check with `pytest tests/test_posttrain_reward_model.py -q`. Per-symbol tests: `
 - Touvron et al. (2023). *Llama 2: Open Foundation and Fine-Tuned Chat Models*. [arXiv:2307.09288](https://arxiv.org/abs/2307.09288).
 - Grattafiori et al. (2024). *The Llama 3 Herd of Models*. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783).
 - Bai et al. (2022). *Constitutional AI: Harmlessness from AI Feedback*. [arXiv:2212.08073](https://arxiv.org/abs/2212.08073).
-- Gao, L., Schulman, J. and Hilton, J. (2022). *Scaling Laws for Reward Model Overoptimization*. arXiv 2210.10760; ICML 2023.
-- Stiennon et al. (2020). *Learning to summarize from human feedback*. arXiv 2009.01325.
-- Coste et al. (2023). *Reward Model Ensembles Help Mitigate Overoptimization*. arXiv 2310.02743.
-- Zheng et al. (2023). *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena*. arXiv 2306.05685.
-- Lambert et al. (2024). *RewardBench: Evaluating Reward Models for Language Modeling*. arXiv 2403.13787.
+- Gao, L., Schulman, J. and Hilton, J. (2022). *Scaling Laws for Reward Model Overoptimization*. [arXiv 2210.10760](https://arxiv.org/abs/2210.10760); ICML 2023.
+- Stiennon et al. (2020). *Learning to summarize from human feedback*. [arXiv 2009.01325](https://arxiv.org/abs/2009.01325).
+- Coste et al. (2023). *Reward Model Ensembles Help Mitigate Overoptimization*. [arXiv 2310.02743](https://arxiv.org/abs/2310.02743).
+- Zheng et al. (2023). *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena*. [arXiv 2306.05685](https://arxiv.org/abs/2306.05685).
+- Lambert et al. (2024). *RewardBench: Evaluating Reward Models for Language Modeling*. [arXiv 2403.13787](https://arxiv.org/abs/2403.13787).

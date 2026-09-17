@@ -5,7 +5,7 @@ The citations editor who added links to this part ran out of WebSearch budget
 before reaching these (STYLE.md section 4). A later pass with fresh budget should
 verify each one, add the link to the chapter, and tick the box.
 
-- [ ] docs/part18-company-deep-dives/google-youtube.md | Google Cloud Document AI documentation; Google Lens product pages
+- [x] docs/part18-company-deep-dives/google-youtube.md | Google Cloud Document AI documentation; Google Lens product pages
 - [x] docs/part18-company-deep-dives/netflix-spotify.md | Gomez-Uribe & Hunt, "The Netflix Recommender System: Algorithms, Business Value, and Innovation", ACM Transactions on Management Information Systems, 2016
 - [x] docs/part18-company-deep-dives/netflix-spotify.md | Steck et al., "Deep Learning for Recommender Systems: A Netflix Case Study", AI Magazine, 2021
 - [x] docs/part18-company-deep-dives/netflix-spotify.md | Steck, "Calibrated Recommendations", RecSys 2018
@@ -45,15 +45,15 @@ verify each one, add the link to the chapter, and tick the box.
 - [x] docs/part18-company-deep-dives/uber-doordash.md | DoorDash Engineering, "Meet Sibyl: DoorDash's New Prediction Service", 2020; "Building a Gigascale ML Feature Store with Redis, Binary Serialization, String Hashing, and Compression", 2020; "Building Riviera: A Declarative Real-Time Feature Engineering Framework", 2021; "Introducing Fabricator: A Declarative Feature Engineering Framework", 2022
 - [x] docs/part18-company-deep-dives/uber-doordash.md | DoorDash Engineering, "Things Not Strings: Understanding Search Intent with Better Recall", 2022
 - [x] docs/part18-company-deep-dives/uber-doordash.md | DoorDash Engineering, posts on ETA prediction for long-tail events (2023) and on multi-task, probabilistic ETA models (2024); "Path to high-quality LLM-based Dasher support automation", 2024
-- [ ] docs/part18-company-deep-dives/airbnb.md | Haldar et al., "Improving Deep Learning for Airbnb Search", KDD 2020 (arXiv 2002.05515)
-- [ ] docs/part18-company-deep-dives/airbnb.md | Grbovic & Cheng, "Real-time Personalization using Embeddings for Search Ranking at Airbnb", KDD 2018
-- [ ] docs/part18-company-deep-dives/airbnb.md | Abdool et al., "Managing Diversity in Airbnb Search", KDD 2020 (arXiv 2004.02621)
-- [ ] docs/part18-company-deep-dives/airbnb.md | Haldar et al., "Learning To Rank Diversely At Airbnb", CIKM 2023 (arXiv 2210.07774)
-- [ ] docs/part18-company-deep-dives/airbnb.md | Tan et al., "Optimizing Airbnb Search Journey with Multi-task Learning", KDD 2023
-- [ ] docs/part18-company-deep-dives/airbnb.md | Airbnb, "Zipline: Airbnb's Machine Learning Data Management Platform", Strata Data Conference 2018; Airbnb Tech Blog, "Chronon, Airbnb's ML Feature Platform, Is Now Open Source", 2024
-- [ ] docs/part18-company-deep-dives/airbnb.md | Airbnb Tech Blog, "Experiments at Airbnb", 2014; posts on the Experimentation Reporting Framework (2017) and experimentation guardrails (2021)
-- [ ] docs/part18-company-deep-dives/airbnb.md | Airbnb Tech Blog, "Architecting a Machine Learning System for Risk", 2014; "Fighting Financial Fraud with Targeted Friction", 2018; Airbnb Newsroom on anti-party technology, 2022
-- [ ] docs/part18-company-deep-dives/airbnb.md | Airbnb Tech Blog, "Categorizing Listing Photos at Airbnb", 2018; "Amenity Detection and Beyond, New Frontiers of Computer Vision at Airbnb", 2019; "WIDeText: A Multimodal Deep Learning Framework", 2020; "Building Airbnb Categories with ML and Human-in-the-Loop", 2022
+- [x] docs/part18-company-deep-dives/airbnb.md | Haldar et al., "Improving Deep Learning for Airbnb Search", KDD 2020 (arXiv 2002.05515)
+- [x] docs/part18-company-deep-dives/airbnb.md | Grbovic & Cheng, "Real-time Personalization using Embeddings for Search Ranking at Airbnb", KDD 2018
+- [x] docs/part18-company-deep-dives/airbnb.md | Abdool et al., "Managing Diversity in Airbnb Search", KDD 2020 (arXiv 2004.02621)
+- [x] docs/part18-company-deep-dives/airbnb.md | Haldar et al., "Learning To Rank Diversely At Airbnb", CIKM 2023 (arXiv 2210.07774)
+- [x] docs/part18-company-deep-dives/airbnb.md | Tan et al., "Optimizing Airbnb Search Journey with Multi-task Learning", KDD 2023
+- [x] docs/part18-company-deep-dives/airbnb.md | Airbnb, "Zipline: Airbnb's Machine Learning Data Management Platform", Strata Data Conference 2018; Airbnb Tech Blog, "Chronon, Airbnb's ML Feature Platform, Is Now Open Source", 2024
+- [x] docs/part18-company-deep-dives/airbnb.md | Airbnb Tech Blog, "Experiments at Airbnb", 2014; posts on the Experimentation Reporting Framework (2017) and experimentation guardrails (2021)
+- [x] docs/part18-company-deep-dives/airbnb.md | Airbnb Tech Blog, "Architecting a Machine Learning System for Risk", 2014; "Fighting Financial Fraud with Targeted Friction", 2018; Airbnb Newsroom on anti-party technology, 2022
+- [x] PARTIAL docs/part18-company-deep-dives/airbnb.md | Airbnb Tech Blog, "Categorizing Listing Photos at Airbnb", 2018; "Amenity Detection and Beyond, New Frontiers of Computer Vision at Airbnb", 2019; "WIDeText: A Multimodal Deep Learning Framework", 2020; "Building Airbnb Categories with ML and Human-in-the-Loop", 2022 | all linked except "Categorizing Listing Photos at Airbnb" (2018), whose URL was not confirmed; chapter keeps it as title-and-year
 - [ ] docs/part18-company-deep-dives/amazon.md | Nigam et al., "Semantic Product Search", KDD 2019 (arXiv 1907.00937)
 - [ ] docs/part18-company-deep-dives/amazon.md | Sorokina & Cantu-Paz, "Amazon Search: The Joy of Ranking Products", SIGIR 2016 (industry track)
 - [ ] docs/part18-company-deep-dives/amazon.md | Linden, Smith & York, "Amazon.com Recommendations: Item-to-Item Collaborative Filtering", IEEE Internet Computing, 2003
