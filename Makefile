@@ -4,7 +4,7 @@ install:
 	pip install -r requirements.txt && pip install -e .
 
 test:
-	pytest -q
+	python -m pytest -q
 
 style:
 	python scripts/check_style.py
@@ -42,7 +42,7 @@ drill:
 	@echo "Check:  make check ITEM=$(ITEM)"
 
 check:
-	MLBOOK_IMPL=practice pytest tests -k "$(notdir $(ITEM))" -q
+	MLBOOK_IMPL=practice python -m pytest tests -k "$(notdir $(ITEM))" -q
 
 reset:
 	python scripts/make_practice_stubs.py $(ITEM) --force

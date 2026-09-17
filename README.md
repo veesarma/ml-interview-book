@@ -55,8 +55,18 @@ practice/           signature-only stubs for retyping the canon by hand
 ```bash
 pip install -r requirements.txt
 pip install -e .
-pytest -q                      # run all implementation tests
+python -m pytest -q            # run all implementation tests
 mkdocs serve                   # http://127.0.0.1:8000
+```
+
+### Retype the canon by hand
+
+```bash
+make stubs                              # signature-only stubs of every module
+make drill ITEM=transformer/multihead   # shows the file to edit and the tests to pass
+#   ... write practice/transformer/multihead.py from memory ...
+make check ITEM=transformer/multihead   # grades your version against the real tests
+make reset ITEM=transformer/multihead   # start over from a clean stub
 ```
 
 Check the prose against the AI-tell linter with `make style` (it runs in CI and
