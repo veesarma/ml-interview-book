@@ -884,10 +884,12 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
     and much better behaviour under distribution shift than MC dropout, with an
     embarrassingly parallel implementation. **Why it won.** The diversity that matters
     comes from different loss basins, which random initialisation provides for free.
-    Paper: "Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles",
-    arXiv:1612.01474. The follow-up empirical study, "Can You Trust Your Model's
-    Uncertainty? Evaluating Predictive Uncertainty Under Dataset Shift" (arXiv:1906.02530),
-    is the one to cite for *shifted* data: every method degrades, ensembles degrade least.
+    Paper: ["Simple and Scalable Predictive Uncertainty Estimation using Deep
+    Ensembles"](https://arxiv.org/abs/1612.01474), NeurIPS 2017, arXiv:1612.01474. The
+    follow-up empirical study, ["Can You Trust Your Model's Uncertainty? Evaluating
+    Predictive Uncertainty Under Dataset Shift"](https://arxiv.org/abs/1906.02530)
+    (NeurIPS 2019, arXiv:1906.02530), is the one to cite for *shifted* data: every method
+    degrades, ensembles degrade least.
 
 !!! production "Cornell / Berkeley: the conformal prediction tutorial (Angelopoulos & Bates)"
     **Problem.** Practitioners needed distribution-free uncertainty for already-trained
@@ -898,8 +900,8 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
     (marginal not conditional; exchangeability breaks under shift). **Why it matters
     operationally.** It converts "the model is 90 % confident" into "this set contains the
     truth 90 % of the time", which is a statement you can put in a contract. Paper:
-    "A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty
-    Quantification", arXiv:2107.07511.
+    ["A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty
+    Quantification"](https://arxiv.org/abs/2107.07511), 2021, arXiv:2107.07511.
 
 !!! production "Berkeley: ImageNet-C and the OOD baselines (Hendrycks et al.)"
     **Problem.** Robustness and OOD claims were evaluated ad hoc, so progress was not
@@ -908,10 +910,11 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
     non-trivial baseline and that it is far from sufficient. (b) ImageNet-C/-P: fixed
     corruption and perturbation suites at controlled severities with a normalised metric,
     explicitly not to be trained on. **Why.** Shared benchmarks turned "our model is
-    robust" into a number others can reproduce. Papers: "A Baseline for Detecting
-    Misclassified and Out-of-Distribution Examples in Neural Networks", arXiv:1610.02136;
-    "Benchmarking Neural Network Robustness to Common Corruptions and Perturbations",
-    arXiv:1903.12261.
+    robust" into a number others can reproduce. Papers: ["A Baseline for Detecting
+    Misclassified and Out-of-Distribution Examples in Neural
+    Networks"](https://arxiv.org/abs/1610.02136), ICLR 2017, arXiv:1610.02136; and
+    ["Benchmarking Neural Network Robustness to Common Corruptions and
+    Perturbations"](https://arxiv.org/abs/1903.12261), ICLR 2019, arXiv:1903.12261.
 
 !!! production "Uber: Michelangelo and model monitoring"
     **Problem.** Hundreds of models across teams, with the dominant failure mode being
@@ -922,16 +925,23 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
     with their features and compares live feature distributions to training distributions,
     alerting on drift. **Why.** Centralising the boring parts made per-model reliability a
     platform property instead of a per-team heroic. Sources: Uber Engineering blog posts
-    "Meet Michelangelo: Uber's Machine Learning Platform" (2017) and its follow-ups on
-    scaling and monitoring.
+    ["Meet Michelangelo: Uber's Machine Learning
+    Platform"](https://eng.uber.com/michelangelo-machine-learning-platform/) (2017) and
+    ["Scaling Machine Learning at Uber with
+    Michelangelo"](https://www.uber.com/blog/scaling-michelangelo/) (2018).
 
 !!! production "Waymo and Tesla: two published positions on perception reliability"
     **Waymo** publishes a safety framework built on layered redundancy: multiple
     complementary sensing modalities, redundant compute and vehicle systems, a defined
     operational design domain, fallback ("minimal risk condition") behaviours, and
     scenario-based validation supported by simulation at a scale far beyond road miles;
-    they also publish methodology papers and the Waymo Open Dataset so external
-    researchers can reproduce perception results. **Tesla** has publicly described the
+    they also publish methodology papers and the
+    [Waymo Open Dataset](https://arxiv.org/abs/1912.04838) (Sun et al., CVPR 2020,
+    arXiv:1912.04838) so external researchers can reproduce perception results; the
+    framework itself is described in
+    ["Sharing our safety framework for fully autonomous
+    operations"](https://waymo.com/blog/2020/10/sharing-our-safety-framework/) and on the
+    [Waymo safety pages](https://waymo.com/safety/). **Tesla** has publicly described the
     opposite architectural bet in its AI Day talks: vision-only perception with a
     fleet-scale data engine, where uncertain or anomalous events on customer vehicles
     trigger clip upload, auto-labelling, and retraining. **What to take into an
@@ -1208,46 +1218,43 @@ the fallback.
 
 ## References
 
-URLs are omitted where they could not be verified in this build; every entry has the exact
-title, venue and year, plus the arXiv identifier where one exists.
-
-* Kendall & Gal, "What Uncertainties Do We Need in Bayesian Deep Learning for Computer Vision?", NeurIPS 2017, arXiv:1703.04977.
-* Nix & Weigend, "Estimating the mean and variance of the target probability distribution", ICNN 1994 (the original heteroscedastic NLL head).
-* Seitzer et al., "On the Pitfalls of Heteroscedastic Uncertainty Estimation with Probabilistic Neural Networks" ($\beta$-NLL), ICLR 2022, arXiv:2203.09168.
-* Houlsby et al., "Bayesian Active Learning for Classification and Preference Learning" (BALD), 2011, arXiv:1112.5745.
-* Gal & Ghahramani, "Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning", ICML 2016, arXiv:1506.02142.
-* Lakshminarayanan, Pritzel & Blundell, "Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles", NeurIPS 2017, arXiv:1612.01474.
-* Ovadia et al., "Can You Trust Your Model's Uncertainty? Evaluating Predictive Uncertainty Under Dataset Shift", NeurIPS 2019, arXiv:1906.02530.
-* Fort, Hu & Lakshminarayanan, "Deep Ensembles: A Loss Landscape Perspective", 2019, arXiv:1912.02757.
-* Guo et al., "On Calibration of Modern Neural Networks", ICML 2017, arXiv:1706.04599.
-* Naeini, Cooper & Hauskrecht, "Obtaining Well Calibrated Probabilities Using Bayesian Binning", AAAI 2015 (ECE).
-* Nixon et al., "Measuring Calibration in Deep Learning", CVPR Workshops 2019, arXiv:1904.01685 (adaptive binning, ECE pitfalls).
-* Kumar, Liang & Ma, "Verified Uncertainty Calibration", NeurIPS 2019, arXiv:1909.10155.
-* Brier, "Verification of forecasts expressed in terms of probability", Monthly Weather Review, 1950.
+* Kendall & Gal, ["What Uncertainties Do We Need in Bayesian Deep Learning for Computer Vision?"](https://arxiv.org/abs/1703.04977), NeurIPS 2017, arXiv:1703.04977.
+* Nix & Weigend, ["Estimating the mean and variance of the target probability distribution"](https://ieeexplore.ieee.org/document/374138/), ICNN 1994 (the original heteroscedastic NLL head).
+* Seitzer et al., ["On the Pitfalls of Heteroscedastic Uncertainty Estimation with Probabilistic Neural Networks"](https://arxiv.org/abs/2203.09168) ($\beta$-NLL), ICLR 2022, arXiv:2203.09168.
+* Houlsby et al., ["Bayesian Active Learning for Classification and Preference Learning"](https://arxiv.org/abs/1112.5745) (BALD), 2011, arXiv:1112.5745.
+* Gal & Ghahramani, ["Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning"](https://arxiv.org/abs/1506.02142), ICML 2016, arXiv:1506.02142.
+* Lakshminarayanan, Pritzel & Blundell, ["Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles"](https://arxiv.org/abs/1612.01474), NeurIPS 2017, arXiv:1612.01474.
+* Ovadia et al., ["Can You Trust Your Model's Uncertainty? Evaluating Predictive Uncertainty Under Dataset Shift"](https://arxiv.org/abs/1906.02530), NeurIPS 2019, arXiv:1906.02530.
+* Fort, Hu & Lakshminarayanan, ["Deep Ensembles: A Loss Landscape Perspective"](https://arxiv.org/abs/1912.02757), 2019, arXiv:1912.02757.
+* Guo et al., ["On Calibration of Modern Neural Networks"](https://arxiv.org/abs/1706.04599), ICML 2017, arXiv:1706.04599.
+* Naeini, Cooper & Hauskrecht, ["Obtaining Well Calibrated Probabilities Using Bayesian Binning"](https://ojs.aaai.org/index.php/AAAI/article/view/9602), AAAI 2015 (ECE).
+* Nixon et al., ["Measuring Calibration in Deep Learning"](https://arxiv.org/abs/1904.01685), CVPR Workshops 2019, arXiv:1904.01685 (adaptive binning, ECE pitfalls).
+* Kumar, Liang & Ma, ["Verified Uncertainty Calibration"](https://arxiv.org/abs/1909.10155), NeurIPS 2019, arXiv:1909.10155.
+* Brier, ["Verification of forecasts expressed in terms of probability"](https://journals.ametsoc.org/view/journals/mwre/78/1/1520-0493_1950_078_0001_vofeit_2_0_co_2.xml), Monthly Weather Review, 1950.
 * Vovk, Gammerman & Shafer, *Algorithmic Learning in a Random World*, Springer 2005.
-* Angelopoulos & Bates, "A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification", 2021, arXiv:2107.07511.
-* Romano, Sesia & Candès, "Classification with Valid and Adaptive Coverage" (APS), NeurIPS 2020, arXiv:2006.02544.
-* Angelopoulos et al., "Uncertainty Sets for Image Classifiers using Conformal Prediction" (RAPS), ICLR 2021, arXiv:2009.14193.
-* Romano, Patterson & Candès, "Conformalized Quantile Regression", NeurIPS 2019, arXiv:1905.03222.
-* Tibshirani et al., "Conformal Prediction Under Covariate Shift", NeurIPS 2019, arXiv:1904.06019.
-* Hendrycks & Gimpel, "A Baseline for Detecting Misclassified and Out-of-Distribution Examples in Neural Networks", ICLR 2017, arXiv:1610.02136.
-* Liu et al., "Energy-based Out-of-distribution Detection", NeurIPS 2020, arXiv:2010.03759.
-* Lee et al., "A Simple Unified Framework for Detecting Out-of-Distribution Samples and Adversarial Attacks", NeurIPS 2018, arXiv:1807.03888.
-* Hein, Andriushchenko & Bitterwolf, "Why ReLU Networks Yield High-Confidence Predictions Far Away From the Training Data", CVPR 2019, arXiv:1812.05720.
-* Hendrycks & Dietterich, "Benchmarking Neural Network Robustness to Common Corruptions and Perturbations", ICLR 2019, arXiv:1903.12261.
-* Shimodaira, "Improving predictive inference under covariate shift by weighting the log-likelihood function", JSPI, 2000.
-* Lipton, Wang & Smola, "Detecting and Correcting for Label Shift with Black Box Predictors" (BBSE), ICML 2018, arXiv:1802.03916.
-* Lopez-Paz & Oquab, "Revisiting Classifier Two-Sample Tests", ICLR 2017, arXiv:1610.06545.
-* Gretton et al., "A Kernel Two-Sample Test", JMLR 2012.
-* Rabanser, Günnemann & Lipton, "Failing Loudly: An Empirical Study of Methods for Detecting Dataset Shift", NeurIPS 2019, arXiv:1810.11953.
-* Goodfellow, Shlens & Szegedy, "Explaining and Harnessing Adversarial Examples", ICLR 2015, arXiv:1412.6572.
-* Madry et al., "Towards Deep Learning Models Resistant to Adversarial Attacks", ICLR 2018, arXiv:1706.06083.
-* Tsipras et al., "Robustness May Be at Odds with Accuracy", ICLR 2019, arXiv:1805.12152.
-* Athalye et al., "Obfuscated Gradients Give a False Sense of Security", ICML 2018, arXiv:1802.00420; and "Synthesizing Robust Adversarial Examples", ICML 2018, arXiv:1707.07397.
-* Eykholt et al., "Robust Physical-World Attacks on Deep Learning Visual Classification", CVPR 2018, arXiv:1707.08945.
-* Brown et al., "Adversarial Patch", 2017, arXiv:1712.09665.
-* Sculley et al., "Hidden Technical Debt in Machine Learning Systems", NeurIPS 2015.
-* Breck et al., "The ML Test Score: A Rubric for ML Production Readiness and Technical Debt Reduction", IEEE Big Data 2017.
-* Uber Engineering Blog, "Meet Michelangelo: Uber's Machine Learning Platform", 2017.
-* Waymo, "Waymo Safety Framework" / Safety Report materials and the Waymo Open Dataset papers.
+* Angelopoulos & Bates, ["A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification"](https://arxiv.org/abs/2107.07511), 2021, arXiv:2107.07511.
+* Romano, Sesia & Candès, ["Classification with Valid and Adaptive Coverage"](https://arxiv.org/abs/2006.02544) (APS), NeurIPS 2020, arXiv:2006.02544.
+* Angelopoulos et al., ["Uncertainty Sets for Image Classifiers using Conformal Prediction"](https://arxiv.org/abs/2009.14193) (RAPS), ICLR 2021, arXiv:2009.14193.
+* Romano, Patterson & Candès, ["Conformalized Quantile Regression"](https://arxiv.org/abs/1905.03222), NeurIPS 2019, arXiv:1905.03222.
+* Tibshirani et al., ["Conformal Prediction Under Covariate Shift"](https://arxiv.org/abs/1904.06019), NeurIPS 2019, arXiv:1904.06019.
+* Hendrycks & Gimpel, ["A Baseline for Detecting Misclassified and Out-of-Distribution Examples in Neural Networks"](https://arxiv.org/abs/1610.02136), ICLR 2017, arXiv:1610.02136.
+* Liu et al., ["Energy-based Out-of-distribution Detection"](https://arxiv.org/abs/2010.03759), NeurIPS 2020, arXiv:2010.03759.
+* Lee et al., ["A Simple Unified Framework for Detecting Out-of-Distribution Samples and Adversarial Attacks"](https://arxiv.org/abs/1807.03888), NeurIPS 2018, arXiv:1807.03888.
+* Hein, Andriushchenko & Bitterwolf, ["Why ReLU networks yield high-confidence predictions far away from the training data and how to mitigate the problem"](https://arxiv.org/abs/1812.05720), CVPR 2019, arXiv:1812.05720.
+* Hendrycks & Dietterich, ["Benchmarking Neural Network Robustness to Common Corruptions and Perturbations"](https://arxiv.org/abs/1903.12261), ICLR 2019, arXiv:1903.12261.
+* Shimodaira, ["Improving predictive inference under covariate shift by weighting the log-likelihood function"](https://www.sciencedirect.com/science/article/abs/pii/S0378375800001154), JSPI, 2000.
+* Lipton, Wang & Smola, ["Detecting and Correcting for Label Shift with Black Box Predictors"](https://arxiv.org/abs/1802.03916) (BBSE), ICML 2018, arXiv:1802.03916.
+* Lopez-Paz & Oquab, ["Revisiting Classifier Two-Sample Tests"](https://arxiv.org/abs/1610.06545), ICLR 2017, arXiv:1610.06545.
+* Gretton et al., ["A Kernel Two-Sample Test"](https://www.jmlr.org/papers/volume13/gretton12a/gretton12a.pdf), JMLR 2012.
+* Rabanser, Günnemann & Lipton, ["Failing Loudly: An Empirical Study of Methods for Detecting Dataset Shift"](https://arxiv.org/abs/1810.11953), NeurIPS 2019, arXiv:1810.11953.
+* Goodfellow, Shlens & Szegedy, ["Explaining and Harnessing Adversarial Examples"](https://arxiv.org/abs/1412.6572), ICLR 2015, arXiv:1412.6572.
+* Madry et al., ["Towards Deep Learning Models Resistant to Adversarial Attacks"](https://arxiv.org/abs/1706.06083), ICLR 2018, arXiv:1706.06083.
+* Tsipras et al., ["Robustness May Be at Odds with Accuracy"](https://arxiv.org/abs/1805.12152), ICLR 2019, arXiv:1805.12152.
+* Athalye et al., ["Obfuscated Gradients Give a False Sense of Security: Circumventing Defenses to Adversarial Examples"](https://arxiv.org/abs/1802.00420), ICML 2018, arXiv:1802.00420; and ["Synthesizing Robust Adversarial Examples"](https://arxiv.org/abs/1707.07397), ICML 2018, arXiv:1707.07397.
+* Eykholt et al., ["Robust Physical-World Attacks on Deep Learning Visual Classification"](https://arxiv.org/abs/1707.08945), CVPR 2018, arXiv:1707.08945.
+* Brown et al., ["Adversarial Patch"](https://arxiv.org/abs/1712.09665), 2017, arXiv:1712.09665.
+* Sculley et al., ["Hidden Technical Debt in Machine Learning Systems"](https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems), NeurIPS 2015.
+* Breck et al., ["The ML Test Score: A Rubric for ML Production Readiness and Technical Debt Reduction"](https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/), IEEE Big Data 2017.
+* Uber Engineering Blog, ["Meet Michelangelo: Uber's Machine Learning Platform"](https://eng.uber.com/michelangelo-machine-learning-platform/), 2017, and ["Scaling Machine Learning at Uber with Michelangelo"](https://www.uber.com/blog/scaling-michelangelo/), 2018.
+* Waymo, ["Sharing our safety framework for fully autonomous operations"](https://waymo.com/blog/2020/10/sharing-our-safety-framework/), 2020, and the [Waymo safety pages](https://waymo.com/safety/); Sun et al., ["Scalability in Perception for Autonomous Driving: Waymo Open Dataset"](https://arxiv.org/abs/1912.04838), CVPR 2020, arXiv:1912.04838.
 * Tesla, AI Day 2021 and 2022 presentations (data engine, auto-labelling, vision-only perception).

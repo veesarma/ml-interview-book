@@ -148,8 +148,8 @@ def _run_pipeline(config: PipelineConfig, verbose: bool) -> dict[str, object]:
     acc["sft"] = accuracy(model, evaluation)
 
     t0 = time.perf_counter()
-    train_pairs = make_preference_pairs(train, seed=config.seed)
-    eval_pairs = make_preference_pairs(evaluation, seed=config.seed + 1)
+    train_pairs = make_preference_pairs(train, seed=config.seed, policy=model)
+    eval_pairs = make_preference_pairs(evaluation, seed=config.seed + 1, policy=model)
     rm = TinyRewardModel.from_policy(model)
     rm_report = train_reward_model(
         rm, train_pairs, steps=config.rm_steps,

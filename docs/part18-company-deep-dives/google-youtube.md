@@ -3,7 +3,7 @@
 > **Why this matters at staff level.** Google's interviews reward candidates who can connect a product problem (a query, a watch session, an ad slot, a photo) to the published system that serves it (the YouTube two-stage DNN recommender, the REINFORCE recommender with off-policy correction, Wide & Deep and DCN for CTR, BERT/MUM in Search, ScaNN for retrieval) and who can reason about TPU-era systems cost. Strong signal is citing the specific paper, naming the trade-off it encodes, and proposing an evaluation that Google's own experimentation culture would accept.
 
 !!! warning "Sources in this chapter"
-    Claims are tied to public Google/YouTube/DeepMind papers, blog posts and docs, cited by exact title, venue and year in [Sources](#sources). URLs are omitted where they could not be verified in the build environment (STYLE.md §4). Anything not in a public source is marked **inference**.
+    Claims are tied to public Google/YouTube/DeepMind papers, blog posts and docs, cited by exact title, venue and year in [Sources](#sources), with a link to the primary source wherever that link could be verified (STYLE.md §4). Where a source carries no link, search the exact title. Anything not in a public source is marked **inference**.
 
 ## 1. The business in one paragraph
 
@@ -52,7 +52,7 @@ flowchart LR
 
 **The problem.** Recommend from a corpus of millions of videos, with a highly non-stationary catalogue, sparse explicit feedback and the need to optimise for watch time rather than clicks.
 
-**The approach.** Covington, Adams and Sargin split the system into *candidate generation* (an extreme multi-class classification where the "class" is the next watched video, trained with sampled softmax over watch histories, search tokens and demographics, and served by nearest-neighbour search on the learned video embeddings) and *ranking*, a deep network over hundreds of features scoring the few hundred candidates, trained with weighted logistic regression where positives are weighted by watch time so the odds approximate expected watch time. Two engineering findings made the paper famous: the "example age" feature to counter the model's bias toward stale content, and the choice of *held-out next-watch* labels (predict the future watch, not a random one) to avoid leaking future information.
+**The approach.** [Covington, Adams and Sargin](https://doi.org/10.1145/2959100.2959190) split the system into *candidate generation* (an extreme multi-class classification where the "class" is the next watched video, trained with sampled softmax over watch histories, search tokens and demographics, and served by nearest-neighbour search on the learned video embeddings) and *ranking*, a deep network over hundreds of features scoring the few hundred candidates, trained with weighted logistic regression where positives are weighted by watch time so the odds approximate expected watch time. Two engineering findings made the paper famous: the "example age" feature to counter the model's bias toward stale content, and the choice of *held-out next-watch* labels (predict the future watch, not a random one) to avoid leaking future information.
 
 ![The two-stage recommendation funnel](../assets/figures/part18_consumer_rec_funnel.png){ width="640" }
 
@@ -71,7 +71,7 @@ flowchart LR
 
 **The problem.** Ranking must predict several conflicting outcomes (click, watch time, likes, dismissals) that share features but not optima, and clicks are corrupted by position bias.
 
-**The approach.** "Recommending What Video to Watch Next" uses a Multi-gate Mixture-of-Experts (MMoE, KDD 2018) trunk: several expert networks with per-task softmax gates, so each task chooses its own mixture. Engagement and satisfaction heads are combined by a weighted formula tuned via experiments. A *shallow tower* takes position and device features and produces a logit that is added to the main logit during training and dropped at serving, learning the bias without polluting the relevance model.
+**The approach.** ["Recommending What Video to Watch Next"](https://dl.acm.org/doi/10.1145/3298689.3346997) uses a Multi-gate Mixture-of-Experts ([MMoE, KDD 2018](https://dl.acm.org/doi/10.1145/3219819.3220007)) trunk: several expert networks with per-task softmax gates, so each task chooses its own mixture. Engagement and satisfaction heads are combined by a weighted formula tuned via experiments. A *shallow tower* takes position and device features and produces a logit that is added to the main logit during training and dropped at serving, learning the bias without polluting the relevance model.
 
 **Math link.** MMoE output for task $k$: $f_k(x) = h_k\!\left(\sum_{e} g^{(k)}_e(x)\, E_e(x)\right)$ with gates $g^{(k)} = \softmax(W_k x)$; see [large-model architecture (MoE)](../part06-llm-training/03-large-model-architecture.md) and [evaluation](../part13-retrieval-eval-reliability/02-evaluation.md) for position-bias handling.
 
@@ -84,7 +84,7 @@ flowchart LR
 
 **The problem.** A recommender is a policy: it changes what users see, so training on logs collected by the previous policy is biased, and myopic click prediction ignores long-term value.
 
-**The approach.** Chen et al. treat the recommender as a policy $\pi_\theta(a \mid s)$ over a huge action space, trained with REINFORCE on logged data from a behaviour policy $\beta$, using importance weighting $\frac{\pi_\theta(a\mid s)}{\beta(a\mid s)}$ corrected for the fact that the system recommends *K* items at once (the top-K correction multiplies the gradient by $\lambda_K = K(1-\pi_\theta)^{K-1}$). The behaviour policy is estimated with a separate head on the same network. Live experiments on YouTube showed the corrected policy improved long-term metrics; the paper is explicit that off-policy correction was necessary to get gains.
+**The approach.** Chen et al. ([arXiv:1812.02353](https://arxiv.org/abs/1812.02353)) treat the recommender as a policy $\pi_\theta(a \mid s)$ over a huge action space, trained with REINFORCE on logged data from a behaviour policy $\beta$, using importance weighting $\frac{\pi_\theta(a\mid s)}{\beta(a\mid s)}$ corrected for the fact that the system recommends *K* items at once (the top-K correction multiplies the gradient by $\lambda_K = K(1-\pi_\theta)^{K-1}$). The behaviour policy is estimated with a separate head on the same network. Live experiments on YouTube showed the corrected policy improved long-term metrics; the paper is explicit that off-policy correction was necessary to get gains.
 
 **Math link.** Policy gradient and importance sampling are derived in [policy gradients & PPO](../part12-rl/04-policy-gradients-ppo.md); the top-K correction is the derivative of $1-(1-\pi)^K$.
 
@@ -97,7 +97,7 @@ flowchart LR
 
 **The problem.** Predict clicks for billions of ad-query pairs with extremely sparse categorical features, under strict memory and latency budgets, while keeping predictions calibrated for the auction.
 
-**The approach.** "Ad Click Prediction: a View from the Trenches" (KDD 2013) describes FTRL-Proximal online logistic regression with per-coordinate learning rates and L1 sparsity, plus practical tricks (probabilistic feature inclusion, calibration layers, and memory-saving quantisation). "Wide & Deep" (2016) keeps a linear "wide" component for memorisation of cross features alongside a deep component for generalisation, deployed on Google Play. "Deep & Cross Network" (ADKDD 2017) and DCN V2 (WWW 2021) replace hand-crafted crosses with explicit polynomial feature crossing layers; DCN V2 reports production learnings for web-scale ranking, including low-rank mixture-of-experts cross layers to cut cost.
+**The approach.** ["Ad Click Prediction: a View from the Trenches"](https://research.google/pubs/ad-click-prediction-a-view-from-the-trenches/) (KDD 2013) describes FTRL-Proximal online logistic regression with per-coordinate learning rates and L1 sparsity, plus practical tricks (probabilistic feature inclusion, calibration layers, and memory-saving quantisation). "Wide & Deep" ([arXiv:1606.07792](https://arxiv.org/abs/1606.07792), 2016) keeps a linear "wide" component for memorisation of cross features alongside a deep component for generalisation, deployed on Google Play. "Deep & Cross Network" (ADKDD 2017, [arXiv:1708.05123](https://arxiv.org/abs/1708.05123)) and DCN V2 (WWW 2021, [arXiv:2008.13535](https://arxiv.org/abs/2008.13535)) replace hand-crafted crosses with explicit polynomial feature crossing layers; DCN V2 reports production learnings for web-scale ranking, including low-rank mixture-of-experts cross layers to cut cost.
 
 **Math link.** Cross layer: $x_{l+1} = x_0 \odot (W_l x_l + b_l) + x_l$, degree-$l+1$ polynomial in the input; see [ads CTR design](../part17-ml-system-design/03-ads-ctr-prediction.md) and [optimization](../part01-math/06-optimization.md) for FTRL.
 
@@ -108,7 +108,7 @@ flowchart LR
 
 ### 4.5 Search understanding: BERT and MUM, and what the interview really asks
 
-**What is public.** Google's 2019 post said BERT models were applied to a substantial fraction of English queries to better understand prepositions and word order; the 2021 MUM post described a multitask, multilingual, multimodal model intended to understand complex information needs across languages and modalities; the 2022 "How AI powers great search results" post lists RankBrain, neural matching, BERT and MUM as distinct systems. AI Overviews (2024) apply Gemini-era generation on top of retrieval. Details of the ranking function are not public; treat any account of "how Google ranks" as inference.
+**What is public.** Google's [2019 post on BERT in Search](https://blog.google/products/search/search-language-understanding-bert/) said BERT models were applied to a substantial fraction of English queries to better understand prepositions and word order; the [2021 MUM post](https://blog.google/products/search/introducing-mum/) described a multitask, multilingual, multimodal model intended to understand complex information needs across languages and modalities; the 2022 post ["How AI powers great search results"](https://blog.google/products/search/how-ai-powers-great-search-results/) lists RankBrain, neural matching, BERT and MUM as distinct systems. AI Overviews (2024) apply Gemini-era generation on top of retrieval. Details of the ranking function are not public; treat any account of "how Google ranks" as inference.
 
 **How to reason about it.** A search-ranking design at Google is graded on separating retrieval (lexical + semantic), first-stage scoring, learned re-ranking with a cross-encoder, and the quality/spam/freshness layers, and on evaluating with human relevance ratings and interleaving rather than clicks alone, see [search ranking design](../part17-ml-system-design/02-search-ranking.md).
 
@@ -117,7 +117,7 @@ flowchart LR
 
 ### 4.6 Perception at consumer scale: Lens, Photos and Document AI
 
-**What is public.** Google Lens performs OCR, translation, visual search and product lookup from the camera; Google Research's CVPR 2022 paper on unified scene-text detection and layout analysis describes a single model that detects text and groups it into lines and paragraphs, a design that fits Lens-style scene text. FormNet (ACL 2022) and Pix2Struct (2022) are Google's document-understanding models, FormNet adds structural encoding to sequence models for forms, Pix2Struct pretrains a pixel-to-text model on screenshot parsing. ScreenAI (2024) extends this to UI understanding. Cloud Document AI offers OCR, form and specialised parsers. Photos ships on-device features (search, Magic Eraser); the on-device models are not detailed. PaLI (2022) and Gemini give Lens multimodal question answering (product-level fact; internals are **inference**).
+**What is public.** Google Lens performs OCR, translation, visual search and product lookup from the camera; Google Research's [CVPR 2022 paper on unified scene-text detection and layout analysis](https://arxiv.org/abs/2203.15143) describes a single model that detects text and groups it into lines and paragraphs, a design that fits Lens-style scene text. FormNet ([ACL 2022](https://aclanthology.org/2022.acl-long.260/)) and Pix2Struct (2022, [arXiv:2210.03347](https://arxiv.org/abs/2210.03347)) are Google's document-understanding models, FormNet adds structural encoding to sequence models for forms, Pix2Struct pretrains a pixel-to-text model on screenshot parsing. ScreenAI (2024, [arXiv:2402.04615](https://arxiv.org/abs/2402.04615)) extends this to UI understanding. Cloud Document AI offers OCR, form and specialised parsers. Photos ships on-device features (search, Magic Eraser); the on-device models are not detailed. PaLI (2022, [arXiv:2209.06794](https://arxiv.org/abs/2209.06794)) and Gemini give Lens multimodal question answering (product-level fact; internals are **inference**).
 
 **Why it matters.** Perception roles at Google ask you to design OCR or document extraction that works across scripts, on-device and at Cloud scale; the published papers show the preference for unified end-to-end models over multi-stage pipelines when data allows.
 
@@ -209,39 +209,39 @@ flowchart LR
 
 **YouTube and recommendation**
 
-* Covington, Adams, Sargin, "Deep Neural Networks for YouTube Recommendations", RecSys 2016.
-* Zhao et al., "Recommending What Video to Watch Next: A Multitask Ranking System", RecSys 2019.
-* Ma et al., "Modeling Task Relationships in Multi-task Learning with Multi-gate Mixture-of-Experts", KDD 2018.
-* Chen et al., "Top-K Off-Policy Correction for a REINFORCE Recommender System", WSDM 2019 (arXiv 1812.02353).
-* Yi et al., "Sampling-Bias-Corrected Neural Modeling for Large Corpus Item Recommendations", RecSys 2019.
-* Yang et al., "Mixed Negative Sampling for Learning Two-tower Neural Networks in Recommendations", WWW 2020.
-* Guo et al., "ScaNN: Accelerating Large-Scale Inference with Anisotropic Vector Quantization", ICML 2020.
-* Ie et al., "SlateQ: A Tractable Decomposition for Reinforcement Learning with Recommendation Sets", IJCAI 2019.
+* Covington, Adams, Sargin, "Deep Neural Networks for YouTube Recommendations", RecSys 2016. [doi:10.1145/2959100.2959190](https://doi.org/10.1145/2959100.2959190)
+* Zhao et al., "Recommending What Video to Watch Next: A Multitask Ranking System", RecSys 2019. [ACM DL](https://dl.acm.org/doi/10.1145/3298689.3346997)
+* Ma et al., "Modeling Task Relationships in Multi-task Learning with Multi-gate Mixture-of-Experts", KDD 2018. [ACM DL](https://dl.acm.org/doi/10.1145/3219819.3220007)
+* Chen et al., "Top-K Off-Policy Correction for a REINFORCE Recommender System", WSDM 2019. [arXiv:1812.02353](https://arxiv.org/abs/1812.02353)
+* Yi et al., "Sampling-Bias-Corrected Neural Modeling for Large Corpus Item Recommendations", RecSys 2019. [ACM DL](https://dl.acm.org/doi/10.1145/3298689.3346996) · [research.google](https://research.google/pubs/sampling-bias-corrected-neural-modeling-for-large-corpus-item-recommendations/)
+* Yang et al., "Mixed Negative Sampling for Learning Two-tower Neural Networks in Recommendations", WWW 2020 companion. [ACM DL](https://dl.acm.org/doi/10.1145/3366424.3386195)
+* Guo et al., "Accelerating Large-Scale Inference with Anisotropic Vector Quantization", ICML 2020 (the paper behind the ScaNN library). [arXiv:1908.10396](https://arxiv.org/abs/1908.10396) · [PMLR](https://proceedings.mlr.press/v119/guo20h.html) · [research.google blog](https://research.google/blog/announcing-scann-efficient-vector-similarity-search/)
+* Ie et al., "SlateQ: A Tractable Decomposition for Reinforcement Learning with Recommendation Sets", IJCAI 2019. [ijcai.org](https://www.ijcai.org/proceedings/2019/360)
 
 **Ads**
 
-* McMahan et al., "Ad Click Prediction: a View from the Trenches", KDD 2013.
-* Cheng et al., "Wide & Deep Learning for Recommender Systems", 2016 (arXiv 1606.07792).
-* Wang et al., "Deep & Cross Network for Ad Click Predictions", ADKDD 2017; Wang et al., "DCN V2: Improved Deep & Cross Network and Practical Lessons for Web-scale Learning to Rank Systems", WWW 2021.
+* McMahan et al., "Ad Click Prediction: a View from the Trenches", KDD 2013. [research.google](https://research.google/pubs/ad-click-prediction-a-view-from-the-trenches/) · [ACM DL](https://dl.acm.org/doi/10.1145/2487575.2488200)
+* Cheng et al., "Wide & Deep Learning for Recommender Systems", 2016. [arXiv:1606.07792](https://arxiv.org/abs/1606.07792)
+* Wang et al., "Deep & Cross Network for Ad Click Predictions", ADKDD 2017. [arXiv:1708.05123](https://arxiv.org/abs/1708.05123) · Wang et al., "DCN V2: Improved Deep & Cross Network and Practical Lessons for Web-scale Learning to Rank Systems", WWW 2021. [arXiv:2008.13535](https://arxiv.org/abs/2008.13535)
 
 **Search and foundation models**
 
-* Google, "Understanding searches better than ever before", 2019; "MUM: A new AI milestone for understanding information", 2021; "How AI powers great search results", 2022.
-* Devlin et al., "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding", 2018 (arXiv 1810.04805).
-* Gemini Team, "Gemini: A Family of Highly Capable Multimodal Models", 2023 (arXiv 2312.11805); "Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context", 2024.
+* Google, "Understanding searches better than ever before", 2019 ([blog.google](https://blog.google/products/search/search-language-understanding-bert/)); "MUM: A new AI milestone for understanding information", 2021 ([blog.google](https://blog.google/products/search/introducing-mum/)); "How AI powers great search results", 2022 ([blog.google](https://blog.google/products/search/how-ai-powers-great-search-results/)).
+* Devlin et al., "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding", NAACL 2019. [arXiv:1810.04805](https://arxiv.org/abs/1810.04805) · [ACL Anthology](https://aclanthology.org/N19-1423/)
+* Gemini Team, "Gemini: A Family of Highly Capable Multimodal Models", 2023. [arXiv:2312.11805](https://arxiv.org/abs/2312.11805) · "Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context", 2024. [arXiv:2403.05530](https://arxiv.org/abs/2403.05530)
 
 **Perception and documents**
 
-* Long et al., "Towards End-to-End Unified Scene Text Detection and Layout Analysis", CVPR 2022.
-* Lee et al., "FormNet: Structural Encoding beyond Sequential Modeling in Form Document Information Extraction", ACL 2022.
-* Lee et al., "Pix2Struct: Screenshot Parsing as Pretraining for Visual Language Understanding", 2022; Baechler et al., "ScreenAI: A Vision-Language Model for UI and Infographics Understanding", 2024.
-* Chen et al., "PaLI: A Jointly-Scaled Multilingual Language-Image Model", 2022.
+* Long et al., "Towards End-to-End Unified Scene Text Detection and Layout Analysis", CVPR 2022. [arXiv:2203.15143](https://arxiv.org/abs/2203.15143) · [CVF Open Access](https://openaccess.thecvf.com/content/CVPR2022/html/Long_Towards_End-to-End_Unified_Scene_Text_Detection_and_Layout_Analysis_CVPR_2022_paper.html)
+* Lee et al., "FormNet: Structural Encoding beyond Sequential Modeling in Form Document Information Extraction", ACL 2022. [ACL Anthology](https://aclanthology.org/2022.acl-long.260/) · [arXiv:2203.08411](https://arxiv.org/abs/2203.08411)
+* Lee et al., "Pix2Struct: Screenshot Parsing as Pretraining for Visual Language Understanding", 2022. [arXiv:2210.03347](https://arxiv.org/abs/2210.03347) · Baechler et al., "ScreenAI: A Vision-Language Model for UI and Infographics Understanding", 2024. [arXiv:2402.04615](https://arxiv.org/abs/2402.04615)
+* Chen et al., "PaLI: A Jointly-Scaled Multilingual Language-Image Model", 2022 (ICLR 2023). [arXiv:2209.06794](https://arxiv.org/abs/2209.06794)
 * Google Cloud Document AI documentation; Google Lens product pages.
 
 **Infrastructure and practice**
 
-* Jouppi et al., "In-Datacenter Performance Analysis of a Tensor Processing Unit", ISCA 2017; Jouppi et al., "TPU v4: An Optically Reconfigurable Supercomputer for Machine Learning with Hardware Support for Embeddings", ISCA 2023.
-* Baylor et al., "TFX: A TensorFlow-Based Production-Scale Machine Learning Platform", KDD 2017.
-* Tang et al., "Overlapping Experiment Infrastructure: More, Better, Faster Experimentation", KDD 2010.
-* Sculley et al., "Hidden Technical Debt in Machine Learning Systems", NeurIPS 2015.
-* Zinkevich, "Rules of Machine Learning: Best Practices for ML Engineering", Google Developers.
+* Jouppi et al., "In-Datacenter Performance Analysis of a Tensor Processing Unit", ISCA 2017. [arXiv:1704.04760](https://arxiv.org/abs/1704.04760) · Jouppi et al., "TPU v4: An Optically Reconfigurable Supercomputer for Machine Learning with Hardware Support for Embeddings", ISCA 2023. [arXiv:2304.01433](https://arxiv.org/abs/2304.01433)
+* Baylor et al., "TFX: A TensorFlow-Based Production-Scale Machine Learning Platform", KDD 2017. [ACM DL](https://dl.acm.org/doi/10.1145/3097983.3098021) · [research.google](https://research.google/pubs/tfx-a-tensorflow-based-production-scale-machine-learning-platform/)
+* Tang et al., "Overlapping Experiment Infrastructure: More, Better, Faster Experimentation", KDD 2010. [research.google](https://research.google/pubs/overlapping-experiment-infrastructure-more-better-faster-experimentation/) · [ACM DL](https://dl.acm.org/doi/10.1145/1835804.1835810)
+* Sculley et al., "Hidden Technical Debt in Machine Learning Systems", NeurIPS 2015. [papers.nips.cc](https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems)
+* Zinkevich, "Rules of Machine Learning: Best Practices for ML Engineering", Google Developers. [developers.google.com](https://developers.google.com/machine-learning/guides/rules-of-ml)

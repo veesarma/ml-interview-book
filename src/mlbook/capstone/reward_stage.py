@@ -36,7 +36,7 @@ import torch.nn.functional as F
 
 from mlbook.capstone import synthetic_task as task
 from mlbook.capstone.multimodal_model import TinyVLM
-from mlbook.capstone.sft_stage import encode_batch
+from mlbook.capstone.sft_stage import encode_batch, next_token_logits
 
 # ---------------------------------------------------------------------------
 # The verifiable reward
@@ -129,19 +129,43 @@ def _answer_space(answer: str) -> tuple[str, ...]:
     return task.COLOURS if answer in task.COLOURS else tuple(str(i) for i in range(task.MAX_SHAPES + 1))
 
 
-def make_preference_pairs(examples: list[task.Example], seed: int = 0) -> list[PreferencePair]:
+def make_preference_pairs(
+    examples: list[task.Example],
+    seed: int = 0,
+    policy: TinyVLM | None = None,
+    temperature: float = 1.0,
+) -> list[PreferencePair]:
     """Build preferences with the verifier standing in for a human annotator.
 
-    The chosen response is the computed answer; the rejected response is a
-    different token from the same answer space. Real pipelines sample both
-    responses from the policy and ask a human, which is slower and noisier; the
-    algebra of Bradley-Terry and DPO is the same either way.
+    The chosen response is always the computed answer. The rejected response is
+    either a random wrong token (``policy=None``) or a sample drawn from the
+    policy and rejected by the verifier, which is the rejection-sampling recipe
+    Llama 2 used to build its preference sets. On-policy negatives are the ones
+    worth having: they are the mistakes the model actually makes, so the
+    gradient lands where the errors are. Where the policy already answers
+    correctly there is no negative to harvest, and a random wrong token stands
+    in so that every prompt still contributes a pair.
     """
     rng = np.random.default_rng(seed)
+    sampled: list[str] | None = None
+    if policy is not None:
+        was_training = policy.training
+        policy.eval()
+        with torch.no_grad():
+            logits = next_token_logits(policy, examples)                 # (B, V)
+        probs = torch.softmax(logits / max(temperature, 1e-6), dim=-1)   # (B, V)
+        generator = torch.Generator().manual_seed(seed)
+        draws = torch.multinomial(probs, num_samples=1, generator=generator)[:, 0]  # (B,)
+        sampled = [task.ITOS[int(i)] for i in draws]
+        policy.train(was_training)
+
     pairs: list[PreferencePair] = []
-    for ex in examples:
+    for i, ex in enumerate(examples):
         space = [a for a in _answer_space(ex.answer) if a != ex.answer]
-        pairs.append(PreferencePair(example=ex, chosen=ex.answer, rejected=space[int(rng.integers(len(space)))]))
+        rejected = space[int(rng.integers(len(space)))]
+        if sampled is not None and sampled[i] in space:
+            rejected = sampled[i]
+        pairs.append(PreferencePair(example=ex, chosen=ex.answer, rejected=rejected))
     return pairs
 
 
