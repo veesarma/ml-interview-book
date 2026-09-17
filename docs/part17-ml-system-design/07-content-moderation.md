@@ -56,7 +56,7 @@ flowchart LR
   labels on the model's false positives.
 - **Evidence**: Meta's Community Standards Enforcement Reports and integrity
   engineering posts (Whole Post Integrity Embeddings, Few-Shot Learner, the
-  open-sourced PDQ/TMK hashing), YouTube's Community Guidelines enforcement reports,
+  open-sourced PDQ/TMK hashing), YouTube's [Community Guidelines enforcement reports](https://transparencyreport.google.com/youtube-policy/removals),
   OpenAI's moderation work, and Meta's Llama Guard.
 
 ## 1. Requirements & scoping
@@ -693,5 +693,5 @@ taxonomy, with reported performance on existing benchmarks.
 - OpenAI. "Using GPT-4 for content moderation", August 2023 ([openai.com](https://openai.com/index/using-gpt-4-for-content-moderation/)); OpenAI moderation endpoint documentation.
 - Inan, H. et al. "Llama Guard: LLM-based Input-Output Safeguard for Human-AI Conversations." 2023 ([arXiv:2312.06674](https://arxiv.org/abs/2312.06674)).
 - Markov, T. et al. "A Holistic Approach to Undesired Content Detection in the Real World." AAAI 2023 ([arXiv:2208.03274](https://arxiv.org/abs/2208.03274)).
-- YouTube. "Community Guidelines enforcement" transparency reports.
+- YouTube. "Community Guidelines enforcement" transparency reports ([transparencyreport.google.com](https://transparencyreport.google.com/youtube-policy/removals)).
 - Book cross-references: [fraud & anomaly detection](04-fraud-anomaly-detection.md), [LLM assistant with RAG](08-llm-product-rag-assistant.md), [visual search](06-visual-search-image-retrieval.md), [safety & failure modes](../part15-interpretability-safety/02-safety-failure-modes.md).

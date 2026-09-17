@@ -829,8 +829,8 @@ reports online metric gains from deployment on Meta surfaces.
 - Ying, R. et al. "Graph Convolutional Neural Networks for Web-Scale Recommender Systems." KDD 2018 ([arXiv:1806.01973](https://arxiv.org/abs/1806.01973)).
 - Pancha, N. et al. "PinnerFormer: Sequence Modeling for User Representation at Pinterest." KDD 2022 ([arXiv:2205.04507](https://arxiv.org/abs/2205.04507)).
 - Zhai, J. et al. "Actions Speak Louder than Words: Trillion-Parameter Sequential Transducers for Generative Recommendations." ICML 2024 ([arXiv:2402.17152](https://arxiv.org/abs/2402.17152)).
-- Joachims, T., Swaminathan, A., Schnabel, T. "Unbiased Learning-to-Rank with Biased Feedback." WSDM 2017.
+- Joachims, T., Swaminathan, A., Schnabel, T. "Unbiased Learning-to-Rank with Biased Feedback." WSDM 2017 ([arXiv:1608.04468](https://arxiv.org/abs/1608.04468)).
 - Singh, A., Joachims, T. "Fairness of Exposure in Rankings." KDD 2018.
 - Netflix Technology Blog. "Artwork Personalization at Netflix." December 2017 ([netflixtechblog.com](https://netflixtechblog.com/artwork-personalization-c589f074ad76)).
 - TikTok Newsroom. "How TikTok recommends videos #ForYou." June 2020 ([newsroom.tiktok.com](https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you)).
-- Sculley, D. et al. "Hidden Technical Debt in Machine Learning Systems." NeurIPS 2015.
+- Sculley, D. et al. "Hidden Technical Debt in Machine Learning Systems." NeurIPS 2015 ([papers.nips.cc](https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems)).

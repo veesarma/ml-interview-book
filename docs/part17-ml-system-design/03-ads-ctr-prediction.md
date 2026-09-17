@@ -176,7 +176,7 @@ The problem: CTR depends on interactions (this user × this advertiser category 
 this placement) that a linear model over ids cannot represent unless the cross is
 enumerated, and enumerating crosses of $10^9$-cardinality ids is hopeless.
 
-**Factorization machines** (Rendle, ICDM 2010) give every feature an embedding
+**Factorization machines** (Rendle, [ICDM 2010](https://dl.acm.org/doi/10.1109/ICDM.2010.127)) give every feature an embedding
 $v_i \in \R^k$ and model pairwise interactions as dot products:
 
 $$
@@ -726,7 +726,7 @@ advertiser and platform outcomes.
 - Guo, H. et al. "DeepFM: A Factorization-Machine based Neural Network for CTR Prediction." IJCAI 2017 ([arXiv:1703.04247](https://arxiv.org/abs/1703.04247)).
 - Wang, R. et al. "Deep & Cross Network for Ad Click Predictions." ADKDD 2017 ([arXiv:1708.05123](https://arxiv.org/abs/1708.05123)).
 - Wang, R. et al. "DCN V2: Improved Deep & Cross Network and Practical Lessons for Web-scale Learning to Rank Systems." WWW 2021 ([arXiv:2008.13535](https://arxiv.org/abs/2008.13535)).
-- Rendle, S. "Factorization Machines." ICDM 2010.
+- Rendle, S. "Factorization Machines." ICDM 2010 ([dl.acm.org](https://dl.acm.org/doi/10.1109/ICDM.2010.127)).
 - Weinberger, K. et al. "Feature Hashing for Large Scale Multitask Learning." ICML 2009.
 - Chapelle, O. "Modeling Delayed Feedback in Display Advertising." KDD 2014 ([dl.acm.org](https://dl.acm.org/doi/10.1145/2623330.2623634)).
 - Ktena, S. I. et al. "Addressing Delayed Feedback for Continuous Training with Neural Networks in CTR prediction." RecSys 2019 ([arXiv:1907.06558](https://arxiv.org/abs/1907.06558)).

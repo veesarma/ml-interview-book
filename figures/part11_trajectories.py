@@ -55,7 +55,9 @@ def main() -> None:
     ax = axes[1]
     rng = np.random.default_rng(1)
     modes = [arc(k) + rng.normal(0, 0.25, size=(T, 2)) for k in (0.75, 0.5, 0.05, -0.05, -0.5, -0.8)]
-    probs = np.array([0.08, 0.27, 0.19, 0.16, 0.24, 0.06])
+    # Probabilities deliberately rank the correct mode 4th, which is the common case:
+    # the trajectory decoder covers the future but the classifier ranks it poorly.
+    probs = np.array([0.10, 0.14, 0.30, 0.22, 0.18, 0.06])
     gt = left
     ades = [np.linalg.norm(m - gt, axis=1).mean() for m in modes]
     best = int(np.argmin(ades))
@@ -70,7 +72,7 @@ def main() -> None:
         ax.plot([gt[k, 0], modes[best][k, 0]], [gt[k, 1], modes[best][k, 1]], color=colors[3], lw=0.9)
     ax.scatter([0], [0], marker="s", s=55, color="black", zorder=5)
     ax.set_title(f"6 modes; the winner (minADE = {ades[best]:.2f} m) takes the gradient", fontsize=9.8, loc="left")
-    ax.text(2, -13.5, "line width is the mode probability;\nred segments are the per-step\ndisplacement errors that ADE averages",
+    ax.text(-12.5, -10.5, "line width is the mode probability;\nred segments are the per-step\ndisplacement errors that ADE averages",
             fontsize=8, color="#333333")
     ax.set_xlabel("x (m)", fontsize=9)
     ax.legend(fontsize=7.6, frameon=False, loc="upper left")
@@ -87,13 +89,14 @@ def main() -> None:
     ax.plot(ks, min_ade_k, "-o", color=colors[0], lw=1.9, label="minADE$_k$")
     ax.plot(ks, min_fde_k, "-s", color=colors[1], lw=1.9, label="minFDE$_k$")
     ax.axhline(2.0, color="#b00020", ls="--", lw=1.2)
-    ax.text(5.6, 2.25, "miss threshold", fontsize=8, color="#b00020", ha="right")
+    ax.text(6.0, 2.06, "miss threshold", fontsize=8, color="#b00020", ha="right", va="bottom")
+    ax.set_ylim(0, max(3.0, max(min_fde_k) * 1.25))
     ax.set_xlabel("k, modes kept by probability", fontsize=9)
     ax.set_ylabel("metres", fontsize=9)
     ax.set_title("more modes always lowers minADE", fontsize=9.8, loc="left")
-    ax.text(1.05, max(min_fde_k) * 0.55, "which is why the metric is\nreported at a fixed k (6 on WOMD,\n6 on Argoverse) and paired with\na probability-aware metric",
+    ax.text(1.08, 5.3, "so k is fixed by the benchmark (6 on\nWOMD and Argoverse) and paired with a\nprobability-aware metric, because\nmin-over-modes ignores the probabilities",
             fontsize=8, color="#333333")
-    ax.legend(fontsize=8, frameon=False)
+    ax.legend(fontsize=8, frameon=False, loc="center right")
     ax.grid(color="#eeeeee", lw=0.5)
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)

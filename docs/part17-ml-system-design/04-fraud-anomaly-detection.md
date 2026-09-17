@@ -485,13 +485,12 @@ feed both into the supervised model, and use community detection for bulk action
 *Serve*: cached per-entity embeddings and neighbourhood aggregates, refreshed every
 few minutes. *Evaluate*: ring-level detection, not only transaction-level.
 
-**What the sources say.** PayPal's public engineering talks and papers on risk have
-described graph-based and deep-learning approaches to fraud, including graph
-databases and graph learning for linking entities across accounts, devices and
-funding instruments, as a complement to per-transaction models; PayPal researchers
-have also published on large-scale graph learning for financial-crime detection
-(see, for example, their work on graph neural networks for transaction risk in
-industry venues).
+**What the sources say.** PayPal's technology blog post ["How PayPal Uses Real-time
+Graph Database and Graph Analysis to Fight Fraud"](https://medium.com/paypal-tech/how-paypal-uses-real-time-graph-database-and-graph-analysis-to-fight-fraud-96a2b918619a) describes their graph
+platform: a real-time graph store over accounts, devices and funding instruments,
+graph algorithms such as connected components and centrality for finding rings, and
+graph neural networks built on top of the graph store, all as a complement to
+per-transaction models.
 
 !!! tip "How to say it in the interview: graph features before GNNs"
     "I'd add graph signal in two steps rather than going straight to a GNN. Step one
@@ -501,7 +500,7 @@ industry venues).
     inductive GNN embeddings computed near-line and cached per entity. The reason
     the GNN goes near-line rather than in the auth path is the 40 ms feature budget:
     a two-hop neighbourhood sample over a graph that changes every second will not
-    fit. PayPal and other payment networks have published on graph learning for
+    fit. PayPal and other payment networks have [published on graph learning](https://medium.com/paypal-tech/how-paypal-uses-real-time-graph-database-and-graph-analysis-to-fight-fraud-96a2b918619a) for
     exactly this problem: linking accounts, devices and funding instruments to
     catch coordinated rings that look normal per transaction. The trade-off I'd flag
     is the point-in-time trap: if the graph snapshot includes edges created after the
@@ -792,6 +791,7 @@ for why PR curves, not ROC, belong in imbalanced evaluation.
 ## References
 
 - Stripe. Radar documentation ([docs.stripe.com](https://docs.stripe.com/radar), [risk evaluation](https://docs.stripe.com/radar/risk-evaluation)) and the Stripe engineering post "How we built it: Stripe Radar" ([stripe.com](https://stripe.com/blog/how-we-built-it-stripe-radar)).
+- PayPal Technology Blog. "How PayPal Uses Real-time Graph Database and Graph Analysis to Fight Fraud" ([medium.com/paypal-tech](https://medium.com/paypal-tech/how-paypal-uses-real-time-graph-database-and-graph-analysis-to-fight-fraud-96a2b918619a)).
 - Dal Pozzolo, A. et al. "Credit Card Fraud Detection: A Realistic Modeling and a Novel Learning Strategy." IEEE Transactions on Neural Networks and Learning Systems, 2018.
 - Saito, T., Rehmsmeier, M. "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets." PLoS ONE, 2015.
 - Liu, F. T., Ting, K. M., Zhou, Z.-H. "Isolation Forest." ICDM 2008.

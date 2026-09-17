@@ -498,7 +498,7 @@ box annotation), a deep embedding trained with user-behaviour-derived pairs, and
 re-ranking stage. *Serve*: a multi-level index with an engineering path for billions
 of images. *Evaluate*: offline retrieval plus live conversion.
 
-**What the source says.** Zhang et al., "Visual Search at Alibaba" (KDD 2018)
+**What the source says.** Zhang et al., ["Visual Search at Alibaba"](https://dl.acm.org/doi/abs/10.1145/3219819.3219820) (KDD 2018)
 describes Pailitao, their visual search product,
 including a detection approach that avoids exhaustive box labelling, deep metric
 learning on user-click data, and the engineering of a billion-scale index serving
@@ -509,7 +509,7 @@ hundreds of millions of users.
     saw a grid, and bought one item. That pair crosses the domain gap between a
     phone photo and a studio image, which catalogue-only pairs never do. Alibaba
     reported training their visual search embeddings on user-click data in 'Visual
-    Search at Alibaba' (KDD 2018), alongside a detection step designed to avoid
+    Search at Alibaba' ([KDD 2018](https://dl.acm.org/doi/abs/10.1145/3219819.3219820)), alongside a detection step designed to avoid
     exhaustive box annotation. The alternative, training only on same-product
     catalogue images, gives clean labels and a model that looks great offline and
     fails on the first real camera photo. The trade-off with behavioural pairs is
@@ -532,18 +532,18 @@ a different index. *Serve*: on-device for the cheap paths and text detection,
 server for the heavy retrieval. *Evaluate*: per-route metrics, since a single
 aggregate number would hide the failure of any one route.
 
-**What the sources say.** Google's product documentation and Search blog posts
+**What the sources say.** Google's product documentation and [Search blog posts](https://blog.google/products-and-platforms/products/search/visual-search-ai/)
 describe Lens routing camera queries into modes including text recognition and
 translation, shopping results, and identification of plants, animals and landmarks,
-with on-device processing for some paths; Google's "multisearch" announcements
-describe combining an image with a text refinement in one query.
+with on-device processing for some paths; Google's ["multisearch" announcement](https://blog.google/products-and-platforms/products/search/multisearch/)
+describes combining an image with a text refinement in one query.
 
 !!! tip "How to say it in the interview: routing is the architecture"
     "For an open-ended camera product the first model is a router, because the
     systems behind 'read this sign', 'buy this jacket' and 'name this plant' share
     almost nothing except the camera. Google Lens works this way, with separate
     modes for text, shopping, and identification of plants, animals and landmarks,
-    and their multisearch work adds a text refinement on top of an image query. The
+    and their [multisearch work](https://blog.google/products-and-platforms/products/search/multisearch/) adds a text refinement on top of an image query. The
     alternative is one universal embedding over everything, which sounds elegant and
     loses to specialised indexes on every individual task. The trade-off with
     routing is that a routing error is a total failure, so I'd allow multiple routes
@@ -723,11 +723,11 @@ Large-Scale Inference with Anisotropic Vector Quantization" (ICML 2020,
 - Zhai, A. et al. "Learning a Unified Embedding for Visual Search at Pinterest." KDD 2019 ([arXiv:1908.01707](https://arxiv.org/abs/1908.01707)).
 - Beal, J. et al. "Billion-scale pretraining with vision transformers for multi-task visual representations." WACV 2022 ([arXiv:2108.05887](https://arxiv.org/abs/2108.05887)).
 - Yang, F. et al. "Visual Search at eBay." KDD 2017 ([arXiv:1706.03154](https://arxiv.org/abs/1706.03154)).
-- Zhang, Y. et al. "Visual Search at Alibaba." KDD 2018.
+- Zhang, Y. et al. "Visual Search at Alibaba." KDD 2018 ([dl.acm.org](https://dl.acm.org/doi/abs/10.1145/3219819.3219820)).
 - Radford, A. et al. "Learning Transferable Visual Models From Natural Language Supervision." ICML 2021 ([arXiv:2103.00020](https://arxiv.org/abs/2103.00020)).
 - Johnson, J., Douze, M., Jégou, H. "Billion-scale similarity search with GPUs." 2017 ([arXiv:1702.08734](https://arxiv.org/abs/1702.08734)).
 - Jégou, H., Douze, M., Schmid, C. "Product Quantization for Nearest Neighbor Search." IEEE TPAMI 2011.
 - Malkov, Y., Yashunin, D. "Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs." 2016 ([arXiv:1603.09320](https://arxiv.org/abs/1603.09320)).
 - Guo, R. et al. "Accelerating Large-Scale Inference with Anisotropic Vector Quantization" (ScaNN). ICML 2020 ([arXiv:1908.10396](https://arxiv.org/abs/1908.10396)).
-- Google. Lens product documentation and Search blog posts on Lens modes and multisearch.
+- Google. "Go beyond the search box: Introducing multisearch" ([blog.google](https://blog.google/products-and-platforms/products/search/multisearch/)) and the Search blog post on visual search with Lens and multisearch ([blog.google](https://blog.google/products-and-platforms/products/search/visual-search-ai/)).
 - Book cross-references: [CLIP & contrastive learning](../part08-multimodal/03-clip-contrastive.md), [retrieval & RAG](../part13-retrieval-eval-reliability/01-retrieval-and-rag.md), [OCR & document understanding](09-ocr-document-understanding.md), [content moderation](07-content-moderation.md).

@@ -345,7 +345,7 @@ Remedies, in order of increasing cost:
   sample size (the unit is now the cluster, so the variance is driven by cluster count).
 - **Switchback (time-based) randomisation**: assign the whole region or market to
   treatment or control in alternating time windows. Standard for marketplaces where
-  supply is shared, and used at DoorDash and Lyft for pricing and dispatch changes. The
+  supply is shared, and used at [DoorDash](https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/) and [Lyft](https://eng.lyft.com/experimentation-in-a-ridesharing-marketplace-b39db027a66e) for pricing and dispatch changes. The
   costs are carry-over effects between windows (handled with burn-in periods that are
   discarded) and heavy temporal correlation, which must be in the variance estimate.
 - **Ego-cluster or graph-cluster designs**: randomise a user together with their
@@ -728,5 +728,6 @@ have written about measuring long-term member value rather than short-term engag
 - Johari, R., Pekelis, L., Walsh, D. J. "Always Valid Inference: Bringing Sequential Analysis to A/B Testing." 2015 ([arXiv:1512.04922](https://arxiv.org/abs/1512.04922)).
 - Lan, K. K. G., DeMets, D. L. "Discrete Sequential Boundaries for Clinical Trials." Biometrika 1983.
 - DoorDash Engineering. "Switchback Tests and Randomized Experimentation Under Network Effects at DoorDash" ([careersatdoordash.com](https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/)).
+- Chamandy, N. "Experimentation in a Ridesharing Marketplace." Lyft Engineering, 2016 ([eng.lyft.com](https://eng.lyft.com/experimentation-in-a-ridesharing-marketplace-b39db027a66e)).
 - Ugander, J. et al. "Graph Cluster Randomization: Network Exposure to Multiple Universes." KDD 2013.
 - Book cross-references: [forecasting & ETA (switchbacks in marketplaces)](10-forecasting-eta.md), [feed ranking (long-term holdouts)](01-recommendation-feed-ranking.md), [evaluation](../part13-retrieval-eval-reliability/02-evaluation.md).

@@ -731,6 +731,6 @@ under interference; the design details are covered in the
 - Salinas, D., Flunkert, V., Gasthaus, J. "DeepAR: Probabilistic Forecasting with Autoregressive Recurrent Networks." 2017 ([arXiv:1704.04110](https://arxiv.org/abs/1704.04110)); published in the International Journal of Forecasting, 2020.
 - DeepMind and Google. "Traffic prediction with advanced Graph Neural Networks" (graph neural networks over supersegments for Google Maps ETAs), 2020 ([deepmind.google](https://deepmind.google/blog/traffic-prediction-with-advanced-graph-neural-networks/)).
 - Wickramasuriya, S. L., Athanasopoulos, G., Hyndman, R. J. "Optimal Forecast Reconciliation for Hierarchical and Grouped Time Series Through Trace Minimization." JASA 2019.
-- Hyndman, R. J., Athanasopoulos, G. "Forecasting: Principles and Practice." Online textbook (hierarchical forecasting, backtesting, evaluation).
+- Hyndman, R. J., Athanasopoulos, G. "Forecasting: Principles and Practice," 3rd edition. Online textbook covering hierarchical forecasting, backtesting and evaluation ([otexts.com/fpp3](https://otexts.com/fpp3/)).
 - Koenker, R., Bassett, G. "Regression Quantiles." Econometrica 1978.
 - Book cross-references: [notifications, uplift & experimentation (switchbacks)](11-notifications-uplift-experimentation.md), [ML platform & point-in-time features](12-ml-platform-feature-store-monitoring.md), [uncertainty & reliability](../part13-retrieval-eval-reliability/03-uncertainty-reliability.md).

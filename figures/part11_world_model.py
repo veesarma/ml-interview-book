@@ -95,7 +95,7 @@ def main() -> None:
         err = np.linalg.norm(traj[-1, :2] - goal.numpy())
         ax.plot(traj[:, 0], traj[:, 1], "-o", ms=3.5, color=c, lw=1.9, label=f"{label} ({err:.2f} m off)")
     ax.scatter([1.0], [1.0], marker="*", s=220, color="#b00020", zorder=5)
-    ax.text(1.0, 1.08, "goal", fontsize=8.5, ha="center", color="#b00020")
+    ax.text(0.97, 0.96, "goal", fontsize=8.5, ha="right", va="top", color="#b00020")
     ax.scatter([0], [0], marker="s", s=50, color="black", zorder=5)
     ax.set_title("plans found in latent space, executed in the real system", fontsize=9.8, loc="left")
     ax.set_xlabel("x", fontsize=9)

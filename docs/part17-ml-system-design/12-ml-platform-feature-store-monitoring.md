@@ -321,7 +321,7 @@ generated. Without chargeback, the platform team is the only one with an incenti
 care, and they are the ones least able to decide what to cut.
 
 **Build versus buy.** Managed feature stores, experiment trackers and serving stacks
-exist (Feast and Tecton in the feature-store space, several vendors elsewhere). The
+exist ([Feast](https://docs.feast.dev/) and [Tecton](https://docs.tecton.ai/) in the feature-store space, several vendors elsewhere). The
 honest decision rule: buy where your requirements are ordinary, build where your
 requirements are load-bearing and unusual. For most companies the feature store's
 *integration* with their existing event bus and warehouse is the hard part, which is
@@ -705,5 +705,5 @@ that the ML code is a small fraction of a real production ML system.
 - Breck, E. et al. "The ML Test Score: A Rubric for ML Production Readiness and Technical Debt Reduction." IEEE Big Data 2017 ([research.google](https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/)).
 - Sculley, D. et al. "Hidden Technical Debt in Machine Learning Systems." NeurIPS 2015 ([papers.nips.cc](https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems)).
 - Zinkevich, M. "Rules of Machine Learning: Best Practices for ML Engineering." Google Developers guide ([developers.google.com](https://developers.google.com/machine-learning/guides/rules-of-ml)).
-- Feast and Tecton documentation (open-source and managed feature stores).
+- Feast ([docs.feast.dev](https://docs.feast.dev/)) and Tecton ([docs.tecton.ai](https://docs.tecton.ai/)) documentation, the open-source and managed feature stores.
 - Book cross-references: [distributed training](../part14-systems/01-distributed-training.md), [training systems](../part14-systems/02-training-systems.md), [inference systems](../part14-systems/03-inference-systems.md), [evaluation](../part13-retrieval-eval-reliability/02-evaluation.md), [LLM assistant with RAG](08-llm-product-rag-assistant.md), [fraud & anomaly detection](04-fraud-anomaly-detection.md), [forecasting & ETA](10-forecasting-eta.md).

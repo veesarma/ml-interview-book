@@ -29,7 +29,7 @@ LINK = re.compile(r"\[([^\]]+)\]\((https?://[^)]+)\)")
 # An entry copied out of a chapter may carry a relative cross-link such as
 # ](../part12-rl/04-...md). This page lives at the docs root, one level up, so
 # that "../" would escape the docs tree. Rewrite it to a root-relative path.
-REL_LINK = re.compile(r"\]\(\.\./(part\d\d[^)]*\.md)\)")
+REL_LINK = re.compile(r"\]\(\.\./((?:part\d\d|preface)[^)]*\.md)\)")
 # A sibling link such as ](06-dimensionality-reduction.md) is relative to the
 # chapter it came from, so it needs that chapter's directory prepended.
 SIBLING_LINK = re.compile(r"\]\((?!https?://|\.\./|/|part\d\d)([0-9a-z][0-9a-z-]*\.md)\)")

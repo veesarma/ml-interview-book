@@ -26,14 +26,14 @@
    a week"); the cross-chapter patterns are what you'll draw on.
 
 !!! note "On citations in this part"
-    Every case study and every "how to say it" script cites a specific public paper or
-    engineering-blog post by company, exact title, venue and year, with the arXiv
-    identifier where one exists. Sources are given as searchable titles rather than as
-    hyperlinks, because the environment this part was written in could not fetch pages
-    directly to confirm that a given URL still resolves; searching the exact title
-    returns the primary source. Nothing here attributes a design choice to a company
-    without such a source, and where the text infers a reason the source does not
-    state, it says so.
+    Every case study and every "how to say it" script cites a specific public paper,
+    engineering-blog post, product document or recorded talk by company, exact title,
+    venue and year. Where the source has been verified, the citation links straight to
+    it: the arXiv abstract page, the company's own engineering blog, the official
+    documentation, or the recording. A small number of older academic references still
+    carry title and venue only; `citations-todo/part17-ml-system-design.md` lists which
+    ones and why. Nothing here attributes a design choice to a company without such a
+    source, and where the text infers a reason the source does not state, it says so.
 
 ## From "the question the interviewer asks" to the chapter
 

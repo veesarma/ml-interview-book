@@ -540,5 +540,5 @@ Prepare four evolutions and run them for each chapter:
 - Covington, P., Adams, J., Sargin, E. "Deep Neural Networks for YouTube Recommendations." RecSys 2016, on offline metrics used for triage with live A/B as the final arbiter ([research.google](https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/)).
 - Huang, J.-T. et al. "Embedding-based Retrieval in Facebook Search." KDD 2020 ([arXiv:2006.11632](https://arxiv.org/abs/2006.11632)).
 - Joachims, T., Swaminathan, A., Schnabel, T. "Unbiased Learning-to-Rank with Biased Feedback." WSDM 2017 ([arXiv:1608.04468](https://arxiv.org/abs/1608.04468)).
-- Hello Interview, "ML System Design" interview guides (the structure this part extends).
+- Hello Interview, "ML System Design in a Hurry" interview guides, the structure this part extends ([hellointerview.com](https://www.hellointerview.com/learn/ml-system-design/in-a-hurry/introduction)).
 - Book cross-references: [Part XIII evaluation](../part13-retrieval-eval-reliability/02-evaluation.md), [Part XIV inference systems](../part14-systems/03-inference-systems.md), [Part XIV roofline](../part14-systems/04-hardware-memory-roofline.md).
