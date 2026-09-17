@@ -844,8 +844,9 @@ preference, not absolute engagement.
     (which removes the shared question-difficulty variance and shrinks the interval),
     cluster the standard error when questions are derived from the same source document,
     and reduce variance by resampling per-question responses. **Why.** Without intervals,
-    eval-driven development optimises noise. Paper/post: "Adding Error Bars to Evals: A
-    Statistical Approach to Language Model Evaluations", Anthropic, 2024 (arXiv:2411.00640).
+    eval-driven development optimises noise. Paper: Evan Miller,
+    ["Adding Error Bars to Evals: A Statistical Approach to Language Model
+    Evaluations"](https://arxiv.org/abs/2411.00640), Anthropic, 2024, arXiv:2411.00640.
 
 !!! production "LMSYS: Chatbot Arena (2024)"
     **Problem.** Static benchmarks saturate and do not measure open-ended human
@@ -855,9 +856,10 @@ preference, not absolute engagement.
     strategies to allocate comparisons to the pairs that most reduce uncertainty.
     **Trade-off named in the paper.** It measures preference on the arena's prompt
     distribution, is affected by style and verbosity, and requires enormous vote volume
-    for tight intervals on new models. Paper: "Chatbot Arena: An Open Platform for
-    Evaluating LLMs by Human Preference", arXiv:2403.04132; the judge-bias analysis is in
-    "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena", arXiv:2306.05685.
+    for tight intervals on new models. Paper: ["Chatbot Arena: An Open Platform for
+    Evaluating LLMs by Human Preference"](https://arxiv.org/abs/2403.04132),
+    arXiv:2403.04132; the judge-bias analysis is in ["Judging LLM-as-a-Judge with MT-Bench
+    and Chatbot Arena"](https://arxiv.org/abs/2306.05685), NeurIPS 2023, arXiv:2306.05685.
 
 !!! production "Stanford CRFM: HELM (2022)"
     **Problem.** Benchmarks reported one number on one scenario, so "which model is best"
@@ -866,7 +868,8 @@ preference, not absolute engagement.
     calibration, robustness, fairness, bias, toxicity and efficiency, with standardised
     prompting and full transparency of raw predictions. **Why.** Multi-metric reporting
     makes trade-offs visible (a model can win accuracy and lose calibration) and prevents
-    cherry-picking. Paper: "Holistic Evaluation of Language Models", arXiv:2211.09110.
+    cherry-picking. Paper: ["Holistic Evaluation of Language
+    Models"](https://arxiv.org/abs/2211.09110), TMLR 2023, arXiv:2211.09110.
 
 !!! production "OpenAI: Codex and the pass@k estimator (2021)"
     **Problem.** Functional-correctness evaluation of generated code is stochastic;
@@ -875,8 +878,8 @@ preference, not absolute engagement.
     unit tests, plus the unbiased pass@k estimator computed from $n \gg k$ samples per
     problem, and the explicit note that the naive $1-(1-\hat p)^k$ plug-in is biased.
     **Why.** Unit tests are objective and hard to game; the estimator makes pass@1 and
-    pass@100 comparable from one sampling run. Paper: "Evaluating Large Language Models
-    Trained on Code", arXiv:2107.03374.
+    pass@100 comparable from one sampling run. Paper: ["Evaluating Large Language Models
+    Trained on Code"](https://arxiv.org/abs/2107.03374), 2021, arXiv:2107.03374.
 
 !!! production "Netflix: interleaving for personalisation (2017)"
     **Problem.** A/B tests on personalisation algorithms need large populations and long
@@ -886,9 +889,10 @@ preference, not absolute engagement.
     as a high-sensitivity first stage to rank candidate algorithms with far fewer
     members, then a conventional A/B test on the survivors to measure the real member
     metric. **Trade-off.** Interleaving measures relative ranker preference, not
-    long-term member satisfaction, so it filters rather than decides. Post: "Innovating
-    Faster on Personalization Algorithms at Netflix Using Interleaving", Netflix
-    Technology Blog, 2017.
+    long-term member satisfaction, so it filters rather than decides. Post:
+    ["Innovating Faster on Personalization Algorithms at Netflix Using
+    Interleaving"](https://netflixtechblog.com/using-interleaving-in-online-experiments-to-accelerate-algorithm-innovation-at-netflix-a04ee392ec55),
+    Netflix Technology Blog, November 2017.
 
 !!! production "Google: Rules of Machine Learning"
     **Problem.** Teams optimise the metric that is easy to compute rather than the one
@@ -897,8 +901,9 @@ preference, not absolute engagement.
     the first objective simple and observable, do not confuse the *modelling* objective
     with the *business* objective, and expect the metric you optimise to be gamed by the
     system around it. **Why.** Most evaluation failures are organisational, not
-    statistical. Document: Martin Zinkevich, "Rules of Machine Learning: Best Practices
-    for ML Engineering", Google (developers.google.com machine-learning guides).
+    statistical. Document: Martin Zinkevich, ["Rules of Machine Learning: Best Practices
+    for ML Engineering"](https://developers.google.com/machine-learning/guides/rules-of-ml),
+    Google for Developers.
 
 !!! production "Princeton / Stanford: SWE-bench and SWE-bench Verified"
     **Problem.** Coding benchmarks were short, synthetic functions; real software work is
@@ -908,8 +913,12 @@ preference, not absolute engagement.
     text alone, some tests were flaky, and some solutions leaked into issue comments; the
     subsequent human-validated subset (SWE-bench Verified, built with OpenAI) filtered
     these. **What to take from it.** The benchmark's construction is part of the result, and
-    an interviewer will expect you to know how SWE-bench Verified differs from the original. Paper: "SWE-bench: Can Language
-    Models Resolve Real-World GitHub Issues?", ICLR 2024, arXiv:2310.06770.
+    an interviewer will expect you to know how SWE-bench Verified differs from the original.
+    Paper: ["SWE-bench: Can Language Models Resolve Real-World GitHub
+    Issues?"](https://arxiv.org/abs/2310.06770), ICLR 2024, arXiv:2310.06770; the verified
+    subset is described in OpenAI's post
+    ["Introducing SWE-bench Verified"](https://openai.com/index/introducing-swe-bench-verified/),
+    August 2024.
 
 ## 6. Interview questions and strong answers
 
@@ -1138,34 +1147,31 @@ could mislead you.
 
 ## References
 
-URLs are omitted where they could not be verified in this build; every entry has the
-exact title, venue and year, plus the arXiv identifier where one exists.
-
-* Järvelin & Kekäläinen, "Cumulated gain-based evaluation of IR techniques", ACM TOIS, 2002.
-* Manning, Raghavan & Schütze, *Introduction to Information Retrieval*, CUP 2008 (ch. 8, evaluation).
-* Davis & Goadrich, "The Relationship Between Precision-Recall and ROC Curves", ICML 2006.
-* Saito & Rehmsmeier, "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets", PLOS ONE, 2015.
-* Everingham et al., "The PASCAL Visual Object Classes (VOC) Challenge", IJCV 2010 (11-point and all-point AP).
-* Lin et al., "Microsoft COCO: Common Objects in Context", ECCV 2014, arXiv:1405.0312.
-* Kirillov et al., "Panoptic Segmentation", CVPR 2019, arXiv:1801.00868 (PQ = SQ × RQ).
-* Karatzas et al., "ICDAR 2015 Competition on Robust Reading" (end-to-end text spotting protocol).
-* Heusel et al., "GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium", NeurIPS 2017, arXiv:1706.08500 (FID).
-* Dowson & Landau, "The Fréchet distance between multivariate normal distributions", Journal of Multivariate Analysis, 1982.
-* Salimans et al., "Improved Techniques for Training GANs", NeurIPS 2016, arXiv:1606.03498 (Inception Score).
-* Kynkäänniemi et al., "Improved Precision and Recall Metric for Assessing Generative Models", NeurIPS 2019, arXiv:1904.06991.
-* Zhang et al., "The Unreasonable Effectiveness of Deep Features as a Perceptual Metric" (LPIPS), CVPR 2018, arXiv:1801.03924.
-* Hessel et al., "CLIPScore: A Reference-free Evaluation Metric for Image Captioning", EMNLP 2021, arXiv:2104.08718.
-* Chen et al., "Evaluating Large Language Models Trained on Code", 2021, arXiv:2107.03374 (HumanEval, pass@k).
-* Liang et al., "Holistic Evaluation of Language Models" (HELM), 2022, arXiv:2211.09110.
-* Zheng et al., "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena", NeurIPS 2023, arXiv:2306.05685.
-* Chiang et al., "Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference", 2024, arXiv:2403.04132.
-* Bradley & Terry, "Rank Analysis of Incomplete Block Designs", Biometrika, 1952; Hunter, "MM algorithms for generalized Bradley-Terry models", Annals of Statistics, 2004.
-* Miller, "Adding Error Bars to Evals: A Statistical Approach to Language Model Evaluations", Anthropic, 2024, arXiv:2411.00640.
+* Järvelin & Kekäläinen, ["Cumulated gain-based evaluation of IR techniques"](https://dl.acm.org/doi/10.1145/582415.582418), ACM TOIS, 2002.
+* Manning, Raghavan & Schütze, [*Introduction to Information Retrieval*](https://nlp.stanford.edu/IR-book/), CUP 2008 (ch. 8, evaluation).
+* Davis & Goadrich, ["The Relationship Between Precision-Recall and ROC Curves"](https://dl.acm.org/doi/10.1145/1143844.1143874), ICML 2006.
+* Saito & Rehmsmeier, ["The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets"](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0118432), PLOS ONE, 2015.
+* Everingham et al., ["The PASCAL Visual Object Classes (VOC) Challenge"](https://link.springer.com/article/10.1007/s11263-009-0275-4), IJCV 2010 (11-point and all-point AP).
+* Lin et al., ["Microsoft COCO: Common Objects in Context"](https://arxiv.org/abs/1405.0312), ECCV 2014, arXiv:1405.0312.
+* Kirillov et al., ["Panoptic Segmentation"](https://arxiv.org/abs/1801.00868), CVPR 2019, arXiv:1801.00868 (PQ = SQ × RQ).
+* Karatzas et al., ["ICDAR 2015 competition on Robust Reading"](https://ieeexplore.ieee.org/document/7333942/), ICDAR 2015 (end-to-end text spotting protocol).
+* Heusel et al., ["GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium"](https://arxiv.org/abs/1706.08500), NeurIPS 2017, arXiv:1706.08500 (FID).
+* Dowson & Landau, ["The Fréchet distance between multivariate normal distributions"](https://www.sciencedirect.com/science/article/pii/0047259X8290077X), Journal of Multivariate Analysis, 1982.
+* Salimans et al., ["Improved Techniques for Training GANs"](https://arxiv.org/abs/1606.03498), NeurIPS 2016, arXiv:1606.03498 (Inception Score).
+* Kynkäänniemi et al., ["Improved Precision and Recall Metric for Assessing Generative Models"](https://arxiv.org/abs/1904.06991), NeurIPS 2019, arXiv:1904.06991.
+* Zhang et al., ["The Unreasonable Effectiveness of Deep Features as a Perceptual Metric"](https://arxiv.org/abs/1801.03924) (LPIPS), CVPR 2018, arXiv:1801.03924.
+* Hessel et al., ["CLIPScore: A Reference-free Evaluation Metric for Image Captioning"](https://arxiv.org/abs/2104.08718), EMNLP 2021, arXiv:2104.08718.
+* Chen et al., ["Evaluating Large Language Models Trained on Code"](https://arxiv.org/abs/2107.03374), 2021, arXiv:2107.03374 (HumanEval, pass@k).
+* Liang et al., ["Holistic Evaluation of Language Models"](https://arxiv.org/abs/2211.09110) (HELM), TMLR 2023, arXiv:2211.09110.
+* Zheng et al., ["Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena"](https://arxiv.org/abs/2306.05685), NeurIPS 2023, arXiv:2306.05685.
+* Chiang et al., ["Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference"](https://arxiv.org/abs/2403.04132), 2024, arXiv:2403.04132.
+* Bradley & Terry, ["Rank Analysis of Incomplete Block Designs: I. The Method of Paired Comparisons"](https://www.jstor.org/stable/2334029), Biometrika, 1952; Hunter, ["MM algorithms for generalized Bradley-Terry models"](https://projecteuclid.org/journals/annals-of-statistics/volume-32/issue-1/MM-algorithms-for-generalized-Bradley-Terry-models/10.1214/aos/1079120141.full), Annals of Statistics, 2004.
+* Miller, ["Adding Error Bars to Evals: A Statistical Approach to Language Model Evaluations"](https://arxiv.org/abs/2411.00640), Anthropic, 2024, arXiv:2411.00640.
 * Efron & Tibshirani, *An Introduction to the Bootstrap*, Chapman & Hall, 1993.
-* Jimenez et al., "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?", ICLR 2024, arXiv:2310.06770.
-* Zhou et al., "WebArena: A Realistic Web Environment for Building Autonomous Agents", ICLR 2024, arXiv:2307.13854.
-* Yao et al., "τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains", 2024, arXiv:2406.12045.
-* Chaudhuri et al. / Netflix Technology Blog, "Innovating Faster on Personalization Algorithms at Netflix Using Interleaving", 2017.
-* Chapelle et al., "Large-scale validation and analysis of interleaved search evaluation", ACM TOIS, 2012.
-* Kohavi, Tang & Xu, *Trustworthy Online Controlled Experiments*, CUP 2020.
-* Zinkevich, "Rules of Machine Learning: Best Practices for ML Engineering", Google.
+* Jimenez et al., ["SWE-bench: Can Language Models Resolve Real-World GitHub Issues?"](https://arxiv.org/abs/2310.06770), ICLR 2024, arXiv:2310.06770; OpenAI, ["Introducing SWE-bench Verified"](https://openai.com/index/introducing-swe-bench-verified/), 2024.
+* Zhou et al., ["WebArena: A Realistic Web Environment for Building Autonomous Agents"](https://arxiv.org/abs/2307.13854), ICLR 2024, arXiv:2307.13854.
+* Yao et al., ["τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains"](https://arxiv.org/abs/2406.12045), 2024, arXiv:2406.12045.
+* Netflix Technology Blog, ["Innovating Faster on Personalization Algorithms at Netflix Using Interleaving"](https://netflixtechblog.com/using-interleaving-in-online-experiments-to-accelerate-algorithm-innovation-at-netflix-a04ee392ec55), 2017.
+* Chapelle, Joachims, Radlinski & Yue, ["Large-scale validation and analysis of interleaved search evaluation"](https://dl.acm.org/doi/10.1145/2094072.2094078), ACM TOIS, 2012.
+* Kohavi, Tang & Xu, *Trustworthy Online Controlled Experiments*, CUP 2020; companion site [experimentguide.com](https://experimentguide.com/).
+* Zinkevich, ["Rules of Machine Learning: Best Practices for ML Engineering"](https://developers.google.com/machine-learning/guides/rules-of-ml), Google for Developers.
