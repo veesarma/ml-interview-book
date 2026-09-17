@@ -196,7 +196,7 @@ conversions). The model produces scores $s_i = f(x_i)$.
 classification of click. Simple, uses every label, but ignores that only the order
 *within a query* matters and that queries have different label scales.
 
-**Pairwise (RankNet, Burges et al., ICML 2005).** For each pair $(i, j)$ with
+**Pairwise (RankNet, Burges et al., [ICML 2005](https://icml.cc/Conferences/2005/proceedings/papers/012_LearningToRank_BurgesEtAl.pdf)).** For each pair $(i, j)$ with
 $y_i > y_j$ in the same query, model $P(i \succ j) = \sigma(\sigma_0 (s_i - s_j))$ and
 minimise cross-entropy against the label $P_{ij} = 1$:
 
@@ -233,7 +233,7 @@ $$
 
 where $|\Delta\text{NDCG}_{ij}| = \frac{|2^{y_i} - 2^{y_j}|\,\bigl|\frac{1}{\log_2(1+r_i)} - \frac{1}{\log_2(1+r_j)}\bigr|}{\text{IDCG}}$
 for current ranks $r_i, r_j$. This is not the gradient of any closed-form loss, but
-Burges's report (Microsoft Research technical report MSR-TR-2010-82, "From RankNet to
+Burges's report ([Microsoft Research technical report MSR-TR-2010-82](https://www.microsoft.com/en-us/research/publication/from-ranknet-to-lambdarank-to-lambdamart-an-overview/), "From RankNet to
 LambdaRank to LambdaMART: An Overview") shows empirically that following these
 "lambdas" optimises NDCG, and that is the sketch you give at the whiteboard.
 *Meaning*: the model works hardest on mis-ordered pairs near the top of the list.
@@ -273,8 +273,8 @@ Stage 2 sees ~200 candidates with full features. Options, in increasing cost:
    document*, so it is affordable only on the top 20–50 and often only for the
    textual part of the score. Distil it into (1) or (2) for the rest.
 
-Google announced BERT in web search ranking in "Understanding searches better than
-ever before" (Google blog, October 2019), describing it as applied to a subset of
+Google announced BERT in web search ranking in ["Understanding searches better than
+ever before"](https://blog.google/products/search/search-language-understanding-bert/) (Google blog, October 2019), describing it as applied to a subset of
 queries where language understanding mattered; LinkedIn's DeText (CIKM 2020,
 [arXiv:2008.02460](https://arxiv.org/abs/2008.02460)) describes a BERT-based ranking framework for their search products
 with attention to serving cost. The interview line: *cross-encoders at the top of the
@@ -300,7 +300,7 @@ The position-based model: $P(\text{click} \mid d, k) = P(E = 1 \mid k)\,P(R = 1 
 Estimate $P(E=1 \mid k)$ with randomisation (swap the top two results for 1 % of
 traffic; the ratio of CTRs at positions 1 and 2 for the same documents is the
 examination ratio) or with the regression-EM approach Google described for personal
-search (Wang et al., WSDM 2018), which estimates propensities from logs without
+search (Wang et al., [WSDM 2018](https://dl.acm.org/doi/10.1145/3159652.3159732)), which estimates propensities from logs without
 explicit randomisation by alternating between fitting the relevance model and the
 propensity model. Then either weight clicks by inverse propensity (Joachims et al.,
 WSDM 2017) or use the position-as-feature trick with dropout (Airbnb, KDD 2020):
@@ -701,13 +701,13 @@ representations, and reports online improvements in Etsy search.
 - Guo, W. et al. "DeText: A Deep Text Ranking Framework with BERT." CIKM 2020 ([arXiv:2008.02460](https://arxiv.org/abs/2008.02460)).
 - Geyik, S. C., Ambler, S., Kenthapadi, K. "Fairness-Aware Ranking in Search & Recommendation Systems with Application to LinkedIn Talent Search." KDD 2019 ([arXiv:1905.01989](https://arxiv.org/abs/1905.01989)).
 - Jha, R. et al. "Unified Embedding Based Personalized Retrieval in Etsy Search." 2023 ([arXiv:2306.11424](https://arxiv.org/abs/2306.11424)).
-- Google (Nayak, P.). "Understanding searches better than ever before." The Keyword blog, October 2019.
-- Burges, C. J. C. et al. "Learning to Rank using Gradient Descent." ICML 2005.
+- Google (Nayak, P.). "Understanding searches better than ever before." The Keyword blog, October 2019 ([blog.google](https://blog.google/products/search/search-language-understanding-bert/)).
+- Burges, C. J. C. et al. "Learning to Rank using Gradient Descent." ICML 2005 ([icml.cc](https://icml.cc/Conferences/2005/proceedings/papers/012_LearningToRank_BurgesEtAl.pdf)).
 - Burges, C. J. C., Ragno, R., Le, Q. V. "Learning to Rank with Nonsmooth Cost Functions." NeurIPS 2006.
-- Burges, C. J. C. "From RankNet to LambdaRank to LambdaMART: An Overview." Microsoft Research Technical Report MSR-TR-2010-82, 2010.
+- Burges, C. J. C. "From RankNet to LambdaRank to LambdaMART: An Overview." Microsoft Research Technical Report MSR-TR-2010-82, 2010 ([microsoft.com](https://www.microsoft.com/en-us/research/publication/from-ranknet-to-lambdarank-to-lambdamart-an-overview/)).
 - Järvelin, K., Kekäläinen, J. "Cumulated Gain-Based Evaluation of IR Techniques." ACM TOIS 2002.
 - Joachims, T., Swaminathan, A., Schnabel, T. "Unbiased Learning-to-Rank with Biased Feedback." WSDM 2017 ([arXiv:1608.04468](https://arxiv.org/abs/1608.04468)).
-- Wang, X. et al. "Position Bias Estimation for Unbiased Learning to Rank in Personal Search." WSDM 2018.
+- Wang, X. et al. "Position Bias Estimation for Unbiased Learning to Rank in Personal Search." WSDM 2018 ([dl.acm.org](https://dl.acm.org/doi/10.1145/3159652.3159732)).
 - Nogueira, R., Cho, K. "Passage Re-ranking with BERT." 2019 ([arXiv:1901.04085](https://arxiv.org/abs/1901.04085)).
 - Khattab, O., Zaharia, M. "ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT." SIGIR 2020 ([arXiv:2004.12832](https://arxiv.org/abs/2004.12832)).
 - Book cross-references: [retrieval & RAG](../part13-retrieval-eval-reliability/01-retrieval-and-rag.md), [evaluation](../part13-retrieval-eval-reliability/02-evaluation.md).
