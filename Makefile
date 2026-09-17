@@ -1,4 +1,4 @@
-.PHONY: install test style fix-style serve build figures references deploy
+.PHONY: install test style fix-style serve build figures references book deploy
 
 install:
 	pip install -r requirements.txt && pip install -e .
@@ -25,6 +25,16 @@ references:
 
 figures:
 	@for f in figures/*.py; do echo "→ $$f"; python $$f || exit 1; done
+
+book:
+	@command -v pandoc >/dev/null || { echo "pandoc not found: apt-get install pandoc"; exit 1; }
+	python scripts/build_book.py --all
+
+book-epub:
+	python scripts/build_book.py --epub
+
+book-pdf:
+	python scripts/build_book.py --pdf
 
 deploy:
 	mkdocs gh-deploy --force

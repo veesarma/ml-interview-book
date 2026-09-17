@@ -12,6 +12,8 @@ window.MathJax = {
       argmax: "\\operatorname{arg\\,max}",
       argmin: "\\operatorname{arg\\,min}",
       tr: "\\operatorname{tr}",
+      Var: "\\operatorname{Var}",
+      Cov: "\\operatorname{Cov}",
       diag: "\\operatorname{diag}",
       norm: ["\\left\\lVert #1 \\right\\rVert", 1]
     }

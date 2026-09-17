@@ -7,9 +7,29 @@ mathematics, from-scratch implementations, systems trade-offs, and production ca
 studies behind modern machine learning, with dedicated parts on ML system design
 and company-specific deep dives.
 
-> Read it at **https://veesarma.github.io/ml-interview-book/** once GitHub Pages is
-> enabled for the repository (Settings → Pages → Source: `gh-pages` branch; the
-> workflow in `.github/workflows/deploy.yml` publishes on every push to `main`).
+## Read it
+
+**As a website.** `mkdocs serve` locally, or publish to GitHub Pages: push this
+branch, merge to `main`, then Settings → Pages → Source → `gh-pages` branch. The
+workflow in `.github/workflows/deploy.yml` builds and publishes on every push to
+`main`, and the site lands at `https://<your-user>.github.io/ml-interview-book/`.
+The site is the primary format: it has search, the navigation sidebar, rendered
+Mermaid diagrams and live MathJax.
+
+**As a single file**, for an e-reader, a plane, or printing a part to annotate:
+
+```bash
+sudo apt-get install pandoc       # plus: pip install weasyprint, for the PDF
+make book                         # EPUB + PDF + one self-contained HTML file
+make book ITEM=                   # or: python scripts/build_book.py --part part05
+```
+
+Outputs land in `build/`: about 3,300 printed pages, 20 MB EPUB, 28 MB PDF.
+Tagging a release (`git tag v1.0 && git push --tags`) builds all three in CI and
+attaches them to the GitHub release.
+
+Mermaid diagrams are the one thing the offline formats cannot draw; they are
+labelled and the web edition has them.
 
 ## What's inside
 
