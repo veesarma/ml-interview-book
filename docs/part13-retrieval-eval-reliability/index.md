@@ -1,4 +1,4 @@
-# Part XIII — Retrieval, evaluation and reliability
+# Part XIII: Retrieval, evaluation and reliability
 
 > **Why this part matters at staff level.** Most senior candidates can train a model.
 > What separates a staff signal in an ML depth or system-design round is knowing how
@@ -32,15 +32,15 @@
 
 Read in this order; the times are for a first careful pass including running the tests.
 
-1. **Evaluation §2.1–2.4** (PR vs ROC, AUC as a rank statistic, NDCG, detection AP) — 90 min.
+1. **Evaluation §2.1–2.4** (PR vs ROC, AUC as a rank statistic, NDCG, detection AP), 90 min.
    These are the derivations interviewers ask for verbatim.
-2. **Evaluation §2.6–2.8** (pass@k, LLM-as-judge, error bars on evals) — 45 min.
-3. **Retrieval §2** (similarities, MIPS reduction, BM25, IVF/HNSW/PQ cost models) — 90 min.
-4. **Retrieval §4** (the recall / latency / memory table, filtering, long-context vs RAG) — 30 min.
+2. **Evaluation §2.6–2.8** (pass@k, LLM-as-judge, error bars on evals), 45 min.
+3. **Retrieval §2** (similarities, MIPS reduction, BM25, IVF/HNSW/PQ cost models), 90 min.
+4. **Retrieval §4** (the recall / latency / memory table, filtering, long-context vs RAG), 30 min.
 5. **Reliability §2.1–2.4** (heteroscedastic loss, entropy/MI, ECE, temperature scaling,
-   split conformal) — 75 min.
-6. **Reliability §2.5–2.7** (OOD scores, shift taxonomy, FGSM/PGD) — 45 min.
-7. Run all three test suites and re-derive every boxed equation with the book closed — 60 min.
+ split conformal), 75 min.
+6. **Reliability §2.5–2.7** (OOD scores, shift taxonomy, FGSM/PGD), 45 min.
+7. Run all three test suites and re-derive every boxed equation with the book closed, 60 min.
 
 ```bash
 pytest tests/test_retrieval_* tests/test_evaluation_* tests/test_reliability_* -q

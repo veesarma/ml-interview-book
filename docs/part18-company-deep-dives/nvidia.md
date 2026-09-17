@@ -2,15 +2,15 @@
 
 > **Why this matters at staff level.** NVIDIA is the only company in this part that
 > sells to every other company in this part. That shapes its interviews: you are asked
-> about *platforms*, not products — a driving stack partners can adopt (DRIVE), world
+> about *platforms*, not products, a driving stack partners can adopt (DRIVE), world
 > foundation models other people fine-tune (Cosmos), a robot foundation model with an
 > open checkpoint (GR00T), and the inference and training systems (TensorRT-LLM,
 > Dynamo, Megatron-LM) that everyone else's models run on. Strong signal is being able
-> to reason about the *whole* stack — roofline on a GPU, a planner's trajectory
-> vocabulary, a diffusion world model's tokenizer — and about why a platform decision
+> to reason about the *whole* stack, roofline on a GPU, a planner's trajectory
+> vocabulary, a diffusion world model's tokenizer, and about why a platform decision
 > differs from a product decision.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - **Four ML businesses**: automotive (DRIVE Hyperion/AGX Thor, DriveWorks, DRIVE Sim),
   robotics (Isaac, GR00T), world models (Cosmos), and the training/inference software
@@ -21,15 +21,15 @@
   simulation metrics) distilled into parallel heads. Its successor GTRS
   ([arXiv:2506.06664](https://arxiv.org/abs/2506.06664)) won the 2025 challenge.
 - **Cosmos** ([arXiv:2501.03575](https://arxiv.org/abs/2501.03575)): "world foundation
-  models" for Physical AI — a diffusion family and an autoregressive family over a
+ models" for Physical AI, a diffusion family and an autoregressive family over a
   learned video tokenizer, pre-trained on large video corpora and *designed to be
   post-trained* by developers into driving or robot world models. Open weights and
   code ([github.com/nvidia-cosmos](https://github.com/nvidia-cosmos/cosmos-predict1)).
 - **GR00T N1** ([arXiv:2503.14734](https://arxiv.org/abs/2503.14734),
   [github.com/NVIDIA/Isaac-GR00T](https://github.com/NVIDIA/Isaac-GR00T)): an open
-  vision-language-action foundation model for humanoids with a dual-system design — a
+ vision-language-action foundation model for humanoids with a dual-system design, a
   VLM "System 2" for reasoning and a diffusion-transformer "System 1" for
-  high-frequency action — trained on a *data pyramid* of web video, synthetic
+ high-frequency action, trained on a *data pyramid* of web video, synthetic
   trajectories and real robot demonstrations.
 - **Alpamayo-R1** ([arXiv:2511.00088](https://arxiv.org/abs/2511.00088)): reasoning-plus-action
   for long-tail driving, released as a teacher model for distillation.
@@ -47,14 +47,14 @@
 NVIDIA sells accelerated computing: GPUs and the software stack that makes them
 useful. Its ML organisations exist to (a) create demand for that compute by making
 new workloads tractable, and (b) sell platforms into industries that do not want to
-build a full stack themselves. In automotive that is DRIVE — an on-vehicle computer
+build a full stack themselves. In automotive that is DRIVE, an on-vehicle computer
 (AGX Thor), a reference sensor architecture (Hyperion), middleware (DriveWorks),
 simulation (DRIVE Sim / Omniverse), and increasingly the models themselves (Hydra-MDP,
 Alpamayo). In robotics it is Isaac and the GR00T foundation models. Across both sits
 Cosmos, a family of world foundation models meant to generate the training and
 evaluation data that Physical AI needs. And underneath everything is the systems
-software — Megatron-LM for training, TensorRT-LLM and Dynamo for inference, NIM for
-packaging — which is why an NVIDIA interview can swing from a BEV detector to a
+software, Megatron-LM for training, TensorRT-LLM and Dynamo for inference, NIM for
+packaging, which is why an NVIDIA interview can swing from a BEV detector to a
 roofline analysis to a KV-cache eviction policy in one loop.
 
 ## The ML problems that define the company
@@ -64,7 +64,7 @@ roofline analysis to a KV-cache eviction policy in one loop.
 | **End-to-end planning that a partner can validate** | A black-box policy is unsellable to an OEM with a safety department; but modular stacks cap performance. | Hydra-MDP ([arXiv:2406.06978](https://arxiv.org/abs/2406.06978)); GTRS ([arXiv:2506.06664](https://arxiv.org/abs/2506.06664)); NVIDIA CVPR 2024 research blog. |
 | **Generating physically plausible worlds** | Video generators hallucinate physics; Physical AI needs controllable, action-conditioned, 3D-consistent rollouts. | Cosmos ([arXiv:2501.03575](https://arxiv.org/abs/2501.03575)); Cosmos project page and open repos. |
 | **Robot foundation models across embodiments** | Robot data is scarce, heterogeneous in action space, and expensive; web video has no actions. | GR00T N1 ([arXiv:2503.14734](https://arxiv.org/abs/2503.14734)); the GR00T whitepaper; the open X-embodiment sim dataset. |
-| **Long-tail driving that needs reasoning** | Rare scenarios need explanation, not just regression; but reasoning models are too slow for the car. | Alpamayo-R1 ([arXiv:2511.00088](https://arxiv.org/abs/2511.00088)); released as a teacher for distillation. |
+| **Long-tail driving that needs reasoning** | Rare scenarios need an explanation of the scene, which a trajectory regressor has no way to produce, and reasoning models are too slow for the car. | Alpamayo-R1 ([arXiv:2511.00088](https://arxiv.org/abs/2511.00088)); released as a teacher for distillation. |
 | **Serving LLMs at the frontier of memory bandwidth** | Decode is memory-bound; batching, KV cache and quantization decide cost per token. | TensorRT-LLM; Dynamo; NIM deployment blogs. |
 | **Training at cluster scale** | A trillion-parameter model does not fit on one device, and naive parallelism wastes bandwidth. | Megatron-LM ([arXiv:1909.08053](https://arxiv.org/abs/1909.08053)); Nemotron-4 340B report ([arXiv:2406.11704](https://arxiv.org/abs/2406.11704)). |
 | **Safety for a platform you do not operate** | You ship compute and models; the partner ships the vehicle and owns the safety case. | DRIVE Hyperion safety/cybersecurity milestones (nvidianews); Halos Outside-In Safety blueprint ([github.com/NVIDIA/halos-outside-in-safety](https://github.com/NVIDIA/halos-outside-in-safety)). |
@@ -123,7 +123,7 @@ trajectories (clustered from data; the public configurations use vocabularies in
 thousands, up to 16,384 in the released variants) is scored by the network, and the
 best-scoring candidate is executed. Training uses **multi-target distillation**: one
 head imitates the human trajectory, and additional heads are supervised by the
-*rule-based simulator's* metric scores for every candidate in the vocabulary — the
+*rule-based simulator's* metric scores for every candidate in the vocabulary, the
 teacher labels the whole vocabulary, not just the one trajectory the human drove.
 Because the environment scores are computed offline for all candidates, the model
 learns a differentiable surrogate for a non-differentiable simulator. At inference the
@@ -150,8 +150,8 @@ non-differentiable rewards; the planning context is
 a manoeuvre outside the set, and building the vocabulary is a data-dependent design
 choice. In exchange you get: a differentiable path to simulator metrics, scores for
 *every* candidate (so a partner can inspect why the chosen one won), and an interface
-where safety weights are tunable at deployment. The rejected alternative — direct
-regression of a continuous trajectory — is simpler and unbounded in resolution but
+where safety weights are tunable at deployment. The rejected alternative, direct
+regression of a continuous trajectory, is simpler and unbounded in resolution but
 provides no ranking signal and no auditable comparison.
 
 **Sources.** Li et al., "Hydra-MDP: End-to-end Multimodal Planning with Multi-target
@@ -166,13 +166,13 @@ Li et al., "Generalized Trajectory Scoring for End-to-end Multimodal Planning"
     than regressing a continuous trajectory. NVIDIA's Hydra-MDP paper, which won the
     CVPR 2024 End-to-End Driving at Scale challenge, shows why that pays: once you
     have a vocabulary you can label *every* candidate with a rule-based simulator's
-    metrics — collision, drivable area, comfort — and distil those scores into
+ metrics (collision, drivable area, comfort) and distil those scores into
     parallel heads alongside the human-imitation head. That turns a non-differentiable
     evaluation metric into a training signal, which is exactly the gap that pure
     imitation leaves. The alternative I would reject is continuous trajectory
     regression: it is simpler, but it gives one target per scene and no ranking, so
     the model never learns why the alternatives were worse. The trade-off I accept is
-    resolution — the vocabulary bounds what I can express, so I would size it from
+ resolution, the vocabulary bounds what I can express, so I would size it from
     clustered real trajectories and check the residual error against the human path.
     I like this design for a supplier because the per-criterion scores are inspectable
     and the combination weights can be retuned by the OEM at deployment without
@@ -182,7 +182,7 @@ Li et al., "Generalized Trajectory Scoring for End-to-end Multimodal Planning"
 
 ### 3.2 Cosmos: world foundation models as a data platform
 
-**The problem.** Physical AI — driving, robotics — is bottlenecked on data for exactly
+**The problem.** Physical AI (driving, robotics) is bottlenecked on data for exactly
 the situations that matter: rare, dangerous, or expensive to stage. Hand-built
 simulators have a sim-to-real gap in appearance and behaviour. A generic video
 generator makes pretty video with implausible physics and no way to condition on the
@@ -191,11 +191,11 @@ action you care about.
 **The approach.** The Cosmos World Foundation Model Platform packages: a **video
 tokenizer** (continuous and discrete variants) that compresses video into latents at
 high compression while preserving reconstruction quality; two model families over
-those latents — **diffusion** WFMs (continuous latents, denoising) and
+those latents, **diffusion** WFMs (continuous latents, denoising) and
 **autoregressive** WFMs (discrete tokens, next-token prediction); a large curated video
 pre-training corpus with a described data-curation pipeline (shot detection,
 filtering, captioning, deduplication); and post-training recipes that specialise a
-pre-trained WFM into a domain model — camera-controllable navigation, robot
+pre-trained WFM into a domain model, camera-controllable navigation, robot
 manipulation conditioned on actions, and driving world models conditioned on multi-view
 video and ego trajectory. The guard rails (pre- and post-generation safety filters) are
 part of the released platform. The key framing in the paper is that the WFM is
@@ -216,7 +216,7 @@ continuous-control conditioning but cost many denoising steps per frame;
 autoregressive WFMs stream and extend naturally and reuse LLM serving infrastructure
 but inherit tokenizer artefacts and exposure bias over long rollouts. NVIDIA shipped
 both, which is the platform answer: let the developer choose. The deeper trade-off is
-generality versus fidelity — a world model good enough to *train* a policy need not be
+generality versus fidelity, a world model good enough to *train* a policy need not be
 photoreal, but a world model used to *evaluate* perception must be, and conflating the
 two is the classic mistake.
 
@@ -232,8 +232,8 @@ and the [Waymo World Model](waymo.md#33-simulation-and-closed-loop-evaluation-si
     than build a bespoke simulator, and I would say so citing NVIDIA's Cosmos platform
     paper, which explicitly positions the WFM as shared infrastructure that developers
     fine-tune into their own domain model. Concretely: take the pre-trained model, and
-    post-train it conditioned on the signals I actually control — multi-view camera and
-    ego trajectory for driving, or action vectors for manipulation — so I can generate
+ post-train it conditioned on the signals I actually control, multi-view camera and
+ ego trajectory for driving, or action vectors for manipulation, so I can generate
     counterfactual rollouts of a rare scenario instead of waiting to encounter it. On
     the architecture choice, Cosmos ships both a diffusion family and an autoregressive
     family over the same video tokenizer, and I would pick diffusion when I need
@@ -242,7 +242,7 @@ and the [Waymo World Model](waymo.md#33-simulation-and-closed-loop-evaluation-si
     cost dominates at long horizons. The alternative I would reject is a hand-built
     graphics simulator as the primary source: it is controllable but its appearance gap
     shows up precisely in the perception models I am trying to test. The trade-off to
-    name honestly is that a generated world is only as trustworthy as its physics — so
+ name is that a generated world is only as trustworthy as its physics, so
     I would use it to train policies and to stress-test, and I would validate any
     conclusion on real logs before it gates a release. My evaluation would be
     downstream: does a policy trained with synthetic rollouts beat the baseline on
@@ -264,7 +264,7 @@ processes the image and the language instruction at low frequency, and "System 1
 diffusion-transformer action head that consumes System 2's latent, the robot's
 proprioceptive state, and emits action chunks at high frequency. The two are trained
 end-to-end. The data strategy is the **data pyramid**: a broad base of web video and
-human videos (no actions — so the model learns representations and *latent* actions
+human videos (no actions, so the model learns representations and *latent* actions
 inferred by a learned inverse-dynamics-style model), a middle layer of synthetic
 trajectories generated in simulation and by neural video generation, and a narrow apex
 of real robot demonstrations. Action spaces differ per embodiment, so embodiment-specific
@@ -278,13 +278,13 @@ to trajectories rather than pixels; the imitation setting and its compounding-er
 failure mode is [Imitation learning](../part12-rl/05-imitation-learning.md); the
 latent-action idea is a form of weak supervision, [Weak supervision & auto-labelling](../part10-self-supervised/03-weak-supervision-and-auto-labeling.md).
 
-**The trade-off.** Splitting the model buys the right compute at the right frequency —
-you do not run a 2B-parameter VLM at 100 Hz — at the cost of a latency-coupling design
+**The trade-off.** Splitting the model buys the right compute at the right frequency, 
+you do not run a 2B-parameter VLM at 100 Hz, at the cost of a latency-coupling design
 problem (how stale may System 2's latent be before System 1 acts on the wrong scene?)
 and a harder training story than a single monolith. The data pyramid buys scale at the
 cost of label quality: the base of the pyramid has *inferred* actions, so errors there
-are systematic, not random. The rejected alternative — training only on real robot
-demonstrations — is clean but cannot reach the data scale that makes foundation models
+are systematic, not random. The rejected alternative, training only on real robot
+demonstrations, is clean but cannot reach the data scale that makes foundation models
 work.
 
 **Sources.** NVIDIA, "GR00T N1: An Open Foundation Model for Generalist Humanoid
@@ -299,7 +299,7 @@ Compare Google DeepMind's Gemini Robotics ([arXiv:2503.20020](https://arxiv.org/
     is the design NVIDIA's GR00T N1 paper describes: a vision-language model that reads
     the scene and the instruction at low rate, and a diffusion-transformer action head
     that takes that latent plus proprioception and emits action chunks at control
-    rate. The reason is a compute argument, not an elegance argument — you cannot run
+ rate. The reason is a compute argument, not an elegance argument, you cannot run
     a multi-billion-parameter VLM in the control loop, and you do not need to, because
     the semantic content of a scene changes far more slowly than the arm does. For
     data I would copy the same paper's pyramid: internet and human video at the base
@@ -307,18 +307,18 @@ Compare Google DeepMind's Gemini Robotics ([arXiv:2503.20020](https://arxiv.org/
     trajectories in the middle, real teleoperated demonstrations at the apex. The
     alternative I would reject is training only on real demonstrations; it is the
     highest-quality data and there will never be enough of it. The trade-off I would
-    watch is systematic error from the inferred actions at the base of the pyramid —
+ watch is systematic error from the inferred actions at the base of the pyramid, 
     it is correlated, so it will not average out, and I would hold a real-demo
     validation set that the pyramid never touches. On evaluation, I would report
-    success rate under distribution shift — new objects, new lighting, a new
-    embodiment — and interventions per hour, and I would be explicit that a
+ success rate under distribution shift, new objects, new lighting, a new
+ embodiment, and interventions per hour, and I would be explicit that a
     latency-coupling bug between the two systems shows up as failures on *moving*
     objects specifically, so that gets its own slice."
 
 ### 3.4 Alpamayo-R1: reasoning for the long tail, distilled for the car
 
 **The problem.** The scenarios that cause AV disengagements are rare and require
-*explanation* — a cyclist's hand signal, a police officer waving traffic through a red
+*explanation*, a cyclist's hand signal, a police officer waving traffic through a red
 light, a truck reversing out of a driveway. A trajectory regressor has no mechanism for
 this; a reasoning model has the mechanism but not the latency budget.
 
@@ -342,7 +342,7 @@ such models are trained; [VLM architecture](../part08-multimodal/04-vlm-architec
 **The trade-off.** Reasoning buys long-tail competence and an inspectable rationale
 (valuable to a partner's safety team) at a compute cost that rules it out of the
 control loop today. Distillation recovers the speed but generally loses the
-rationale's faithfulness — the student can learn to produce the *conclusion* without
+rationale's faithfulness, the student can learn to produce the *conclusion* without
 the reasoning that justified it, which is a known hazard whenever chain-of-thought is
 distilled.
 
@@ -360,13 +360,13 @@ Generalizable Autonomous Driving in the Long Tail"
     mine the long-tail clips, have the reasoning model produce both a rationale and a
     trajectory, use those as supervision for the onboard model, and keep the rationale
     as an auxiliary target so the student has some pressure to encode *why*. The
-    alternative I would reject is putting the reasoning model in the car — the compute
+ alternative I would reject is putting the reasoning model in the car, the compute
     is not there, and a variable-latency component in a control loop is its own safety
     problem. The trade-off I would name out loud is faithfulness: a distilled student
     can reproduce the conclusion without the reasoning, so the rationale it emits is
     not evidence, and I would not let a safety argument lean on it. I would evaluate on
-    a curated long-tail scenario set — the kind Waymo's WOD-E2E release defines at
-    roughly the 0.03%-frequency level — and measure whether the distilled student
+ a curated long-tail scenario set, the kind Waymo's WOD-E2E release defines at
+ roughly the 0.03%-frequency level, and measure whether the distilled student
     closes the gap to the teacher specifically on those slices, not on average."
 
 ### 3.5 Inference systems: TensorRT-LLM, Dynamo, and where the milliseconds go
@@ -385,14 +385,14 @@ vLLM's PagedAttention, [arXiv:2309.06180](https://arxiv.org/abs/2309.06180));
 **quantization** to FP8 and FP4 on Hopper/Blackwell for both weights and KV cache;
 **speculative decoding** ([arXiv:2211.17192](https://arxiv.org/abs/2211.17192)) to
 amortise the memory-bound decode step over several tokens; and, in Dynamo,
-**disaggregated serving** — running prefill and decode on separate GPU pools sized
+**disaggregated serving**, running prefill and decode on separate GPU pools sized
 independently, with the KV cache transferred between them.
 
 The arithmetic you should be able to do at a whiteboard is in
 [Hardware, memory & roofline](../part14-systems/04-hardware-memory-roofline.md) and
 [Inference systems](../part14-systems/03-inference-systems.md): for decode, time per
 token $\approx (\text{bytes of weights} + \text{bytes of KV read}) / \text{HBM bandwidth}$,
-so batching increases throughput almost for free until the KV cache exhausts memory —
+so batching increases throughput almost for free until the KV cache exhausts memory, 
 which is why paging and KV quantization buy throughput directly. Quantization theory is
 [Quantization](../part06-llm-training/05-quantization.md); attention and cache
 structure is [Efficient attention & KV cache](../part06-llm-training/04-efficient-attention-kv-cache.md).
@@ -413,12 +413,12 @@ Leviathan et al., speculative decoding ([arXiv:2211.17192](https://arxiv.org/abs
     "I would start by separating the two phases, because they are bound by different
     resources: prefill is compute-bound and decode is memory-bandwidth-bound, so a
     single batching policy is always leaving one of them idle. My first three moves
-    would be in-flight batching, a paged KV cache, and FP8 weights and KV — the paged
+ would be in-flight batching, a paged KV cache, and FP8 weights and KV, the paged
     cache because fragmentation, not raw memory, is usually what caps batch size,
     which is the argument the vLLM PagedAttention paper makes and which TensorRT-LLM
     implements. Only then would I consider disaggregated prefill and decode the way
     NVIDIA's Dynamo does it, because that buys independent scaling of the two pools at
-    the cost of moving the KV cache across the network on the critical path — worth it
+ the cost of moving the KV cache across the network on the critical path, worth it
     at scale and with long prompts, not worth it for a small deployment. I would add
     speculative decoding where the workload has a cheap draft model available, since
     it converts a bandwidth-bound step into a compute-bound one. The trade-off I would
@@ -444,7 +444,7 @@ bubble), data parallelism, and sequence/context parallelism for long contexts, t
 the 4-D parallelism vocabulary interviews use. Nemotron-4 340B is NVIDIA's own model
 family; the report is notable less for the architecture than for the **synthetic data
 generation** pipeline (over 98% of the alignment data was synthetically generated
-according to the report) and for releasing the reward model used to filter it — the
+according to the report) and for releasing the reward model used to filter it, the
 closest thing to a public recipe for the data-engine step that
 [Scale AI's business](scale-ai-data-engines.md) sells as a service. Llama-Nemotron
 ([arXiv:2505.00949](https://arxiv.org/abs/2505.00949)) continued the line with
@@ -478,12 +478,12 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
     where NVLink bandwidth is high; pipeline parallelism communicates only activations
     at stage boundaries, so it crosses nodes; data parallelism wraps the outside; and
     I would add sequence or context parallelism only when activation memory for long
-    contexts is what is actually binding. Doing this backwards — tensor parallel across
-    slow links — is the classic way to burn half a cluster. Once training scales, my
+ contexts is what is actually binding. Doing this backwards, tensor parallel across
+ slow links, is the classic way to burn half a cluster. Once training scales, my
     attention shifts to data, and here I would follow NVIDIA's Nemotron-4 340B report,
     which describes generating the overwhelming majority of its alignment data
-    synthetically and releasing the reward model used to filter it. The alternative —
-    buying all alignment data from human annotators — does not scale to the volumes
+ synthetically and releasing the reward model used to filter it. The alternative, 
+ buying all alignment data from human annotators, does not scale to the volumes
     modern post-training needs. The trade-off is a closed loop: a model grading its own
     synthetic data amplifies its own biases, so I would keep a human-labelled gold set
     that the generator never sees and track the divergence between reward-model scores
@@ -534,14 +534,14 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
         hand-building the world each time. I would condition on ego trajectory and
         multi-view camera so the scenario is controllable. Before I trusted any result
         I would calibrate the generator: regenerate near-duplicates of real logs and
-        check that perception metrics on them match the real ones — if they do not, the
+ check that perception metrics on them match the real ones, if they do not, the
         gap is my error bar. The trade-off is that generated physics is not evidence, so
         this informs triage and training but does not gate a safety claim."
 
 !!! interview "Q3. Why split a robot policy into System 1 and System 2? What breaks if you do not?"
     **Answer sketch.** Frequency mismatch: semantics change slowly, control must be
     fast. A monolith either runs the VLM too often (compute infeasible) or the
-    controller too rarely (jerky, unsafe). Splitting introduces staleness coupling —
+ controller too rarely (jerky, unsafe). Splitting introduces staleness coupling, 
     quantify the maximum age of the System 2 latent given object speed. Failure slice:
     moving objects. Link: [Imitation learning](../part12-rl/05-imitation-learning.md).
 
@@ -586,7 +586,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
 
     !!! tip "How to say it in the interview"
         "With 100k-token prompts and short outputs this is a prefill-bound workload, so
-        I would size for prefill and treat decode as an afterthought — the opposite of
+ I would size for prefill and treat decode as an afterthought, the opposite of
         the default chat deployment. Concretely: chunked prefill so a long prompt does
         not block the queue, prefix caching if prompts share a large system preamble,
         a paged KV cache with FP8 KV because cache memory scales linearly with context
@@ -597,9 +597,9 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
 
 !!! interview "Q6. Tensor parallel across nodes or pipeline parallel across nodes? Justify with communication volume."
     **Answer sketch.** Tensor parallelism: two all-reduces per layer per direction, each
-    moving activations of size $B \times T \times d$ — high frequency, so it needs
+ moving activations of size $B \times T \times d$, high frequency, so it needs
     intra-node NVLink. Pipeline: one point-to-point send of the stage boundary
-    activation per micro-batch — low volume, tolerant of slower links, but introduces
+ activation per micro-batch, low volume, tolerant of slower links, but introduces
     bubbles mitigated by interleaved schedules. Answer: tensor inside the node, pipeline
     across nodes, data parallel outermost. Link:
     [Distributed training](../part14-systems/01-distributed-training.md).
@@ -619,7 +619,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
     **Answer sketch.** Wins on appearance realism, diversity and the cost of authoring
     content; loses on exact controllability, ground-truth availability (a renderer knows
     the depth; a generator does not), physical guarantees, and determinism for
-    regression testing. Practical answer: hybrid — renderer for geometry-exact
+ regression testing. Practical answer: hybrid, renderer for geometry-exact
     regression, WFM for appearance diversity and rare-event synthesis.
 
     !!! tip "How to say it in the interview"
@@ -649,7 +649,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
         human trajectory; the metric heads are per-candidate binary cross-entropy against
         the simulator's scores, which is the Hydra-MDP formulation. My test would be
         behavioural, not numerical: with the collision weight turned up, a candidate
-        labelled colliding must never be selected — that catches sign errors and
+ labelled colliding must never be selected, that catches sign errors and
         broadcasting bugs at once."
 
 !!! interview "Q9. A partner reports that FP8 quantization dropped accuracy on their task. Debug it."
@@ -664,7 +664,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
     !!! tip "How to say it in the interview"
         "First I would check the eval has the power to see the difference, because a
         one-point drop on a small benchmark is often noise. Then I would bisect by
-        tensor type — weights, activations, KV cache — and by layer, since FP8 failures
+ tensor type (weights, activations, KV cache) and by layer, since FP8 failures
         are usually a handful of activation-outlier channels rather than a global
         problem. The fixes in order of cost: per-channel rather than per-tensor scales,
         recalibrate on in-domain data rather than a generic corpus, keep the offending
@@ -684,7 +684,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
         "A platform model is designed to be post-trained by someone whose task I cannot
         see, so I optimise for transferability, clean conditioning interfaces and
         documented limits rather than a single benchmark. That is visible in how NVIDIA
-        ships Cosmos and GR00T N1 — weights, code, datasets and post-training recipes,
+ ships Cosmos and GR00T N1, weights, code, datasets and post-training recipes,
         with guard rails in the platform, because the vendor does not control the
         downstream use. A product model can overfit its distribution and its hardware,
         and should. The trade-off is that platform generality costs peak performance on
@@ -695,7 +695,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
     **Answer sketch.** Split responsibility: platform-level certification (ASIL-D
     capable SoC, safety-certified OS, cybersecurity milestones on Hyperion), reference
     architectures and blueprints (Halos), documented model limitations and evaluation
-    harnesses — while the OEM owns the vehicle-level safety case (compare
+ harnesses, while the OEM owns the vehicle-level safety case (compare
     [Aurora's claims-and-evidence structure](zoox-nuro-aurora.md#36-aurora-verifiable-ai-and-the-safety-case-framework)).
     Mark as inference anything about a specific partner's process.
 
@@ -705,7 +705,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
         safety and cybersecurity milestone announcements describe, plus reference
         architectures and open blueprints like Halos, plus models shipped with their
         limitations and an evaluation harness. The vehicle-level safety case belongs to
-        the OEM — that division is structural to a supplier business, and I would not
+ the OEM, that division is structural to a supplier business, and I would not
         claim more. The trade-off is that I must make my components *arguable*: if a
         partner cannot attach evidence to my planner's decisions, they cannot certify
         the vehicle, which is a concrete reason to prefer the inspectable trajectory-
@@ -723,7 +723,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
         "I would compute it from the tokenizer outwards, because the compression ratio
         sets everything: tokens per second of video times hours times epochs gives the
         token budget, and then it is the same scaling arithmetic as an LLM. That is why
-        the Cosmos platform paper puts so much weight on the tokenizer — compression is
+ the Cosmos platform paper puts so much weight on the tokenizer, compression is
         the cost lever. I would also budget for the parts people forget: video decoding
         throughput in the data loader, which is frequently the real bottleneck, and
         evaluation rollouts, which are expensive for diffusion models. The trade-off is
@@ -756,7 +756,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
   scoring consumes those features. Be ready to discuss how perception error propagates
   into planner scores.
 * **Inference optimisation** is the single highest-leverage story for an NVIDIA loop.
-  Quantization, batching, latency budgets, kernel-level thinking — if you have shipped
+ Quantization, batching, latency budgets, kernel-level thinking, if you have shipped
   an OCR or detection model under a latency SLO, translate it into roofline terms
   (bandwidth-bound versus compute-bound) and be ready to defend the numbers.
 * **Large-scale data pipelines**: Cosmos and GR00T are both, at bottom, data-curation
@@ -765,7 +765,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
 * **Multi-task model design** (one backbone, many heads, a fixed compute budget) is the
   shared structure of DriveWorks-era perception and of GR00T's dual system.
 * **Platform thinking**: if you have ever shipped a model other teams consumed, frame
-  it that way — versioning, documented limitations, evaluation harnesses, backwards
+ it that way, versioning, documented limitations, evaluation harnesses, backwards
   compatibility. That is the difference between a product engineer and a platform
   engineer, and NVIDIA hires for the latter.
 
@@ -773,17 +773,17 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
 
 **Papers**
 
-* Li et al., "Hydra-MDP: End-to-end Multimodal Planning with Multi-target Hydra-Distillation" (2024) — [arXiv:2406.06978](https://arxiv.org/abs/2406.06978)
-* Li et al., "Generalized Trajectory Scoring for End-to-end Multimodal Planning" (2025) — [arXiv:2506.06664](https://arxiv.org/abs/2506.06664)
-* NVIDIA, "Cosmos World Foundation Model Platform for Physical AI" (2025) — [arXiv:2501.03575](https://arxiv.org/abs/2501.03575)
-* NVIDIA, "GR00T N1: An Open Foundation Model for Generalist Humanoid Robots" (2025) — [arXiv:2503.14734](https://arxiv.org/abs/2503.14734)
-* NVIDIA, "Alpamayo-R1: Bridging Reasoning and Action Prediction for Generalizable Autonomous Driving in the Long Tail" (2025) — [arXiv:2511.00088](https://arxiv.org/abs/2511.00088)
-* Shoeybi et al., "Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism" (2019) — [arXiv:1909.08053](https://arxiv.org/abs/1909.08053)
-* NVIDIA, "Nemotron-4 340B Technical Report" (2024) — [arXiv:2406.11704](https://arxiv.org/abs/2406.11704)
-* NVIDIA, "Llama-Nemotron: Efficient Reasoning Models" (2025) — [arXiv:2505.00949](https://arxiv.org/abs/2505.00949)
-* Xie et al., "M²BEV: Multi-Camera Joint 3D Detection and Segmentation with Unified Bird's-Eye View Representation" (NVIDIA, 2022) — [arXiv:2204.05088](https://arxiv.org/abs/2204.05088)
-* Kwon et al., "Efficient Memory Management for Large Language Model Serving with PagedAttention" (SOSP 2023) — [arXiv:2309.06180](https://arxiv.org/abs/2309.06180)
-* Leviathan et al., "Fast Inference from Transformers via Speculative Decoding" (ICML 2023) — [arXiv:2211.17192](https://arxiv.org/abs/2211.17192)
+* Li et al., "Hydra-MDP: End-to-end Multimodal Planning with Multi-target Hydra-Distillation" (2024). [arXiv:2406.06978](https://arxiv.org/abs/2406.06978)
+* Li et al., "Generalized Trajectory Scoring for End-to-end Multimodal Planning" (2025). [arXiv:2506.06664](https://arxiv.org/abs/2506.06664)
+* NVIDIA, "Cosmos World Foundation Model Platform for Physical AI" (2025). [arXiv:2501.03575](https://arxiv.org/abs/2501.03575)
+* NVIDIA, "GR00T N1: An Open Foundation Model for Generalist Humanoid Robots" (2025). [arXiv:2503.14734](https://arxiv.org/abs/2503.14734)
+* NVIDIA, "Alpamayo-R1: Bridging Reasoning and Action Prediction for Generalizable Autonomous Driving in the Long Tail" (2025). [arXiv:2511.00088](https://arxiv.org/abs/2511.00088)
+* Shoeybi et al., "Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism" (2019). [arXiv:1909.08053](https://arxiv.org/abs/1909.08053)
+* NVIDIA, "Nemotron-4 340B Technical Report" (2024). [arXiv:2406.11704](https://arxiv.org/abs/2406.11704)
+* NVIDIA, "Llama-Nemotron: Efficient Reasoning Models" (2025). [arXiv:2505.00949](https://arxiv.org/abs/2505.00949)
+* Xie et al., "M²BEV: Multi-Camera Joint 3D Detection and Segmentation with Unified Bird's-Eye View Representation" (NVIDIA, 2022). [arXiv:2204.05088](https://arxiv.org/abs/2204.05088)
+* Kwon et al., "Efficient Memory Management for Large Language Model Serving with PagedAttention" (SOSP 2023). [arXiv:2309.06180](https://arxiv.org/abs/2309.06180)
+* Leviathan et al., "Fast Inference from Transformers via Speculative Decoding" (ICML 2023). [arXiv:2211.17192](https://arxiv.org/abs/2211.17192)
 
 **Code, models and datasets**
 
@@ -795,14 +795,14 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
 
 **Product and platform documentation**
 
-* DRIVE AGX platform — [developer.nvidia.com/drive/agx](https://developer.nvidia.com/drive/agx) · DriveWorks — [developer.nvidia.com/drive/driveworks](https://developer.nvidia.com/drive/driveworks) · DRIVE Sim — [developer.nvidia.com/drive/drive-sim](https://developer.nvidia.com/drive/drive-sim)
-* "Introducing NVIDIA Jetson Thor, the Ultimate Platform for Physical AI" — [developer.nvidia.com/blog/…](https://developer.nvidia.com/blog/introducing-nvidia-jetson-thor-the-ultimate-platform-for-physical-ai/)
-* "Simplify LLM Deployment and AI Inference with a Unified NVIDIA NIM Workflow" — [developer.nvidia.com/blog/…](https://developer.nvidia.com/blog/simplify-llm-deployment-and-ai-inference-with-unified-nvidia-nim-workflow/)
-* NVIDIA automotive research at CVPR 2024 — [blogs.nvidia.com/blog/auto-research-cvpr-2024/](https://blogs.nvidia.com/blog/auto-research-cvpr-2024/)
-* Global DRIVE Hyperion ecosystem — [blogs.nvidia.com/blog/global-drive-hyperion-ecosystem-full-autonomy/](https://blogs.nvidia.com/blog/global-drive-hyperion-ecosystem-full-autonomy/)
-* "NVIDIA DRIVE Hyperion Platform Achieves Critical Automotive Safety and Cybersecurity Milestones for AV Development" — [nvidianews.nvidia.com/news/…](https://nvidianews.nvidia.com/news/nvidia-drive-hyperion-platform-achieves-critical-automotive-safety-and-cybersecurity-milestones-for-av-development)
+* DRIVE AGX platform. [developer.nvidia.com/drive/agx](https://developer.nvidia.com/drive/agx) · DriveWorks. [developer.nvidia.com/drive/driveworks](https://developer.nvidia.com/drive/driveworks) · DRIVE Sim. [developer.nvidia.com/drive/drive-sim](https://developer.nvidia.com/drive/drive-sim)
+* "Introducing NVIDIA Jetson Thor, the Ultimate Platform for Physical AI". [developer.nvidia.com/blog/…](https://developer.nvidia.com/blog/introducing-nvidia-jetson-thor-the-ultimate-platform-for-physical-ai/)
+* "Simplify LLM Deployment and AI Inference with a Unified NVIDIA NIM Workflow". [developer.nvidia.com/blog/…](https://developer.nvidia.com/blog/simplify-llm-deployment-and-ai-inference-with-unified-nvidia-nim-workflow/)
+* NVIDIA automotive research at CVPR 2024. [blogs.nvidia.com/blog/auto-research-cvpr-2024/](https://blogs.nvidia.com/blog/auto-research-cvpr-2024/)
+* Global DRIVE Hyperion ecosystem. [blogs.nvidia.com/blog/global-drive-hyperion-ecosystem-full-autonomy/](https://blogs.nvidia.com/blog/global-drive-hyperion-ecosystem-full-autonomy/)
+* "NVIDIA DRIVE Hyperion Platform Achieves Critical Automotive Safety and Cybersecurity Milestones for AV Development". [nvidianews.nvidia.com/news/…](https://nvidianews.nvidia.com/news/nvidia-drive-hyperion-platform-achieves-critical-automotive-safety-and-cybersecurity-milestones-for-av-development)
 
 **Comparison points used in this chapter**
 
-* Google DeepMind, "Genie 3: A new frontier for world models" — [deepmind.google/blog/genie-3-a-new-frontier-for-world-models/](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/)
-* Google DeepMind, "Gemini Robotics: Bringing AI into the Physical World" — [arXiv:2503.20020](https://arxiv.org/abs/2503.20020)
+* Google DeepMind, "Genie 3: A new frontier for world models". [deepmind.google/blog/genie-3-a-new-frontier-for-world-models/](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/)
+* Google DeepMind, "Gemini Robotics: Bringing AI into the Physical World". [arXiv:2503.20020](https://arxiv.org/abs/2503.20020)

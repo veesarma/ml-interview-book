@@ -3,20 +3,20 @@
 > **Why this matters at staff level.** Tesla is the best-documented vision-only autonomy
 > programme in the world: two AI Days, two CVPR workshop keynotes, a Hot Chips talk and
 > shareholder letters lay out the stack from cameras to chips. Interviewers there ask
-> about *their* problems — eight cameras into one 3D model, a fleet-scale data engine,
-> occupancy instead of boxes, end-to-end driving, training on video at exaflop scale —
+> about *their* problems, eight cameras into one 3D model, a fleet-scale data engine,
+> occupancy instead of boxes, end-to-end driving, training on video at exaflop scale, 
 > and strong signal is knowing which of those choices were forced by the constraints
 > (no lidar, no HD map, a fixed in-car compute budget, millions of cars) and what each
 > choice gave up.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - **The bet**: cameras only, no HD maps, learned everything, fleet as the data source. Every design choice below follows from those constraints and from a fixed on-car compute budget (the FSD computer).
 - **Perception lineage (public)**: per-camera CNN features → transformer fusion into a bird's-eye "vector space" (AI Day 2021) → volumetric **occupancy + flow** replacing per-object 3D boxes (CVPR'22 WAD, AI Day 2022) → **end-to-end** network from video to control in FSD V12 (Q4 2023 shareholder letter).
 - **The data engine**: fleet triggers (the AI Day 2021 slides show a catalogue of 221 triggers) → clip upload → **offline auto-labelling** by multi-trip 4D reconstruction and large offline models → targeted retraining → shadow mode → OTA. Iteration speed of this loop is the moat, not any one model.
 - **Occupancy** = predict $o \in [0,1]$ and flow $f \in \R^3$ per voxel from cameras; it handles arbitrary shapes and overhangs that box detectors cannot represent, at the cost of memory scaling with the voxel grid.
 - **Lanes as language**: AI Day 2022 decodes the lane graph autoregressively as tokens, because lanes are a graph with topology, not a segmentation mask.
-- **Dojo**: a custom training chip (D1) and tile, presented at AI Day 2021 and Hot Chips 34, motivated by video-heavy training; press reports in August 2025 say the team was wound down — the durable lesson is the trade-off analysis, not the product.
+- **Dojo**: a custom training chip (D1) and tile, presented at AI Day 2021 and Hot Chips 34, motivated by video-heavy training; press reports in August 2025 say the team was wound down, the durable lesson is the trade-off analysis, not the product.
 - **Optimus**: the humanoid reuses the FSD computer and vision stack (AI Day 2022); the ML story is imitation from teleoperation plus the same data-engine reflexes.
 - **Evaluation vocabulary**: interventions per mile, shadow-mode disagreement, scenario-sliced regression, and the caveats of Tesla's own Vehicle Safety Report (exposure bias: Autopilot miles are mostly highway miles).
 
@@ -660,28 +660,28 @@ sim-to-real.
 
 **Talks and events**
 
-* Tesla AI Day 2021 — [youtube.com/watch?v=j0z4FweCy4M](https://www.youtube.com/watch?v=j0z4FweCy4M)
-* Tesla AI Day 2022 — [youtube.com/watch?v=ODSJsviD_SU](https://www.youtube.com/watch?v=ODSJsviD_SU)
-* Tesla Autonomy Day 2019 — [youtube.com/watch?v=Ucp0TTmvqOE](https://www.youtube.com/watch?v=Ucp0TTmvqOE)
-* Andrej Karpathy, CVPR 2021 Workshop on Autonomous Driving keynote — [youtube.com/watch?v=g6bOwQdCJrc](https://www.youtube.com/watch?v=g6bOwQdCJrc)
-* Ashok Elluswamy, CVPR 2022 Workshop on Autonomous Driving keynote (occupancy networks) — [youtube.com/watch?v=jPCV4GKX9Dw](https://www.youtube.com/watch?v=jPCV4GKX9Dw)
-* Tesla Optimus Gen 2 video (December 2023) — [youtube.com/watch?v=cpraXaw7dyc](https://www.youtube.com/watch?v=cpraXaw7dyc)
+* Tesla AI Day 2021. [youtube.com/watch?v=j0z4FweCy4M](https://www.youtube.com/watch?v=j0z4FweCy4M)
+* Tesla AI Day 2022. [youtube.com/watch?v=ODSJsviD_SU](https://www.youtube.com/watch?v=ODSJsviD_SU)
+* Tesla Autonomy Day 2019. [youtube.com/watch?v=Ucp0TTmvqOE](https://www.youtube.com/watch?v=Ucp0TTmvqOE)
+* Andrej Karpathy, CVPR 2021 Workshop on Autonomous Driving keynote. [youtube.com/watch?v=g6bOwQdCJrc](https://www.youtube.com/watch?v=g6bOwQdCJrc)
+* Ashok Elluswamy, CVPR 2022 Workshop on Autonomous Driving keynote (occupancy networks). [youtube.com/watch?v=jPCV4GKX9Dw](https://www.youtube.com/watch?v=jPCV4GKX9Dw)
+* Tesla Optimus Gen 2 video (December 2023). [youtube.com/watch?v=cpraXaw7dyc](https://www.youtube.com/watch?v=cpraXaw7dyc)
 * "We, Robot" event (October 2024): Tesla livestream; cited by name (URL not verified).
 
 **Hardware and infrastructure**
 
-* Hot Chips 34 (2022), "The Microarchitecture of Tesla's Exa-Scale Computer" — [PDF](https://hc34.hotchips.org/assets/program/conference/day2/Machine%20Learning/HotChips_tesla_dojo_uarch.pdf)
-* Hot Chips 34 (2022), "Super-Compute System Scaling for ML Training" (Dojo system) — [PDF](https://hc34.hotchips.org/assets/program/conference/day2/Machine%20Learning/Hotchip%20Dojo%20System%20v25.pdf)
-* Tesla, "Tesla Dojo Technology" (CFloat8/CFloat16 formats) — [PDF](https://digitalassets.tesla.com/tesla-contents/image/upload/tesla-dojo-technology.pdf)
+* Hot Chips 34 (2022), "The Microarchitecture of Tesla's Exa-Scale Computer". [PDF](https://hc34.hotchips.org/assets/program/conference/day2/Machine%20Learning/HotChips_tesla_dojo_uarch.pdf)
+* Hot Chips 34 (2022), "Super-Compute System Scaling for ML Training" (Dojo system). [PDF](https://hc34.hotchips.org/assets/program/conference/day2/Machine%20Learning/Hotchip%20Dojo%20System%20v25.pdf)
+* Tesla, "Tesla Dojo Technology" (CFloat8/CFloat16 formats). [PDF](https://digitalassets.tesla.com/tesla-contents/image/upload/tesla-dojo-technology.pdf)
 
 **Company documents**
 
-* Tesla AI & Robotics page — [tesla.com/AI](https://www.tesla.com/AI)
-* Tesla Q4 2023 Update (shareholder letter; FSD V12 described as end-to-end) — [PDF](https://digitalassets.tesla.com/tesla-contents/image/upload/IR/TSLA-Q4-2023-Update.pdf)
-* Tesla Vehicle Safety Report — [tesla.com/VehicleSafetyReport](https://www.tesla.com/VehicleSafetyReport)
+* Tesla AI & Robotics page. [tesla.com/AI](https://www.tesla.com/AI)
+* Tesla Q4 2023 Update (shareholder letter; FSD V12 described as end-to-end). [PDF](https://digitalassets.tesla.com/tesla-contents/image/upload/IR/TSLA-Q4-2023-Update.pdf)
+* Tesla Vehicle Safety Report. [tesla.com/VehicleSafetyReport](https://www.tesla.com/VehicleSafetyReport)
 * Press reports on the Dojo team (August 2025): cited by description; no single primary source.
 
 **Technique references used in this chapter**
 
-* Philion & Fidler, "Lift, Splat, Shoot" (ECCV 2020) — [arXiv:2008.05711](https://arxiv.org/abs/2008.05711)
-* Li et al., "BEVFormer" (ECCV 2022); Tian et al., "Occ3D" (NeurIPS 2023); Hu et al., "Planning-oriented Autonomous Driving (UniAD)" (CVPR 2023) — cited by title; see [Part XI](../part11-perception-autonomy/index.md) for the derivations.
+* Philion & Fidler, "Lift, Splat, Shoot" (ECCV 2020). [arXiv:2008.05711](https://arxiv.org/abs/2008.05711)
+* Li et al., "BEVFormer" (ECCV 2022); Tian et al., "Occ3D" (NeurIPS 2023); Hu et al., "Planning-oriented Autonomous Driving (UniAD)" (CVPR 2023). cited by title; see [Part XI](../part11-perception-autonomy/index.md) for the derivations.

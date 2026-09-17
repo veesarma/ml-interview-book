@@ -13,7 +13,7 @@
 > feature crosses and sparse embeddings at scale, and how the model plugs into
 > bidding and pacing.
 
-## TL;DR — the whiteboard in 60 seconds
+## TL;DR: the whiteboard in 60 seconds
 
 ```mermaid
 flowchart LR
@@ -69,7 +69,7 @@ every eligible ad with the probabilities the auction needs (click, and for
 conversion-optimised campaigns each conversion type), return them with the bid and
 pacing signals to the auction, and log everything needed to train and to bill.
 
-**Non-functional — ask for or assume.**
+**Non-functional, ask for or assume.**
 
 | Quantity | Ask | Defensible assumption |
 |---|---|---|
@@ -83,7 +83,7 @@ pacing signals to the auction, and log everything needed to train and to bill.
 **Success metrics.**
 
 - *North star*: revenue *and* advertiser value (conversions delivered per dollar,
-  cost per acquisition) — an ads system that raises short-term revenue by
+  cost per acquisition). An ads system that raises short-term revenue by
   over-charging advertisers loses them.
 - *Guardrails*: user-side (ad load, hide/report rate, session length), advertiser
   ROI by segment, calibration ratio per segment, latency, budget-pacing error.
@@ -93,11 +93,11 @@ pacing signals to the auction, and log everything needed to train and to bill.
 
 **Questions a staff engineer asks.**
 
-1. "Which bidding products do we support — CPM, CPC, oCPM/CPA? That decides which
+1. "Which bidding products do we support, CPM, CPC, oCPM/CPA? That decides which
    heads I need and which must be calibrated."
 2. "Is the auction second-price / VCG? Then over-prediction changes who wins and
    what they pay; I'll need per-advertiser calibration monitoring."
-3. "What is the conversion attribution window and how are conversions reported —
+3. "What is the conversion attribution window and how are conversions reported,
    pixel, server-to-server, app SDK? Each has a different delay distribution."
 4. "How is the id space growing? Do we have an embedding-table memory budget?"
 5. "What is our exploration policy for new ads? Without it, new ads never get
@@ -324,7 +324,7 @@ still does not fit on one host. Options, in the order to mention them:
 - *Hashing* ids into a fixed table ($2^{30}$ rows) with collisions; the collisions
   are noise the model tolerates, and the table size is a knob.
 - *Compositional embeddings* (Shi et al., KDD 2020, arXiv:1909.02107, Facebook):
-  quotient–remainder trick — two small tables indexed by $\lfloor id / m \rfloor$ and
+  quotient–remainder trick, two small tables indexed by $\lfloor id / m \rfloor$ and
   $id \bmod m$, combined by element-wise product, giving unique vectors with
   $O(\sqrt{N})$ memory.
 - *Mixed dimensions*: popular ids get 64 dims, rare ids 8.
@@ -353,7 +353,7 @@ automatic calibration and NE gate before it reaches serving.
 - *Score*: $\text{eCPM}_a = \text{bid}_a \times \hat p_{\text{CTR},a}$ for CPC; for
   conversion-optimised bidding $\text{bid}_a \times \hat p_{\text{CTR},a} \times
   \hat p_{\text{CVR},a}$ where the bid is a target cost per action; platforms add
-  user-value terms (predicted negative feedback) to the score — Meta's public
+  user-value terms (predicted negative feedback) to the score. Meta's public
   auction documentation describes the auction as ranking by a "total value" that
   combines the bid, estimated action rates and ad quality.
 - *Pricing*: generalized second price (Edelman, Ostrovsky & Schwarz, AER 2007) or
@@ -452,9 +452,9 @@ Retrain continuously; roll back automatically on a calibration breach.
 - *Auction interference in A/B*: treatment spends control's budget; use
   budget-aware designs.
 
-## 7. How real companies did it — as mock interviews
+## 7. How real companies did it: as mock interviews
 
-### 7.1 Google — "predict clicks for sponsored search, online, at scale"
+### 7.1 Google: "predict clicks for sponsored search, online, at scale"
 
 **Interviewer prompt.** "Billions of ad impressions a day, billions of sparse
 features, a model that must update as advertisers change bids and creatives, and
@@ -475,7 +475,7 @@ savings (probabilistic feature inclusion, reduced-precision weights, sharing acr
 similar models), a calibration layer, confidence estimates, and a list of things that
 did *not* help in their setting.
 
-!!! tip "How to say it in the interview — the calibration layer"
+!!! tip "How to say it in the interview: the calibration layer"
     "I'd put an explicit calibration layer between the model and the auction and
     monitor it per segment, rather than trusting logloss to keep the probabilities
     honest, because Google reported in 'Ad Click Prediction: a View from the
@@ -486,7 +486,7 @@ did *not* help in their setting.
     a separate layer is one more thing to refit when the model changes, so I'd
     refit it automatically on the latest matured window with every model push."
 
-### 7.2 Facebook — "GBDT features, LR on top, and freshness"
+### 7.2 Facebook: "GBDT features, LR on top, and freshness"
 
 **Interviewer prompt.** "Our click model is a logistic regression on hand-built
 features. Improve it without exploding serving cost, and tell me how often to
@@ -507,7 +507,7 @@ retraining), online learning for the LR, the online joiner, negative down-sampli
 with the re-calibration formula $q = p/(p + (1-p)/w)$, and that historical
 (behavioural) features dominated contextual ones.
 
-!!! tip "How to say it in the interview — down-sampling and freshness"
+!!! tip "How to say it in the interview: down-sampling and freshness"
     "I'd down-sample negatives to about a tenth and correct the output with
     $p = p'/(p' + (1-p')/w)$, which Facebook published in 'Practical Lessons from
     Predicting Clicks on Ads at Facebook' (2014); the alternative is training on
@@ -518,7 +518,7 @@ with the re-calibration formula $q = p/(p + (1-p)/w)$, and that historical
     retrofitting it. The trade-off is an online joiner whose attribution window
     becomes a correctness parameter: too short and clicks become negatives."
 
-### 7.3 Meta — "the model does not fit on one GPU"
+### 7.3 Meta: "the model does not fit on one GPU"
 
 **Interviewer prompt.** "Our ranking model has terabytes of embedding tables and a
 modest MLP. Design the model and its training system."
@@ -535,20 +535,20 @@ Personalization and Recommendation Systems" (2019, arXiv:1906.00091) describes
 DLRM's architecture and its hybrid model-parallel (embeddings) / data-parallel (MLP)
 training with all-to-all communication. Shi et al., "Compositional Embeddings Using
 Complementary Partitions for Memory-Efficient Recommendation Systems" (KDD 2020,
-arXiv:1909.02107) describes the quotient–remainder trick for shrinking tables.
+arXiv:1909.02107) describes the quotient-remainder trick for shrinking tables.
 
-!!! tip "How to say it in the interview — embedding memory"
+!!! tip "How to say it in the interview: embedding memory"
     "For the id features I'd budget the embedding memory first: ten billion ids at
     64 dimensions is a couple of terabytes, so it will not live on one device. I'd
     shard the tables model-parallel and keep the dense network data-parallel, which
     is the DLRM design Meta published in 2019, and reduce the tables with hashing
-    and the quotient–remainder compositional embeddings from their KDD 2020 paper.
+    and the quotient-remainder compositional embeddings from their KDD 2020 paper.
     The alternative is one hashed table that fits; the trade-off is collision noise
     on the rare ids that carry the most advertiser-specific signal. I'd flip back to
     a single hashed table only for a pre-ranker, where the accuracy loss is
     acceptable."
 
-### 7.4 Criteo and Twitter — "conversions arrive a week late"
+### 7.4 Criteo and Twitter: "conversions arrive a week late"
 
 **Interviewer prompt.** "We bid on conversions. Conversions are attributed up to
 seven days after the click. Our model retrains hourly and keeps under-predicting on
@@ -568,19 +568,19 @@ Neural Networks in CTR prediction" (RecSys 2019) compares loss functions for
 continuous training under delayed feedback at Twitter, including fake-negative
 schemes with importance weighting.
 
-!!! tip "How to say it in the interview — delayed feedback"
+!!! tip "How to say it in the interview: delayed feedback"
     "I would not treat 'no conversion yet' as a negative. If the trainer can hold
     examples, I'd fit conversion probability and conversion delay jointly, as
     Chapelle did in 'Modeling Delayed Feedback in Display Advertising' (KDD 2014),
     so that a two-hour-old click contributes 'probably not converted yet' rather
     than 'no'. If the trainer is fully streaming, I'd use the fake-negative scheme
     with importance weighting that Twitter evaluated in their RecSys 2019 paper.
-    The alternative — waiting a week for labels — costs freshness, which the
+    The alternative (waiting a week for labels) costs freshness, which the
     Facebook paper shows is worth real NE. The trade-off is that both corrections
     depend on a delay model that itself drifts, so I'd validate calibration only
     on matured labels from weeks ago."
 
-### 7.5 Alibaba — "CVR is trained on clicks but served on impressions"
+### 7.5 Alibaba: "CVR is trained on clicks but served on impressions"
 
 **Interviewer prompt.** "Our conversion model is trained on clicked impressions and
 scores every impression. It is miscalibrated on the ones that would not be clicked.
@@ -596,16 +596,16 @@ Approach for Estimating Post-Click Conversion Rate" (SIGIR 2018, arXiv:1804.0793
 introduces ESMM to address sample selection bias and data sparsity in CVR
 estimation, with results on Taobao data.
 
-!!! tip "How to say it in the interview — the CVR training space"
+!!! tip "How to say it in the interview: the CVR training space"
     "For the conversion head I'd train over the entire impression space via the
     product of the click and post-click-conversion heads, which is the ESMM design
     Alibaba published at SIGIR 2018 to fix the selection bias of training CVR only
-    on clicks. The alternative — clicked-only training — is simpler and fine when
+    on clicks. The alternative (clicked-only training) is simpler and fine when
     the auction only needs CVR for likely-clicked ads; the trade-off of ESMM is
     that the CVR head is learned indirectly, so I'd still check its calibration on
     clicked impressions directly."
 
-### 7.6 LinkedIn — "spend the budget evenly"
+### 7.6 LinkedIn: "spend the budget evenly"
 
 **Interviewer prompt.** "Advertisers give us a daily budget. Our system spends it in
 the first two hours, on the cheapest impressions. Fix it, and tell me how this
@@ -621,7 +621,7 @@ advertisements at LinkedIn" (KDD 2014) describes a pacing system that controls
 participation in auctions to spread spend across the day and reports improved
 advertiser and platform outcomes.
 
-!!! tip "How to say it in the interview — pacing literacy"
+!!! tip "How to say it in the interview: pacing literacy"
     "I'd make sure the interviewer knows I see the model as one input to a control
     loop: LinkedIn's KDD 2014 pacing paper controls each campaign's auction
     participation toward a target spend curve, which means a miscalibrated pCTR
@@ -635,7 +635,7 @@ advertiser and platform outcomes.
 !!! interview "Your new model has +0.3 % AUC and −0.2 % NE offline but revenue is flat online. Why?"
     Ranking quality improved but the auction did not change much: check the
     winner-change rate in auction replay. If winners changed and revenue is flat,
-    look at calibration per segment — a better ranker that is 5 % under-calibrated
+    look at calibration per segment: a better ranker that is 5 % under-calibrated
     lowers every eCPM and the second price with it. If calibration is fine, check
     pacing: if campaigns were already budget-constrained, a better model shifts
     *which* impressions they buy, not how much they spend, and the gain appears as
@@ -693,8 +693,8 @@ advertiser and platform outcomes.
 !!! interview "What breaks first at 10× scale?"
     Embedding tables (memory and lookup bandwidth), then the online joiner (state
     for open attribution windows grows with traffic), then the calibration
-    layer's segment count (too many segments, too few labels per segment — move to
-    a hierarchical or learned calibrator). The dense network scales by adding
+    layer's segment count: too many segments and too few labels per segment, which
+    forces a hierarchical or learned calibrator. The dense network scales by adding
     replicas.
 
 ## 9. Scaling & evolution
@@ -713,7 +713,7 @@ advertiser and platform outcomes.
 - **LLM-augmented**: creative understanding (image/text/video embeddings from
   foundation models) as features; LLM-generated creative variants that the model
   then scores; advertiser-intent understanding for targeting; none of it in the
-  50 ms path — it runs at ad-creation time and its outputs are cached as features.
+  50 ms path. It runs at ad-creation time and its outputs are cached as features.
 
 ## References
 

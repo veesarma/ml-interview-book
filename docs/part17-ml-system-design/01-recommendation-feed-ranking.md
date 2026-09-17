@@ -10,7 +10,7 @@
 > the funnel, write down the objectives, combine them into one score, and say how the
 > logged data lies to you.
 
-## TL;DR — the whiteboard in 60 seconds
+## TL;DR: the whiteboard in 60 seconds
 
 ```mermaid
 flowchart LR
@@ -74,7 +74,7 @@ list of $K$ items from a corpus, with support for multiple item types (posts, vi
 ads slots handled by [chapter 3](03-ads-ctr-prediction.md)), pagination, and
 per-request exclusions (already seen, blocked authors, policy-removed).
 
-**Non-functional — ask for or assume these numbers.**
+**Non-functional, ask for or assume these numbers.**
 
 | Quantity | Ask | A defensible assumption if not given |
 |---|---|---|
@@ -103,7 +103,7 @@ per-request exclusions (already seen, blocked authors, policy-removed).
    long-term holdout, because the short-term test rewards clickbait."
 2. "Is this a single-column infinite feed or a grid? A grid has weaker position
    effects and needs set-level diversity."
-3. "How social is it — connected graph (friends), follow graph (creators), or
+3. "How social is it, connected graph (friends), follow graph (creators), or
    unconnected (Explore/For You)? Unconnected feeds lean on content understanding
    and exploration; connected feeds have a natural candidate set."
 4. "Do we have a real-time feature pipeline, or is everything daily?"
@@ -497,13 +497,13 @@ null-rate alarm; treat a sudden change in the retrieval source mix as an inciden
   force on a sample, every rebuild.
 - *Traffic spike*: staged load-shedding (smaller k, pre-ranker-only, cached).
 
-## 7. How real companies did it — as mock interviews
+## 7. How real companies did it: as mock interviews
 
 Each case is framed as an interview: the company's business prompt, then the walk
 in the interview's order, then the script you would use to justify the decision the
 case proves.
 
-### 7.1 YouTube — "recommend from a billion-video corpus"
+### 7.1 YouTube: "recommend from a billion-video corpus"
 
 **Interviewer prompt.** "Users watch billions of hours a day. Given a user's watch
 and search history, recommend videos from a corpus of hundreds of millions on the
@@ -526,7 +526,7 @@ feature that removed the model's bias toward stale content, the choice to predic
 *held-out next watch* rather than a random held-out watch (to avoid leaking future
 information), and watch-time-weighted logistic regression for ranking.
 
-!!! tip "How to say it in the interview — retrieval as classification"
+!!! tip "How to say it in the interview: retrieval as classification"
     "For retrieval I'd train a two-tower model with a sampled softmax objective and
     serve it through approximate nearest neighbour search. The alternative is
     item-to-item collaborative filtering from co-watch counts, which is simpler and
@@ -536,12 +536,12 @@ information), and watch-time-weighted logistic regression for ranking.
     'Deep Neural Networks for YouTube Recommendations' (RecSys 2016) that framing
     candidate generation as extreme multiclass classification with sampled softmax,
     and serving it as nearest-neighbour lookup, let them recommend from a corpus of
-    millions within their latency budget — and that adding an 'example age' feature
+    millions within their latency budget. Adding an 'example age' feature
     fixed the model's bias toward old videos, which is why I'd add item age as a
     feature to the towers. I'd flip to co-engagement lists only as an extra
     candidate source, never as the only one."
 
-### 7.2 Facebook Feed — "rank posts for two billion people"
+### 7.2 Facebook Feed: "rank posts for two billion people"
 
 **Interviewer prompt.** "A user opens Facebook. There are thousands of eligible posts
 from friends, groups and pages. Rank them so that the feed is worth the user's time,
@@ -562,7 +562,7 @@ model → neural-network ranking pipeline, the prediction of multiple action
 probabilities, their combination into a single score, and the use of surveys to
 tune ranking toward posts people say are worth their time.
 
-!!! tip "How to say it in the interview — the value model"
+!!! tip "How to say it in the interview: the value model"
     "I would not train one head for 'engagement'; I'd predict each action separately
     and combine the calibrated probabilities with product-owned weights in a value
     model. The alternative is a single learned objective, which is cleaner but makes
@@ -576,7 +576,7 @@ tune ranking toward posts people say are worth their time.
     valuable. I'd add a long-term holdout, because the weights that win a two-week
     test are not always the ones that keep people a year."
 
-### 7.3 Instagram Explore — "an unconnected feed at scale"
+### 7.3 Instagram Explore: "an unconnected feed at scale"
 
 **Interviewer prompt.** "Explore shows content from accounts the user does not
 follow. Candidates come from the whole corpus. Build the ranking system and keep the
@@ -596,7 +596,7 @@ first-stage ranking, second-stage ranking, final re-ranking), two-tower retrieva
 a first-stage ranker trained to approximate the second-stage model's output so the
 expensive model runs on fewer candidates.
 
-!!! tip "How to say it in the interview — the pre-ranker"
+!!! tip "How to say it in the interview: the pre-ranker"
     "Between retrieval and the heavy ranker I'd put a pre-ranker distilled from the
     ranker, trained on the retrieval candidate distribution rather than on
     impressions. The alternative is to reuse the retrieval score for the cut, which
@@ -608,12 +608,12 @@ expensive model runs on fewer candidates.
     I'd revisit if the ranker became cheap enough to score everything the retriever
     returns."
 
-### 7.4 ByteDance / TikTok — "the corpus turns over in hours"
+### 7.4 ByteDance / TikTok: "the corpus turns over in hours"
 
 **Interviewer prompt.** "Short videos go viral in hours and die in a day. A model
 trained last night is stale by lunch. Design training so the recommender keeps up."
 
-**Walkthrough.** *Clarify*: how quickly must feedback affect ranking — minutes.
+**Walkthrough.** *Clarify*: how quickly must feedback affect ranking, minutes.
 *Metrics*: engagement with a rollback SLA. *Data*: an unbounded stream of new ids.
 *Model*: sparse embedding tables that can grow (hash without collisions, expire
 stale ids) and a dense model. *Serve*: separate training and serving parameter
@@ -626,10 +626,10 @@ collisionless embedding tables with expiry, online training with frequent
 synchronisation of sparse parameters to serving, and reports online training
 outperforming batch training in their experiments.
 
-!!! tip "How to say it in the interview — training cadence"
+!!! tip "How to say it in the interview: training cadence"
     "I'd choose daily retraining with hourly incremental updates for the ranker by
     default, and move to minute-level online training only if the interviewer tells
-    me the corpus turns over within hours. The alternative — full online learning —
+    me the corpus turns over within hours. The alternative (full online learning)
     is what ByteDance built in Monolith (2022), where sparse embeddings are
     synchronised from training to serving at minute granularity and they report
     that it beats batch training; the trade-off they accept is a system that must
@@ -639,7 +639,7 @@ outperforming batch training in their experiments.
     features instead, which give most of the freshness benefit with none of the
     training instability."
 
-### 7.5 Pinterest — "graph and sequence, and what to compute offline"
+### 7.5 Pinterest: "graph and sequence, and what to compute offline"
 
 **Interviewer prompt.** "Pins live on boards; users save pins to boards. Use that
 graph and each user's action sequence to recommend pins, at billions of nodes."
@@ -662,7 +662,7 @@ al., "PinnerFormer: Sequence Modeling for User Representation at Pinterest" (KDD
 loss over a 28-day horizon, and that this closed most of the gap between real-time and
 daily-batch user embeddings.
 
-!!! tip "How to say it in the interview — long history offline, short history online"
+!!! tip "How to say it in the interview: long history offline, short history online"
     "For the user's history I'd run a transformer over the long action sequence in
     batch, once a day, and keep only the last few dozen events real-time in the
     request path. The alternative is a fully real-time sequence model, which is
@@ -675,7 +675,7 @@ daily-batch user embeddings.
     SIM-style online search over the long history if the product were intent-heavy,
     like e-commerce, where the last hour dominates."
 
-### 7.6 Meta — "make the ranker a sequence model"
+### 7.6 Meta: "make the ranker a sequence model"
 
 **Interviewer prompt.** "Our ranking models have plateaued despite more features.
 Propose the next architecture and how you'd know it is worth its compute."
@@ -691,7 +691,7 @@ Parameter Sequential Transducers for Generative Recommendations" (ICML 2024,
 arXiv:2402.17152) introduces HSTU, reports scaling behaviour with compute, and
 reports online metric gains from deployment on Meta surfaces.
 
-!!! tip "How to say it in the interview — when to bet on the sequence model"
+!!! tip "How to say it in the interview: when to bet on the sequence model"
     "If the interviewer asks what comes after MMoE over hand-built features, my
     answer is a sequence model over the raw action stream, because Meta reported in
     'Actions Speak Louder than Words' (ICML 2024) that a transducer over user
@@ -705,15 +705,15 @@ reports online metric gains from deployment on Meta surfaces.
 ## 8. Staff-level follow-ups
 
 !!! interview "Your ranker is 2 % better on AUC offline but sessions are flat online. Why?"
-    Check, in order: (1) *where* the AUC came from — if the gain is in reordering
+    Check, in order. (1) *Where* the AUC came from: if the gain is in reordering
     items below position 20, users never see it; compute AUC restricted to the top
-    slots. (2) *Policy bias* — the offline set was logged under the old ranker; the
+    slots. (2) *Policy bias*: the offline set was logged under the old ranker; the
     new ranker's preferred items have few labels, so offline evaluation rewards
     agreement with the old one; use the exploration slice and an IPS estimate. (3)
-    *Calibration* — a better-discriminating head that is miscalibrated makes the
-    value model worse; check reliability per head. (4) *Skew* — a feature computed
+    *Calibration*: a better-discriminating head that is miscalibrated makes the
+    value model worse; check reliability per head. (4) *Skew*: a feature computed
     differently in serving; diff served-feature logs with training features. (5)
-    *Power* — a 2 % AUC gain typically translates to a sub-1 % online lift; compute
+    *Power*: a 2 % AUC gain typically translates to a sub-1 % online lift; compute
     the minimum detectable effect before calling it flat.
 
 !!! interview "How do you handle a 5× spike at a live event?"
@@ -753,23 +753,23 @@ reports online metric gains from deployment on Meta surfaces.
 !!! interview "How do you stop the feed from collapsing into one topic per user?"
     Three layers: diversity constraints in the re-ranker (per-topic and per-creator
     caps, MMR-style penalties), an exploration slice that samples outside the
-    user's estimated interests, and a metric — topic entropy per user over a week —
-    as an A/B guardrail. The feedback loop is real: without the guardrail, a
+    user's estimated interests, and a metric (topic entropy per user over a week)
+    used as an A/B guardrail. The feedback loop is real: without the guardrail, a
     ranker that maximises short-term engagement will narrow the distribution and
     the logs will confirm that narrowing was right.
 
 !!! interview "Real-time features vs online model training: which first?"
     Real-time features first. They give most of the freshness benefit (the ranker
     sees what you did a minute ago) with a stateless model that can be rolled back
-    trivially. Online training is worth it when the *item* side moves faster than
-    daily retraining can follow (short video, news); ByteDance's Monolith paper is
+    by pointing serving at the previous checkpoint. Online training is worth it
+    when the *item* side moves faster than daily retraining can follow (short video, news); ByteDance's Monolith paper is
     the evidence that the gain is real in that regime, and its parameter
     synchronisation design is the price.
 
 !!! interview "How would you evaluate a new retrieval source offline?"
-    Not by recall against logged clicks — the logs only contain what old sources
+    Not by recall against logged clicks. The logs only contain what old sources
     surfaced. Instead: (a) recall against the *ranker's* top choices over the union
-    of all sources on exploration traffic; (b) the marginal contribution — how many
+    of all sources on exploration traffic; (b) the marginal contribution: how many
     final-list items come only from the new source; (c) an online A/B where the new
     source is added to the union, measuring final-list engagement and the source's
     share of impressions.
@@ -779,7 +779,7 @@ reports online metric gains from deployment on Meta surfaces.
     value model (large negative weights, product-owned), the guardrails (prevalence,
     report rate, topic entropy), and the long-term holdout. I'd say explicitly that
     a system without a holdout cannot claim to optimise well-being, because the only
-    metric that measures it — retention — is unobservable in a two-week test.
+    metric that measures it, retention, is unobservable in a two-week test.
 
 !!! interview "What breaks first at 10× scale?"
     The feature fan-out: 10× QPS × 5k candidates × dozens of features per candidate is
@@ -787,7 +787,7 @@ reports online metric gains from deployment on Meta surfaces.
     caching close to the ranker, fewer candidates from retrieval, and packing item
     features into the ANN payload. Second is the embedding table memory, which moves
     to sharded parameter servers or multi-GPU model parallelism. Third is the
-    experimentation platform — hundreds of concurrent tests need layered
+    experimentation platform: hundreds of concurrent tests need layered
     assignment and variance reduction.
 
 ## 9. Scaling & evolution

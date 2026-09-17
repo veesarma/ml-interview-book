@@ -22,7 +22,8 @@
 - $\alpha/r$ scaling keeps the update magnitude roughly constant as you change $r$, so the
   learning rate need not be re-tuned per rank. Common: $r = 8$–64, $\alpha = 2r$.
 - Which matrices: originally $W_q, W_v$; modern practice adapts all of $q,k,v,o$ and often the
-MLP too, at lower rank, more adapted matrices at low rank beats fewer at high rank.
+  MLP too, at lower rank. Spreading the rank budget over more matrices beats concentrating it
+  in fewer.
 - Merging: $W \leftarrow W + \frac{\alpha}{r}BA$ gives a plain Linear with **zero** inference
   overhead (unlike adapters). Unmerge by subtracting. Merged models cannot be batched with
   other adapters; unmerged multi-LoRA can (S-LoRA/Punica style).
@@ -50,9 +51,9 @@ correction as a product of two thin matrices.
 Take a tiny concrete case: $W \in \R^{4\times 4}$ and $r = 1$. Then $A \in \R^{1\times4}$ (4 numbers),
 $B \in \R^{4\times 1}$ (4 numbers): 8 trainable parameters instead of 16, and the update
 $BA$ is a rank-1 outer product. Scale to $d = 4096$: $W$ has 16.8M parameters; $r = 8$ gives
-$8\times(4096+4096) = 65{,}536$, i.e. 0.4%. Because $x(BA)^\top$ is computed as $(xA^\top)B^\top$,
-project down to $r$, then up, the extra forward FLOPs are $2r(d_{in}+d_{out})$ per token,
-also negligible.
+$8\times(4096+4096) = 65{,}536$, i.e. 0.4%. The forward pass computes $x(BA)^\top$ as
+$(xA^\top)B^\top$: project down to $r$, then back up. That costs $2r(d_{in}+d_{out})$ FLOPs per
+token, the same 0.4% of the base matmul.
 
 ![LoRA structure and trainable parameter counts](../assets/figures/part06_lora_diagram.png){ width="760" }
 
@@ -86,8 +87,8 @@ $$
 \boxed{\;M_{\text{full}} \approx 16\text{–}18\,N \;+\; M_{\text{activations}}.\;}
 $$
 
-For $N = 7\times10^9$: 112–126 GB of state, before activations, two to four 80 GB GPUs with
-ZeRO sharding for a model that *infers* on one. With LoRA, only the adapter parameters
+For $N = 7\times10^9$ that is 112–126 GB of state before activations: two to four 80 GB GPUs
+with ZeRO sharding, for a model that *infers* on one. With LoRA, only the adapter parameters
 $N_{\text{LoRA}} = \sum_{\text{adapted}} r(d_{in}+d_{out})$ carry gradient and optimiser state:
 
 $$
@@ -204,7 +205,7 @@ Three controls, in order of effectiveness:
 1. **Data mixing / replay**: include 5–30% of general instruction or pretraining data in the
    fine-tuning mixture. This directly restores the missing term in the objective.
 2. **Smaller effective update**: low LR, few epochs, and parameter-efficient methods. LoRA's
-rank-$r$ constraint is an implicit regulariser, it forgets less, and it also *learns*
+   rank-$r$ constraint acts as an implicit regulariser. It forgets less and it also learns
    less.
 3. **Explicit regularisation**: KL to the base model's outputs (the same term post-training
    uses; see [Part VII](../part07-post-training/03-rlhf-ppo.md)) or an L2 pull toward base
@@ -281,8 +282,8 @@ that `k_proj` is untouched, that exactly four tensors require grad, that the mod
 is *unchanged* at init, and that after a backward pass `lora_B.grad` exists while
 `base.weight.grad` is `None`.
 
-`lora_state_dict` extracts only the adapter tensors, that is the artefact you ship per
-task, kilobytes to megabytes rather than gigabytes.
+`lora_state_dict` extracts only the adapter tensors. That is the artefact you ship per task:
+kilobytes to megabytes rather than gigabytes.
 
 ### 3.3 Multi-LoRA batching
 
@@ -460,7 +461,7 @@ Activations are excluded and dominate at long sequence length; gradient checkpoi
 ## 6. Interview questions and strong answers
 
 !!! interview "Why is $B$ initialised to zero and $A$ randomly? What breaks if you swap or zero both?"
-Zero $B$ makes $\Delta W = BA = 0$, so training starts exactly at the pretrained function,
+    Zero $B$ makes $\Delta W = BA = 0$, so training starts exactly at the pretrained function,
     no initial perturbation of a model that already works. $A$ must be non-zero because
     $\partial\mathcal L/\partial B \propto xA^\top$; with both zero, both gradients vanish and you sit
     at a saddle forever. Swapping (zero $A$, random $B$) also gives $\Delta W = 0$ and does
@@ -506,8 +507,8 @@ Zero $B$ makes $\Delta W = BA = 0$, so training starts exactly at the pretrained
     attention compute per token and is harder to optimise; prompt tuning is the weakest and
     only competitive at very large scale. **Staff follow-up:** *What would make you pick
     prefix tuning?* If I must keep a single served model completely untouched and want the
-    adaptation to live purely in the KV cache, for example, swapping "personas" per request
-    with no weight changes at all.
+    adaptation to live purely in the KV cache. Swapping "personas" per request with no
+    weight changes at all is the case that fits.
 
 !!! interview "You fine-tuned on 50k support tickets; task accuracy is up 9 points but MMLU dropped 11. What happened and what do you do?"
     Catastrophic forgetting: the objective had no term for general capability, so the model
@@ -560,8 +561,8 @@ Zero $B$ makes $\Delta W = BA = 0$, so training starts exactly at the pretrained
         ```
         At $r = 16$ the loss goes to ~0 (the product of two $16\times16$ matrices spans all of
         $\R^{16\times16}$). At $r = 2$ it plateaus at the residual of the best rank-2
-        approximation, which by Eckart–Young is $\sum_{i>2}\sigma_i^2 / d^2$, compute the SVD of
-        `target` to confirm the plateau matches.
+        approximation, which by Eckart–Young is $\sum_{i>2}\sigma_i^2 / d^2$. Compute the SVD
+        of `target` to confirm the plateau matches.
 
 4. ★★ Compare the parameter counts of LoRA ($r=8$ on $q,v$), a bottleneck adapter ($r=8$,
    two per layer), prefix tuning ($n_p = 16$), and prompt tuning ($n_v = 100$) for a 32-layer,
@@ -587,11 +588,11 @@ Zero $B$ makes $\Delta W = BA = 0$, so training starts exactly at the pretrained
         memory on demand (S-LoRA's design). Batch formation: continuous batching groups
         requests regardless of adapter; the base GEMM runs once for the batch, and a
         gather-GEMM applies each row's $A_{i}, B_{i}$. Bottlenecks: (1) host-to-device PCIe
-        bandwidth when the working set of adapters exceeds resident capacity, mitigate with
-        LRU pinning of hot tenants and lower $r$; (2) the gather-GEMM's efficiency when a
+        bandwidth when the working set of adapters exceeds resident capacity; mitigate with
+        LRU pinning of hot tenants and a lower $r$. (2) The gather-GEMM's efficiency when a
         batch contains many distinct adapters, since each contributes a small, poorly-shaped
-        matmul, mitigate by scheduling requests with the same adapter into the same batch
-        when latency budget allows.
+        matmul; mitigate by scheduling requests with the same adapter into the same batch
+        when the latency budget allows.
 
 ## References
 

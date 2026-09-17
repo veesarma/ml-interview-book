@@ -16,7 +16,7 @@
 - Softmax Jacobian $\partial a_i/\partial s_j = a_i(\delta_{ij} - a_j)$; with cross-entropy, $\nabla_s L = a - y$.
 - Attention backward: $dV = A^\top dY$, $dA = dY V^\top$, $dS = A\odot(dA - \mathrm{rowsum}(dA\odot A))$, $dQ = dS\,K/\sqrt{d_k}$, $dK = dS^\top Q/\sqrt{d_k}$. The rowsum equals $\mathrm{rowsum}(dY \odot Y)$, the trick FlashAttention's backward uses to avoid storing $A$.
 - Taylor: $f(x+\delta) \approx f + g^\top\delta + \tfrac12\delta^\top H\delta$. Gradient step minimises the linear term under a step-size penalty; Newton step $-H^{-1}g$ minimises the quadratic.
-- Lagrange: $\nabla f = \lambda\nabla g$ at a constrained optimum; PCA and max-entropy softmax both fall out of it.
+- Lagrange: $\nabla f = \lambda\nabla g$ at a constrained optimum. Setting up that stationarity condition is how you derive PCA and how you derive the softmax as a max-entropy distribution.
 - Gradient check: central difference, $\epsilon \approx 10^{-6}$ in float64, relative error $< 10^{-6}$ good, $> 10^{-3}$ a bug. Never check in float16.
 - In production: PyTorch/JAX reverse-mode autograd; FlashAttention's recomputation-based backward; loss scaling in mixed precision because fp16 gradients underflow.
 
@@ -242,8 +242,8 @@ def relative_error(a: np.ndarray, b: np.ndarray) -> float:
 ```
 
 `nditer` with `multi_index` walks every entry of an arbitrary-shaped array, so the same checker works
-for vectors, weight matrices and 4-D tensors; the gradient is built in the shape of `x`. The cast to
-float64 is not optional.
+for vectors, weight matrices and 4-D tensors; the gradient is built in the shape of `x`. Cast to
+float64 or the check is meaningless: in float32 the round-off floor sits above the error you are measuring.
 
 The two closed-form gradients and the softmax VJP:
 
@@ -262,8 +262,8 @@ def softmax_backward(dA: np.ndarray, A: np.ndarray) -> np.ndarray:
     return A * (dA - inner)  # (..., n)
 ```
 
-`keepdims=True` keeps the row sums as a $(T, 1)$ column so they broadcast back across each row — drop it
-and NumPy will broadcast a $(T,)$ vector across *columns*, a silent wrong answer that the gradient check catches.
+`keepdims=True` keeps the row sums as a $(T, 1)$ column so they broadcast back across each row. Drop it
+and NumPy broadcasts a $(T,)$ vector across *columns* instead, a silent wrong answer that the gradient check catches.
 
 Attention forward with a cache and the backward pass, line for line the boxed formulas:
 
@@ -294,12 +294,12 @@ prevents overflow. The cache holds $A$; the FlashAttention variant would hold on
 recompute.
 
 **How you'd test it.** Three independent references: (1) `numerical_gradient` on the scalar
-$L = \langle dY, Y(Q)\rangle$ — this is the check you can run anywhere; (2) `torch.autograd` on the same
+$L = \langle dY, Y(Q)\rangle$, which you can run anywhere; (2) `torch.autograd` on the same
 formula; (3) `torch.nn.functional.scaled_dot_product_attention` for the forward. `softmax_backward`
 against `torch.softmax(...).backward`. `numerical_hessian` of a quadratic recovers its matrix; the
 second-order Taylor model of a quadratic is exact.
 
-??? example "Full implementation — `src/mlbook/math/calculus.py`"
+??? example "Full implementation: `src/mlbook/math/calculus.py`"
     ```python
     --8<-- "src/mlbook/math/calculus.py"
     ```
@@ -311,7 +311,7 @@ second-order Taylor model of a quadratic is exact.
 | `numerical_gradient`, `relative_error` | `src/mlbook/math/calculus.py` | 8 min together |
 | `grad_quadratic_form`, `grad_linear_least_squares` | `src/mlbook/math/calculus.py` | 3 min together |
 | `softmax_backward` | `src/mlbook/math/calculus.py` | 4 min |
-| `attention_forward`, `attention_backward` | `src/mlbook/math/calculus.py` | 12 min together — the single most-asked derivation |
+| `attention_forward`, `attention_backward` | `src/mlbook/math/calculus.py` | 12 min together; the single most-asked derivation |
 
 Fine to just read: `numerical_jacobian`, `numerical_hessian`, `taylor_second_order`.
 
@@ -326,7 +326,7 @@ pytest tests/test_math_calculus.py -k "numerical_gradient or relative_error or g
 ## 4. Systems view: cost, failure modes, trade-offs
 
 **Cost.** For a linear layer $Y = XW$ with $X: N\times d$, $W: d\times k$: forward $2Ndk$ FLOPs, backward
-$2Ndk$ for $dX = dY W^\top$ plus $2Ndk$ for $dW = X^\top dY$ — hence the "backward $\approx 2\times$ forward"
+$2Ndk$ for $dX = dY W^\top$ plus $2Ndk$ for $dW = X^\top dY$. Hence the "backward $\approx 2\times$ forward"
 rule and the $6ND$-FLOPs-per-token training estimate in [scaling laws](../part06-llm-training/02-scaling-laws.md).
 Memory: reverse mode must keep every activation needed by a VJP until its backward runs; for attention that
 is the $T\times T$ matrix per head unless you recompute. Activation checkpointing trades a second forward for
@@ -339,7 +339,7 @@ $O(\sqrt{L})$ stored layers ([Part XIV](../part14-systems/02-training-systems.md
   does not need it, but has only 8 mantissa bits, so accumulate reductions in fp32.
 * Saturated softmax/sigmoid: Jacobian $\to 0$; the fused softmax–cross-entropy gradient $a - y$ does not have this problem.
 * Non-differentiable points (ReLU at 0, max, abs, `argmax`): autograd picks a subgradient; finite-difference checks straddling
-  a kink disagree with it — not a bug, but avoid kinks in tests.
+  a kink disagree with it. That is not a bug, but avoid kinks in tests.
 * Wrong `keepdims`/broadcast in reductions: silently wrong gradients with the right shape. The gradient check exists for this.
 * In-place ops that overwrite a tensor the backward needs (PyTorch raises; NumPy hand-written code does not).
 
@@ -356,25 +356,25 @@ $O(\sqrt{L})$ stored layers ([Part XIV](../part14-systems/02-training-systems.md
 
 ## 5. In production
 
-!!! production "Stanford / Together — FlashAttention's backward pass"
+!!! production "Stanford / Together: FlashAttention's backward pass"
     Dao et al., "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness", NeurIPS 2022
     (arXiv:2205.14135); Dao, "FlashAttention-2", 2023 (arXiv:2307.08691). The forward stores only $Y$ and the
     per-row log-sum-exp $m_i + \log\ell_i$; the backward recomputes each $T_b\times T_b$ block of $A$ in SRAM
-    and uses $D_i = \mathrm{rowsum}(dY\odot Y)_i$ — the identity derived in §2.6 — so $dS = A\odot(dA - D)$ never
+    and uses $D_i = \mathrm{rowsum}(dY\odot Y)_i$ (the identity derived in §2.6), so $dS = A\odot(dA - D)$ never
     needs the stored $A$. *Why:* HBM bandwidth, not FLOPs, bounds attention; recomputation costs extra FLOPs
     but removes $O(T^2)$ reads/writes. *Rejected alternative:* approximate/sparse attention, which changes the
     function. It is the default attention kernel in PyTorch (`scaled_dot_product_attention`) and every major
     LLM training stack.
 
-!!! production "NVIDIA / Baidu — mixed-precision training with loss scaling"
+!!! production "NVIDIA / Baidu: mixed-precision training with loss scaling"
     Micikevicius et al., "Mixed Precision Training", ICLR 2018 (arXiv:1710.03740). Keep an fp32 master copy of
     weights, run forward/backward in fp16, and scale the loss so that gradient magnitudes stay above fp16's
-    representable range — the paper shows a histogram of activation-gradient magnitudes with a large fraction
+    representable range. The paper shows a histogram of activation-gradient magnitudes with a large fraction
     below $2^{-24}$ that would otherwise be lost. *Why:* $2$–$8\times$ tensor-core throughput and half the
     activation memory. *Cost:* a scale factor to manage (dynamic loss scaling backs off on overflow). bf16 later
     removed the need for scaling in most LLM training, at the price of precision in reductions.
 
-!!! production "Meta — PyTorch autograd and `torch.autograd.gradcheck`"
+!!! production "Meta: PyTorch autograd and `torch.autograd.gradcheck`"
     Paszke et al., "Automatic differentiation in PyTorch", NeurIPS Autodiff Workshop 2017; Paszke et al.,
     "PyTorch: An Imperative Style, High-Performance Deep Learning Library", NeurIPS 2019 (arXiv:1912.01703).
     PyTorch records a dynamic tape of VJP closures; every custom `autograd.Function` in the codebase and in
@@ -395,8 +395,8 @@ $O(\sqrt{L})$ stored layers ([Part XIV](../part14-systems/02-training-systems.md
 !!! interview "Why is the gradient of softmax + cross-entropy just $a - y$, and why do we care?"
     Chain the softmax Jacobian $a_i(\delta_{ij} - a_j)$ with $\partial L/\partial a_i = -y_i/a_i$; the $a_i$ cancels
     and $\sum_i y_i = 1$ collapses the rest. We care because the standalone softmax Jacobian $\to 0$ when the softmax
-    saturates, whereas $a - y$ stays $O(1)$ when the prediction is confidently wrong — the fused form trains,
-    the unfused form stalls (and overflows). **Staff follow-up:** *does the same hold for sigmoid + BCE?* Yes,
+    saturates, whereas $a - y$ stays $O(1)$ when the prediction is confidently wrong. The fused form trains;
+    the unfused form stalls and overflows. **Staff follow-up:** *does the same hold for sigmoid + BCE?* Yes,
     $\nabla_z = \sigma(z) - y$; same reason `BCEWithLogitsLoss` exists.
 
 !!! interview "You wrote a custom Triton kernel for RMSNorm. How do you know the backward is right?"
@@ -419,12 +419,12 @@ $O(\sqrt{L})$ stored layers ([Part XIV](../part14-systems/02-training-systems.md
     preconditioned Hessian); its spectrum's bulk vs outliers explains why Adam beats SGD on Transformers (blocks
     with very different curvature). You never form it: use Hessian–vector products (double backward) with power
     iteration or Lanczos, $\sim$ 20 HVPs for the top eigenvalue. **Staff follow-up:** *what happens to $\lambda_{\max}$
-    over training with a constant LR?* It rises until $\approx 2/\eta$ and hovers there — the "edge of stability"
+    over training with a constant LR?* It rises until $\approx 2/\eta$ and hovers there, the "edge of stability"
     regime (Cohen et al., ICLR 2021, arXiv:2103.00065).
 
 !!! interview "Explain Lagrange multipliers with an ML example that is not PCA."
-    Maximum entropy under a mean constraint gives the softmax/Boltzmann distribution — the multiplier is the inverse
-    temperature. Another: the KL-constrained policy update in TRPO/PPO is a Lagrangian
+    Maximum entropy under a mean constraint gives the softmax/Boltzmann distribution, where the multiplier is the
+    inverse temperature. Another: the KL-constrained policy update in TRPO/PPO is a Lagrangian
     $\max\ \E[\text{advantage}] - \beta\,\KL$, and $\beta$ is the multiplier of the trust-region constraint; PPO's
     clipping is a cheaper surrogate for the same constraint. **Staff follow-up:** *what is the sign of the multiplier
     telling you?* Whether the constraint is active and in which direction relaxing it would improve the objective.
@@ -482,7 +482,7 @@ $O(\sqrt{L})$ stored layers ([Part XIV](../part14-systems/02-training-systems.md
 ??? success "Solution"
     $\sum_j dA_{ij}A_{ij} = \sum_j\big(\sum_k dY_{ik}V_{jk}\big)A_{ij} = \sum_k dY_{ik}\sum_j A_{ij}V_{jk} = \sum_k dY_{ik}Y_{ik}$. The softmax VJP $dS = A\odot(dA - D)$ needs $D_i$ for each row; computing $D$ from $A$ would require $A$ in memory ($T^2$), but this identity computes it from $dY$ and $Y$ ($T\times d_v$ each). Combined with storing the per-row log-sum-exp of $S$, each $T_b\times T_b$ block of $A$ can be recomputed from $Q$, $K$ on the fly, so nothing $T\times T$ is ever written to HBM.
 
-**★★★ 7 (coding).** Implement `hvp(f, x, v)` — a Hessian–vector product using only `numerical_gradient` (i.e. $[\nabla f(x + \epsilon v) - \nabla f(x - \epsilon v)]/(2\epsilon)$) and use it in a 20-step power iteration to estimate $\lambda_{\max}$ of the Hessian of $f(x) = \tfrac12 x^\top A x + \sum_i \cos x_i$ at $x = 0$ for $A = \diag(1, 5, 20)$. Compare with the exact value.
+**★★★ 7 (coding).** Implement `hvp(f, x, v)`, a Hessian-vector product using only `numerical_gradient` (i.e. $[\nabla f(x + \epsilon v) - \nabla f(x - \epsilon v)]/(2\epsilon)$) and use it in a 20-step power iteration to estimate $\lambda_{\max}$ of the Hessian of $f(x) = \tfrac12 x^\top A x + \sum_i \cos x_i$ at $x = 0$ for $A = \diag(1, 5, 20)$. Compare with the exact value.
 
 ??? success "Solution"
     ```python

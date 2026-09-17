@@ -1,4 +1,4 @@
-# Part XIV — Systems
+# Part XIV: Systems
 
 > **Why this matters at staff level.** Every frontier-lab and autonomy interview loop now has a
 > round where the interviewer hands you a model, a fleet of accelerators and a latency target and
@@ -23,7 +23,7 @@
   you need the shapes $(B, T, d)$, $(H, T, d_\text{head})$ and the four matmuls per block in your fingers.
 * [Efficient attention & KV cache](../part06-llm-training/04-efficient-attention-kv-cache.md)
   (FlashAttention, paged KV cache) and [Quantization](../part06-llm-training/05-quantization.md).
-  This part links to those chapters rather than repeating them.
+  This part links to those chapters instead of repeating their derivations.
 * [Scaling laws](../part06-llm-training/02-scaling-laws.md) for $C \approx 6ND$.
 * Comfort with back-of-envelope arithmetic in GB, TB/s and TFLOP/s.
 

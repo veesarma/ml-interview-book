@@ -23,7 +23,7 @@
 - Attention is a **soft dictionary lookup**: query $s_t$, keys $h_j$, values $h_j$. Hard lookup
   returns $V[\argmax_j \text{score}]$; softmax makes it differentiable and returns a weighted
   average. Self-attention is the same operation with queries, keys and values all derived from *one*
- sequence, that is the entire bridge to [chapter 3](03-attention-mathematics.md).
+ sequence. That is the bridge to [chapter 3](03-attention-mathematics.md).
 - **Teacher forcing**: at training time feed the *gold* prefix, not the model's own output, so all
   $T$ steps can be computed with known inputs (and, for a Transformer, in parallel).
 - **Exposure bias**: at inference the model consumes its own outputs, a distribution it never
@@ -551,7 +551,7 @@ caches, which is why beam search is expensive to serve and why chat products use
     output becomes $\sum_j \alpha_j v_j$ with $\alpha = \softmax(\text{scores})$, a convex
     combination of all values, smooth in every input. Temperature (or the $\sqrt{d_k}$ scale)
     controls how close it is to hard lookup. Queries and keys live in one space (matching), values in
- another (content), which is why they are separate projections, the model can learn to match on
+ another (content), which is why they are separate projections. The model can learn to match on
     one criterion and retrieve something else.
 
  **Staff-level follow-up, "what breaks if you use hard attention instead?"** You lose gradients
@@ -638,7 +638,7 @@ batches with heavy padding. What happens, and why is the effect batch-dependent?
 
 ??? success "Solution"
     Attention puts non-zero weight on padding embeddings, so the context vector is contaminated by a
- vector that carries no information but *is* consistent, the model partly learns to use it as a
+ vector that carries no information but *is* consistent, so the model partly learns to use it as a
     bias. Quality now depends on how much padding a batch happens to contain, so the same example
     scores differently in different batches, and evaluation with batch size 1 disagrees with batched
     evaluation. That inconsistency is the tell for a missing mask in production.
@@ -673,11 +673,11 @@ global attention.
 
 ??? success "Solution"
     The Gaussian is applied *after* the softmax over the window (Luong's formulation), so weights no
- longer sum to 1 exactly, that is intended, it is a soft window. It learns the reversal task
+ longer sum to 1 exactly. That is intended: it is a soft window. It learns the reversal task
     because the alignment is monotone-ish (anti-diagonal) and $p_t$ can track it. Attention entropy
     drops substantially versus global attention, which is the mechanism: the Gaussian prior removes
     probability mass from distant positions that the scoring function has not yet learned to
- suppress. The lesson generalises, this is the ancestor of every windowed/sparse attention
+ suppress. The lesson generalises. This is the ancestor of every windowed/sparse attention
     pattern in [Part VI ch. 3](../part06-llm-training/03-large-model-architecture.md), and it works
     precisely when the alignment is local, which is why it helps in translation and hurts in tasks
     needing long-range retrieval.

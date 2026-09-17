@@ -9,7 +9,7 @@
 > system is any good. Strong signal is naming the recall / latency / memory trade-off with
 > numbers, committing to an index type, and describing the evaluation before the model.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 * For unit vectors, $\norm{q-x}^2 = 2 - 2\cos(q,x)$: cosine, dot product and Euclidean
   give the **same ranking**. They differ only when norms carry information (popularity,
@@ -473,7 +473,7 @@ def asymmetric_distances(self, q: np.ndarray, codes: np.ndarray) -> np.ndarray:
 ```
 
 `table[rows, codes]` gathers, for every stored vector, the $M$ entries selected by its
-codes — that single fancy-index line is the "$M$ look-ups per vector" from §2.4. The test
+codes, that single fancy-index line is the "$M$ look-ups per vector" from §2.4. The test
 checks that the ADC distance equals the exact distance to the *reconstructed* vector,
 which is the identity that makes ADC correct.
 
@@ -481,7 +481,7 @@ which is the identity that makes ADC correct.
 
 *Two sub-spaces of a 4-dim vector with $K = 8$ codewords each; the vector in the title
 becomes the pair of codes $(5, 3)$. The right-hand sub-space is correlated, so codewords
-line up along a diagonal and waste resolution — the case OPQ's rotation fixes.*
+line up along a diagonal and waste resolution, the case OPQ's rotation fixes.*
 
 ### 3.6 RRF and the RAG pipeline
 
@@ -525,32 +525,32 @@ reconstruction. `test_retrieval_hybrid.py` checks RRF against hand-computed valu
 `test_retrieval_rag.py` runs the pipeline end to end with and without IVF and with a
 metadata filter.
 
-??? example "Full implementation — `src/mlbook/retrieval/similarity.py`"
+??? example "Full implementation: `src/mlbook/retrieval/similarity.py`"
     ```python
     --8<-- "src/mlbook/retrieval/similarity.py"
     ```
 
-??? example "Full implementation — `src/mlbook/retrieval/bm25.py`"
+??? example "Full implementation: `src/mlbook/retrieval/bm25.py`"
     ```python
     --8<-- "src/mlbook/retrieval/bm25.py"
     ```
 
-??? example "Full implementation — `src/mlbook/retrieval/ivf.py`"
+??? example "Full implementation: `src/mlbook/retrieval/ivf.py`"
     ```python
     --8<-- "src/mlbook/retrieval/ivf.py"
     ```
 
-??? example "Full implementation — `src/mlbook/retrieval/hnsw.py`"
+??? example "Full implementation: `src/mlbook/retrieval/hnsw.py`"
     ```python
     --8<-- "src/mlbook/retrieval/hnsw.py"
     ```
 
-??? example "Full implementation — `src/mlbook/retrieval/pq.py`"
+??? example "Full implementation: `src/mlbook/retrieval/pq.py`"
     ```python
     --8<-- "src/mlbook/retrieval/pq.py"
     ```
 
-??? example "Full implementation — `src/mlbook/retrieval/hybrid.py`, `toy_embedder.py`, `rag.py`"
+??? example "Full implementation: `src/mlbook/retrieval/hybrid.py`, `toy_embedder.py`, `rag.py`"
     ```python
     --8<-- "src/mlbook/retrieval/hybrid.py"
     ```
@@ -628,9 +628,10 @@ Shard by id range or hash when one machine's RAM is the limit; every query fans 
 shards and merges top-$k$ (scatter–gather), so tail latency is the *max* over shards.
 Shard by tenant or partition key when queries are always filtered on it: no fan-out, and
 filtering becomes free. Replicate for QPS and availability. HNSW inserts are cheap but
-deletes are tombstones until a rebuild; IVF supports both trivially but drifts when the
+deletes are tombstones until a rebuild; IVF supports both with a list append or removal,
+but drifts when the
 distribution changes (retrain centroids periodically). Embedding model upgrades require a
-full re-index — plan blue/green indexes.
+full re-index, plan blue/green indexes.
 
 ### 4.4 GPU ANN
 
@@ -684,7 +685,7 @@ A 1M-token context does not remove retrieval; it changes where the cost lands:
 | best for | large, changing corpora; auditability | small corpora that fit; reasoning across many parts of one document |
 
 Production systems combine them: retrieve a generous top-$k$, then let a long-context
-model reason over it. Cache what you can — embedding of repeated queries, KV cache of a
+model reason over it. Cache what you can, embedding of repeated queries, KV cache of a
 shared prefix (system prompt + stable context), and full responses for exact-duplicate
 queries.
 
@@ -701,7 +702,7 @@ queries.
 
 ## 5. In production
 
-!!! production "Meta — embedding-based retrieval in Facebook Search (Huang et al., KDD 2020)"
+!!! production "Meta: embedding-based retrieval in Facebook Search (Huang et al., KDD 2020)"
     **Problem.** Keyword retrieval could not capture personalised or fuzzy intent in
     social search ("photos of my cousin's wedding"). **Built.** A unified two-tower
     embedding model (query tower with searcher context and social graph features,
@@ -715,7 +716,7 @@ queries.
     precision of exact term constraints; hybrid inside one engine kept both. Paper:
     "Embedding-based Retrieval in Facebook Search", arXiv:2006.11632.
 
-!!! production "Google / YouTube — two-tower retrieval with sampling-bias correction (Yi et al., RecSys 2019)"
+!!! production "Google / YouTube: two-tower retrieval with sampling-bias correction (Yi et al., RecSys 2019)"
     **Problem.** Training a softmax over hundreds of millions of items is impossible;
     in-batch negatives from a streaming pipeline over-sample popular items. **Built.** A
     two-tower model trained with in-batch softmax where each logit is corrected by
@@ -726,7 +727,7 @@ queries.
     from being pushed away as false negatives. Paper: "Sampling-Bias-Corrected Neural
     Modeling for Large Corpus Item Recommendations", RecSys 2019.
 
-!!! production "Meta — Faiss (Johnson, Douze & Jégou 2017; Douze et al. 2024)"
+!!! production "Meta: Faiss (Johnson, Douze & Jégou 2017; Douze et al. 2024)"
     **Problem.** Billion-scale similarity search for images and embeddings with
     predictable memory. **Built.** A library organised around the trade-off of IVF
     coarse quantisers, PQ/OPQ compression and HNSW/flat exact options, with a GPU
@@ -737,7 +738,7 @@ queries.
     trade-off explicit lets each product pick its point. Papers: "Billion-scale
     similarity search with GPUs", arXiv:1702.08734; "The Faiss library", arXiv:2401.08281.
 
-!!! production "Google — ScaNN (Guo et al., ICML 2020)"
+!!! production "Google: ScaNN (Guo et al., ICML 2020)"
     **Problem.** Serve MIPS at scale with quantised vectors without the recall loss that
     plain PQ incurs. **Built.** Anisotropic vector quantisation: the codebook training
     loss penalises the component of quantisation error parallel to the data point (which
@@ -748,9 +749,9 @@ queries.
     Inference with Anisotropic Vector Quantization", arXiv:1908.10396; Google AI blog post
     "Announcing ScaNN: Efficient Vector Similarity Search" (July 2020).
 
-!!! production "Anthropic — contextual retrieval (September 2024)"
+!!! production "Anthropic: contextual retrieval (September 2024)"
     **Problem.** Chunks lose their context when embedded in isolation ("revenue grew
-    3 %" — whose revenue, which quarter?). **Built.** For each chunk, an LLM (with prompt
+ 3 %", whose revenue, which quarter?). **Built.** For each chunk, an LLM (with prompt
     caching to make it affordable) writes a short chunk-specific context using the whole
     document; the context is prepended before computing *both* the embedding and the
     BM25 representation. Results are fused, and a reranker is applied on the top
@@ -824,7 +825,7 @@ queries.
     passages; ANN recall against exact search), generation (faithfulness and answer
     relevance from a judge validated against human labels; citation precision), product
     (task success, escalation rate). When faithfulness drops, first check retrieval
-    recall on the same queries — most "hallucinations" are missing context. If retrieval
+ recall on the same queries, most "hallucinations" are missing context. If retrieval
     is fine, check context assembly (truncation, ordering; put the best chunk first and
     last), then the prompt (instruction to abstain), then the model version. Add
     unanswerable queries to the eval so you measure abstention.
@@ -928,7 +929,7 @@ $s$) in place of "$M$ closest" in `HNSW._connect`, and measure recall@10 at `ef 
 each one moves.
 
 ??? success "Solution"
-    (1) Recall@5 on the *failing* queries only — if it is far below 0.92 the average
+ (1) Recall@5 on the *failing* queries only, if it is far below 0.92 the average
     hides a slice. (2) Oracle-context experiment: feed the gold passage directly; if
     faithfulness stays at 0.70 the problem is generation, not retrieval. (3) Context
     ordering/truncation: put the top chunk first and check the prompt token budget.

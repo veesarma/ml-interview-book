@@ -39,7 +39,7 @@ accept.
 ∝ standard deviation along each) and the rank-1 reconstruction (orange), every
 point snapped onto the PC1 line. Right: a scree plot for a 20-D dataset generated
 from 3 latent factors plus isotropic noise; three components carry ~99% of the
-variance, the rest is a flat noise floor.*
+variance; the rest is a flat noise floor.*
 
 ## 2. The math
 
@@ -80,7 +80,8 @@ $$
 $$
 
 using $V_r^TV_r = I$ so that $(V_rV_r^T)^2 = V_rV_r^T$. Minimising the error is
-therefore *identical* to maximising $\sum_jv_j^TCv_j$ over orthonormal $v_j$, Derivation 1.
+therefore *identical* to maximising $\sum_jv_j^TCv_j$ over orthonormal $v_j$, which is
+Derivation 1.
 The optimum is again the top-$r$ eigenvectors, and the minimum error is
 $(N-1)\sum_{i>r}\lambda_i = \sum_{i>r}s_i^2$.
 
@@ -281,7 +282,7 @@ classifier.
 
 ## 5. In production
 
-!!! production "Meta: FAISS: PCA before product quantisation"
+!!! production "Meta (FAISS): PCA before product quantisation"
     *Problem:* index $10^9$ vectors of $d = 128$–$1024$ within a memory budget.
     *What they built:* the index-factory grammar composes a `PCAR<d'>` pre-transform
     (PCA to $d'$ dims followed by a random rotation so that variance is spread evenly
@@ -335,7 +336,7 @@ classifier.
     Randomized SVD: sketch with a $1024\times138$ Gaussian, 2 power iterations with
     QR, project to a $138\times1024$ matrix, small SVD. Four streaming passes over the
     data, $O(Nd\cdot138)$ FLOPs, embarrassingly parallel across shards (accumulate
-    $A^TY$). Or subsample $10^6$ rows, the covariance estimate converges fast.
+    $A^TY$). Or subsample $10^6$ rows; the covariance estimate converges fast.
     **Follow-up:** *what do power iterations buy?* Error depends on $s_{r+1}/s_r$
     raised to $2q+1$; two iterations turn a slow spectral decay into a sharp one.
 
@@ -348,12 +349,13 @@ classifier.
     and hurts recall; FAISS uses PCA + rotation, sometimes a partial whitening.
 
 !!! interview "What does this t-SNE plot tell us?"
-    Which points are near each other in the original space, and only that.
+    Which points are near each other in the original space, and nothing else.
     Cluster sizes, gaps and shapes depend on perplexity and initialisation; noise
     can look clustered. Ask what perplexity, whether it was run several times, and
     whether the same structure appears in UMAP with different `n_neighbors`.
-    **Follow-up:** *could we use the 2-D coordinates as features?* No, no `transform`
-    for new points (t-SNE), no metric meaning, and different runs are not aligned.
+    **Follow-up:** *could we use the 2-D coordinates as features?* No. There is no
+    `transform` for new points in t-SNE, the coordinates carry no metric meaning,
+    and two runs are not aligned with each other.
 
 !!! interview "PCA vs autoencoder for compression?"
     Linear AE = PCA subspace; a non-linear AE can do better on curved manifolds at
@@ -423,7 +425,7 @@ $4\sum_j(p_{ij} - q_{ij})(1 + \norm{y_i - y_j}^2)^{-1}(y_i - y_j)$ and interpret
     Combining and using $\sum_jp_{ij}$ over both orderings gives
     $4\sum_j(p_{ij} - q_{ij})w_{ij}(y_i - y_j)$. Pairs with $p_{ij} > q_{ij}$ (should be
     closer) attract; pairs with $p_{ij} < q_{ij}$ (too close in the map) repel, but
-    only weakly because $w_{ij}$ decays with distance, that weak long-range
+    only weakly, because $w_{ij}$ decays with distance. That weak long-range
     repulsion is why global layout is arbitrary.
 
 **★★★ Exercise 5.** Show that the global minima of the linear autoencoder loss

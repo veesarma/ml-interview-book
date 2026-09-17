@@ -32,7 +32,7 @@ $$
 
 Its Hessian is $\diag(1, 25)$, condition number $\kappa = 25$. Start at $(-2.5, 1)$. Gradient descent must
 pick one learning rate for both coordinates. Stability along $x_2$ requires $\eta < 2/25 = 0.08$; but with
-$\eta = 0.07$, the $x_1$ coordinate shrinks by a factor $0.93$ per step, it needs $\sim 100$ steps to travel
+$\eta = 0.07$, the $x_1$ coordinate shrinks by a factor $0.93$ per step, so it needs $\sim 100$ steps to travel
 what $x_2$ covers in one. The path zig-zags across the steep valley while creeping along the flat floor.
 That single picture explains almost everything in this chapter:
 
@@ -81,7 +81,7 @@ $$
 buys speed: feature standardisation ($\kappa(X^\top X)$ drops when columns share a scale), normalisation
 layers, better initialisation, residual connections (which keep the Jacobian near identity), and
 preconditioners. Momentum improves the dependence to $O(\sqrt\kappa)$, a quadratic speedup, which is why
-it is not optional. Newton's method would make $\kappa = 1$ but costs $O(d^3)$.
+every serious recipe uses it. Newton's method would make $\kappa = 1$ but costs $O(d^3)$.
 
 ### 2.3 SGD and why noise helps
 
@@ -310,7 +310,7 @@ class RMSProp(Optimizer):
         return self.lr * g / (np.sqrt(self.s[i]) + self.eps)
 ```
 
-Every state buffer is allocated with `np.zeros_like(p)`, so it carries the parameter's shape, this is the entire
+Every state buffer is allocated with `np.zeros_like(p)`, so it carries the parameter's shape. That is the entire
 memory story of optimizer state: SGD 0 extra copies, momentum 1, Adam 2. For a 7B model in bf16 with fp32 Adam
 states that is $7\text{B}\times(4 + 4 + 4)$ bytes $= 84$ GB before activations
 ([Part XIV](../part14-systems/02-training-systems.md)).
@@ -496,15 +496,15 @@ step, negligible FLOPs but non-trivial time at scale (a few percent), which is w
     unusually valuable for interviews because it documents *instabilities and their fixes* rather than only the final
     recipe: loss spikes traced to specific data, growth of attention logits addressed with QK-norm, output-logit growth
     addressed with a z-loss regulariser, plus initialisation and epsilon changes, all with released intermediate
-    checkpoints and training curves. *Why this matters:* the paper is the public reference for "what do you actually
- do when a large run destabilises", the answer is layered defences (clip + z-loss + QK-norm + data inspection),
+    checkpoints and training curves. The paper is the public reference for "what do you actually
+    do when a large run destabilises". The answer is layered defences (clip + z-loss + QK-norm + data inspection),
     not a single knob. See [training systems](../part14-systems/02-training-systems.md).
 
 !!! production "DeepSeek: V3's multi-stage learning-rate schedule"
     DeepSeek-AI, "DeepSeek-V3 Technical Report", 2024 (arXiv:2412.19437). Trained with AdamW
     ($\beta_1 = 0.9$, $\beta_2 = 0.95$, weight decay $0.1$), the schedule is explicitly *not* a single cosine: a
     warmup, then a constant-LR phase over the bulk of the $14.8$T tokens, then staged decay, with long-context
- extension phases afterwards. This is the WSD philosophy of §2.7 at frontier scale, the plateau lets the token
+    extension phases afterwards. This is the WSD philosophy of §2.7 at frontier scale: the plateau lets the token
     budget and data mix change without invalidating the schedule. *Why not cosine:* a cosine commits to $T$ on day
     one; at 14.8T tokens with curriculum changes, that commitment is expensive. Related: MiniCPM
     (Hu et al., 2024, arXiv:2404.06395) is the clearest published ablation of WSD versus cosine.
@@ -512,7 +512,7 @@ step, negligible FLOPs but non-trivial time at scale (a few percent), which is w
 !!! production "Meta / Facebook AI Research: the linear scaling rule and gradual warmup"
     P. Goyal et al., "Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour", 2017 (arXiv:1706.02677).
     Scaling ResNet-50 to batch size 8192 across 256 GPUs, the authors show the LR must scale linearly with batch size
- and that a *gradual* (5-epoch) warmup is required, a constant warmup or no warmup loses accuracy or diverges.
+    and that a *gradual* (5-epoch) warmup is required; a constant warmup or no warmup loses accuracy or diverges.
     They also document the subtle bugs that bite at scale (weight decay on BN parameters, the difference between
     per-worker and global loss normalisation, momentum correction when the LR changes). *Cost/gain:* 29 hours → 1 hour
     at matched accuracy. This is the canonical citation when an interviewer asks "we're doubling the cluster, what
@@ -523,19 +523,19 @@ step, negligible FLOPs but non-trivial time at scale (a few percent), which is w
     moments, the bias correction of §2.5, and the default $(\beta_1, \beta_2, \epsilon) = (0.9, 0.999, 10^{-8})$.
     I. Loshchilov & F. Hutter, "Decoupled Weight Decay Regularization", ICLR 2019 (arXiv:1711.05101) shows that
     Adam's poor generalisation relative to SGD was substantially an artefact of coupling L2 into the adaptive
- denominator, and that decoupling restores it, the change of §2.6 that made AdamW the default for Transformers.
+    denominator, and that decoupling restores it. That is the change of §2.6 that made AdamW the default for Transformers.
     Read together, they are the cleanest example in ML of "a one-line change to an update rule, justified by an
     analysis of what the rule actually does to each coordinate".
 
 ## 6. Interview questions and strong answers
 
 !!! interview "Derive Adam's bias correction. What breaks without it?"
- $m_t = (1-\beta_1)\sum_{k\le t}\beta_1^{t-k}g_k$, so for stationary gradients $\E[m_t] = \E[g](1-\beta_1^t)$, 
+    $m_t = (1-\beta_1)\sum_{k\le t}\beta_1^{t-k}g_k$, so for stationary gradients $\E[m_t] = \E[g](1-\beta_1^t)$, 
     the geometric sum. Same for $v$ with $\beta_2$. Dividing by $(1-\beta_1^t)$ and $(1-\beta_2^t)$ debiases them.
     Without correction the two moments are shrunk by *different* factors, so the ratio $m/\sqrt v$ is wrong by
- $\sqrt{1-\beta_2^t}/(1-\beta_1^t)$, about $0.32$ at $t=1$, and with $\beta_2 = 0.999$ it takes hundreds of steps
+    $\sqrt{1-\beta_2^t}/(1-\beta_1^t)$, about $0.32$ at $t=1$; with $\beta_2 = 0.999$ it takes hundreds of steps
     to wash out, exactly the phase where the model is most fragile. **Staff follow-up:** *what does the corrected first
- step equal?* $\eta\,g/(|g|+\epsilon) \approx \eta\,\mathrm{sign}(g)$, the step size is $\eta$ regardless of gradient
+    step equal?* $\eta\,g/(|g|+\epsilon) \approx \eta\,\mathrm{sign}(g)$. The step size is $\eta$ regardless of gradient
     magnitude, which is why Adam's LR transfers across problems and why you still need warmup at init.
 
 !!! interview "Why is AdamW's weight decay different from L2 in Adam?"
@@ -543,7 +543,7 @@ step, negligible FLOPs but non-trivial time at scale (a few percent), which is w
     $\sqrt{\hat v}$: weights with large gradient history get the *least* regularisation, which is backwards.
     AdamW applies $-\eta\lambda\theta$ directly, so every weight shrinks by the same relative amount per step.
     Empirically this recovers the generalisation gap Adam had against SGD on vision and is now standard for
- Transformers. **Staff follow-up:** *does the distinction exist for SGD?* No, with a fixed LR they are algebraically
+    Transformers. **Staff follow-up:** *does the distinction exist for SGD?* No. With a fixed LR they are algebraically
     identical ($\theta \leftarrow (1-\eta\lambda)\theta - \eta g$); it only appears when the update is preconditioned.
 
 !!! interview "Why warm up the learning rate?"
@@ -556,11 +556,11 @@ step, negligible FLOPs but non-trivial time at scale (a few percent), which is w
     $\beta_2$ so the variance estimate adapts faster.
 
 !!! interview "Your 30B run's loss spikes at step 12,000 and never recovers. Walk me through the debug."
- First check whether it *is* recoverable: restart from the last good checkpoint and skip the offending batches, 
+    First check whether it *is* recoverable: restart from the last good checkpoint and skip the offending batches, 
     if the loss returns to trend, the batch was the cause; if it spikes again at the same step, it is deterministic
     (data or a schedule boundary). Look at the logged pre-clip gradient norm around the spike: a single $100\times$
     spike means a bad document; a slow climb over hundreds of steps means the LR is too high for the current curvature.
- Check for logit growth (attention or output logits drifting up), that is the OLMo 2 failure mode, fixed with
+    Check for logit growth (attention or output logits drifting up), which is the OLMo 2 failure mode, fixed with
     QK-norm and a z-loss. Check for fp16/bf16 issues in the norm layers. The forcing function is that the optimizer
     state is poisoned by one enormous update, so recovery usually requires rolling back, not just lowering the LR
     going forward. **Staff follow-up:** *what would you add to the training loop to make this cheaper next time?*
@@ -569,7 +569,7 @@ step, negligible FLOPs but non-trivial time at scale (a few percent), which is w
 
 !!! interview "Why $\beta_2 = 0.95$ instead of 0.999 for LLMs?"
     $\beta_2$ sets the averaging window of the squared-gradient estimate: $\sim 1/(1-\beta_2)$ steps, so 1000 vs 20.
- A 1000-step window cannot react to a genuine change in gradient scale, after a loss spike or a curriculum
+    A 1000-step window cannot react to a genuine change in gradient scale: after a loss spike or a curriculum
     boundary the denominator is stale, so the effective LR is wrong for hundreds of steps. $0.95$ trades a noisier
     denominator for responsiveness, which at LLM scale (where a single bad phase costs a lot of compute) is the right
     trade. **Staff follow-up:** *what is the cost of the noisier estimate?* More step-to-step variance in the update
@@ -580,18 +580,18 @@ step, negligible FLOPs but non-trivial time at scale (a few percent), which is w
     Global norm: it rescales all gradients by one scalar, so the update direction is exactly preserved and only the
     step length is capped. Value clipping truncates coordinates independently, which changes the direction and can
     produce an update that is not a descent direction at all. $c = 1.0$ globally is the default; if clipping fires
- on most steps, the LR is wrong. **Staff follow-up:** *does clipping bias the optimizer?* Yes, it is a nonlinear
+    on most steps, the LR is wrong. **Staff follow-up:** *does clipping bias the optimizer?* Yes. It is a nonlinear
     function of the minibatch gradient, so the clipped update is a biased estimate of the true gradient direction.
     It is accepted because the alternative (occasional divergence) is worse, and the bias only acts on the rare
     heavy-tailed batches.
 
 !!! interview "Explain the trade-off between SGD+momentum and Adam. When would you still pick SGD?"
     Adam adapts per coordinate, which is essential when gradient scales differ wildly across parameters (embeddings
- vs attention vs norms) and makes the LR far more transferable, at the cost of $2\times$ optimizer memory and a
+    vs attention vs norms) and makes the LR far more transferable, at the cost of $2\times$ optimizer memory and of a
     tendency to converge to sharper minima without decoupled decay. SGD+Nesterov with a tuned schedule still matches
     or beats Adam on ConvNets with heavy augmentation and long schedules, and uses a third of the memory. For anything
     with sparse embedding gradients or a Transformer block, AdamW. **Staff follow-up:** *what about Muon or Shampoo?*
- They precondition with matrix structure rather than per coordinate, Shampoo with Kronecker-factored second
+    They precondition with matrix structure rather than per coordinate: Shampoo with Kronecker-factored second
     moments, Muon by orthogonalising the momentum matrix. Both report wall-clock wins on LLM pretraining; both add
     implementation and distributed complexity, and both typically keep Adam for 1-D parameters and embeddings.
 
@@ -638,11 +638,11 @@ has a $100\times$ larger gradient.
     With zero gradient AdamW shrinks both coordinates by exactly $\eta\lambda = 0.05$; Adam's coupled L2 would route the decay through $\sqrt{\hat v}$ and shrink them by different amounts once gradients differ.
 
 **★★ 5.** A run uses warmup $=2000$, cosine to $10\%$ over $T = 500{,}000$ steps, peak $\eta = 3\times10^{-4}$.
-You stop at step $250{,}000$ and want to "finish" the model. What is wrong with simply decaying from there, and what
+You stop at step $250{,}000$ and want to "finish" the model. What is wrong with decaying from there, and what
 would WSD have given you?
 
 ??? success "Solution"
- At step 250k the cosine is at $\eta_{\min} + \tfrac12(\eta_{\text{peak}}-\eta_{\min})(1 + \cos(\pi/2)) \approx 1.65\times10^{-4}$, still more than half the peak. A model stopped there is undertrained *and* sitting at a high LR; loss is well above where an equal-token run with a correctly sized cosine would be. You cannot retroactively re-shape the schedule without re-running. WSD would have held the plateau and let you branch a short decay phase at 250k tokens, producing a properly annealed checkpoint at that budget while the main run continued.
+    At step 250k the cosine is at $\eta_{\min} + \tfrac12(\eta_{\text{peak}}-\eta_{\min})(1 + \cos(\pi/2)) \approx 1.65\times10^{-4}$, still more than half the peak. A model stopped there is undertrained *and* sitting at a high LR; loss is well above where an equal-token run with a correctly sized cosine would be. You cannot retroactively re-shape the schedule without re-running. WSD would have held the plateau and let you branch a short decay phase at 250k tokens, producing a properly annealed checkpoint at that budget while the main run continued.
 
 **★★★ 6 (coding).** Implement a `SkipSpike` wrapper that maintains a running median of the global gradient norm over
 the last 100 steps and skips the update (but still counts the step) whenever the current norm exceeds $5\times$ that
@@ -684,7 +684,7 @@ median. Demonstrate on a stream where one batch in 200 has a $100\times$ gradien
 correct place to clip when accumulating $k$ micro-batches.
 
 ??? success "Solution"
- Accumulation sums (or averages) micro-batch gradients to form one effective-batch gradient, then steps. Clipping must be applied **once, to the accumulated gradient, immediately before the optimizer step**, clipping each micro-batch separately caps each partial sum and therefore changes the effective batch's direction (it is no longer proportional to the true large-batch gradient, and the cap depends on $k$). If you average rather than sum the micro-batches, the clip threshold has the same meaning as in a single large batch; if you sum without dividing by $k$, the norm is $k\times$ larger and a fixed $c = 1.0$ effectively clips $k\times$ harder. The same reasoning applies in DDP: clip after the all-reduce, not before.
+    Accumulation sums (or averages) micro-batch gradients to form one effective-batch gradient, then steps. Clipping must be applied **once, to the accumulated gradient, immediately before the optimizer step**, clipping each micro-batch separately caps each partial sum and therefore changes the effective batch's direction (it is no longer proportional to the true large-batch gradient, and the cap depends on $k$). If you average rather than sum the micro-batches, the clip threshold has the same meaning as in a single large batch; if you sum without dividing by $k$, the norm is $k\times$ larger and a fixed $c = 1.0$ effectively clips $k\times$ harder. The same reasoning applies in DDP: clip after the all-reduce, not before.
 
 ## References
 

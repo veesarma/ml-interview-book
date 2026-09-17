@@ -395,13 +395,13 @@ neural model (Facebook), or a NN with a GBDT teacher.
 
 ## 5. In production
 
-!!! production "Airbnb: search ranking: GBDT to neural networks"
+!!! production "Airbnb: search ranking, from GBDT to neural networks"
     *Problem:* rank listings for a search. *History:* the initial gains came from a
     gradient-boosted decision tree ranker; those gains plateaued. *What they built:*
-    a sequence of neural rankers, with the paper candid about failures, a first
-    NN replicating the GBDT with hand-crafted features did *not* beat it; gains came
-    from listing-ID embeddings' failure teaching them about overfitting, from
-    Lambdarank losses and from feeding the GBDT's prediction as a feature during the
+    a sequence of neural rankers, and the paper is candid about the failures. A first
+    NN that replicated the GBDT on hand-crafted features did *not* beat it. The gains
+    came once they had learned what listing-ID embeddings overfit to, switched to a
+    Lambdarank loss, and fed the GBDT's own prediction in as a feature during the
     transition. *Trade-off:* NNs removed feature-engineering bottlenecks and let them
     scale with data, at the price of far more tooling (feature normalisation, output
     monotonicity, debugging). Haldar et al., "Applying Deep Learning to Airbnb
@@ -427,7 +427,8 @@ neural model (Facebook), or a NN with a GBDT teacher.
     milliseconds. *History:* the incumbent was an XGBoost model; DeepETA's stated
     goal was to beat its MAE while serving at Uber scale. *What replaced it:* a
     Transformer-style encoder over bucketised features (the blog explains they
-    discretise continuous inputs, a tree-like inductive bias inside the NN). Uber
+    discretise continuous inputs, which puts a tree-like inductive bias inside the
+    network). Uber
     Engineering, 2022, [uber.com](https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/).
     Uber's Michelangelo platform post lists tree models among the first-class
     supported model types, [uber.com](https://www.uber.com/us/en/blog/michelangelo-machine-learning-platform/).
@@ -445,11 +446,10 @@ neural model (Facebook), or a NN with a GBDT teacher.
     $G_jw + \tfrac12(H_j+\lambda)w^2$, minimised at $w^* = -G_j/(H_j+\lambda)$ with value
     $-\tfrac12G_j^2/(H_j+\lambda)$. Gain of a split = value before − value after − $\gamma$.
     **Staff follow-up:** *why second order?* Newton steps per leaf use the loss's
-    curvature, for logistic loss, leaves of confident examples ($h$ small) get
-    bigger moves, and the same code handles any twice-differentiable loss,
-    including ranking losses. *What does $\lambda$ do to the gain?* It discounts leaves
-    with small $H$, i.e. few or uninformative examples, a built-in prior against
-    splits on tiny groups.
+    curvature. For logistic loss, leaves of confident examples ($h$ small) get
+    bigger moves for the same gradient, and one code path handles any
+    twice-differentiable loss, ranking losses included. *What does $\lambda$ do to the gain?* It discounts leaves with small $H$, meaning few or
+    uninformative examples. That is a built-in prior against splits on tiny groups.
 
 !!! interview "Why do random forests work, quantitatively?"
     $\operatorname{Var}(\bar f) = \rho\sigma^2 + (1-\rho)\sigma^2/M$. Bagging attacks the second
@@ -472,8 +472,8 @@ neural model (Facebook), or a NN with a GBDT teacher.
     small gradients are subsampled and re-weighted, keeping the gain estimate
     unbiased. EFB: bundle mutually exclusive sparse features. **Follow-up:** *what
     does CatBoost fix that these don't?* Target leakage in categorical encodings and
-    the gradient's "prediction shift", both via ordered statistics on random
-    permutations.
+    the gradient's "prediction shift". Both fixes come from ordered statistics on
+    random permutations.
 
 !!! interview "When would you replace the GBDT ranker with a neural net?"
     When the GBDT has plateaued and the constraint is feature engineering; when
@@ -493,7 +493,7 @@ neural model (Facebook), or a NN with a GBDT teacher.
     XGBoost learns a default direction per split from the rows that have the value
     (sparsity-aware split); LightGBM similarly. Alternatives: impute plus an
     indicator feature, or surrogate splits (CART). Never drop rows silently in a
-    production feature pipeline, the missingness is usually informative.
+    production feature pipeline. The missingness is usually informative.
 
 ## 7. Exercises
 

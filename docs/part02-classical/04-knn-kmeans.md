@@ -327,7 +327,7 @@ overlapping or elongated clusters: GMM; unknown $k$ and noise: DBSCAN/HDBSCAN.
 
 ## 5. In production
 
-!!! production "Meta: FAISS: k-means as the coarse quantiser and inside PQ"
+!!! production "Meta (FAISS): k-means as the coarse quantiser and inside PQ"
     *Problem:* nearest-neighbour search over $10^9$ image/text embeddings on a
     handful of GPUs. *What they built:* `IndexIVFPQ`: a k-means coarse quantiser with
     `nlist` centroids partitions the space (search visits `nprobe` inverted lists),
@@ -342,7 +342,7 @@ overlapping or elongated clusters: GMM; unknown $k$ and noise: DBSCAN/HDBSCAN.
     "[Guidelines to choose an index](https://github.com/facebookresearch/faiss/wiki/Guidelines-to-choose-an-index)";
     Jégou, Douze, Schmid, "Product Quantization for Nearest Neighbor Search", TPAMI 2011.
 
-!!! production "Meta AI: SemDeDup: k-means over embeddings to deduplicate LAION"
+!!! production "Meta AI (SemDeDup): k-means over embeddings to deduplicate LAION"
     *Problem:* web-scale datasets are full of near-duplicates that waste compute.
     *What they built:* embed every image with a pretrained encoder, run k-means over
     the embeddings, and search for semantic duplicates only *within* each cluster
@@ -381,7 +381,8 @@ overlapping or elongated clusters: GMM; unknown $k$ and noise: DBSCAN/HDBSCAN.
     cannot recover because it is local. Sampling $\propto D^2$ makes every uncovered
     cluster likely to receive a seed; Arthur & Vassilvitskii prove
     $\E[J] \le 8(\ln k + 2)J_{\text{opt}}$ for the seeding alone. **Follow-up:** *cost?*
-    $k$ passes, $O(Nkd)$, one Lloyd iteration; parallel variants (k-means$\|$) sample
+    $k$ passes, $O(Nkd)$, the same as one Lloyd iteration; parallel variants
+    (k-means$\|$) sample
     many seeds per pass for distributed settings.
 
 !!! interview "Explain the curse of dimensionality for KNN."
@@ -395,7 +396,7 @@ overlapping or elongated clusters: GMM; unknown $k$ and noise: DBSCAN/HDBSCAN.
 !!! interview "Brute force vs kd-tree vs ANN: pick one for 100M 128-d vectors, 10 ms budget."
     Brute force is $1.3\times10^{10}$ FLOPs per query, too slow on CPU; kd-tree is
     useless at $d = 128$. IVF-PQ: $\sqrt N \approx 10^4$ centroids, probe 32 lists,
-    scan $3\times10^5$ codes with table lookups, well inside 10 ms, memory
+    scan $3\times10^5$ codes with table lookups. That lands well inside 10 ms, at a memory cost of
     $\approx 100\text{M}\times 16$ bytes. HNSW if RAM allows the graph. Re-rank the top 100
     with exact distances. **Follow-up:** *how do you set `nlist`/`nprobe`?* Sweep
     recall@10 against latency on a held-out query set; the FAISS guidelines page is
@@ -411,7 +412,7 @@ overlapping or elongated clusters: GMM; unknown $k$ and noise: DBSCAN/HDBSCAN.
 
 !!! interview "How do you pick $k$?"
     Not by minimising $J$ (monotone). Elbow, silhouette, gap statistic, stability
-    across resamples, or the downstream metric, for a quantiser $k$ is dictated by
+    across resamples, or the downstream metric. For a quantiser, $k$ is dictated by
     the byte budget ($k = 256$) or by $\sqrt N$ for balanced inverted lists.
 
 !!! interview "A single feature with range 0–10⁶ is in your KNN. What happens?"

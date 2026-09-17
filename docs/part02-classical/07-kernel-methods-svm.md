@@ -3,8 +3,8 @@
 > **Why this matters at staff level.** The SVM dual is the cleanest example of
 > Lagrangian duality you will be asked to derive, the kernel trick is the idea that
 > lets a linear method fit non-linear data without ever computing the features, and
-> kernel smoothing is the direct ancestor of attention, the bridge between this part
-> and Transformers. Interviewers use it to separate people who can *derive* (primal
+> kernel smoothing is the direct ancestor of attention, which bridges this part of the
+> book and the Transformer chapters. Interviewers use it to separate people who can *derive* (primal
 > → Lagrangian → KKT → dual → support vectors) from people who remember "maximum
 > margin". Strong signal: the full derivation with the KKT conditions and what they
 > say about support vectors, the primal/dual cost trade-off, kernel ridge's closed
@@ -41,8 +41,8 @@ that inner product is $(x^Tx')^2$, a formula in the *original* coordinates.
 
 ![SVM margin](../assets/figures/part02_svm_margin.png){ width="720" }
 
-*Figure. Left: a linear soft-margin SVM (our SMO-lite), the separator, the two
-margin lines $f = \pm1$, and the three support vectors circled in red; every other
+*Figure. Left: a linear soft-margin SVM (our SMO-lite) showing the separator, the
+two margin lines $f = \pm1$, and the three support vectors circled in red; every other
 point could be deleted without changing the fit. Right: an RBF-kernel SVM on a
 circular class boundary with 5% label noise; the circled support vectors line the
 boundary and include the mislabelled points that sit at $\alpha_i = C$.*
@@ -135,7 +135,7 @@ $$
 $$
 
 where we have written $x_i^Tx_j$ as $\kappa(x_i,x_j)$ because that is the *only* way the
-data appears, the kernel trick applies. Strong duality holds (convex problem,
+data appears, so the kernel trick applies. Strong duality holds (convex problem,
 Slater's condition satisfied with $\xi$ large), so the dual optimum equals the primal
 optimum.
 

@@ -2,12 +2,12 @@
 
 > **Why this matters at staff level.** Inference is where ML meets the P&L: the same model at
 > the same quality can differ 10× in cost per token depending on batching, KV-cache management
-> and scheduling. Interviews test this with "TTFT vs TPOT — which do you optimise and why?",
-> "why is decode memory-bandwidth-bound?", and "size a fleet for 50 QPS at a 200 ms TTFT SLO".
+> and scheduling. Interviews test this with "TTFT vs TPOT, which do you optimise and why?",
+> "why is decode memory-bandwidth-bound?" And "size a fleet for 50 QPS at a 200 ms TTFT SLO".
 > Strong signal is deriving arithmetic intensity, naming the batch size where decode flips to
 > compute-bound, and treating serving as a queueing problem with SLOs rather than a model problem.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - **Prefill** processes all $S$ prompt tokens in parallel: $2PS$ FLOPs against $\sim wP$ bytes of
   weights, intensity $\approx 2S/w$ → **compute-bound** beyond a few hundred tokens.
@@ -23,7 +23,7 @@
   ones every step; on variable-length workloads it is a 2–4× throughput win over static batching.
 - **Speculative decoding:** draft $K$ tokens with a cheap model, verify in one target pass, accept
   $x$ with probability $\min(1, p(x)/q(x))$ and on rejection resample from
-  $\max(0, p-q)$ normalised — the output distribution is **exactly** $p$. Expected tokens per target
+ $\max(0, p-q)$ normalised, the output distribution is **exactly** $p$. Expected tokens per target
   call $= \frac{1-\alpha^{K+1}}{1-\alpha}$ with $\alpha = 1 - \mathrm{TV}(p,q)$.
 - **Disaggregation:** prefill and decode have opposite bottlenecks, so run them on separate pools
   (DistServe, Splitwise) and ship the KV cache between them.
@@ -41,25 +41,25 @@ Take Llama-2-7B in bf16: 13.5 GB of weights, and one H100 with 3.35 TB/s of HBM 
   matmuls: 500 rows of work per weight element read. Arithmetic intensity $\approx 2\cdot500/2 = 500$
   FLOP/byte, far above the H100's ridge of ~295. The GPU is doing what it was built for.
 * **Decode.** You have *one* token. The same matmul is now $(1 \times 4096) \times (4096 \times 4096)$:
-  a matrix-vector product. You read 13.5 GB of weights to do $1.35\times10^{10}$ FLOPs — intensity
-  1 FLOP/byte. At best that step takes $13.5\,\text{GB} / 3.35\,\text{TB/s} = 4.0$ ms, and the
+  a matrix-vector product. You read 13.5 GB of weights to do $1.35\times10^{10}$ FLOPs, an
+  intensity of 1 FLOP/byte. At best that step takes $13.5\,\text{GB} / 3.35\,\text{TB/s} = 4.0$ ms, and the
   tensor cores are idle 99.7 % of the time.
 
 The consequence organises the whole chapter: **the only way to make decode efficient is to
 amortise the weight read across many sequences**, i.e. batch. Each additional sequence in the
-batch is nearly free until you hit $B^\star \approx 295$ — that is why the entire serving stack
+batch is nearly free until you hit $B^\star \approx 295$. That is why the entire serving stack
 (continuous batching, paged KV, disaggregation) exists to keep the batch full.
 
 The second half of the intuition is what stops you from batching: the **KV cache**. Llama-2-7B
 stores 512 KB per token, so a batch of 64 sequences with 4096-token contexts is
-$64 \times 4096 \times 512\,\text{KB} = 128$ GB — more than the GPU. GQA (Llama-3-70B: 320 KB/token)
+$64 \times 4096 \times 512\,\text{KB} = 128$ GB, more than the GPU. GQA (Llama-3-70B: 320 KB/token)
 and paged allocation exist to buy back batch size.
 
 ![Prefill and decode arithmetic intensity](../assets/figures/part14_prefill_decode_intensity.png){ width="900" }
 
-*Left: decode's intensity is simply the batch size (in bf16), so it crosses the H100 ridge at
+*Left: decode's intensity equals the batch size (in bf16), so it crosses the H100 ridge at
 $B^\star \approx 295$, while a 512-token prefill sits far to the right, compute-bound. Right: the
-consequence — TPOT is nearly flat up to $B^\star$ while throughput grows almost linearly, which
+consequence. TPOT is nearly flat up to $B^\star$ while throughput grows almost linearly, which
 is why batching is the highest-leverage serving decision.*
 
 ## 2. The math
@@ -91,7 +91,7 @@ $$
 
 H100 SXM: $\frac{989\times10^{12}}{3.35\times10^{12}} = 295$ FLOP/byte, so $B^\star = 295\cdot\frac{2}{2} \approx 295$
 sequences in bf16. A100 80 GB: ridge 156, $B^\star \approx 156$. Quantising weights to int8 *halves*
-$B^\star$ (to ~148 on H100) because you read half as many bytes — quantisation's main serving
+$B^\star$ (to ~148 on H100) because you read half as many bytes. Quantisation's main serving
 benefit is bandwidth, not FLOPs. Note also what the KV term does: once $BTk$ is comparable to
 $wP$, further batching stops helping, because the extra sequences bring their own bytes. For
 7B with $T=4096$: $wP = 13.5$ GB and $BTk = B \cdot 2$ GB, so by $B = 7$ the KV traffic already
@@ -115,8 +115,8 @@ $$
 $$
 
 **Goodput**, not throughput, is the number to optimise in a product: requests/second that meet
-*both* the TTFT and TPOT SLOs. Throughput and latency trade off through batch size — a larger
-batch raises tokens/s and raises TPOT — so a serving system without an SLO target is
+*both* the TTFT and TPOT SLOs. Throughput and latency trade off through batch size, a larger
+batch raises tokens/s and raises TPOT, so a serving system without an SLO target is
 underspecified. The canonical tension:
 
 | You care about | You choose | Because |
@@ -130,7 +130,7 @@ underspecified. The canonical tension:
 Static batching runs a batch to completion: with generation lengths $G_1..G_B$ the batch occupies
 all $B$ slots for $\max_i G_i$ steps, so the wasted slot-steps are $\sum_i (\max_j G_j - G_i)$.
 For a geometric length distribution with mean $\bar G$, $\E[\max]$ grows like $\bar G \ln B$, so
-utilisation falls as $\bar G / (\bar G \ln B) = 1/\ln B$ — **worse with bigger batches**, the
+utilisation falls as $\bar G / (\bar G \ln B) = 1/\ln B$, **worse with bigger batches**, the
 opposite of what you want.
 
 Continuous (iteration-level) batching re-decides membership every forward pass: finished
@@ -188,8 +188,8 @@ $$
 $$
 
 If the draft costs a fraction $c$ of a target call, the speed-up is $\frac{1-\alpha^{K+1}}{(1-\alpha)(1+Kc)}$.
-At $\alpha = 0.8$, $K = 5$, $c = 0.1$: $2.5\times$. At $\alpha = 0.6$, $K = 5$, $c = 0.2$: $1.2\times$ —
-a weak draft with a large $K$ can be barely worth it. The simulator matches the theory closely:
+At $\alpha = 0.8$, $K = 5$, $c = 0.1$: $2.5\times$. At $\alpha = 0.6$, $K = 5$, $c = 0.2$: $1.2\times$. A weak draft
+with a large $K$ can be barely worth it. The simulator matches the theory closely:
 
 | draft temperature | $\alpha$ | theory ($K{=}4$) | measured |
 |---|---|---|---|
@@ -217,7 +217,7 @@ Given a target load $\lambda$ requests/s with mean prompt $S$ and generation $G$
 Worked example from `replicas_for_slo` (Llama-2-7B, one H100, 512-token prompts, 256-token
 generations, TPOT SLO 30 ms): the memory limit is 179 concurrent sequences; the SLO allows
 batch 169, giving 5,647 tokens/s per replica. At $\lambda = 20$ req/s the demand is
-$20 \times 256 = 5{,}120$ tokens/s, so **one replica** suffices at ~91 % utilisation — which is
+$20 \times 256 = 5{,}120$ tokens/s, so **one replica** suffices at ~91 % utilisation, which is
 exactly the point at which you should provision a second one for queueing headroom.
 
 ## 3. Implementation
@@ -306,20 +306,20 @@ def simulate_continuous(requests, max_batch, cost=CostModel()):
 
 `simulate_static` is the same loop with the batch frozen until every member finishes. The tests
 assert both conserve tokens and complete all requests, that continuous beats static by > 1.5× on
-variable lengths, and — the sanity check that catches an unfair comparison — that the two agree
+variable lengths, and (the sanity check that catches an unfair comparison) that the two agree
 exactly when all requests are identical in length and arrive together.
 
-??? example "Full implementation — `src/mlbook/systems/inference_metrics.py`"
+??? example "Full implementation: `src/mlbook/systems/inference_metrics.py`"
     ```python
     --8<-- "src/mlbook/systems/inference_metrics.py"
     ```
 
-??? example "Full implementation — `src/mlbook/systems/speculative_decoding.py`"
+??? example "Full implementation: `src/mlbook/systems/speculative_decoding.py`"
     ```python
     --8<-- "src/mlbook/systems/speculative_decoding.py"
     ```
 
-??? example "Full implementation — `src/mlbook/systems/continuous_batching_sim.py`"
+??? example "Full implementation: `src/mlbook/systems/continuous_batching_sim.py`"
     ```python
     --8<-- "src/mlbook/systems/continuous_batching_sim.py"
     ```
@@ -333,11 +333,11 @@ static vs continuous equal on identical requests and 1.5×+ apart on variable on
 
 | Symbol | File | Retype from memory? | Target time |
 |---|---|---|---|
-| `acceptance_rate`, `residual_distribution`, `speculative_step` | `src/mlbook/systems/speculative_decoding.py` | **Yes** — the speculative sampling acceptance rule | 15 minutes |
+| `acceptance_rate`, `residual_distribution`, `speculative_step` | `src/mlbook/systems/speculative_decoding.py` | **Yes**: the speculative sampling acceptance rule | 15 minutes |
 | `prefill_intensity`, `decode_intensity`, `decode_ridge_batch` | `src/mlbook/systems/inference_metrics.py` | **Yes** | 5 minutes |
-| `estimate_latency` | `src/mlbook/systems/inference_metrics.py` | **Yes** — the latency/throughput estimator | 15 minutes |
-| `simulate_continuous` | `src/mlbook/systems/continuous_batching_sim.py` | **Yes** — the scheduler loop | 15 minutes |
-| `expected_tokens_per_call`, `max_batch_for_memory`, `replicas_for_slo`, `simulate_static`, `make_toy_models` | same files | Read and understand | — |
+| `estimate_latency` | `src/mlbook/systems/inference_metrics.py` | **Yes**: the latency/throughput estimator | 15 minutes |
+| `simulate_continuous` | `src/mlbook/systems/continuous_batching_sim.py` | **Yes**: the scheduler loop | 15 minutes |
+| `expected_tokens_per_call`, `max_batch_for_memory`, `replicas_for_slo`, `simulate_static`, `make_toy_models` | same files | Read and understand |: |
 
 Checks: `pytest tests/test_systems_inference_metrics.py tests/test_systems_speculative_decoding.py tests/test_systems_continuous_batching.py -q`.
 
@@ -361,23 +361,23 @@ Checks: `pytest tests/test_systems_inference_metrics.py tests/test_systems_specu
 
 **Failure modes.** *KV-cache OOM under load*: admission control must reject or preempt rather than
 crash; vLLM preempts by swapping or recomputing a sequence's KV. *Head-of-line blocking*: one
-32K-token prefill stalls every decode in the batch — the reason chunked prefill exists.
+32K-token prefill stalls every decode in the batch, the reason chunked prefill exists.
 *TPOT drift*: as sessions lengthen, $BTk$ grows and TPOT degrades, so an SLO measured at session
 start is not the SLO at turn 20. *Throughput collapse at high utilisation*: queueing delay
 diverges as $\rho \to 1$; plan for 60–80 % utilisation. *Speculative decoding backfiring*: at
-large batch the system is already compute-bound, and the draft's extra FLOPs slow it down —
+large batch the system is already compute-bound, and the draft's extra FLOPs slow it down, so
 production systems disable speculation above a batch threshold. *Quantisation quality regressions*
 that appear only on long-tail inputs; always evaluate on your own eval set, not the paper's.
 
 **Cost model to carry.** Cost per 1M tokens $= \frac{\text{GPU \$/h} \times G}{3600 \times \text{tokens/s}}\times10^6$.
 Because tokens/s in the memory-bound regime is roughly $B \cdot BW/(wP)$, cost per token falls
-almost linearly with batch until $B^\star$ or the KV limit — so **every technique that raises
+almost linearly with batch until $B^\star$ or the KV limit, so **every technique that raises
 achievable batch is a cost reduction**, and that is the single sentence that ties this chapter
 together.
 
 ## 5. In production
 
-!!! production "UC Berkeley / vLLM — PagedAttention (2023)"
+!!! production "UC Berkeley / vLLM: PagedAttention (2023)"
     Problem: KV-cache memory was fragmented and over-reserved (naive allocation reserves the max
     sequence length per request), capping batch size and wasting most of the cache. Built:
     PagedAttention, which stores KV in fixed-size blocks with a page table, plus continuous
@@ -387,7 +387,7 @@ together.
     *Source: Kwon et al., "Efficient Memory Management for Large Language Model Serving with
     PagedAttention", SOSP 2023, arXiv:2309.06180.*
 
-!!! production "Seoul National University / FriendliAI — Orca: iteration-level scheduling (2022)"
+!!! production "Seoul National University / FriendliAI: Orca: iteration-level scheduling (2022)"
     Problem: request-level batching wastes slots because sequences finish at different times.
     Built: iteration-level scheduling (what everyone now calls continuous batching) plus
     selective batching for the operators that cannot be batched across different sequence
@@ -395,7 +395,7 @@ together.
     *Source: Yu et al., "Orca: A Distributed Serving System for Transformer-Based Generative
     Models", OSDI 2022.*
 
-!!! production "Google — speculative decoding (2023)"
+!!! production "Google: speculative decoding (2023)"
     Problem: decode latency is bounded by memory bandwidth, not compute, so the accelerator is
     idle. Built: draft-then-verify with the modified rejection-sampling rule proven to preserve
     the target distribution exactly, reporting 2–3× wall-clock speed-ups on T5 and similar
@@ -404,8 +404,8 @@ together.
     Decoding", ICML 2023, arXiv:2211.17192; Chen et al., "Accelerating Large Language Model
     Decoding with Speculative Sampling", 2023, arXiv:2302.01318.*
 
-!!! production "Peking University / UCSD — DistServe, and Microsoft — Splitwise (2024)"
-    Problem: prefill and decode have opposite bottlenecks and interfere when colocated — a long
+!!! production "Peking University / UCSD: DistServe, and Microsoft: Splitwise (2024)"
+ Problem: prefill and decode have opposite bottlenecks and interfere when colocated, a long
     prefill spikes every colocated request's TPOT. Built: disaggregated serving, running prefill
     and decode on separate GPU pools with the KV cache transferred between them, each pool
     independently scaled and parallelised. Reported large gains in goodput under tight
@@ -414,7 +414,7 @@ together.
     Large Language Model Serving", OSDI 2024, arXiv:2401.09670; Patel et al., "Splitwise:
     Efficient Generative LLM Inference Using Phase Splitting", ISCA 2024, arXiv:2311.18677.*
 
-!!! production "Stanford / LMSYS — SGLang and RadixAttention (2024)"
+!!! production "Stanford / LMSYS: SGLang and RadixAttention (2024)"
     Problem: agentic and structured workloads re-send large shared prefixes (system prompts,
     few-shot blocks, tool schemas) and constrain outputs to grammars. Built: RadixAttention, a
     radix-tree KV cache that shares prefixes automatically across requests, plus a frontend
@@ -422,7 +422,7 @@ together.
     *Source: Zheng et al., "SGLang: Efficient Execution of Structured Language Model Programs",
     NeurIPS 2024, arXiv:2312.07104.*
 
-!!! production "NVIDIA — TensorRT-LLM"
+!!! production "NVIDIA: TensorRT-LLM"
     Problem: squeeze the last factor out of a fixed GPU. Built: fused kernels, in-flight
     (continuous) batching, paged KV, FP8 and INT4 weight-only quantisation paths, chunked
     prefill, speculative decoding and multi-LoRA, exposed through a compiled engine per model
@@ -434,12 +434,12 @@ together.
 
 !!! interview "Why is decode memory-bandwidth-bound, and at what batch size does that stop being true?"
     A decode step reads every weight once and does 2 FLOPs per weight per *sequence*, so
-    arithmetic intensity is $2B/w$ — 1 FLOP/byte at batch 1 in bf16. The GPU's ridge point is
+ arithmetic intensity is $2B/w$, 1 FLOP/byte at batch 1 in bf16. The GPU's ridge point is
     $F_\text{peak}/BW$: 295 FLOP/byte on an H100. Setting them equal gives
     $B^\star = \text{ridge}\cdot w/2 \approx 295$ sequences. Below that, time per step is
-    $wP/BW$ — fixed, independent of batch — which is why batching is nearly free and why the
+ $wP/BW$ (fixed, independent of batch) which is why batching is nearly free and why the
     whole serving stack is built to keep the batch full. **Staff follow-up:** "does int8
-    quantisation double throughput?" — it halves the bytes so it roughly halves the memory-bound
+ quantisation double throughput?" It halves the bytes so it roughly halves the memory-bound
     step time *and* halves $B^\star$ to ~148, but it does not help once you are compute-bound,
     and the KV cache (not the weights) may already dominate the bytes at long context.
 
@@ -451,50 +451,50 @@ together.
     TPOT; prioritising prefill improves TTFT but stalls decodes (head-of-line blocking), which
     chunked prefill fixes by slicing the prompt into pieces merged into decode iterations. If
     they genuinely conflict at scale, disaggregate: separate prefill and decode pools, sized
-    independently. **Follow-up:** "what do you report to the business?" — goodput and cost per
+ independently. **Follow-up:** "what do you report to the business?" Goodput and cost per
     million tokens, not peak throughput.
 
 !!! interview "Derive the speculative-decoding acceptance rule and prove it preserves the target distribution."
     Sample $x \sim q$, accept with probability $\min(1, p(x)/q(x))$; on rejection sample from
     $\max(0, p-q)$ normalised. Then $\Pr[\text{out}=x] = q(x)\min(1, p(x)/q(x)) + (1-\alpha)r(x)
     = \min(p(x),q(x)) + \max(0,p(x)-q(x)) = p(x)$, where $\alpha=\sum\min(p,q)$ is exactly the
-    normaliser of the residual. So the output is exactly the target's distribution — this is
+ normaliser of the residual. So the output is exactly the target's distribution. The scheme is
     lossless, unlike distillation or early exit. Expected tokens per target call is
     $\frac{1-\alpha^{K+1}}{1-\alpha}$, and $\alpha = 1-\mathrm{TV}(p,q)$. **Follow-up:** "when
-    does it stop helping?" — when you are compute-bound (large batch), because the verification
+ does it stop helping?" When you are compute-bound (large batch), because the verification
     pass is no longer free; and when $\alpha$ is low, since a $K$ of 5 with $\alpha=0.6$ and a
     draft costing 20 % yields only ~1.2×.
 
 !!! interview "Size a fleet: 50 req/s, 1K-token prompts, 256-token outputs, Llama-3-70B, TTFT ≤ 1 s, TPOT ≤ 30 ms."
     First the per-replica shape: 70B in bf16 is 141 GB, so a replica is at least 2 H100s for
     weights; I'd use 8-way tensor parallelism per replica for latency, giving ~8 ms TPOT at
-    batch 32 and ~1.7 s TTFT for 2K prompts at that batch in my roofline estimate — TTFT is the
+ batch 32 and ~1.7 s TTFT for 2K prompts at that batch in my roofline estimate, TTFT is the
     binding constraint, so I'd use chunked prefill and cap the batch, or disaggregate prefill.
     Demand is $50 \times 256 = 12{,}800$ output tokens/s. At batch 128 a replica delivers roughly
     10K tokens/s but TPOT rises to ~12 ms (still inside SLO), so ~2 replicas of 8 GPUs plus
-    headroom — call it 3 replicas / 24 GPUs for 60–70 % utilisation. Then I'd validate against a
+ headroom, call it 3 replicas / 24 GPUs for 60–70 % utilisation. Then I'd validate against a
     real benchmark, because the roofline ignores kernel efficiency and scheduling. **Follow-up:**
-    "how does prefix caching change this?" — if the 1K-token prompts share a long system prefix,
+ "how does prefix caching change this?" If the 1K-token prompts share a long system prefix,
     prefill cost per request collapses and TTFT stops binding, which can halve the fleet.
 
 !!! interview "Your P99 TTFT blew up but mean TTFT is fine. What happened?"
     Almost certainly head-of-line blocking or queueing at high utilisation. A few very long
-    prompts monopolise prefill iterations, so short requests behind them wait — mean is fine,
+ prompts monopolise prefill iterations, so short requests behind them wait, mean is fine,
     tail is not. Fixes: chunked prefill so a long prompt yields the GPU every chunk; a scheduler
     that bounds the prefill tokens per iteration; separate queues or priorities by prompt length;
     and at the fleet level, drop utilisation or shard by request class. The other candidate is
     KV-cache pressure causing preemption/recompute of running sequences, which shows up as
     sporadic latency spikes correlated with cache occupancy. **Follow-up:** "how would you tell
-    the two apart?" — correlate tail events with (a) the largest prompt in the batch and (b) the
+ the two apart?" Correlate tail events with (a) the largest prompt in the batch and (b) the
     cache eviction/preemption counter; they are separate metrics and only one will move.
 
 !!! interview "When would you *not* use continuous batching?"
-    When every request has identical length and arrives together — offline batch scoring, for
-    example — the schedulers coincide and static batching is simpler with no scheduler overhead
+ When every request has identical length and arrives together, offline batch scoring, for
+ example, the schedulers coincide and static batching is simpler with no scheduler overhead
     (my simulator asserts this equivalence as a test). Also when the model is so small that the
     per-iteration scheduling overhead is comparable to the forward pass, or when strict ordering
     or reproducibility per batch is required. **Follow-up:** "what is the cost of continuous
-    batching?" — TPOT becomes load-dependent (a user's stream slows when the batch grows), which
+ batching?", TPOT becomes load-dependent (a user's stream slows when the batch grows), which
     you must either accept, bound with admission control, or hide with a per-request rate limit.
 
 ## 7. Exercises
@@ -514,7 +514,7 @@ together.
     ??? success "Solution"
         Ridge $= 312/2.0 = 156$ FLOP/byte, so $B^\star = 156 \cdot 2/2 = 156$ sequences; with int8
         weights $w=1$ so $B^\star = 78$. Half the bytes means you reach the compute roof at half
-        the batch — but you also got there twice as fast.
+ the batch, but you also got there twice as fast.
 
 3. ★★ Using `speculative_decoding.py`, measure the empirical acceptance rate and tokens/call for
    draft temperatures 1.1 to 5.0, and check both against $\alpha = 1-\mathrm{TV}(p,q)$ and
@@ -544,7 +544,7 @@ together.
     ??? success "Solution"
         Goodput is non-monotone: it rises with batch while TPOT stays under SLO, then collapses
         once TPOT crosses it (every request fails, not just the marginal one). The optimum sits
-        just below the batch where `estimate_latency(...).tpot_s` crosses 30 ms — which for
+ just below the batch where `estimate_latency(...).tpot_s` crosses 30 ms, which for
         Llama-2-7B on one H100 is ~169, matching `replicas_for_slo`. The lesson to state: SLO
         systems have a cliff, so you provision *below* the knee, not at it.
 

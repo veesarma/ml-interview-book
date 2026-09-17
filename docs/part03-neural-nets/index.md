@@ -1,4 +1,4 @@
-# Part III — Neural networks from first principles
+# Part III: Neural networks from first principles
 
 > **What this part is for.** By the end of it you can build a small deep-learning
 > framework with nothing but NumPy: layers with `forward`/`backward`, losses, a
@@ -32,20 +32,20 @@
 If you have one day before an ML-depth round, do this, in this order, with a
 terminal open:
 
-1. **Morning (3 h) — chapter 2, then chapter 1's TL;DR.** Re-derive the affine
+1. **Morning (3 h): chapter 2, then chapter 1's TL;DR.** Re-derive the affine
    backward with shapes on paper, then type `Linear`, `ReLU`, `CrossEntropyLoss`
    and the `MLP.backward` loop from memory and run
    `pytest tests/test_nn_mlp.py -q`. This is the single most common "implement
    from scratch" question for senior/staff ML roles.
-2. **Early afternoon (2 h) — chapter 3.** Type the `Tensor` class with `add`,
+2. **Early afternoon (2 h): chapter 3.** Type the `Tensor` class with `add`,
    `mul`, `matmul`, `sum`, `relu`, `log_softmax` and `unbroadcast`; run
    `pytest tests/test_nn_autograd.py -q`. Then read the PyTorch/JAX comparison
    so you can answer "how does PyTorch's autograd actually work?".
-3. **Late afternoon (2 h) — chapters 5 and 4.** Derive BatchNorm's backward
+3. **Late afternoon (2 h): chapters 5 and 4.** Derive BatchNorm's backward
    once on paper (the two "hidden" paths through $\mu$ and $\sigma^2$), type
    `LayerNorm` and `RMSNorm`, and memorise the Xavier/He derivation and the
    $1/\sqrt{2L}$ residual scaling.
-4. **Evening (1 h) — chapter 6 TL;DR and interview questions.** Dropout's
+4. **Evening (1 h): chapter 6 TL;DR and interview questions.** Dropout's
    inverted scaling, label smoothing's effect on logits, weight decay vs L2
    under Adam, and one sentence each on stochastic depth and double descent.
 

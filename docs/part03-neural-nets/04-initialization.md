@@ -8,17 +8,17 @@
 > it. At staff level you are also expected to *debug* a training run whose loss is
 > flat or NaN at step 0 and name initialisation as the first suspect.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Variance propagation through $z = \sum_{i=1}^{n_{in}} w_i x_i$ with i.i.d. zero-mean $w$, $x$: $\boxed{\mathrm{Var}(z) = n_{in}\,\mathrm{Var}(w)\,\mathrm{Var}(x)}$. Keep it at 1 per layer or the signal grows/shrinks geometrically with depth.
 - LeCun: $\mathrm{Var}(w) = 1/n_{in}$ (linear/tanh/SELU forward preservation).
-- Xavier/Glorot: $\mathrm{Var}(w) = 2/(n_{in} + n_{out})$ — the harmonic compromise between forward ($1/n_{in}$) and backward ($1/n_{out}$) preservation. Uniform limit $\sqrt{6/(n_{in}+n_{out})}$.
+- Xavier/Glorot: $\mathrm{Var}(w) = 2/(n_{in} + n_{out})$, the harmonic compromise between forward ($1/n_{in}$) and backward ($1/n_{out}$) preservation. Uniform limit $\sqrt{6/(n_{in}+n_{out})}$.
 - He/Kaiming: $\mathrm{Var}(w) = 2/n_{in}$ for ReLU, because $\E[\mathrm{relu}(z)^2] = \tfrac12\mathrm{Var}(z)$ for symmetric $z$.
 - Orthogonal: $W^\top W = I$; preserves norms exactly in linear nets; scale by gain $\sqrt2$ for ReLU.
 - Residual streams: with $2L$ branches each adding variance $\sigma^2$, the stream's variance is $2L\sigma^2$; GPT-2 scales the residual-writing projections by $1/\sqrt{2L}$ ($\text{std} = 0.02/\sqrt{2L}$) to cancel it.
 - Zero-init the last layer of each residual branch (Fixup; "zero-γ" for BN) so each block starts as the identity and depth is free at init.
 - μP (maximal update parametrisation): choose init *and* learning-rate scaling with width so that feature updates stay $O(1)$; hyperparameters tuned on a small model transfer to a large one.
-- Biases: zeros (except forget-gate biases in LSTMs, ~1). Embeddings/LM heads: small normal (e.g. 0.02) — width-independent by convention in GPT-2.
+- Biases: zeros (except forget-gate biases in LSTMs, ~1). Embeddings/LM heads: small normal (e.g. 0.02), width-independent by convention in GPT-2.
 
 ## 1. Intuition first
 
@@ -68,7 +68,7 @@ $$
 
 For $\mathrm{Var}(z) = \mathrm{Var}(x)$ we need $\mathrm{Var}(w) = 1/n_{in}$: **LeCun
 initialisation**. The assumptions to state at a whiteboard: zero-mean, i.i.d. weights
-independent of inputs; inputs with finite second moment. Nothing about Gaussianity —
+independent of inputs; inputs with finite second moment. Nothing about Gaussianity,
 uniform weights with the same variance work identically.
 
 ### 2.2 The nonlinearity: ReLU halves the second moment
@@ -181,7 +181,7 @@ embedding and head) on step 0. Two ways to do it:
 - **Fixup** (Zhang, Dauphin, Ma, 2019): remove normalisation entirely; zero-init the
   last layer of each branch, scale the other layers in a branch by $L^{-1/(2m-2)}$
   ($m$ layers per branch), and add scalar biases/multipliers. They trained
-  10,000-layer ResNets and normalisation-free Transformers this way — the point being
+  10,000-layer ResNets and normalisation-free Transformers this way, the point being
   that *initialisation alone* can supply the stability normalisation was credited for.
 
 Why a zero last layer is safe when a zero *first* layer is not: with $W_2 = 0$ in
@@ -274,7 +274,7 @@ stays in $[0.3, 1.5]$ after 20 layers while LeCun+ReLU collapses below $0.01$
 would be the reference for exact distributions, but the variance formulas are the
 contract.
 
-??? example "Full implementation — `src/mlbook/nn/init.py`"
+??? example "Full implementation: `src/mlbook/nn/init.py`"
     ```python
     --8<-- "src/mlbook/nn/init.py"
     ```
@@ -290,14 +290,14 @@ contract.
 Fine to just read: `orthogonal` (know *why* QR + sign fix; the code is plumbing),
 `zeros`.
 
-Full drill — **all initialisers plus the depth experiment: 15 minutes.** Grader:
+Full drill: **all initialisers plus the depth experiment: 15 minutes.** Grader:
 `pytest tests/test_nn_init.py -q`. Whiteboard drill: derive $\mathrm{Var}(z) = n\,\mathrm{Var}(w)\,\mathrm{Var}(x)$
 and the He factor of 2 in under 5 minutes.
 
 ## 4. Systems view: cost, failure modes, trade-offs
 
 **Cost.** Initialisation is free at runtime; its cost is in *tuning*. A wrong init
-does not crash — it produces a loss that is flat (vanished), NaN at step 1
+does not crash. It produces a loss that is flat (vanished), NaN at step 1
 (exploded), or a network that trains but to a worse optimum, and you pay in
 engineer-hours and GPU-hours to discover it. This is the argument for μP: pay the
 analysis once, transfer the hyperparameters.
@@ -320,7 +320,7 @@ of §2.5, which is why pre-LN Transformers still need the $1/\sqrt{2L}$ scaling.
 Chapter 5 derives the backward.
 
 **Interaction with the optimiser.** Adam normalises update magnitudes per parameter,
-so a badly scaled init is *partly* corrected by the optimiser — and partly not: the
+so a badly scaled init is *partly* corrected by the optimiser, and partly not: the
 first steps move every parameter by $\approx \eta$ regardless of its scale, which for a
 tiny init is a huge relative change. That is the standard-parametrisation pathology
 μP fixes. Under SGD the update scales with the gradient, so init and learning rate
@@ -340,7 +340,7 @@ are coupled the other way. See [Part I, optimization](../part01-math/06-optimiza
 
 ## 5. In production
 
-!!! production "OpenAI — GPT-2's scaled residual init (2019)"
+!!! production "OpenAI: GPT-2's scaled residual init (2019)"
     The GPT-2 report describes a modified initialisation that accounts for the
     accumulation on the residual path with depth: the weights of residual layers
     are scaled by $1/\sqrt N$ with $N$ the number of residual layers. Karpathy's
@@ -351,7 +351,7 @@ are coupled the other way. See [Part I, optimization](../part01-math/06-optimiza
     Multitask Learners*, [cdn.openai.com PDF](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf);
     [nanoGPT `model.py`](https://github.com/karpathy/nanoGPT/blob/master/model.py).
 
-!!! production "Facebook AI — zero-γ in large-minibatch ImageNet training (2017)"
+!!! production "Facebook AI: zero-γ in large-minibatch ImageNet training (2017)"
     In *Accurate, Large Minibatch SGD*, Goyal et al. train ResNet-50 with minibatches
     of 8192 across 256 GPUs in one hour. Among the implementation details they
     report is initialising the scale $\gamma$ of the last BatchNorm in each residual
@@ -361,14 +361,14 @@ are coupled the other way. See [Part I, optimization](../part01-math/06-optimiza
     "Bag of Tricks" study ablates the same zero-γ trick on ResNet-50:
     [arXiv:1812.01187](https://arxiv.org/abs/1812.01187).
 
-!!! production "Microsoft Research — He init for the first super-human ImageNet result (2015)"
+!!! production "Microsoft Research: He init for the first super-human ImageNet result (2015)"
     He et al. derived the $2/n$ variance for rectifier nets and showed that with
     Xavier-scaled init a 30-layer ReLU network stalled while the same network with the
     corrected scale trained from scratch. The deeper PReLU-nets they trained this way
     reached 4.94% top-5 error on ImageNet, the first result below the 5.1% human
     estimate. Source: [arXiv:1502.01852](https://arxiv.org/abs/1502.01852).
 
-!!! production "Microsoft / OpenAI — μTransfer for hyperparameter transfer (2022)"
+!!! production "Microsoft / OpenAI: μTransfer for hyperparameter transfer (2022)"
     Yang et al. parametrised models in μP and tuned learning rate, init scale and
     other hyperparameters on small proxies, then transferred them zero-shot: they
     report outperforming published BERT-large with total tuning cost equal to one
@@ -377,7 +377,7 @@ are coupled the other way. See [Part I, optimization](../part01-math/06-optimiza
     parametrisation (per-layer LR and init rules) in exchange for not re-sweeping
     hyperparameters at every scale. Source: [arXiv:2203.03466](https://arxiv.org/abs/2203.03466).
 
-!!! production "MIT / Google — Fixup: 10,000-layer ResNets without normalisation (2019)"
+!!! production "MIT / Google: Fixup: 10,000-layer ResNets without normalisation (2019)"
     Zhang, Dauphin and Ma showed that rescaling a standard init (zero last layer per
     branch, depth-dependent scaling of the others, scalar biases) trains residual
     networks as stably as BatchNorm does, including 10,000-layer ResNets and a
@@ -401,7 +401,7 @@ are coupled the other way. See [Part I, optimization](../part01-math/06-optimiza
     Init controls *where you start*, not where you end.
 
 !!! interview "Why does GPT-2 scale some weights by $1/\sqrt{2L}$ and not others?"
-    Only the matrices that write into the residual stream — attention output
+Only the matrices that write into the residual stream, attention output
     projection and the MLP down-projection. Each of the $2L$ branches adds an
     (approximately independent, LN-normalised) contribution of variance $\sigma_f^2$, so
     the stream's variance grows as $2L\sigma_f^2$. Scaling those writers by $1/\sqrt{2L}$
@@ -418,7 +418,7 @@ are coupled the other way. See [Part I, optimization](../part01-math/06-optimiza
     $\propto\sqrt{\ell}$ means missing $1/\sqrt{2L}$ scaling. (3) Attention logits'
     scale: missing $1/\sqrt{d_k}$ or too-large $Q/K$ init gives a saturated softmax
     and huge gradients. (4) Learning rate and warmup: NaN at step 3 (not step 1) is
-    the signature of an update, not the init — check the LR schedule and gradient
+    the signature of an update, not the init, check the LR schedule and gradient
     clipping. (5) Mixed precision: fp16 overflow in the softmax or the loss; use bf16
     or a loss scaler. I would fix the init issues first because they are free and
     deterministic, then revisit the LR.
@@ -431,7 +431,7 @@ are coupled the other way. See [Part I, optimization](../part01-math/06-optimiza
     optimal hyperparameters then become width-stable and can be tuned on a small
     model and transferred. I would use it when I am about to train a model an order
     of magnitude wider than anything I have tuned, and cannot afford a sweep at the
-    target size — which is every frontier pretraining run. I would not bother for
+    target size, which is every frontier pretraining run. I would not bother for
     fine-tuning or for models I can sweep directly. **Staff follow-up:** does it
     handle depth? Not in the original paper; depth-μP is a separate line of work, and
     in practice people combine width-μP with residual scaling like $1/\sqrt{2L}$.
@@ -440,7 +440,7 @@ are coupled the other way. See [Part I, optimization](../part01-math/06-optimiza
     With $f(x) = \mathrm{relu}(xW_1)W_2$ and $W_2 = 0$: $f = 0$ so the block is the
     identity, and $\bar W_2 = \mathrm{relu}(xW_1)^\top\bar f \ne 0$, so $W_2$ starts learning
     immediately from a random, symmetry-broken $W_1$. With $W_1 = 0$: $\bar W_1$ carries
-    a factor $W_2$ and the ReLU mask of an all-zero pre-activation — both kill it, and
+    a factor $W_2$ and the ReLU mask of an all-zero pre-activation, both kill it, and
     all hidden units would receive identical gradients even if they did not. Zero must
     sit *after* the randomness on every path. In BN-ResNets the same effect is
     obtained with $\gamma = 0$ in the last BN (zero-γ), which Goyal et al. used at
@@ -461,7 +461,7 @@ unit-variance signal fall below float32's smallest normal number ($\approx 10^{-
     The second moment halves per layer, so the std falls by $\sqrt2$ per layer:
     $2^{-L/2} < 10^{-38} \Rightarrow L > 2\cdot 38\log_2 10 \approx 252$ layers. Long before
     that, at $\sim 40$ layers, the signal is $10^{-6}$ and gradients are numerically
-    meaningless — depth is lost well before underflow.
+    meaningless, depth is lost well before underflow.
 
 **★★ Residual-stream growth (coding).** Simulate a 48-block pre-LN residual stream
 in NumPy where each branch is `LN -> Linear(d,4d) -> relu -> Linear(4d,d)` with He
@@ -499,7 +499,7 @@ above which it exceeds $\log 1000 + 1$.
     Logits have variance $512\sigma^2$; sample and average $-\log\softmax(z)_y$ over random
     $y$. The loss equals $\log K$ only as $\sigma \to 0$ and grows roughly like the logit
     std beyond it; numerically the "$+1$ nat" threshold sits near logit std $\approx 1.5$,
-    i.e. $\sigma \approx 1.5/\sqrt{512} \approx 0.066$ — larger than a typical $0.02$ but
+    i.e. $\sigma \approx 1.5/\sqrt{512} \approx 0.066$, larger than a typical $0.02$ but
     smaller than He's $\sqrt{2/512} \approx 0.0625$ is *not* (they are comparable), which is
     why classifier heads are often initialised smaller than hidden layers, or zeroed.
 
@@ -520,7 +520,7 @@ non-square layers?
 ## References
 
 - Glorot, X., Bengio, Y. (2010). *Understanding the difficulty of training deep feedforward neural networks.* AISTATS. [proceedings.mlr.press/v9/glorot10a](https://proceedings.mlr.press/v9/glorot10a.html)
-- He, K., Zhang, X., Ren, S., Sun, J. (2015). *Delving Deep into Rectifiers.* [arXiv:1502.01852](https://arxiv.org/abs/1502.01852)
+- He, K., Zhang, X., Ren, S., Sun, J. (2015), ICCV. PReLU and the He/Kaiming initialisation for rectifier networks. [arXiv:1502.01852](https://arxiv.org/abs/1502.01852)
 - Saxe, A. M., McClelland, J. L., Ganguli, S. (2014). *Exact solutions to the nonlinear dynamics of learning in deep linear neural networks.* ICLR. [arXiv:1312.6120](https://arxiv.org/abs/1312.6120)
 - Radford, A. et al. (2019). *Language Models are Unsupervised Multitask Learners.* [cdn.openai.com](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf)
 - Karpathy, A. *nanoGPT.* [github.com/karpathy/nanoGPT](https://github.com/karpathy/nanoGPT/blob/master/model.py)
@@ -528,4 +528,4 @@ non-square layers?
 - Goyal, P. et al. (2017). *Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour.* [arXiv:1706.02677](https://arxiv.org/abs/1706.02677)
 - He, T. et al. (2018). *Bag of Tricks for Image Classification with Convolutional Neural Networks.* [arXiv:1812.01187](https://arxiv.org/abs/1812.01187)
 - Yang, G. et al. (2022). *Tensor Programs V: Tuning Large Neural Networks via Zero-Shot Hyperparameter Transfer.* [arXiv:2203.03466](https://arxiv.org/abs/2203.03466)
-- Xiong, R. et al. (2020). *On Layer Normalization in the Transformer Architecture.* [arXiv:2002.04745](https://arxiv.org/abs/2002.04745) — why pre-LN needs less warmup; see chapter 5.
+- Xiong, R. et al. (2020). *On Layer Normalization in the Transformer Architecture.* [arXiv:2002.04745](https://arxiv.org/abs/2002.04745). why pre-LN needs less warmup; see chapter 5.

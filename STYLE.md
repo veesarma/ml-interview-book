@@ -155,85 +155,98 @@ Never duplicate a derivation that lives elsewhere: link it and state the result.
 
 ## 8. Write like a person, not like a language model (enforced by a linter)
 
-The single fastest way to make this book worthless is for it to read as though a
-machine produced it. A reader who spots the tells stops trusting the content.
-`scripts/check_style.py` runs in CI and fails the build on the patterns below.
-Run it on your own files before you finish:
+The fastest way to make this book worthless is for it to read as though a machine
+produced it. A reader who spots the tells stops trusting the content.
+
+The catalogue below is Ivo Velitchkov's "22 Claude-prose Patterns: A Catalog of
+Stylistic Attractors in Generated Texts" (Link & Think, 25 June 2026), which
+identifies the recurring rhetorical moves in generated prose. They are attractors:
+states the writing keeps sliding back toward no matter what the prompt was. Knowing
+the names is what lets you catch yourself.
+
+`scripts/check_style.py` runs in CI and fails the build. Run it on your own files:
 
 ```bash
-python scripts/check_style.py docs/part05-sequence-transformers   # report
-python scripts/check_style.py --stats                             # counts only
-python scripts/fix_style.py docs/part05-sequence-transformers      # mechanical fixes
+python scripts/check_style.py docs/part05-sequence-transformers
+python scripts/check_style.py --stats
+python scripts/fix_style.py docs/part05-sequence-transformers
 ```
 
-`fix_style.py` handles the mechanical cases (em dashes in headings, tables,
-admonition titles and reference lists). Everything else you fix by rewriting the
-sentence, because only the author knows what the sentence meant.
+Two severities. **ERROR** patterns fail on any occurrence. **DENSITY** patterns are
+legitimate in technical prose but read as verbal reflexes when repeated, so they
+fail only above a per-1000-word budget: one "in other words" is fine, nine are not.
 
-### Banned outright
+### The 22 patterns
 
-**No em dashes.** Not one, anywhere, including inside headings, table cells,
-admonition titles and reference lists. Use a comma, a colon, a full stop, or
-parentheses. Em dashes are the loudest tell there is.
+| Code | Pattern | What it looks like | Severity |
+|---|---|---|---|
+| SDA | Spaced-dash aside | Em dashes and spaced en dashes for asides and lists | error |
+| CB | Contrastive binary | "not X but Y", "it is not A; it is B", "not just X, but Y" | error |
+| CB2 | Bare contrastive binary | "X, not Y", "rather than" | density, 2 per 1k |
+| SS | Significance-signaling | "this matters because", "which matters for" | error |
+| AE | Aphoristic ender | Landing a section on a compact quotable epigram | density, 1 per 1k |
+| MCS | Mirrored-clause symmetry | Two clauses in one frame, semicolon, slots swapped | density, 1.5 per 1k |
+| MS | Meta-signposting | "below I", "as we saw above", "in what follows" | error |
+| SRC | Self-ranking your claims | "the most important point", "the key insight is" | error |
+| SH | Suspense hook | "has a name", "the cleanest idea is this" | error |
+| SK | Stakes-raising | "shapes everything that follows", "the stakes are" | error |
+| CDF | Candor flag | "the honest answer", "honestly", "to be fair" | error |
+| VP | Validate then promise precision | "is correct, and it can be made precise" | error |
+| RF | The reframe | "better posed:", "the better question is" | error |
+| CP | Corrective pivot | "it would be wrong, though, to call it..." | error |
+| ARR | Anticipate-and-rebut | "as though it carried no stance. It carries one." | error |
+| CCC | Clean-consequence connector | "falls out of", "follows directly" | error |
+| CL | Confidence by litotes | "not difficult", "not optional", "no accident" | error |
+| DT | Deflating tail clause | "and no more", "and nothing else" | error |
+| CF | Contribution framing | "supplies the other half", "fills the gap" | error |
+| AHM | Reflexive AI-humility | "I could be wrong", "as a language model" | error |
+| CR | Colon-reveal | "the answer is this:" setup, colon, payload | density, 0.5 per 1k |
+| RG | Restatement gloss | "in other words", "put differently" | density, 1.5 per 1k |
+| RH | Reflexive hedging | "tends to", "roughly", "largely", "by and large" | density, 4 per 1k |
 
-**No contrastive-binary template.** "It's not X, it's Y." "This isn't just a
-detector, it's a perception system." "Not only fast but also accurate."
-Interviews are about trade-offs, so you will constantly need contrast: state it
-plainly instead. Write "Decode is bound by memory bandwidth, not compute," not
+Plus vocabulary rules: metadiscourse filler ("here's the thing", "let's unpack this",
+"the real question is", "think of it like", "Enter FlashAttention."), overused
+connectives (Moreover, Furthermore, Additionally, Thus, Notably, Crucially),
+marketing words (game-changer, seamless, battle-tested, under the hood, delve,
+tapestry, silver bullet, double-edged sword, unlock the power of), empty intensifiers
+(crucial, pivotal, vital, simply, trivially, obviously, unquantified "significantly"),
+lexical tics (genuinely, structurally, fundamentally, inherently), decorative emoji,
+summary-restating closes, and rhetorical questions you then answer.
+
+### Two notes on the hard cases
+
+**Contrast is the content of this book.** Every chapter is about trade-offs, so you
+will constantly need to say that A holds and B does not. The linter allows that as a
+factual statement within a density budget (CB2) and rejects only the rhetorical
+template (CB). Write "Decode is bound by memory bandwidth, not compute." Do not write
 "Decode isn't about compute; it's about memory bandwidth."
 
-**No false-candour filler.** "Let's be honest", "honestly", "to be fair",
-"the honest answer is", "let's face it". It implies your other sentences were
-less honest.
-
-**No reveal scaffolding.** "Here's the thing", "here's the kicker", "but here's
-where it gets interesting", "the real question is", "this is where X shines",
-"Enter FlashAttention.", "let me walk you through", "let's unpack this",
-"let's break it down", "think of it like".
-
-**No rhetorical question you then answer.** "Why does this matter? Because..."
-Delete the question and make the assertion.
-
-**No summary-restating close.** "In summary", "In conclusion", "The takeaway",
-"Bottom line", "At the end of the day". Stop on the last substantive sentence.
-
-**No marketing vocabulary.** game-changer, paradigm shift, seamless, cutting-edge,
-revolutionise, bulletproof, battle-tested, first-class citizen, under the hood,
-unlock/unleash/harness the power of, cannot be overstated, double-edged sword,
-silver bullet, tapestry, landscape of, realm of, the world of, journey through,
-delve, dive into, in today's fast-paced world.
-
-**No empty intensifiers.** crucial, pivotal, vital, essential, significantly,
-dramatically, substantially, vastly, simply, trivially, obviously, clearly,
-"it is easy to see". If something matters, say what breaks without it. If
-something is faster, give the factor.
-
-**No decorative emoji**, no ✅/🚀 bullets, no emoji in headings.
-
-**No hedging tics.** "I could be wrong", "as an AI", "it's worth noting",
-"it's important to note". State the claim, or state the uncertainty precisely
-("the talk does not say whether they used X").
+**Significance is shown, not announced.** The mandated chapter opener
+("Why this matters at staff level") is a structural affordance of a study book and is
+exempt. In body prose, replace "This matters because the KV cache dominates memory at
+long context" with "The KV cache dominates memory at long context." The consequence
+is the point; the announcement is padding.
 
 ### Also avoid, though the linter cannot catch them
 
-* **Forced triads.** Three parallel items because three sounds complete. Use two
-  if there are two, four if there are four.
-* **Epigram endings.** Landing every section on a compact quotable line.
+* **Forced triads.** Three parallel items because three sounds complete. Use two if
+  there are two.
 * **Bold lead-ins on every bullet.** Vary the shape of your paragraphs and lists.
-* **"That said" as a pivot** more than once per chapter.
-* **Analogy inflation.** One good analogy per concept, introduced without fanfare.
 * **Adjective stacking.** "clean, concise, and readable" is three words doing one
   word's work.
 * **Uniform paragraph length.** Real writing has a two-word sentence next to a
   forty-word one.
+* **Analogy inflation.** One analogy per concept, introduced without fanfare.
+* **Pre-justification.** Explaining how to read a sentence before the sentence.
+  It outsources the reader's orientation and forecloses their own reading.
 
 ### The test
 
-Read a paragraph aloud. If it sounds like a conference keynote or a product
-launch, rewrite it. If it sounds like a strong engineer explaining something at a
-whiteboard to a colleague they respect, it is right. Aim for the register of
-Karpathy's blog posts and OpenAI Spinning Up: direct, specific, unhurried,
-willing to say "this is fiddly" or "nobody really knows why this works".
+Read a paragraph aloud. If it sounds like a conference keynote, rewrite it. If it
+sounds like a strong engineer at a whiteboard explaining something to a colleague
+they respect, it is right. Karpathy's blog posts and OpenAI Spinning Up are the
+register: direct, specific, unhurried, willing to say "this is fiddly" or "nobody
+really knows why this works".
 
 ## 9. Do not
 

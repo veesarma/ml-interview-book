@@ -9,7 +9,7 @@
 > forward pass and why, and connecting the activation memory it needs to
 > checkpointing and to how large models are actually trained.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Reverse-mode AD: forward computes and *caches*; backward walks the graph in reverse topological order, each node computing one vector–Jacobian product (VJP) $\bar x = \bar y\, \partial y/\partial x$. You never form a Jacobian.
 - Affine layer $Z = XW + b$: $\boxed{dX = dZ\,W^\top},\ \boxed{dW = X^\top dZ},\ \boxed{db = \sum_n dZ_{n,:}}$. Shapes: $(N,d_{out})(d_{out},d_{in})$, $(d_{in},N)(N,d_{out})$, $(d_{out},)$.
@@ -17,7 +17,7 @@
 - Softmax + cross-entropy fused: $\partial L/\partial Z = (P - Y)/N$.
 - General matmul $C = AB$: $dA = dC\,B^\top$, $dB = A^\top dC$. Broadcast in forward $\Rightarrow$ sum in backward; reshape/transpose in forward $\Rightarrow$ the inverse reshape/transpose in backward.
 - Cost: backward $\approx 2\times$ forward FLOPs (two GEMMs per Linear vs one), so a training step $\approx 3\times$ forward. Reverse mode gives *all* parameter gradients for one extra pass; forward mode would need one pass per parameter.
-- Memory: every cached activation lives until its backward runs — $O(L N d)$ for an MLP, $O(L\,B\,T\,d)$ for a Transformer. Activation checkpointing trades a second forward for $O(\sqrt L)$ storage.
+- Memory: every cached activation lives until its backward runs, $O(L N d)$ for an MLP, $O(L\,B\,T\,d)$ for a Transformer. Activation checkpointing trades a second forward for $O(\sqrt L)$ storage.
 - Verify with central finite differences in float64: $|\text{analytic} - \text{numeric}| / (|a| + |n|) < 10^{-6}$. Every layer in this book passes that test.
 
 ## 1. Intuition first
@@ -93,8 +93,8 @@ $$
 \quad\Longrightarrow\quad \boxed{\;\bar X = \bar Z\, W^\top \in \R^{N\times d_{in}}\;}
 $$
 
-*Gradient w.r.t. $b$.* $b_k$ is added to $z_{nk}$ for **every** $n$ — that is what
-broadcasting means — so $\partial z_{nk}/\partial b_k = 1$ for all $n$:
+*Gradient w.r.t. $b$.* Broadcasting adds $b_k$ to $z_{nk}$ for **every** $n$, so
+$\partial z_{nk}/\partial b_k = 1$ for all $n$:
 
 $$
 \boxed{\;\bar b_k = \sum_n \bar Z_{nk},\qquad \bar b = \mathbf 1^\top \bar Z \in \R^{d_{out}}\;}
@@ -133,7 +133,7 @@ $$
 \boxed{\;\bar Z = \bar H \odot f'(Z)\;}
 $$
 
-ReLU: $f'(z) = 1[z>0]$ — a mask, with the convention $f'(0) = 0$. Sigmoid:
+ReLU: $f'(z) = 1[z>0]$, a mask, with the convention $f'(0) = 0$. Sigmoid:
 $s(1-s)$ with $s$ the cached output. tanh: $1 - t^2$. GELU: $\Phi(z) + z\phi(z)$.
 For a *binary* elementwise op $C = A \odot B$: $\bar A = \bar C\odot B$, $\bar B = \bar C \odot A$.
 For $C = A + B$: $\bar A = \bar B = \bar C$ (plus unbroadcasting if shapes differed).
@@ -196,7 +196,7 @@ the row vector $\bar\theta = \mathbf 1^\top J_L J_{L-1}\cdots J_1$ (a $1\times n
 because $L$ is scalar).
 
 *Forward mode* evaluates the product left-to-right from a seed *column* vector $v$:
-$J_L(\cdots(J_2(J_1 v)))$. Each pass gives one Jacobian–vector product $Jv$ — the
+$J_L(\cdots(J_2(J_1 v)))$. Each pass gives one Jacobian–vector product $Jv$, the
 directional derivative along $v$. To get the full gradient of a scalar w.r.t. $n_\theta$
 parameters you need $n_\theta$ passes ($v = e_1, e_2, \dots$). With $10^9$ parameters
 that is impossible.
@@ -215,7 +215,7 @@ backward $\approx 2\times$ forward and a full step $\approx 3\times$ forward. Fo
 first layer you can skip $\bar X$; for elementwise ops backward is a single multiply.
 The price of reverse mode is not FLOPs but *memory*: every $X_\ell$ needed by
 $\bar W_\ell = X_\ell^\top \bar Z_\ell$ must be kept alive from the forward pass until its
-backward runs. Forward mode needs no such storage — which is why it is used for
+backward runs. Forward mode needs no such storage, which is why it is used for
 Jacobian-vector products, Hessian-vector products (forward-over-reverse) and
 `jax.jvp`, but not for training.
 
@@ -253,7 +253,7 @@ class MLP:
 ```
 
 `forward` is the topological order; `backward` is its reverse. Nothing here knows
-what a Linear or a ReLU is — that is the abstraction boundary that autograd will
+what a Linear or a ReLU is, that is the abstraction boundary that autograd will
 later automate.
 
 ```python
@@ -276,7 +276,7 @@ def train_classifier(model, x, y, epochs=200, lr=0.1, batch_size=32, seed=0):
     return history
 ```
 
-The training loop is the standard four beats — forward, loss, backward, step — with
+The training loop is the standard four beats (forward, loss, backward, step) with
 the seed of backprop being the loss's own `backward()`, which returns $(P - Y)/B$.
 
 ```python
@@ -295,7 +295,7 @@ def make_two_moons(n=400, noise=0.1, seed=0):
 ![Two moons trained with the NumPy MLP](../assets/figures/part03_two_moons.png){ width="720" }
 
 *Left: training loss of a 2-32-32-2 ReLU MLP on two moons with hand-written backprop and
-SGD (lr 0.1, batch 32). Right: the learned decision boundary — a piecewise-linear
+SGD (lr 0.1, batch 32). Right: the learned decision boundary, a piecewise-linear
 surface, as a ReLU network must produce. Accuracy exceeds 99% on this task; the test
 requires > 95%.*
 
@@ -313,7 +313,7 @@ Central differences have $O(\epsilon^2)$ truncation error, and in float64 with
 $\epsilon = 10^{-6}$ the round-off error is $\sim 10^{-10}$, so $10^{-6}$–$10^{-5}$ is the
 right bar. Never gradient-check in float32; the round-off alone is $\sim 10^{-2}$.
 
-??? example "Full implementation — `src/mlbook/nn/mlp.py`"
+??? example "Full implementation: `src/mlbook/nn/mlp.py`"
     ```python
     --8<-- "src/mlbook/nn/mlp.py"
     ```
@@ -330,7 +330,7 @@ right bar. Never gradient-check in float32; the round-off alone is $\sim 10^{-2}
 
 Fine to just read: `make_two_moons`, `accuracy`.
 
-Full drill — **2-layer MLP forward + backward + SGD in NumPy, with a finite-difference
+Full drill: **2-layer MLP forward + backward + SGD in NumPy, with a finite-difference
 check, from a blank file: 25 minutes.** Grader: `pytest tests/test_nn_mlp.py -q`.
 
 ## 4. Systems view: cost, failure modes, trade-offs
@@ -384,7 +384,7 @@ where the gradients go once you have them.
 
 ## 5. In production
 
-!!! production "Every deep learning framework — reverse mode as the engine"
+!!! production "Every deep learning framework: reverse mode as the engine"
     PyTorch's autograd, TensorFlow's `GradientTape` and JAX's `grad` are all
     implementations of reverse-mode AD over a computational graph; PyTorch's
     documentation describes the graph of `Function` objects whose leaves are inputs
@@ -396,7 +396,7 @@ where the gradients go once you have them.
     learning: a survey*, JMLR 2018, [arXiv:1502.05767](https://arxiv.org/abs/1502.05767).
     Chapter 3 builds the same thing in 300 lines.
 
-!!! production "Activation checkpointing — the memory trade every large model makes"
+!!! production "Activation checkpointing: the memory trade every large model makes"
     Chen, Xu, Zhang and Guestrin showed that dropping intermediate activations and
     recomputing them during backward reduces training memory from $O(n)$ to $O(\sqrt n)$
     for an $n$-layer network at the cost of one extra forward pass per minibatch.
@@ -406,7 +406,7 @@ where the gradients go once you have them.
     lengths on a fixed memory budget. Sources: [arXiv:1604.06174](https://arxiv.org/abs/1604.06174);
     [torch.utils.checkpoint docs](https://docs.pytorch.org/docs/main/checkpoint.html).
 
-!!! production "Karpathy — micrograd and the 'build it in 100 lines' pedagogy"
+!!! production "Karpathy: micrograd and the 'build it in 100 lines' pedagogy"
     micrograd is a scalar-valued reverse-mode engine in about 100 lines plus a
     50-line neural-net library, built to show that backprop over a dynamically built
     DAG is the whole trick. The tensor-valued engine in chapter 3 follows the same
@@ -428,7 +428,7 @@ where the gradients go once you have them.
 
 !!! interview "Why is reverse mode preferred for training, and what does it cost?"
     A scalar loss with $P$ parameters needs $\partial L/\partial\theta \in \R^{1\times P}$. Reverse
-    mode computes $\mathbf 1^\top J_L\cdots J_1$ right-to-left as $L$ VJPs — one pass for all
+    mode computes $\mathbf 1^\top J_L\cdots J_1$ right-to-left as $L$ VJPs, one pass for all
     $P$ gradients. Forward mode computes $Jv$ for one direction per pass, so it would need
     $P$ passes. The cost of reverse mode is (a) FLOPs: about $2\times$ the forward, since
     each Linear needs two GEMMs backward; (b) memory: every input to a Linear must be
@@ -462,7 +462,7 @@ where the gradients go once you have them.
     Checkpointing stores every $k$-th, recomputes the rest from the nearest checkpoint
     during backward: memory $O(L/k + k)$, minimised at $k = \sqrt L$, for one extra forward
     ($\approx 33\%$ more compute per step). I would not use it when memory is not the
-    binding constraint — small models, short sequences — because it wastes compute, and
+    binding constraint (small models, short sequences) because it wastes compute, and
     I would use *selective* recompute (recompute attention, keep GEMM inputs) before
     full recompute, since attention's activations are large and cheap to regenerate.
     **Staff follow-up:** how does it interact with pipeline parallelism? Each pipeline
@@ -485,7 +485,7 @@ Write the shapes of $\bar X$, $\bar W$, $\bar b$ and the FLOPs of each backward 
 ??? success "Solution"
     $\bar X = \bar Z W^\top \in \R^{64\times 300}$: $2\cdot 64\cdot 10\cdot 300 = 384{,}000$ FLOPs.
     $\bar W = X^\top \bar Z \in \R^{300\times 10}$: same, $384{,}000$. $\bar b \in \R^{10}$: $640$ adds.
-    Forward was one GEMM of $384{,}000$; backward is two — the $2\times$ rule.
+    Forward was one GEMM of $384{,}000$; backward is two, the $2\times$ rule.
 
 **★ Accumulation.** For $L = (x\cdot x + 3x)$ with scalar $x = 2$, trace backprop through
 the graph where $x$ feeds two nodes and confirm $\bar x = 2x + 3 = 7$.
@@ -497,8 +497,8 @@ the graph where $x$ feeds two nodes and confirm $\bar x = 2x + 3 = 7$.
     test in `tests/test_nn_autograd.py` is this exercise.
 
 **★★ Bias gradient for a 3-D broadcast (coding).** Let $Y = X + b$ with $X \in \R^{2\times 3\times 4}$
-and $b \in \R^{1\times 4}$. Given random $\bar Y$, compute $\bar b$ two ways — by the
-sum rule and by `torch.autograd` — and check they agree.
+and $b \in \R^{1\times 4}$. Given random $\bar Y$, compute $\bar b$ two ways, by the
+sum rule and by `torch.autograd`, and check they agree.
 
 ??? success "Solution"
     ```python
@@ -565,7 +565,7 @@ and what is the peak? (c) What is the compute overhead?
     (a) $96 \times 4 = 384$ GB: no. (b) Peak $\approx (L/k + k)\times 4$ GB (checkpoints plus one
     segment being recomputed); minimised at $k = \sqrt{96} \approx 10$: $(9.6 + 10)\times 4 \approx 78$ GB. Fits.
     (c) One extra forward per segment during backward: the forward is recomputed once,
-    so the step costs $\approx 4\times$ forward instead of $3\times$ — about 33% more compute.
+    so the step costs $\approx 4\times$ forward instead of $3\times$, about 33% more compute.
     In practice you would first try selective recompute of attention only, which
     frees most of the memory at a fraction of the recompute.
 
@@ -577,4 +577,4 @@ and what is the peak? (c) What is the compute overhead?
 - PyTorch. *Autograd mechanics.* [docs.pytorch.org](https://docs.pytorch.org/docs/stable/notes/autograd.html)
 - PyTorch. *torch.utils.checkpoint.* [docs.pytorch.org](https://docs.pytorch.org/docs/main/checkpoint.html)
 - Karpathy, A. *micrograd.* [github.com/karpathy/micrograd](https://github.com/karpathy/micrograd)
-- He, K., Zhang, X., Ren, S., Sun, J. (2015). *Deep Residual Learning for Image Recognition.* [arXiv:1512.03385](https://arxiv.org/abs/1512.03385) — the residual gradient identity of §6.
+- He, K., Zhang, X., Ren, S., Sun, J. (2015). *Deep Residual Learning for Image Recognition.* [arXiv:1512.03385](https://arxiv.org/abs/1512.03385). the residual gradient identity of §6.

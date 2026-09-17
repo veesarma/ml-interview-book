@@ -1,10 +1,11 @@
 # Probabilistic models & EM
 
 > **Why this matters at staff level.** Generative classifiers and EM are where an
-> interviewer checks whether you can reason with Bayes' rule under a model, not
-> just fit a discriminative loss. The EM derivation (Jensen → ELBO → E/M steps) is
-> the same object as the VAE objective and the same alternating scheme as k-means,
-> so being fluent here pays off in Parts IX and XII. Strong signal: derive Naive
+> interviewer checks whether you can reason with Bayes' rule under a model. Fitting a
+> discriminative loss is the easier skill and this part of the book already covered it.
+> The EM derivation (Jensen → ELBO → E/M steps) is the same object as the VAE
+> objective and the same alternating scheme as k-means, so being fluent here pays off
+> in Parts IX and XII. Strong signal: derive Naive
 > Bayes with Laplace smoothing, show that LDA's posterior is a logistic function,
 > derive EM for a GMM with the monotonicity proof, and explain when you would reach
 > for a mixture in a production uncertainty head or anomaly detector.
@@ -349,8 +350,8 @@ distributional assumptions and lots of data → logistic regression or trees.
 
 !!! production "MIT Lincoln Lab / NIST evaluations: GMM-UBM speaker verification"
     *Problem:* verify a speaker's identity from a few seconds of speech. *What they
-    built:* a Universal Background Model, a 1024–2048-component GMM over MFCC
-    frames trained with EM on many speakers, then per-speaker models obtained by
+    built:* a Universal Background Model (a 1024–2048-component GMM over MFCC
+    frames, trained with EM on many speakers), then per-speaker models obtained by
     Bayesian (MAP) adaptation of the UBM's means from enrolment data; the decision
     is a log-likelihood ratio between the speaker GMM and the UBM. *Why a mixture:*
     frames are a multimodal distribution over phonetic events, and MAP adaptation
@@ -364,7 +365,7 @@ distributional assumptions and lots of data → logistic regression or trees.
     Bishop's Mixture Density Network (1994) puts a GMM on the output of a neural
     network: the net predicts $\pi_k(x)$, $\mu_k(x)$, $\sigma_k(x)$ and is trained by the
     mixture negative log-likelihood. This is the standard head whenever the target
-    is multimodal, trajectory prediction (a car may turn left or right; a single
+    is multimodal: trajectory prediction (a car may turn left or right; a single
     Gaussian predicts "straight into the divider"), inverse kinematics, and
     handwriting synthesis. Bishop, "Mixture Density Networks", Aston University
     technical report NCRG/94/004, 1994.
@@ -390,7 +391,7 @@ distributional assumptions and lots of data → logistic regression or trees.
     **Staff follow-up:** *what if the M-step can only be done approximately?*
     Generalised EM: any $\theta$ that increases $Q$ preserves monotonicity. *And if the
     E-step is intractable?* Variational EM: restrict $q$ to a family; the bound is no
-    longer tight and you optimise the ELBO on both sides, that is the VAE.
+    longer tight and you optimise the ELBO on both sides. That is the VAE.
 
 !!! interview "Write the GMM E and M steps and their cost."
     $r_{ik} \propto \pi_k\mathcal N(x_i;\mu_k,\Sigma_k)$ normalised over $k$ via log-sum-exp;
@@ -474,7 +475,7 @@ Interpret the second term.
     $\mathcal L = \E_q[\log p(x,z)] + H(q)$ with $q$ factorised over $i$ and
     $q(z_i = k) = r_{ik}$ gives exactly the displayed form; the second term is the
     entropy of the responsibilities. Since $r_{ik}$ is the exact posterior, the KL
-    gap is zero and $\mathcal L = \sum_i\log\sum_k\pi_k\mathcal N_k(x_i)$, you can verify
+    gap is zero and $\mathcal L = \sum_i\log\sum_k\pi_k\mathcal N_k(x_i)$. You can check
     numerically that the two expressions agree after every `e_step`. The entropy
     term is what k-means drops by forcing one-hot $q$; it is the "softness bonus"
     that keeps EM from committing prematurely.

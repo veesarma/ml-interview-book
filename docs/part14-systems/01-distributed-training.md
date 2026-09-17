@@ -8,7 +8,7 @@
 > memory budget, a bandwidth hierarchy and a decision procedure, then names who runs it that way
 > in production.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - **Training state per parameter (Adam, bf16 mixed precision):** $2 + 2 + 4 + 4 + 4 = 16$ bytes
   (bf16 weight, bf16 grad, fp32 master, Adam $m$, Adam $v$). 7B → 108 GB, 70B → 1.13 TB,
@@ -156,7 +156,7 @@ all-reduce, and that identity is the whole idea of ZeRO.
 
 For a 7B model's bf16 gradients ($S = 13.5$ GB) across 8 GPUs, the bandwidth term is
 $2 \cdot \frac{7}{8} \cdot 13.5\,\text{GB} / 450\,\text{GB/s} \approx 52$ ms on NVLink and
-about 470 ms over a single 400 Gb/s InfiniBand port — the first number hides behind a backward
+about 470 ms over a single 400 Gb/s InfiniBand port, the first number hides behind a backward
 pass, the second does not.
 
 ### 2.4 Data parallelism and DDP mechanics
@@ -183,7 +183,7 @@ the parameters it will update if we agree that rank $r$ updates shard $r$. Rajbh
 | Stage | Sharded across $N$ | Per-GPU state | Communication per step (per rank) |
 |---|---|---|---|
 | 0 (DDP) | nothing | $16P$ | all-reduce grads: $2\frac{N-1}{N}\cdot 2P$ |
-| 1 | optimizer states (12 B/param) | $4P + 12P/N$ | reduce-scatter grads + all-gather updated weights: $\frac{N-1}{N}(2P + 2P)$ — same as DDP |
+| 1 | optimizer states (12 B/param) | $4P + 12P/N$ | reduce-scatter grads + all-gather updated weights: $\frac{N-1}{N}(2P + 2P)$: same as DDP |
 | 2 | + gradients | $2P + 14P/N$ | same as stage 1 (gradients are reduce-scattered anyway) |
 | 3 (FSDP) | + parameters | $16P/N$ | all-gather params in forward, all-gather again in backward, reduce-scatter grads: $\frac{N-1}{N}(2P + 2P + 2P)$ = **1.5× DDP** |
 
@@ -220,8 +220,8 @@ $$
 because GELU is element-wise, so $\text{GELU}([XA_1 \mid \dots \mid XA_t]) = [\text{GELU}(XA_1) \mid \dots]$
 and the row-parallel matmul consumes each rank's own column block. One all-reduce forward (after
 $B$), one backward (before $A$). Attention is the same pattern: split $W_Q, W_K, W_V$ by head
-(column-parallel), compute each rank's heads locally — softmax is per head, so no cross-rank
-dependency — then the output projection $W_O$ is row-parallel over the concatenated heads.
+(column-parallel), compute each rank's heads locally, softmax is per head, so no cross-rank
+dependency, then the output projection $W_O$ is row-parallel over the concatenated heads.
 
 $$
 \boxed{\;\text{per Transformer block: 2 all-reduces forward (attention out-proj, MLP down-proj), 2 backward, each on an } (s, b, h) \text{ tensor}\;}
@@ -385,22 +385,22 @@ B$_j$ needs B$_j$ on stage $i+1$) and returns start/end times, from which the fi
 for both schedules and that in-flight counts are $[m,\dots,m]$ for GPipe and $[p, p-1, \dots, 1]$
 for 1F1B.
 
-??? example "Full implementation — `src/mlbook/systems/memory_calc.py`"
+??? example "Full implementation: `src/mlbook/systems/memory_calc.py`"
     ```python
     --8<-- "src/mlbook/systems/memory_calc.py"
     ```
 
-??? example "Full implementation — `src/mlbook/systems/tensor_parallel_toy.py`"
+??? example "Full implementation: `src/mlbook/systems/tensor_parallel_toy.py`"
     ```python
     --8<-- "src/mlbook/systems/tensor_parallel_toy.py"
     ```
 
-??? example "Full implementation — `src/mlbook/systems/ddp_example.py`"
+??? example "Full implementation: `src/mlbook/systems/ddp_example.py`"
     ```python
     --8<-- "src/mlbook/systems/ddp_example.py"
     ```
 
-??? example "Full implementation — `src/mlbook/systems/pipeline_calc.py` and `parallelism.py`"
+??? example "Full implementation: `src/mlbook/systems/pipeline_calc.py` and `parallelism.py`"
     ```python
     --8<-- "src/mlbook/systems/pipeline_calc.py"
     ```
@@ -417,12 +417,12 @@ gradients against the single-process gradient; pipeline makespan against $(m+p-1
 
 | Symbol | File | Retype from memory? | Target time |
 |---|---|---|---|
-| `bytes_per_param_training`, `activation_bytes_per_layer`, `training_memory_per_gpu` | `src/mlbook/systems/memory_calc.py` | **Yes** — the training-memory calculator | 15 minutes |
-| `column_shards`, `row_shards`, `column_parallel_forward`, `row_parallel_forward`, `tensor_parallel_mlp` | `src/mlbook/systems/tensor_parallel_toy.py` | **Yes** — the column/row tensor-parallel Linear pair | 20 minutes |
-| `ring_bytes_on_wire`, `dp_step_comm_bytes` | `src/mlbook/systems/parallelism.py` | **Yes** — ring all-reduce and ZeRO traffic | 10 minutes |
+| `bytes_per_param_training`, `activation_bytes_per_layer`, `training_memory_per_gpu` | `src/mlbook/systems/memory_calc.py` | **Yes**: the training-memory calculator | 15 minutes |
+| `column_shards`, `row_shards`, `column_parallel_forward`, `row_parallel_forward`, `tensor_parallel_mlp` | `src/mlbook/systems/tensor_parallel_toy.py` | **Yes**: the column/row tensor-parallel Linear pair | 20 minutes |
+| `ring_bytes_on_wire`, `dp_step_comm_bytes` | `src/mlbook/systems/parallelism.py` | **Yes**: ring all-reduce and ZeRO traffic | 10 minutes |
 | `bubble_fraction`, `peak_in_flight` | `src/mlbook/systems/pipeline_calc.py` | **Yes** | 5 minutes |
-| `manual_all_reduce_grads`, `_worker` | `src/mlbook/systems/ddp_example.py` | **Yes** — the manual all-reduce and the rank slicing | 10 minutes |
-| `count_params`, `tensor_parallel_attention`, `simulate_schedule`, `choose_parallelism` | same files | Read and understand | — |
+| `manual_all_reduce_grads`, `_worker` | `src/mlbook/systems/ddp_example.py` | **Yes**: the manual all-reduce and the rank slicing | 10 minutes |
+| `count_params`, `tensor_parallel_attention`, `simulate_schedule`, `choose_parallelism` | same files | Read and understand |: |
 
 Checks: `pytest tests/test_systems_memory_calc.py tests/test_systems_tensor_parallel.py tests/test_systems_parallelism.py tests/test_systems_pipeline.py tests/test_systems_ddp.py -q`.
 
@@ -450,13 +450,13 @@ in the last bits between world sizes.
 
 **Cost model to carry in your head.** Step time $\approx \max(\text{compute}, \text{exposed comm}) + \text{bubble}$;
 compute per rank $= 6P \cdot \text{tokens per rank} / (\text{MFU} \cdot \text{peak})$; DDP comm
-$\approx 4P/\beta$ per step, so the compute-to-comm ratio grows with tokens per rank per step —
-larger micro-batches and gradient accumulation hide communication, which is the systems reason
+$\approx 4P/\beta$ per step, so the compute-to-comm ratio grows with tokens per rank per step.
+Larger micro-batches and gradient accumulation hide communication, which is the systems reason
 global batch sizes are large.
 
 ## 5. In production
 
-!!! production "NVIDIA — Megatron-LM (2019–2021)"
+!!! production "NVIDIA: Megatron-LM (2019–2021)"
     Problem: train multi-billion-parameter Transformers when no single GPU holds them.
     Built: intra-layer tensor parallelism with the column/row split and the two all-reduces per
     block (Shoeybi et al. 2019), then the 3D composition with interleaved 1F1B pipelines
@@ -464,33 +464,33 @@ global batch sizes are large.
     al. 2022). Rejected: pure pipeline parallelism (bubble) and pure ZeRO (all-gather traffic at
     trillion scale). Reported 52 % MFU on 1T parameters across 3072 A100s in the 2021 paper.
 
-!!! production "Microsoft — ZeRO / DeepSpeed (2020)"
+!!! production "Microsoft: ZeRO / DeepSpeed (2020)"
     Problem: DDP wastes $16P$ per GPU of redundant state. Built: ZeRO stages 1–3, which shard
     optimizer state, gradients and parameters across the data-parallel group and re-gather on
     demand. Trade-off accepted: ZeRO-3's 1.5× communication for linear memory scaling, plus
     ZeRO-Offload/-Infinity to CPU and NVMe when even that is not enough. Rejected: model
     parallelism as the only route, because it requires model-code changes.
 
-!!! production "Meta / PyTorch — Fully Sharded Data Parallel (2023)"
+!!! production "Meta / PyTorch: Fully Sharded Data Parallel (2023)"
     Problem: bring ZeRO-3 into PyTorch natively with overlap and composability. Built: FSDP
     with per-unit flat parameters, prefetching of the next unit's all-gather during compute,
     hybrid sharding (shard within a node, replicate across nodes) and mixed-precision policies.
     Trade-off: memory for wrapping granularity and the extra all-gather in backward.
 
-!!! production "Meta — Llama 3 405B infrastructure (2024)"
+!!! production "Meta: Llama 3 405B infrastructure (2024)"
     Trained on 16K H100s with 4D parallelism: TP 8 inside the NVLink domain, pipeline
     parallelism across nodes, context parallelism for the long-context stage, and FSDP-style
     data parallelism sharding the training state. The paper reports 38–43 % BF16 MFU and a
     detailed interruption log (see the training-systems chapter) dominated by hardware faults.
     The choice of *pipeline* before more data parallelism was driven by inter-node bandwidth.
 
-!!! production "Google — PaLM on TPU v4 pods with Pathways (2022)"
+!!! production "Google: PaLM on TPU v4 pods with Pathways (2022)"
     Two 3072-chip TPU v4 pods with data parallelism across pods and 12-way model parallelism ×
     256-way data parallelism within a pod, relying on the pod's ICI fabric rather than
     pipelining ("no pipeline parallelism"). The TPU's 2D/3D torus and systolic arrays make
     large TP degrees cheaper than on GPU clusters; reported 46 % MFU.
 
-!!! production "Meta — OPT-175B (2022)"
+!!! production "Meta: OPT-175B (2022)"
     Trained with FSDP plus Megatron tensor parallelism on 992 A100s; the public chronicles
     document dozens of restarts for hardware failures and loss instabilities, and are the best
     available description of what "keeping a run alive" actually involves.
@@ -504,7 +504,7 @@ global batch sizes are large.
     activations at $s = 8192$, micro-batch 1, selective recompute, SP: $34 \cdot 8192 \cdot 8192 \cdot 80 / 8 = 21$ GB;
     total $\approx 70$ GB, which fits an 80 GB GPU with little headroom. To create headroom:
     FSDP full sharding instead of ZeRO-1 (weights + grads drop to 4 GB, total $\approx 38$ GB),
-    or PP 2. **Staff follow-up:** "what changes at 128K context?" — the $34sbh$ term is now
+ or PP 2. **Staff follow-up:** "what changes at 128K context?" The $34sbh$ term is now
     16× larger per layer and exceeds the GPU by itself; you need context parallelism (Llama 3
     used CP for exactly this stage) rather than more recompute.
 
@@ -513,7 +513,7 @@ global batch sizes are large.
     per rank, bandwidth-optimal and independent of $N$ in the limit. The latency term
     $2(N-1)\alpha$ is linear in $N$: for small tensors and large $N$ it dominates and a tree
     (logarithmic depth) or a hierarchical intra-node-then-inter-node scheme wins; NCCL picks by
-    message size. **Follow-up:** "how does DDP hide it?" — buckets of ~25 MB all-reduced from
+ message size. **Follow-up:** "how does DDP hide it?" Buckets of ~25 MB all-reduced from
     the last layer backwards during the remaining backward compute; only the final bucket is
     exposed, so the exposed time is roughly one bucket's transfer plus the optimizer step.
 
@@ -522,7 +522,7 @@ global batch sizes are large.
     by output columns and GELU is element-wise, so the second matrix, sharded by input rows,
     consumes each rank's own columns; the only cross-rank operation is summing the partial
     outputs. Attention is the same with heads as the columns: softmax is per head. Backward has
-    the mirror-image two. **Follow-up:** "why then add sequence parallelism?" — the LayerNorm
+ the mirror-image two. **Follow-up:** "why then add sequence parallelism?" The LayerNorm
     and dropout regions were replicated $t$ times; SP shards them along $s$ by replacing the
     all-reduce with reduce-scatter + all-gather at zero extra traffic.
 
@@ -532,7 +532,7 @@ global batch sizes are large.
     flight to $p$ per stage instead of $m$, which is what makes large $m$ affordable.
     Interleaving with $v$ chunks per stage makes each stage-time $1/v$ as long, so the bubble
     becomes $\frac{p-1}{vm+p-1}$ at $v\times$ the point-to-point messages. **Follow-up:** "why
-    not $p = 64$?" — every stage boundary is a synchronisation point and the first/last stages
+ not $p = 64$?" Every stage boundary is a synchronisation point and the first/last stages
     carry the embedding and LM head, so imbalance grows with $p$; and you must find $m \gg p$
     micro-batches, which pushes global batch size up.
 
@@ -542,7 +542,7 @@ global batch sizes are large.
     1.5×, all of it overlappable with layer prefetching. Worth it whenever $16P$ does not fit
     and tensor parallelism would cross the NVLink domain; not worth it when the model fits with
     ZeRO-1 (same traffic as DDP, $12P/N$ saved). **Follow-up:** "why does FSDP offer hybrid
-    sharding?" — with thousands of ranks the all-gather group's latency term and the smallest
+ sharding?" With thousands of ranks the all-gather group's latency term and the smallest
     shard size make global sharding inefficient; sharding within a node and replicating across
     nodes keeps the gather on NVLink and the cross-node traffic a plain gradient all-reduce.
 
@@ -552,7 +552,7 @@ global batch sizes are large.
     DP 128 with FSDP-sharded state; per-GPU state $16 \times 405.9/(128 \cdot 128) \approx 0.4$ GB
     with ZeRO-3 or $\approx 12$ GB with ZeRO-1, activations $\approx 67$ GB at $s = 8192$ with
     selective recompute and 16 micro-batches in flight (the first stage). This is Llama 3's
-    published layout. **Follow-up:** "what dominates step time?" — pipeline bubble at the
+ published layout. **Follow-up:** "what dominates step time?" Pipeline bubble at the
     chosen $m$, then exposed communication when tokens-per-rank is small.
 
 ## 7. Exercises
@@ -625,7 +625,7 @@ title.
 * Jacobs, S. A. et al. *DeepSpeed Ulysses: System Optimizations for Enabling Training of
   Extreme Long Sequence Transformer Models.* 2023. arXiv:2309.14509.
 * Grattafiori, A. et al. (Llama Team, Meta). *The Llama 3 Herd of Models.* 2024.
-  arXiv:2407.21783 — §3.3 "Infrastructure, Scaling, and Efficiency".
+ arXiv:2407.21783, §3.3 "Infrastructure, Scaling, and Efficiency".
 * Chowdhery, A. et al. *PaLM: Scaling Language Modeling with Pathways.* 2022. arXiv:2204.02311.
 * Zhang, S. et al. *OPT: Open Pre-trained Transformer Language Models.* 2022. arXiv:2205.01068,
   and the OPT-175B training chronicles in the `metaseq` GitHub repository.

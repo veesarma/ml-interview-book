@@ -426,12 +426,12 @@ Failure modes:
     generative/anomaly formulation ([probabilistic models](05-probabilistic-models-em.md)).
 
 !!! interview "What is Platt scaling, and how is it different from temperature scaling?"
-    Platt: fit $\sigma(as + b)$ on held-out scores by MLE, a 1-D logistic regression,
-    two parameters. Temperature scaling: divide the logit vector by $T$, one
+    Platt: fit $\sigma(as + b)$ on held-out scores by MLE. That is a 1-D logistic
+    regression with two parameters. Temperature scaling: divide the logit vector by $T$, one
     parameter, no bias, preserves the argmax; it is Platt with $b = 0$ generalised
     to $K$ classes. Both are fit on data the model did not train on. **Follow-up:**
     *when does Platt fail?* When the score-to-probability map is not sigmoid-shaped
-    (e.g. boosted trees with heavy shrinkage), use isotonic regression given
+    (e.g. boosted trees with heavy shrinkage). Use isotonic regression instead, given
     enough data.
 
 !!! interview "Softmax over 100k classes is too slow. Options?"

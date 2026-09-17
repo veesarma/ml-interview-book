@@ -7,7 +7,7 @@
 > buy over ReLU. A strong candidate writes the shapes before the code, states every
 > derivative from memory, and knows which activation each production family uses and why.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - One layer: $Z = XW + b$, with $X \in \R^{N \times d_{in}}$, $W \in \R^{d_{in} \times d_{out}}$, $b \in \R^{d_{out}}$, $Z \in \R^{N \times d_{out}}$. Row-major: one example per row, so **$XW$, not $Wx$**.
 - An MLP is $f(X) = f_L(\cdots f_2(f_1(X)))$ with a nonlinearity between affine maps. Without the nonlinearity the composition collapses to a single affine map.
@@ -31,7 +31,7 @@ $$
 Then $Z = XW + b = \begin{pmatrix} 3 & 1 \\ -1 & -1 \end{pmatrix}$: row $n$ of $Z$ is
 example $n$'s two pre-activations; column $k$ of $W$ is the weight vector of output
 unit $k$; $b$ is added to *every row* by broadcasting. Applying ReLU gives
-$H = \begin{pmatrix} 3 & 1 \\ 0 & 0 \end{pmatrix}$ — example 2 has switched both units off.
+$H = \begin{pmatrix} 3 & 1 \\ 0 & 0 \end{pmatrix}$, example 2 has switched both units off.
 
 This is the whole mental model: a layer is a bank of $d_{out}$ linear "detectors"
 (the columns of $W$), each producing one number per example; the activation decides
@@ -52,7 +52,7 @@ plateau of width you choose. With enough bumps you can trace any continuous func
 on a bounded interval to any tolerance. That is the content of the universal
 approximation theorems (Cybenko 1989 for sigmoids; Hornik, Stinchcombe and White 1989
 for general squashing functions). What the theorem does *not* say is that gradient
-descent will find those weights, or how many units you need — both of which grow
+descent will find those weights, or how many units you need, both of which grow
 badly for one hidden layer. Depth is what makes the approximation efficient.
 
 ![Activation functions and their derivatives](../assets/figures/part03_activations.png){ width="720" }
@@ -105,13 +105,13 @@ Derivation of the two that get asked:
 $\sigma'(z) = (1+e^{-z})^{-2}e^{-z} = \sigma(z)\cdot\frac{e^{-z}}{1+e^{-z}} = \sigma(z)(1-\sigma(z))$.
 Its maximum is at $z=0$: $\tfrac12\cdot\tfrac12 = \tfrac14$. Multiply $L$ of these
 together along a deep sigmoid net and the gradient reaching layer 1 is at most
-$4^{-L}$ times the gradient at the output — the *vanishing gradient* that motivated
+$4^{-L}$ times the gradient at the output, the *vanishing gradient* that motivated
 ReLU and, later, normalisation and residual connections.
 
 *GELU.* $\frac{d}{dz}[z\Phi(z)] = \Phi(z) + z\Phi'(z) = \Phi(z) + z\phi(z)$ by the
 product rule, with $\phi(z) = e^{-z^2/2}/\sqrt{2\pi}$. For large positive $z$,
 $\Phi \to 1$ and $z\phi \to 0$, so GELU behaves like the identity; for large
-negative $z$ both terms vanish, so it behaves like zero — a ReLU with a smooth,
+negative $z$ both terms vanish, so it behaves like zero, a ReLU with a smooth,
 slightly negative dip near $z \approx -0.75$. The dip is why GELU units do not "die":
 the gradient is small but nonzero on the negative side.
 
@@ -157,9 +157,9 @@ $$
 \boxed{\;\frac{\partial L}{\partial Z} = \frac{1}{N}\,(P - Y)\;}\qquad (Y \text{ one-hot}, \text{ shape } N\times K).
 $$
 
-This is the single most important gradient in the book: the error signal is simply
-"predicted probability minus target". It means the last layer's gradient is bounded
-in $[-1, 1]$ per entry, and it is why you fuse softmax and NLL into one loss — the
+This is the single most important gradient in the book: the error signal is the
+predicted probability minus the target. It means the last layer's gradient is bounded
+in $[-1, 1]$ per entry, and it is why you fuse softmax and NLL into one loss, the
 separate softmax Jacobian and the $-1/p$ of the log cancel algebraically, and
 numerically you avoid $\log$ of a tiny $p$.
 
@@ -176,7 +176,7 @@ A ReLU unit with $z_{nk} \le 0$ for every example $n$ in the data receives
 $\partial L/\partial z_{nk} = 0$ everywhere, so its incoming weights $W_{:,k}$ and bias
 $b_k$ get exactly zero gradient and never change: it is dead. This happens when a
 large update pushes $b_k$ or $W_{:,k}$ so that the pre-activation is negative for the
-whole input distribution — typically after a too-large learning rate step, or from
+whole input distribution, typically after a too-large learning rate step, or from
 an initialisation with the wrong scale. You detect it by measuring the fraction of
 units whose activation is zero across a validation batch; a healthy ReLU layer is
 sparse but not mostly-dead. The remedies are a lower learning rate or warmup, He
@@ -307,12 +307,12 @@ weights `r`, define the scalar $s(x) = \sum \text{forward}(x)\odot r$, and compa
 `tests/test_nn_losses.py` do exactly this, including a "sigmoid of $\pm1000$ is finite"
 check and a "dead ReLU has zero gradient" check.
 
-??? example "Full implementation — `src/mlbook/nn/layers.py`"
+??? example "Full implementation: `src/mlbook/nn/layers.py`"
     ```python
     --8<-- "src/mlbook/nn/layers.py"
     ```
 
-??? example "Full implementation — `src/mlbook/nn/losses.py`"
+??? example "Full implementation: `src/mlbook/nn/losses.py`"
     ```python
     --8<-- "src/mlbook/nn/losses.py"
     ```
@@ -355,7 +355,7 @@ parameters $L d^2$ do not. This is the trade activation checkpointing makes
 **Failure modes.** Saturating activations vanish gradients with depth; ReLUs die;
 unnormalised logits overflow a naive softmax; MSE on a sigmoid output stalls. A
 wrong `axis` in softmax (normalising over the batch instead of over classes) trains
-"fine" for a while and is a classic bug — put a shape assertion in.
+"fine" for a while and is a classic bug. Put a shape assertion in.
 
 **When to use what.**
 
@@ -371,7 +371,7 @@ wrong `axis` in softmax (normalising over the batch instead of over classes) tra
 
 ## 5. In production
 
-!!! production "Google / YouTube — ReLU MLP towers for candidate generation and ranking (2016)"
+!!! production "Google / YouTube: ReLU MLP towers for candidate generation and ranking (2016)"
     The YouTube recommendation paper describes both the candidate-generation and ranking
     networks as towers of fully connected ReLU layers over concatenated embeddings and
     dense features, trained with softmax cross-entropy (candidate generation) and a
@@ -379,10 +379,10 @@ wrong `axis` in softmax (normalising over the batch instead of over classes) tra
     the ReLU tower improved held-out metrics, and that the ReLU MLP was chosen over
     the previous matrix-factorisation approach because it can consume arbitrary
     continuous and categorical features. Source: Covington, Adams, Sargin, *Deep Neural
-    Networks for YouTube Recommendations*, RecSys 2016 —
+    Networks for YouTube Recommendations*, RecSys 2016,
     [research.google](https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/).
 
-!!! production "Meta — Llama's SwiGLU feed-forward"
+!!! production "Meta: Llama's SwiGLU feed-forward"
     Llama replaced the ReLU FFN of the original Transformer with SwiGLU, a gated
     unit built on SiLU, with the hidden width scaled to $\tfrac23\cdot 4d$ so the
     parameter count matched the ungated FFN. The paper states this was adopted from
@@ -392,7 +392,7 @@ wrong `axis` in softmax (normalising over the batch instead of over classes) tra
     [arXiv:2302.13971](https://arxiv.org/abs/2302.13971); PaLM: Chowdhery et al.
     (2022), [arXiv:2204.02311](https://arxiv.org/abs/2204.02311).
 
-!!! production "Google — Swish discovered by search (2017)"
+!!! production "Google: Swish discovered by search (2017)"
     Ramachandran, Zoph and Le searched over activation functions with reinforcement
     learning and found $x\,\sigma(\beta x)$ ("Swish"; SiLU when $\beta = 1$),
     reporting top-1 improvements over ReLU on ImageNet for Mobile NASNet-A and
@@ -402,7 +402,7 @@ wrong `axis` in softmax (normalising over the batch instead of over classes) tra
     GELU, which predates it and is the Transformer default, is Hendrycks and Gimpel,
     [arXiv:1606.08415](https://arxiv.org/abs/1606.08415).
 
-!!! production "Microsoft Research — ReLU + He init for very deep rectifier nets (2015)"
+!!! production "Microsoft Research: ReLU + He init for very deep rectifier nets (2015)"
     He, Zhang, Ren and Sun introduced PReLU and the He/Kaiming initialisation
     specifically because ReLU's derivative structure (zero on half the domain)
     made Xavier-initialised deep nets stall; with it they trained 30-layer
@@ -419,7 +419,7 @@ wrong `axis` in softmax (normalising over the batch instead of over classes) tra
     Mathematically the gradients transpose: in row convention $dW = X^\top dZ$; in
     column convention $dW = dZ\, X^\top$. If you mix them you get a shape error at
     best and a silently transposed weight at worst. **Staff follow-up:** PyTorch's
-    `nn.Linear` stores `weight` as $(d_{out}, d_{in})$ and computes `x @ weight.T` —
+    `nn.Linear` stores `weight` as $(d_{out}, d_{in})$ and computes `x @ weight.T`,
     why? Answer: it makes each output unit's weights a contiguous row, which is
     convenient for per-unit operations and matches cuBLAS's preferred layout when
     the batch is the leading dimension.
@@ -439,7 +439,7 @@ wrong `axis` in softmax (normalising over the batch instead of over classes) tra
     A unit whose pre-activation is non-positive on the whole data distribution: its
     output and gradient are identically zero, so its weights never move again. Detect
     it by logging, per layer, the fraction of units with zero activation over a
-    validation batch — a step change after a learning-rate spike is the signature.
+    validation batch. A step change after a learning-rate spike is the signature.
     Fixes, in the order I would try them: warmup and a lower peak LR; He init; a
     normalisation layer before the activation; switching to GELU/SiLU/leaky ReLU
     whose negative side has nonzero slope. **Staff follow-up:** can GELU units die?
@@ -464,7 +464,7 @@ wrong `axis` in softmax (normalising over the batch instead of over classes) tra
     SGD finds the weights. Depth, inductive bias (convolution, attention) and the
     optimisation/initialisation stack are what make approximation *efficient and
     learnable*. **Staff follow-up:** name an inductive bias that makes a task
-    tractable for a small network — translation equivariance in CNNs, or
+    tractable for a small network, translation equivariance in CNNs, or
     permutation equivariance in attention.
 
 !!! interview "You see the training loss stuck at $\log K$ from step 0. What are your top three hypotheses?"
@@ -473,8 +473,8 @@ wrong `axis` in softmax (normalising over the batch instead of over classes) tra
     the labels are misaligned with the logits (shuffled `X` but not `y`). (3) The
     learning rate is far too small, or gradients are being zeroed/clipped to
     nothing. I would check the gradient norm per layer, the fraction of zero
-    activations, and overfit a single batch first — if a single batch cannot be
-    memorised, it is a bug, not a hyperparameter.
+    activations, and overfit a single batch first. If a single batch cannot be
+    memorised, the problem is a bug rather than a hyperparameter.
 
 ## 7. Exercises
 
@@ -539,8 +539,8 @@ from a confidently wrong prediction.
 
 ??? success "Solution"
     At $z=-10$, $p \approx 4.5\times10^{-5}$ and $\sigma'(z) = p(1-p) \approx 4.5\times10^{-5}$.
-    MSE: $\partial L/\partial z = 2(p - 1)\,p(1-p) \approx -9\times10^{-5}$ — almost nothing.
-    BCE: $\partial L/\partial z = p - y \approx -1$ — a full-strength push. MSE's gradient
+    MSE: $\partial L/\partial z = 2(p - 1)\,p(1-p) \approx -9\times10^{-5}$, almost nothing.
+    BCE: $\partial L/\partial z = p - y \approx -1$, a full-strength push. MSE's gradient
     carries $\sigma'(z)$, which is tiny exactly when the model is confidently wrong;
     BCE's does not, because the $\sigma'$ cancels against the $1/p$ of the log.
     This is the argument for log-loss on probabilistic outputs.
@@ -549,10 +549,10 @@ from a confidently wrong prediction.
 
 - Cybenko, G. (1989). *Approximation by superpositions of a sigmoidal function.* Mathematics of Control, Signals and Systems 2, 303–314. [Springer](https://link.springer.com/article/10.1007/BF02551274)
 - Hornik, K., Stinchcombe, M., White, H. (1989). *Multilayer feedforward networks are universal approximators.* Neural Networks 2(5), 359–366. [ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/0893608089900208)
-- He, K., Zhang, X., Ren, S., Sun, J. (2015). *Delving Deep into Rectifiers.* [arXiv:1502.01852](https://arxiv.org/abs/1502.01852)
+- He, K., Zhang, X., Ren, S., Sun, J. (2015), ICCV. PReLU and the He/Kaiming initialisation for rectifier networks. [arXiv:1502.01852](https://arxiv.org/abs/1502.01852)
 - Hendrycks, D., Gimpel, K. (2016). *Gaussian Error Linear Units (GELUs).* [arXiv:1606.08415](https://arxiv.org/abs/1606.08415)
 - Ramachandran, P., Zoph, B., Le, Q. V. (2017). *Searching for Activation Functions.* [arXiv:1710.05941](https://arxiv.org/abs/1710.05941)
 - Covington, P., Adams, J., Sargin, E. (2016). *Deep Neural Networks for YouTube Recommendations.* RecSys. [research.google](https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/)
 - Touvron, H. et al. (2023). *LLaMA: Open and Efficient Foundation Language Models.* [arXiv:2302.13971](https://arxiv.org/abs/2302.13971)
 - Chowdhery, A. et al. (2022). *PaLM: Scaling Language Modeling with Pathways.* [arXiv:2204.02311](https://arxiv.org/abs/2204.02311)
-- Karpathy, A. (2019). *A Recipe for Training Neural Networks.* [karpathy.github.io](http://karpathy.github.io/2019/04/25/recipe/) — the "overfit one batch first" discipline used in §6.
+- Karpathy, A. (2019). *A Recipe for Training Neural Networks.* [karpathy.github.io](http://karpathy.github.io/2019/04/25/recipe/). the "overfit one batch first" discipline used in §6.

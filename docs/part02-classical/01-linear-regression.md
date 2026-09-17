@@ -1,9 +1,9 @@
 # Linear regression
 
 > **Why this matters at staff level.** Linear regression is the model interviewers use
-> to check whether you can *derive*, not just *fit*: the normal equations, the SVD view
-> of ridge, why L1 gives sparsity, and what happens when $X^TX$ is singular are all
-> ten-minute whiteboard questions. In system-design rounds it reappears as the
+> to check whether you can derive results or only reproduce them. The normal equations,
+> the SVD view of ridge, why L1 gives sparsity, and what happens when $X^TX$ is singular
+> are all ten-minute whiteboard questions. In system-design rounds it reappears as the
 > calibration layer, the "simple baseline that must be beaten", and the explainable
 > model regulators accept. Strong signal is deriving every result below from the
 > objective, naming the failure mode of each solver, and knowing where a linear model
@@ -343,7 +343,7 @@ Check with `pytest tests/test_classical_linear.py -q` (one test per symbol, name
 Failure modes to name in an interview:
 
 - **Ill-conditioning.** Symptoms: huge weights of opposite sign, GD stalls, `solve` warns about a singular matrix. Fixes: standardise, drop/merge duplicates, ridge.
-- **Outliers.** Squared loss gives an outlier a quadratic vote; one bad label can move the line arbitrarily (the hat matrix diagonal $H_{ii}$, "leverage", tells you which points can). Fixes: Huber loss, quantile regression, or a tree model.
+- **Outliers.** Squared loss gives an outlier a quadratic vote; one bad label can move the line arbitrarily (the hat matrix diagonal $H_{ii}$, called leverage, tells you which points can). Fixes: Huber loss, quantile regression, or a tree model.
 - **Heteroscedastic / heavy-tailed targets.** OLS is still unbiased but no longer efficient and confidence intervals lie. Fix: weighted least squares, or model $\log y$.
 - **Extrapolation.** Linear models extrapolate linearly without any warning. Trees flat-line, which is often safer.
 - **Leakage through interactions.** With hashed crosses you can memorise `(user_id × item_id)`; regularise crosses more heavily than singletons (Google's per-coordinate learning rates do this implicitly).
@@ -414,7 +414,7 @@ interpretability, monotonicity guarantees, or a regulator-friendly model → lin
     Diagnose first: duplicated columns, dummy-variable trap, $d > N$. Options in
     order of preference: remove the redundancy (interpretability), ridge (smooth,
     always invertible, closed form), pseudoinverse (minimum-norm solution, what
-    `lstsq` does silently, dangerous because it hides the problem). *Never*
+    `lstsq` does silently, which is dangerous because it hides the problem). *Never*
     `np.linalg.inv` on a nearly-singular matrix. **Follow-up:** *why does the
     minimum-norm solution generalise reasonably in the $d > N$ regime?* Because
     among all interpolating solutions it has the smallest weights, which is

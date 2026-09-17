@@ -40,7 +40,7 @@ users per arm. Every A/B-test question is a version of this arithmetic plus the 
 ![CLT and A/B test power](../assets/figures/part01_clt_ab_test.png){ width="760" }
 
 *Left: standardised sample means of Exponential(1) draws for $n = 1, 5, 30, 200$. The source law is
-maximally skewed, yet by $n = 30$ the mean is close to Gaussian, this is why $\bar x \pm 1.96\,s/\sqrt n$
+maximally skewed, yet by $n = 30$ the mean is close to Gaussian. That is why $\bar x \pm 1.96\,s/\sqrt n$
 works for almost any per-user metric. Right: the power of a two-proportion z-test on a 5% baseline as a
 function of the true lift, for three sample sizes. Power at zero lift is $\alpha = 0.05$ (false positives).*
 
@@ -357,7 +357,7 @@ then deployed under shift; treating a Bayesian posterior with a flat prior on a 
     KDD 2013; A. Deng, Y. Xu, R. Kohavi & T. Walker, "Improving the Sensitivity of Online Controlled Experiments by
     Utilizing Pre-Experiment Data", WSDM 2013 (the CUPED paper); R. Kohavi, D. Tang & Y. Xu, *Trustworthy Online
     Controlled Experiments*, Cambridge University Press, 2020. Bing ran thousands of concurrent experiments; CUPED
- with a pre-period version of the same metric was reported to cut variance by roughly half on key metrics, 
+    with a pre-period version of the same metric was reported to cut variance by roughly half on key metrics, 
     equivalent to doubling traffic. The KDD paper's rules of thumb (sample-ratio-mismatch checks, the surprising
     frequency of "flat" results, Twyman's law for too-good results) are the checklist interviewers expect you to know.
     *Rejected alternative:* more traffic or longer runs, which cost real product velocity.
@@ -374,7 +374,7 @@ then deployed under shift; treating a Bayesian posterior with a flat prior on a 
 !!! production "Airbnb: peeking, novelty effects and selection bias"
     J. Overgoor, "Experiments at Airbnb", Airbnb Engineering (Medium), 2014; M. Shen et al., "Selection Bias in
     Online Experimentation", Airbnb Engineering, 2018. The 2014 post documents a test that looked significant
- after a few days and washed out by the end (the peeking problem) and Airbnb's response of computing a
+    after a few days and washed out by the end, the peeking problem, along with Airbnb's response of computing a
     dynamic p-value threshold plus a minimum run length covering a full weekly cycle. The 2018 post covers
     why the *winning* variants' measured lifts are optimistically biased (the winner's curse) and how to correct it.
     Both are canonical reading for the "what can go wrong with this test" follow-up.
@@ -397,10 +397,10 @@ then deployed under shift; treating a Bayesian posterior with a flat prior on a 
     or bootstrap SE because CTR is a ratio. **Staff follow-up:** *the PM wants to peek daily.* Then use a sequential
     test with a pre-registered boundary, and explain that the price is somewhat lower power at the planned horizon.
 
-!!! interview "Why is the MLE of the variance biased, and does it matter for deep learning?"
+!!! interview "Why is the MLE of the variance biased, and where does that bite in deep learning?"
     $\hat\sigma^2$ uses $\bar x$ instead of $\mu$; since $\bar x$ minimises $\sum(x_i - c)^2$ over $c$, the sum is
-    systematically smaller than with $\mu$, by a factor $\frac{N-1}{N}$. It does not matter for training a net
-    (any consistent estimator is fine at $N \gg 1$) but it matters for *batch norm with small batches*: the biased
+    systematically smaller than with $\mu$, by a factor $\frac{N-1}{N}$. Training a net is unaffected
+    (any consistent estimator is fine at $N \gg 1$). *Batch norm with small batches* is affected: the biased
     variance of a batch of 2–8 underestimates the true variance and the running statistics are wrong, one reason
     group/layer norm replaced it in small-batch regimes. **Staff follow-up:** *PyTorch's BatchNorm uses which
     estimator for running variance?* The unbiased one for the running estimate, the biased one for normalising the current batch.
@@ -411,10 +411,10 @@ then deployed under shift; treating a Bayesian posterior with a flat prior on a 
     exact prior interpretation; the closest is Gal & Ghahramani's variational reading (a Bernoulli-mixture
     approximate posterior), which is an argument about the *approximating family*, not a prior. **Staff follow-up:**
     *does the correspondence survive with Adam?* Not for coupled L2: Adam rescales the penalty's gradient per
- coordinate, so the effective prior is no longer isotropic, that is AdamW's motivation ([chapter 06](06-optimization.md)).
+    coordinate, so the effective prior is no longer isotropic. That is AdamW's motivation ([chapter 06](06-optimization.md)).
 
 !!! interview "Your model's validation loss is much lower than test loss on a new city. Bias or variance?"
- Neither in the classical sense, it is distribution shift, which the decomposition assumes away (same $p(x)$
+    Neither, in the classical sense. This is distribution shift, which the decomposition assumes away (same $p(x)$
     at train and test). Diagnose: does a model trained on the new city's small labelled set do better (shift) or
     does more data from the old city help (variance)? Under shift the fix is data from the target, domain
     adaptation, or features invariant to the city. **Staff follow-up:** *how would you estimate the shift's size
@@ -423,7 +423,7 @@ then deployed under shift; treating a Bayesian posterior with a flat prior on a 
 !!! interview "You compare two detectors on a 5k-image test set: mAP 41.2 vs 41.9. Is B better?"
     Paired bootstrap over images (both models on the same resamples), 2000 resamples, look at the distribution
     of the mAP difference; report the CI. 0.7 mAP on 5k images is often within noise for rare classes. Also report
- per-class deltas and run three seeds per model, seed variance of $\pm 0.3$ mAP is typical. **Staff follow-up:**
+    per-class deltas and run three seeds per model; seed variance of $\pm 0.3$ mAP is typical. **Staff follow-up:**
     *how do you decide the test set is big enough before you start?* From the bootstrap SE of the metric on the
     current set: it scales as $1/\sqrt{N}$, so extrapolate to the $N$ that gives the resolution you need.
 
@@ -431,7 +431,7 @@ then deployed under shift; treating a Bayesian posterior with a flat prior on a 
     Accuracy is meaningless at that base rate (predicting "never fraud" gets 99%). Ask for precision/recall at the
     operating threshold, the PR curve, calibration of the scores (the threshold is a cost decision that needs
     calibrated probabilities), and the CI on recall given the tiny number of positives ($\approx$ 50 fraud cases in
- 5k gives a recall SE of $\sim 7$ points). **Staff follow-up:** *the training set was rebalanced to 50/50, 
+    5k gives a recall SE of $\sim 7$ points). **Staff follow-up:** *the training set was rebalanced to 50/50, 
     what happened to calibration?* Scores are shifted by $\log$ of the prior ratio; correct with the
     prior-shift formula or re-fit a temperature/bias on unbalanced validation data.
 

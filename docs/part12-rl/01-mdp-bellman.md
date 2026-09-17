@@ -2,7 +2,7 @@
 
 > **Why this matters at staff level.** Every RL question in an interview eventually
 > reduces to "what is the state, what is the action, what is the reward, and over what
-> horizon?" — and candidates who learned RL from an RLHF diagram cannot answer it. The
+> horizon?", and candidates who learned RL from an RLHF diagram cannot answer it. The
 > ML depth round tests whether you can derive both Bellman equations and say why the
 > optimality one has a $\max$ where the expectation one has a sum. The system design
 > round tests whether you can recognise that your ranking problem is a bandit, your
@@ -10,7 +10,7 @@
 > signal is deriving $V^\pi$ from the definition of the return without hesitating, and
 > then immediately talking about what breaks in production.
 
-## TL;DR — the interview card
+## TL;DR, the interview card
 
 * An MDP is $(\mathcal{S}, \mathcal{A}, P, R, \gamma)$ with the **Markov property**:
   $P(s_{t+1}\mid s_t,a_t)$ does not depend on anything earlier. Shapes for a finite MDP:
@@ -20,7 +20,7 @@
 * **Bellman expectation:** $V^\pi(s)=\sum_a \pi(a|s)\big[R(s,a)+\gamma\sum_{s'}P(s'|s,a)V^\pi(s')\big]$.
   It is one linear system: $V^\pi = (I-\gamma P_\pi)^{-1}R_\pi$.
 * **Bellman optimality:** $V^*(s)=\max_a\big[R(s,a)+\gamma\sum_{s'}P(s'|s,a)V^*(s')\big]$.
-  Nonlinear because of the $\max$ — hence iteration, not matrix inversion.
+  The $\max$ makes it nonlinear, so you iterate instead of inverting a matrix.
 * Both backup operators are **$\gamma$-contractions in the sup norm**, so value iteration
   converges geometrically: $\norm{V_k - V^*}_\infty \le \gamma^k \norm{V_0 - V^*}_\infty$.
 * **Policy improvement theorem:** if $Q^\pi(s,\pi'(s))\ge V^\pi(s)$ for all $s$ then
@@ -70,7 +70,7 @@ Here is the answer, computed by the code in §3:
 
 Look at two things. First, value *bleeds* outward from the goal: cell $(0,2)$ is worth
 $0.98$ because it is one reliable step away, $(2,0)$ is worth $0.61$ because it is four
-noisy steps away. Second, look at the arrow in $(2,3)$ — directly below the pit. The
+noisy steps away. Second, look at the arrow in $(2,3)$, directly below the pit. The
 optimal action there is to move **left**, away from the pit, even though that is
 geometrically the long way round to the goal. With a $10\%$ slip, stepping "up" next to a
 $-1$ cell risks landing in it; the optimal policy pays two extra steps of $-0.04$ to buy
@@ -111,7 +111,7 @@ $S_{t+1}$ and $R_{t+1}$ depends on $(S_t, A_t)$ and on nothing earlier. This is 
 about your *state representation*, not about the world. A single camera frame is not
 Markov for driving (you cannot tell a parked car from one reversing); a frame plus
 velocity estimates plus a map is much closer. Half of applied RL is engineering a state
-that makes the Markov assumption approximately true — stacking four Atari frames, keeping
+that makes the Markov assumption approximately true: stacking four Atari frames, keeping
 a tracker's state, carrying an LSTM hidden state.
 
 A policy is a conditional distribution $\pi(a\mid s)$, a table $\pi \in \R^{S\times A}$
@@ -184,7 +184,7 @@ $$
 
 The first term expands by conditioning on the action: $\E_\pi[R_{t+1}\mid S_t=s] = \sum_a \pi(a|s) R(s,a)$.
 
-For the second term, condition on $(A_t, S_{t+1})$ — this is the law of total expectation,
+For the second term, condition on $(A_t, S_{t+1})$. This is the law of total expectation,
 the only probabilistic tool needed here:
 
 $$
@@ -205,10 +205,9 @@ $$
 \boxed{\;Q^\pi(s,a) \;=\; R(s,a) + \gamma \sum_{s'} P(s'\mid s,a) \sum_{a'} \pi(a'\mid s')\, Q^\pi(s',a')\;}
 $$
 
-**What it means.** $V^\pi$ is not defined by these equations — it is *characterised* by
-them. The equation says the value function is self-consistent: if you know it everywhere
-else, you know it here. That turns an expectation over infinite trajectories into $S$
-coupled linear equations.
+**What it means.** These equations do not define $V^\pi$, they characterise it. They say
+the value function is self-consistent: if you know it everywhere else, you know it here.
+That turns an expectation over infinite trajectories into $S$ coupled linear equations.
 
 #### The linear-algebra view
 
@@ -224,7 +223,7 @@ $$
 
 The inverse exists because $P_\pi$ is stochastic, so its spectral radius is $1$ and every
 eigenvalue of $I - \gamma P_\pi$ is at least $1-\gamma > 0$. Policy evaluation is a linear
-solve — $O(S^3)$ exactly, or $O(S^2)$ per iteration if you iterate. Both are implemented
+solve: $O(S^3)$ exactly, or $O(S^2)$ per iteration if you iterate. Both are implemented
 in §3 and tested against each other.
 
 ### 2.5 The Bellman optimality equation
@@ -286,7 +285,7 @@ $$
 That fixed point is $V^*$ because $V^*$ satisfies the optimality equation, i.e. $TV^* = V^*$,
 and the fixed point is unique. The same argument with $\sum_a \pi(a|s)$ instead of
 $\max_a$ shows the expectation operator $T^\pi$ is also a $\gamma$-contraction with fixed
-point $V^\pi$ — which is why *iterative* policy evaluation works too.
+point $V^\pi$, which is why *iterative* policy evaluation works too.
 
 Two practical corollaries you should quote in an interview:
 
@@ -337,13 +336,13 @@ $V^\pi$ satisfies the Bellman *optimality* equation, hence $\pi$ is optimal).
 
 **Policy iteration** alternates exact evaluation and greedy improvement. Because each
 step strictly improves a policy unless it has converged, and there are only $A^S$
-deterministic policies, it terminates in finitely many steps — usually a handful. That is
+deterministic policies, it terminates in finitely many steps, usually a handful. That is
 the theorem in the code in §3, tested against value iteration.
 
 !!! warning "Where the theorem quietly breaks in deep RL"
     The proof assumes $Q^\pi$ is *exact*. With function approximation you have $\hat{Q}$,
-    and greedification with respect to a wrong $\hat{Q}$ can make the policy worse —
-    this is *policy oscillation*, and it is one of the reasons TRPO and PPO (chapter 4)
+    and greedification with respect to a wrong $\hat{Q}$ can make the policy worse.
+    This is *policy oscillation*, and it is one of the reasons TRPO and PPO (chapter 4)
     take small, trust-region-limited steps instead of fully greedy ones. Saying this
     sentence is what separates a candidate who memorised the theorem from one who
     understands it.
@@ -361,7 +360,7 @@ $b_t(s) = \Pr(s_t = s \mid o_{1:t}, a_{1:t-1})$, which *is* Markov; but the beli
 lives in a continuous simplex of dimension $S-1$, so exact solutions are intractable
 beyond toy sizes.
 
-What engineers actually do — and what you should say in an autonomy interview:
+What engineers actually do, and what you should say in an autonomy interview:
 
 | Belief-state approximation | Where you have seen it |
 |---|---|
@@ -385,7 +384,7 @@ evaluated literally.
 
 * **Shaping.** You may add a potential-based shaping term
   $F(s,a,s') = \gamma\Phi(s') - \Phi(s)$ to the reward without changing the optimal
-  policy (Ng, Harada & Russell, 1999) — the added terms telescope in the return. Any
+  policy (Ng, Harada & Russell, 1999), because the added terms telescope in the return. Any
   *other* shaping can and usually does change the optimum. In the gridworld, the $-0.04$
   step cost is not potential-based, and it does change the policy: make it $-0.5$ and the
   agent prefers the pit to a long walk.
@@ -406,8 +405,8 @@ evaluated literally.
 
 ## 3. Implementation
 
-The whole chapter rests on two tensors. Building them explicitly — rather than letting a
-library hide them — is what makes the Bellman equations concrete.
+The whole chapter rests on two tensors. Building them explicitly, rather than letting a
+library hide them, is what makes the Bellman equations concrete.
 
 ### 3.1 The gridworld as explicit $P$ and $R$
 
@@ -488,9 +487,9 @@ def policy_evaluation_exact(P, R, pi, gamma):
 
 The `einsum` string is the one place this part uses one, so it is explained term by term:
 `sa` is $\pi(a|s)$, `sat` is $P(s'|s,a)$ with `t` standing for $s'$, and the output `st`
-sums over the repeated `a` — exactly $P_\pi[s,s'] = \sum_a \pi(a|s)P(s'|s,a)$.
+sums over the repeated `a`, which is exactly $P_\pi[s,s'] = \sum_a \pi(a|s)P(s'|s,a)$.
 
-??? example "Full implementations — `src/mlbook/rl/envs.py` and `dynamic_programming.py`"
+??? example "Full implementation: `src/mlbook/rl/dynamic_programming.py`"
     ```python
     --8<-- "src/mlbook/rl/dynamic_programming.py"
     ```
@@ -501,11 +500,11 @@ Four properties, all in `tests/test_rl_dynamic_programming.py` and `tests/test_r
 
 1. **$P$ is a valid MDP**: rows sum to one, terminals absorb, and hand-computed slip
    probabilities for one cell match ($0.8 / 0.1 / 0.1$ with `slip=0.2`).
-2. **Iterative evaluation equals the closed form** to $10^{-8}$ — this catches sign,
+2. **Iterative evaluation equals the closed form** to $10^{-8}$. This catches sign,
    transpose and discount errors that eyeballing a heatmap would not.
 3. **Value iteration returns a fixed point**: $V = \max_a Q(V)$ to $10^{-9}$.
 4. **Policy iteration agrees with value iteration** on both $V^*$ and the greedy actions
-   in every non-terminal cell, and does so in fewer than 10 improvement steps — which is
+   in every non-terminal cell, and does so in fewer than 10 improvement steps, which is
    the policy improvement theorem's finite-termination claim, checked numerically.
 
 ```bash
@@ -526,8 +525,8 @@ symbols from memory; then run the test that targets them.
 | `GridWorld._build_tensors` (the $(S,A,S)$ / $(S,A)$ construction) | `src/mlbook/rl/envs.py` | 15 min |
 
 **Fine to just read** (do not spend memory on them): `GridWorld._move`, `to_index` /
-`to_cell`, `one_hot_policy`, `greedy_policy`, and the episodic `reset` / `step` interface —
-they are bookkeeping, not ideas.
+`to_cell`, `one_hot_policy`, `greedy_policy`, and the episodic `reset` / `step` interface.
+They are bookkeeping, not ideas.
 
 Check yourself with:
 
@@ -557,9 +556,9 @@ iteration is preferred when you can afford the linear solve, and *modified* poli
 iteration (a few evaluation sweeps instead of an exact solve) is what people actually run.
 
 The brutal fact is the $S^2A$ memory: $P$ for a $100\times100$ grid with 4 actions is
-$4\times10^8$ floats. Dynamic programming is exact and useless at scale — which is the
-entire motivation for chapters 2–4. Everything after this chapter is a way to avoid ever
-materialising $P$.
+$4\times10^8$ floats. Dynamic programming is exact and useless at scale, which is the
+entire motivation for chapters 2 to 4. Everything after this chapter is a way to avoid
+ever materialising $P$.
 
 ### When to use what
 
@@ -596,21 +595,21 @@ bandit system.
 
 ## 5. In production
 
-!!! production "DeepMind + Google — data-centre cooling as a control MDP"
+!!! production "DeepMind and Google: data-centre cooling as a control MDP"
     DeepMind and Google applied machine learning to Google's data-centre cooling and
     reported **a 40% reduction in the energy used for cooling**, equivalent to a 15%
     reduction in overall PUE overhead. The framing is a textbook control MDP: the state is
     a vector of sensor readings (temperatures, pressures, setpoints, weather, load), the
     actions are setpoint changes, the reward is negative energy subject to hard safety
-    constraints, and the horizon is the thermal time constant of the building — the
-    reason the problem is not myopic is that cooling decisions now change the temperature
-    trajectory for the next hour. Note what made it deployable: a *simulated/predictive*
+    constraints, and the horizon is the thermal time constant of the building. The problem
+    is not myopic because cooling decisions now change the temperature trajectory for the
+    next hour. Note what made it deployable: a *simulated/predictive*
     model of the plant plus human-in-the-loop setpoint recommendation, not a policy given
     direct control of a live building. That is the model-based branch of the taxonomy,
     chosen because interaction is expensive and unsafe.
     [DeepMind AI reduces Google data centre cooling bill by 40% (2016)](https://deepmind.google/blog/deepmind-ai-reduces-google-data-centre-cooling-bill-by-40/)
 
-!!! production "Google DeepMind — AlphaChip: floorplanning as a sequential decision problem"
+!!! production "Google DeepMind: AlphaChip, floorplanning as a sequential decision problem"
     Chip floorplanning (placing macros on a canvas) was reframed as an MDP: the state is
     the partially placed netlist, an action places the next macro on a grid cell, and the
     reward is a proxy for wirelength, congestion and density evaluated at the end. The
@@ -622,18 +621,18 @@ bandit system.
     which is what makes millions of rollouts affordable.
     [How AlphaChip transformed computer chip design (Google DeepMind)](https://deepmind.google/blog/how-alphachip-transformed-computer-chip-design/)
 
-!!! production "YouTube — when a recommender is genuinely an MDP, not a bandit"
+!!! production "YouTube: when a recommender is genuinely an MDP"
     Chen et al. (WSDM 2019) describe a REINFORCE-based recommender deployed on YouTube
     with an action space on the order of millions. The reason it is an MDP rather than a
     contextual bandit is stated plainly in the framing: what the system recommends now
     changes what the user watches, which changes the state the next recommendation is made
     in, and the quantity they care about accrues over a session and beyond. The paper's
-    hard parts are all consequences of that choice — off-policy correction because the
+    hard parts are all consequences of that choice: off-policy correction because the
     logged data came from many earlier policies, and a top-$K$ correction because the
     policy emits a slate rather than a single action.
     [Top-K Off-Policy Correction for a REINFORCE Recommender System (arXiv:1812.02353)](https://arxiv.org/abs/1812.02353)
 
-!!! production "DeepMind — AlphaGo Zero: the Bellman equation with a learned $V$ and a search"
+!!! production "DeepMind: AlphaGo Zero, the Bellman equation with a learned $V$ and a search"
     AlphaGo Zero learns purely from self-play with no human games, using a single network
     that outputs a policy prior and a value $V(s)$, wrapped in Monte Carlo tree search.
     In MDP terms: the model $P$ is known exactly (the rules of Go), the reward is sparse
@@ -649,7 +648,7 @@ bandit system.
     Start from $V^\pi(s) = \E_\pi[G_t\mid S_t=s]$, substitute $G_t = R_{t+1} + \gamma G_{t+1}$,
     split the expectation, condition the second term on $A_t$ and $S_{t+1}$, and then use
     the Markov property to replace $\E[G_{t+1}\mid S_{t+1}=s', \ldots]$ with $V^\pi(s')$.
-    Say the last step out loud — it is the only place the Markov assumption is used, and
+    Say the last step out loud. It is the only place the Markov assumption is used, and
     the interviewer is listening for it. Finish by writing the matrix form
     $V^\pi = (I-\gamma P_\pi)^{-1}R_\pi$ and noting the inverse exists because
     $\gamma < 1$.
@@ -673,23 +672,23 @@ bandit system.
     translates into policy error with another $1/(1-\gamma)$ factor, so near $\gamma=1$ a
     small value residual is not a small policy error.
 
-!!! interview "Value iteration vs policy iteration — which do you reach for?"
+!!! interview "Value iteration vs policy iteration: which do you reach for?"
     Both converge to $\pi^*$; they trade per-iteration cost against iteration count. Policy
     iteration does an exact $O(S^3)$ evaluation and needs very few improvement steps
     (4 vs 29 on the gridworld in this chapter); value iteration does $O(S^2A)$ per sweep
     and needs many. If $S$ is small enough for a linear solve, policy iteration; if not,
-    value iteration or, better, modified policy iteration — a fixed number $m$ of
+    value iteration or, better, modified policy iteration: a fixed number $m$ of
     evaluation sweeps per improvement, which interpolates between them ($m=1$ is value
     iteration, $m=\infty$ is policy iteration).
 
     **Staff-level follow-up: why does policy iteration terminate at all?**
     The policy improvement theorem says each greedification is non-decreasing everywhere
     and strictly increasing somewhere unless the policy is already greedy w.r.t. its own
-    value — in which case the Bellman optimality equation holds. Since there are finitely
+    value, in which case the Bellman optimality equation holds. Since there are finitely
     many deterministic policies and none can repeat, it terminates.
 
 !!! interview "Your robot has cameras. Is that an MDP?"
-    No — it is a POMDP, and the distinction is load-bearing. A single image does not
+    No. It is a POMDP, and the distinction is load-bearing. A single image does not
     determine velocity, occluded objects, or other agents' intent, so two different true
     states can produce the same observation while demanding different actions. The optimal
     policy is over belief states, which is intractable exactly; in practice you approximate
@@ -699,8 +698,8 @@ bandit system.
     deterministic argmax policies can be provably suboptimal.
 
     **Staff-level follow-up: how would you detect partial observability empirically?**
-    Train two policies, one on the current observation and one on a history window; if the
-    history one is substantially better, your state is not Markov. Or look for
+    Train two policies, one on the current observation and one on a history window. If the
+    history one scores higher, your state is not Markov. Or look for
     "impossible" value inconsistencies: high TD error concentrated on particular
     observation clusters is a signature of aliased states.
 
@@ -709,7 +708,7 @@ bandit system.
     decision steps over which consequences actually matter. If a recommendation influences
     the next ~20 items in a session, $\gamma\approx 0.95$; if you genuinely care about
     retention weeks later and your step is a session, you need either a much larger
-    $\gamma$ or — better — a reward that *already includes* the long-term quantity
+    $\gamma$ or (better) a reward that *already includes* the long-term quantity
     (session length, next-day return), so the algorithm does not have to propagate credit
     across thousands of steps. Then say the trade-off: raising $\gamma$ raises the variance
     of every return estimate and the number of iterations to converge, both by
@@ -721,10 +720,10 @@ bandit system.
     gradient is worth the bias. Say that explicitly; it shows you have trained something.
 
 !!! interview "Your agent found a way to get high reward that you hate. What happened?"
-    You specified a proxy, and the agent optimised it — correctly. Walk through the
+    You specified a proxy, and the agent optimised it correctly. Walk through the
     diagnosis: (1) is the reward a *learned* model (then you are off-distribution and need
     a KL anchor or a better model); (2) is it a hand-crafted dense shaping term (then check
-    whether it is potential-based — if not, it changes the optimum by construction); (3) is
+    whether it is potential-based, since if it is not it changes the optimum by construction); (3) is
     the episode boundary being exploited (agents love terminating early or never); (4) is
     the environment itself buggy. The general principle: never add a shaping term that is
     not of the form $\gamma\Phi(s')-\Phi(s)$ unless you intend to change what optimal
@@ -733,7 +732,7 @@ bandit system.
     **Staff-level follow-up: give the LLM version of this.**
     A reward model trained on human preferences is a proxy for human judgement; optimising
     it hard produces outputs that score well and read badly, which is precisely why RLHF
-    adds a KL penalty to the reference policy — see
+    adds a KL penalty to the reference policy. See
     [RLHF with PPO](../part07-post-training/03-rlhf-ppo.md).
 
 ## 7. Exercises
@@ -756,7 +755,7 @@ bandit system.
     ??? success "Solution"
         $V^*(\text{goal}) = 1 + 0.95V^*(\text{goal}) \Rightarrow V^* = 1/0.05 = 20$. Every
         other state's value inflates toward $20\gamma^d$, and the policy becomes: reach the
-        goal and stay there forever. Nothing is *wrong* — it is a different MDP — but the
+        goal and stay there forever. Nothing is *wrong*, it is a different MDP, but the
         returns are no longer comparable to the episodic ones, which is exactly the bug
         that appears when a real implementation forgets to zero the bootstrap at
         termination.
@@ -778,9 +777,9 @@ bandit system.
         With no slip the agent walks straight up past the pit; as slip grows, the expected
         cost of a $10\%$–$50\%$ chance of $-1$ exceeds the cost of the detour and the arrow
         flips to "left". The start value falls monotonically with slip. The lesson for
-        interviews: the optimal policy depends on the *dynamics*, not just the geometry —
-        which is why an imitation policy trained on a low-noise expert transfers badly to a
-        high-noise vehicle.
+        interviews: the optimal policy depends on the *dynamics*, not only the geometry.
+        An imitation policy trained on a low-noise expert transfers badly to a high-noise
+        vehicle for exactly this reason.
 
 4. **★★ Prove the residual bound.** Show that if $\norm{TV - V}_\infty \le \epsilon$ then
    $\norm{V - V^*}_\infty \le \epsilon/(1-\gamma)$.
@@ -838,7 +837,7 @@ bandit system.
         to the stochastic one *in this symmetric case*. Now break the symmetry: make the
         wrong answer cost $-1$ but also end the episode, while the right answer gives
         $+1$ and continues. Then a deterministic policy has expected return $0.5\cdot 1/(1-\gamma/2)\cdot\ldots$
-        — evaluate both numerically. The general lesson is what matters: in a POMDP,
+        and evaluate both numerically. The general lesson is what matters: in a POMDP,
         randomising is a way of hedging over an unobserved state, and the class of
         deterministic observation-policies is strictly weaker. This is also why policy-gradient
         methods (which keep a stochastic $\pi$) are often preferred over value-greedy ones
@@ -846,14 +845,14 @@ bandit system.
 
 ## References
 
-* Sutton & Barto, *Reinforcement Learning: An Introduction*, 2nd ed. — chapters 3 (finite
+* Sutton & Barto, *Reinforcement Learning: An Introduction*, 2nd ed., chapters 3 (finite
   MDPs), 4 (dynamic programming). The canonical treatment; the policy improvement theorem
   proof above follows its structure. [Book site](http://incompleteideas.net/book/the-book-2nd.html)
-* OpenAI, *Spinning Up in Deep RL* — Part 1 (key concepts) and
+* OpenAI, *Spinning Up in Deep RL*, Part 1 (key concepts) and
   [Part 2: Kinds of RL Algorithms](https://spinningup.openai.com/en/latest/spinningup/rl_intro2.html)
   for the taxonomy used in this part's overview. [Spinning Up](https://spinningup.openai.com/en/latest/)
 * Ng, Harada & Russell, "Policy invariance under reward transformations: theory and
-  application to reward shaping", ICML 1999 — the potential-based shaping result quoted in
+  application to reward shaping", ICML 1999. The potential-based shaping result quoted in
   §2.9.
 * Evans & Gao, "DeepMind AI reduces Google data centre cooling bill by 40%", 2016.
   [DeepMind blog](https://deepmind.google/blog/deepmind-ai-reduces-google-data-centre-cooling-bill-by-40/)

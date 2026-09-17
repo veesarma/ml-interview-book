@@ -83,7 +83,7 @@ radius $0.6$, $1.0$ and $1.6$, and two LSTM cell paths with different forget bia
 
 *Look at the vertical axis: it is logarithmic and spans 24 decades. The $\rho = 0.6$ RNN's
 gradient is $10^{-12}$ after 60 steps, numerically zero in fp32. The $\rho = 1.6$ RNN's is
-$10^{11}$, one such minibatch destroys the weights. Only the $\rho\approx 1$ knife-edge is
+$10^{11}$. One such minibatch destroys the weights. Only the $\rho\approx 1$ knife-edge is
 usable, and it is not stable under training. The dashed LSTM curves stay flat because the cell
 path multiplies by $f_t \in (0,1)$ chosen by the network rather than by a fixed $W_h$.*
 
@@ -753,7 +753,7 @@ last one.
 !!! interview "You are training an LSTM and the loss goes to NaN on some batches. Debug it."
     First, confirm it is the gradient and not the data: log $\lVert g\rVert$ per step and the input
     statistics; an unnormalised outlier feature is as likely a culprit as the recurrence. If
- $\lVert g\rVert$ spikes by orders of magnitude on the NaN step, it is exploding gradients, 
+ $\lVert g\rVert$ spikes by orders of magnitude on the NaN step, the cause is exploding gradients:
     apply global-norm clipping at 1–5, which rescales the whole gradient vector and keeps its
     direction. Check whether the spiking batches are the long ones; if so, bucket by length so a
     single 2000-step sequence does not dominate. Also check the loss itself for $\log 0$ (clamp

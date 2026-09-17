@@ -68,15 +68,16 @@ flowchart TB
 ```
 
 *The solid path is what a lab running its own pretraining does; the dashed path is what you
-do when you start from someone else's open-weights checkpoint, continued pretraining first,
+do when you start from someone else's open-weights checkpoint: continued pretraining first,
 then your own anneal, then post-training.*
 
 Why does the *end* of training deserve special data? Because the learning rate is decaying,
 so late tokens have an outsized influence on the final weights: with a small LR the model
 makes small, precise adjustments and does not have time to "wash out" what it just saw. It
-is the same intuition as the last epoch of any fine-tune, applied at pretraining scale. Data
-you would not want to dominate 15T tokens, a few tens of billions of textbook-quality,
-synthetic, or instruction-adjacent tokens, is exactly what you want in the last 2%.
+is the same intuition as the last epoch of any fine-tune, applied at pretraining scale. You
+would not want a few tens of billions of textbook-quality, synthetic, or
+instruction-adjacent tokens to dominate a 15T-token run. Those are exactly the tokens you
+want in the last 2%.
 
 ![A mid-training schedule: learning rate and data mixture](../assets/figures/part06_midtraining_pipeline.png){ width="720" }
 
@@ -141,16 +142,16 @@ that positions beyond that produce, extrapolation fails abruptly.
 Three ways to extend to $k\,T_{\text{train}}$:
 
 1. **Position interpolation (PI)**: map $m \to m/k$. Every angle the model sees stays inside
-the trained range. Cost: fine-grained resolution shrinks by $k$, nearby positions become
-   harder to distinguish, hurting short-context quality unless you fine-tune.
+   the trained range. Cost: fine-grained resolution shrinks by $k$, so nearby positions
+   become harder to distinguish, which hurts short-context quality unless you fine-tune.
 2. **NTK-aware / base scaling**: raise the base, $\theta_{\text{base}} \to \theta_{\text{base}}\cdot k^{d/(d-2)}$.
    High-frequency dimensions (small $i$) are nearly unchanged, so local resolution is
    preserved; low-frequency dimensions are stretched, which is where long-range information
    lives. This is what most production models do; Llama 3 uses a base of 500,000.
-3. **YaRN**: interpolate per frequency band, leave wavelengths shorter than the trained
-context untouched, fully interpolate wavelengths longer than it, and ramp in between,
-   plus a temperature factor $1/\sqrt{t}$ on attention logits to counteract the entropy
-   increase from attending over more positions.
+3. **YaRN**: interpolate per frequency band. Wavelengths shorter than the trained context
+   are left untouched, wavelengths longer than it are fully interpolated, and the band
+   between ramps. YaRN adds a temperature factor $1/\sqrt{t}$ on the attention logits to
+   counteract the entropy increase from attending over more positions.
 
 Deriving the NTK exponent: you want the *longest* wavelength (the $i = d/2 - 1$ dimension,
 $\theta_{\min} = \theta_{\text{base}}^{-(d-2)/d}$) to be stretched by exactly $k$ while the shortest
@@ -350,13 +351,13 @@ product of the classifier-filtering and synthetic-generation work of chapter 1.
 
 **Evaluating a mid-training stage.** There is no single metric, so use a fixed panel:
 
-1. **Held-out loss on the target distribution**, does it learn the domain?
-2. **Held-out loss on the original distribution**, forgetting, measured continuously.
-3. **Targeted capability suite** (math, code, multilingual, long-context RULER /
-needle-in-a-haystack), does the capability actually appear?
-4. **General suite** (MMLU-style knowledge, reasoning), the regression guard.
-5. **Equal-token ablation**, the same token budget spent on the base mixture. Without this
-   you cannot separate "this data was good" from "more tokens were good".
+1. Held-out loss on the target distribution: does it learn the domain?
+2. Held-out loss on the original distribution: forgetting, measured continuously.
+3. A targeted capability suite (math, code, multilingual, long-context RULER or
+   needle-in-a-haystack): does the capability actually appear?
+4. A general suite (MMLU-style knowledge, reasoning) as the regression guard.
+5. An equal-token ablation, meaning the same token budget spent on the base mixture. Without
+   it you cannot separate "this data was good" from "more tokens were good".
 6. **Contamination check** on every new source (chapter 1) before believing any of the above.
 
 ## 5. In production
@@ -416,11 +417,11 @@ needle-in-a-haystack), does the capability actually appear?
     In the last 1–5% of tokens you decay the learning rate toward zero while up-weighting
     high-quality, curated and synthetic data. It works because the remaining LR budget
     $\sum_{s\ge t}\eta_s$ is small, so the final weights stay near where decay started and are
-    adjusted precisely by the data seen during decay, late data is not washed out. Llama 3
+    adjusted precisely by the data seen during decay. Late data does not get washed out. Llama 3
     and OLMo 2 both do this, and Llama 3 additionally averages annealing checkpoints.
     **Staff follow-up:** *So why not train on the good data the whole time?* There is not
     enough of it (tens of billions of tokens against a 15T budget), and using it early wastes
-    it, the model would overwrite what it learned. Annealing spends a scarce resource at the
+    it, because the model would overwrite what it learned. Annealing spends a scarce resource at the
     moment it has the most leverage.
 
 !!! interview "Design a context extension from 8k to 128k. What are the failure modes?"
@@ -453,7 +454,7 @@ needle-in-a-haystack), does the capability actually appear?
     the embedding and unembedding matrices. Initialise each new row as the mean of the
     embeddings of its old sub-token pieces (optionally frequency-weighted) so the model's
     behaviour barely changes at step 0, then continue pretraining on a mixture of the new
-    language and replay data. This cannot be done with LoRA, the new rows are genuinely new
+    language and replay data. LoRA cannot do this, because the new rows are genuinely new
     parameters. **Staff follow-up:** *What improves after this, mechanically?* Tokens per byte
     for that language drops, so the same context holds more text, inference is cheaper per
     character, and the effective training signal per token improves because tokens align with
@@ -462,16 +463,16 @@ needle-in-a-haystack), does the capability actually appear?
 !!! interview "How do you evaluate a mid-training stage that has no single benchmark?"
     A fixed panel, with an equal-token control: held-out loss on the target distribution,
     held-out loss on the original distribution (forgetting), a targeted capability suite, a
-    general suite, and long-context evals if context changed, all compared against spending
-    the identical token budget on the base mixture. Without that control I cannot separate
+    general suite, and long-context evals if context changed. All of it is compared against
+    spending the identical token budget on the base mixture. Without that control I cannot separate
     "the data helped" from "more training helped". And every new source gets a contamination
     check before any of these numbers are believed. **Staff follow-up:** *Cheapest version of
     this?* Branch several short decay runs from one stable checkpoint (WSD) and compare their
-    panels, that is the whole reason to prefer WSD over cosine.
+    panels. That is the whole reason to prefer WSD over cosine.
 
 !!! interview "Where is the line between mid-training and post-training?"
-Objective and data type. Mid-training keeps the pretraining objective, next-token
-prediction on documents, and changes what the model knows or how far it sees.
+    Objective and data type. Mid-training keeps the pretraining objective (next-token
+    prediction on documents) and changes what the model knows or how far it sees.
     Post-training changes *behaviour* using instruction/preference data and different
     objectives (SFT's masked-prompt cross-entropy, then reward modelling and RL). The line
     has blurred: annealing mixtures now include instruction-formatted and synthetic reasoning
@@ -552,11 +553,11 @@ prediction on documents, and changes what the model knows or how far it sees.
         against any eval set you will use. (2) Vocabulary check: if the tokeniser fragments
         internal identifiers badly, extend it with a few thousand tokens and mean-initialise.
         (3) CPT: ~1 epoch over the 40B internal code tokens mixed with ~20% general/public
-        code replay and a few percent general text, roughly 50B tokens total, LR re-warmed
-        to ~20% of the original peak, WSD schedule. (4) Anneal (~2–3B tokens): up-weight the
+        code replay and a few percent general text: roughly 50B tokens total, with the LR
+        re-warmed to ~20% of the original peak on a WSD schedule. (4) Anneal (~2–3B tokens): up-weight the
         internal docs, high-quality internal code (tests, well-reviewed modules), and
         synthetic doc-to-code / code-to-doc pairs; LR → 0. (5) Context extension if the use
-        case needs whole-repo context, staged, with genuine long files and concatenated
+        case needs whole-repo context. Stage it, with genuine long files and concatenated
         module-level contexts. Then SFT on internal task data.
         **Panel.** Held-out internal-code loss; held-out general and public-code loss
         (forgetting); internal task suite (completion acceptance, build-passing rate);
@@ -565,7 +566,7 @@ prediction on documents, and changes what the model knows or how far it sees.
         **With only 2B tokens.** CPT on 2B tokens is a weak signal and 20 epochs would be
         wasteful and over-fit (chapter 2). I would skip CPT, go straight to LoRA/SFT on
         task-formatted data (chapter 6), and spend the effort on retrieval over the repo
-        instead (Part XIII), at that data scale, context beats weights.
+        instead (Part XIII). At that data scale, context beats weights.
 
 ## References
 

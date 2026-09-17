@@ -9,7 +9,7 @@
 > claims, and the discipline of a safety case. Strong signal is naming the trade-off a
 > Waymo paper made and what it measured.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - **The bet**: redundant sensing (lidar + cameras + radar + audio), a safety case,
   geo-fenced rider-only operation, and a relentless evaluation stack. Learned
@@ -17,14 +17,14 @@
 - **Perception**: multi-sensor fusion; the 6th-generation Driver carries 13 cameras,
   4 lidar, 6 radar and external audio receivers (Aug 2024 blog). The Open Dataset
   (arXiv:1912.04838) is their public shape of the perception problem.
-- **Prediction lineage**: Wayformer (arXiv:2207.05844) — attention encoders over agents,
-  road graph and traffic signals with latent queries → **MotionLM** (arXiv:2309.16534)
-  — motion as discrete tokens, *joint* multi-agent futures decoded autoregressively
-  with a plain next-token loss.
+- **Prediction lineage**: Wayformer (arXiv:2207.05844) encodes agents, road graph and
+  traffic signals with attention and latent queries. MotionLM (arXiv:2309.16534) then
+  discretises motion into tokens and decodes *joint* multi-agent futures
+  autoregressively, with a plain next-token loss.
 - **Simulation**: SimulationCity (2021), the open Waymax simulator (arXiv:2310.08710, JAX,
   built on the Open Motion Dataset), the Sim Agents challenge (arXiv:2305.12032), and a
   generative **Waymo World Model** built on Genie 3 (Feb 2026 blog).
-- **End-to-end research**: **EMMA** (arXiv:2410.23262) — a Gemini-based multimodal model
+- **End-to-end research**: **EMMA** (arXiv:2410.23262), a Gemini-based multimodal model
   that reads camera images and text and writes trajectories, objects and road graph as
   text; explicitly a research model with stated limitations (no lidar, few frames).
 - **Scaling laws** (arXiv:2506.08228, June 2025 blog): motion forecasting and planning
@@ -283,7 +283,7 @@ you deploy it?".
 
 **Sources.** Hwang et al., "EMMA: End-to-End Multimodal Model for Autonomous Driving"
 (arXiv:2410.23262; blog "Introducing EMMA", Oct 2024; research page); Baniodeh et al.,
-"Scaling Laws of Motion Forecasting and Planning — A Technical Report" (arXiv:2506.08228;
+"Scaling Laws of Motion Forecasting and Planning, A Technical Report" (arXiv:2506.08228;
 blog, June 2025).
 
 !!! tip "How to say it in the interview"
@@ -599,30 +599,30 @@ for calibration and abstention.
 
 **Papers**
 
-* Sun et al., "Scalability in Perception for Autonomous Driving: Waymo Open Dataset" (CVPR 2020) — [arXiv:1912.04838](https://arxiv.org/abs/1912.04838); dataset at [waymo.com/open](https://waymo.com/open/)
-* Ettinger et al., "Large Scale Interactive Motion Forecasting for Autonomous Driving: The Waymo Open Motion Dataset" (ICCV 2021) — [arXiv:2104.10133](https://arxiv.org/abs/2104.10133)
-* Nayakanti et al., "Wayformer: Motion Forecasting via Simple & Efficient Attention Networks" (ICRA 2023) — [arXiv:2207.05844](https://arxiv.org/abs/2207.05844)
-* Seff et al., "MotionLM: Multi-Agent Motion Forecasting as Language Modeling" (ICCV 2023) — [arXiv:2309.16534](https://arxiv.org/abs/2309.16534)
-* Gulino et al., "Waymax: An Accelerated, Data-Driven Simulator for Large-Scale Autonomous Driving Research" (NeurIPS 2023) — [arXiv:2310.08710](https://arxiv.org/abs/2310.08710), [github.com/waymo-research/waymax](https://github.com/waymo-research/waymax)
-* Montali et al., "The Waymo Open Sim Agents Challenge" (2023) — [arXiv:2305.12032](https://arxiv.org/abs/2305.12032)
-* Hwang et al., "EMMA: End-to-End Multimodal Model for Autonomous Driving" (2024) — [arXiv:2410.23262](https://arxiv.org/abs/2410.23262), [research page](https://waymo.com/research/emma/)
-* Baniodeh et al., "Scaling Laws of Motion Forecasting and Planning — A Technical Report" (2025) — [arXiv:2506.08228](https://arxiv.org/abs/2506.08228)
-* "WOD-E2E: Waymo Open Dataset for End-to-End Driving in Challenging Long-tail Scenarios" (2025) — [arXiv:2510.26125](https://arxiv.org/abs/2510.26125)
-* Tancik et al., "Block-NeRF: Scalable Large Scene Neural View Synthesis" (CVPR 2022) — [arXiv:2202.05263](https://arxiv.org/abs/2202.05263)
-* Kusano, Scanlon et al., "Comparison of Waymo Rider-Only Crash Rates by Crash Type to Human Benchmarks at 56.7 Million Miles", *Traffic Injury Prevention* (2025) — [doi:10.1080/15389588.2025.2499887](https://www.tandfonline.com/doi/full/10.1080/15389588.2025.2499887)
+* Sun et al., "Scalability in Perception for Autonomous Driving: Waymo Open Dataset" (CVPR 2020). [arXiv:1912.04838](https://arxiv.org/abs/1912.04838); dataset at [waymo.com/open](https://waymo.com/open/)
+* Ettinger et al., "Large Scale Interactive Motion Forecasting for Autonomous Driving: The Waymo Open Motion Dataset" (ICCV 2021). [arXiv:2104.10133](https://arxiv.org/abs/2104.10133)
+* Nayakanti et al., "Wayformer: Motion Forecasting via Simple & Efficient Attention Networks" (ICRA 2023). [arXiv:2207.05844](https://arxiv.org/abs/2207.05844)
+* Seff et al., "MotionLM: Multi-Agent Motion Forecasting as Language Modeling" (ICCV 2023). [arXiv:2309.16534](https://arxiv.org/abs/2309.16534)
+* Gulino et al., "Waymax: An Accelerated, Data-Driven Simulator for Large-Scale Autonomous Driving Research" (NeurIPS 2023). [arXiv:2310.08710](https://arxiv.org/abs/2310.08710), [github.com/waymo-research/waymax](https://github.com/waymo-research/waymax)
+* Montali et al., "The Waymo Open Sim Agents Challenge" (2023). [arXiv:2305.12032](https://arxiv.org/abs/2305.12032)
+* Hwang et al., "EMMA: End-to-End Multimodal Model for Autonomous Driving" (2024). [arXiv:2410.23262](https://arxiv.org/abs/2410.23262), [research page](https://waymo.com/research/emma/)
+* Baniodeh et al., "Scaling Laws of Motion Forecasting and Planning. A Technical Report" (2025). [arXiv:2506.08228](https://arxiv.org/abs/2506.08228)
+* "WOD-E2E: Waymo Open Dataset for End-to-End Driving in Challenging Long-tail Scenarios" (2025). [arXiv:2510.26125](https://arxiv.org/abs/2510.26125)
+* Tancik et al., "Block-NeRF: Scalable Large Scene Neural View Synthesis" (CVPR 2022). [arXiv:2202.05263](https://arxiv.org/abs/2202.05263)
+* Kusano, Scanlon et al., "Comparison of Waymo Rider-Only Crash Rates by Crash Type to Human Benchmarks at 56.7 Million Miles", *Traffic Injury Prevention* (2025). [doi:10.1080/15389588.2025.2499887](https://www.tandfonline.com/doi/full/10.1080/15389588.2025.2499887)
 
 **Blog posts and company documents**
 
-* "Meet the 6th-generation Waymo Driver" (Aug 2024) — [waymo.com/blog/2024/08/meet-the-6th-generation-waymo-driver/](https://waymo.com/blog/2024/08/meet-the-6th-generation-waymo-driver/)
-* "Introducing EMMA" (Oct 2024) — [waymo.com/blog/2024/10/introducing-emma/](https://waymo.com/blog/2024/10/introducing-emma/)
-* "New Insights for Scaling Laws in Autonomous Driving" (June 2025) — [waymo.com/blog/2025/06/scaling-laws-in-autonomous-driving/](https://waymo.com/blog/2025/06/scaling-laws-in-autonomous-driving/)
-* "Simulation City" (2021) — [waymo.com/blog/2021/07/simulation-city/](https://waymo.com/blog/2021/07/simulation-city/)
-* "Waymo advances AI research with our multifunctional Waymax simulator" (Oct 2023) — [waymo.com/blog/2023/10/…waymax-simulator](https://waymo.com/blog/2023/10/waymo-advances-ai-research-with-our-multifunctional-waymax-simulator)
-* "The Waymo World Model: A New Frontier for Autonomous Driving Simulation" (Feb 2026) — [waymo.com/blog/2026/02/…](https://waymo.com/blog/2026/02/the-waymo-world-model-a-new-frontier-for-autonomous-driving-simulation/); Google DeepMind, "Genie 3: A new frontier for world models" (Aug 2025) — [deepmind.google/blog/genie-3-a-new-frontier-for-world-models/](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/)
-* "Fleet Response" (May 2024) — [waymo.com/blog/2024/05/fleet-response/](https://waymo.com/blog/2024/05/fleet-response/)
-* Waymo Safety — [waymo.com/safety/](https://waymo.com/safety/); Safety Impact hub — [waymo.com/safety/impact/](https://waymo.com/safety/impact/); Safety Data Hub launch (Sept 2024) — [waymo.com/blog/2024/09/safety-data-hub/](https://waymo.com/blog/2024/09/safety-data-hub/)
-* "Waymo's Safety Methodologies and Safety Readiness Determinations" (2020) — [waymo.com/research/waymos-safety-methodologies-and-safety-readiness/](https://waymo.com/research/waymos-safety-methodologies-and-safety-readiness/)
-* "Waymo Safety Case Approach" (white paper) — [PDF](https://assets.ctfassets.net/e6t5diu0txbw/66jOjPtNIjzawaK0ZjpU3q/7f081b392cf29a3355c97d0d758fe6cf/Waymo_Safety_Case_Approach.pdf)
-* "Waymo's autonomous vehicles are significantly safer than human-driven ones, says new research led by Swiss Re" (Sept 2023) — [waymo.com/blog/2023/09/…](https://waymo.com/blog/2023/09/waymos-autonomous-vehicles-are-significantly-safer-than-human-driven-ones/)
-* "Demonstrably Safe AI for Autonomous Driving" (Dec 2025) — [waymo.com/blog/2025/12/demonstrably-safe-ai-for-autonomous-driving/](https://waymo.com/blog/2025/12/demonstrably-safe-ai-for-autonomous-driving/)
-* Independent audits (Nov 2025) — [waymo.com/blog/2025/11/independent-audits/](https://waymo.com/blog/2025/11/independent-audits/)
+* "Meet the 6th-generation Waymo Driver" (Aug 2024). [waymo.com/blog/2024/08/meet-the-6th-generation-waymo-driver/](https://waymo.com/blog/2024/08/meet-the-6th-generation-waymo-driver/)
+* "Introducing EMMA" (Oct 2024). [waymo.com/blog/2024/10/introducing-emma/](https://waymo.com/blog/2024/10/introducing-emma/)
+* "New Insights for Scaling Laws in Autonomous Driving" (June 2025). [waymo.com/blog/2025/06/scaling-laws-in-autonomous-driving/](https://waymo.com/blog/2025/06/scaling-laws-in-autonomous-driving/)
+* "Simulation City" (2021). [waymo.com/blog/2021/07/simulation-city/](https://waymo.com/blog/2021/07/simulation-city/)
+* "Waymo advances AI research with our multifunctional Waymax simulator" (Oct 2023). [waymo.com/blog/2023/10/…waymax-simulator](https://waymo.com/blog/2023/10/waymo-advances-ai-research-with-our-multifunctional-waymax-simulator)
+* "The Waymo World Model: A New Frontier for Autonomous Driving Simulation" (Feb 2026). [waymo.com/blog/2026/02/…](https://waymo.com/blog/2026/02/the-waymo-world-model-a-new-frontier-for-autonomous-driving-simulation/); Google DeepMind, "Genie 3: A new frontier for world models" (Aug 2025). [deepmind.google/blog/genie-3-a-new-frontier-for-world-models/](https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/)
+* "Fleet Response" (May 2024). [waymo.com/blog/2024/05/fleet-response/](https://waymo.com/blog/2024/05/fleet-response/)
+* Waymo Safety. [waymo.com/safety/](https://waymo.com/safety/); Safety Impact hub. [waymo.com/safety/impact/](https://waymo.com/safety/impact/); Safety Data Hub launch (Sept 2024). [waymo.com/blog/2024/09/safety-data-hub/](https://waymo.com/blog/2024/09/safety-data-hub/)
+* "Waymo's Safety Methodologies and Safety Readiness Determinations" (2020). [waymo.com/research/waymos-safety-methodologies-and-safety-readiness/](https://waymo.com/research/waymos-safety-methodologies-and-safety-readiness/)
+* "Waymo Safety Case Approach" (white paper). [PDF](https://assets.ctfassets.net/e6t5diu0txbw/66jOjPtNIjzawaK0ZjpU3q/7f081b392cf29a3355c97d0d758fe6cf/Waymo_Safety_Case_Approach.pdf)
+* "Waymo's autonomous vehicles are significantly safer than human-driven ones, says new research led by Swiss Re" (Sept 2023). [waymo.com/blog/2023/09/…](https://waymo.com/blog/2023/09/waymos-autonomous-vehicles-are-significantly-safer-than-human-driven-ones/)
+* "Demonstrably Safe AI for Autonomous Driving" (Dec 2025). [waymo.com/blog/2025/12/demonstrably-safe-ai-for-autonomous-driving/](https://waymo.com/blog/2025/12/demonstrably-safe-ai-for-autonomous-driving/)
+* Independent audits (Nov 2025). [waymo.com/blog/2025/11/independent-audits/](https://waymo.com/blog/2025/11/independent-audits/)

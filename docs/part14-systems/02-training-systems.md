@@ -3,17 +3,17 @@
 > **Why this matters at staff level.** Getting a run to *start* is a week of work; keeping it
 > alive, fast and reproducible for two months is the job. Interviewers probe this with "your MFU
 > is 18 %, what do you look at first?", "how often do you checkpoint?", "the loss spiked at step
-> 84k — what do you do?". Strong signal is a candidate who reasons with an explicit budget
+> 84k, what do you do?". Strong signal is a candidate who reasons with an explicit budget
 > (compute, memory, failure rate) instead of listing tools, and who knows that most "algorithmic"
 > speedups are memory-bandwidth wins.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - **MFU** $= \dfrac{\text{tokens/s} \times (6N + 12Lhs)}{\text{GPUs} \times \text{peak FLOP/s}}$.
   Quote MFU, not HFU: HFU counts recomputation, so it rewards doing extra work. 35–50 % BF16 MFU
   is a good large-scale number; Llama 3 405B reported 38–43 %.
 - **Gradient accumulation** over $k$ micro-batches with the loss scaled by $1/k$ is *exactly*
-  equal to one large batch — except for any layer that mixes examples (BatchNorm).
+ equal to one large batch, except for any layer that mixes examples (BatchNorm).
 - **Mixed precision:** fp16 needs dynamic loss scaling (its exponent range underflows gradients);
   bf16 has fp32's exponent range and needs none. Both keep an fp32 master weight. fp8 (E4M3
   forward / E5M2 backward) needs per-tensor scaling and is used selectively.
@@ -46,14 +46,14 @@ flowchart LR
 ```
 
 A concrete tiny example. Suppose one step processes 2M tokens and the GPU math takes 400 ms.
-Those 2M tokens as `int32` ids are 8 MB — nothing. But if your loader hands out *untokenised*
+Those 2M tokens as `int32` ids are 8 MB, nothing. But if your loader hands out *untokenised*
 text and tokenises in the training process, you are doing ~2M BPE merges per step on a handful
 of CPU cores, which takes seconds. The GPU idles at 10 % MFU and the profiler shows a gap
-before every step. The fix is not a faster GPU kernel; it is to tokenise once, offline, into
-packed fixed-length sequences. **Most low-MFU incidents are not on the GPU.**
+before every step. The fix is to tokenise once, offline, into packed fixed-length sequences, not to buy a
+faster GPU. **Most low-MFU incidents are not on the GPU.**
 
 Second intuition: the same step has a memory budget you already derived in the
-[distributed-training chapter](01-distributed-training.md) — $16P$ of state plus activations.
+[distributed-training chapter](01-distributed-training.md), $16P$ of state plus activations.
 Training systems is the set of knobs that trade one resource for another:
 
 | Knob | Buys | Costs |
@@ -114,7 +114,7 @@ $$
 **The two caveats.** (i) Any layer whose forward depends on the *composition* of the
 micro-batch breaks the identity: BatchNorm normalises by micro-batch statistics, so
 $\ell_i$ is no longer a function of example $i$ alone. LayerNorm/RMSNorm are per-example and are
-safe — one reason Transformers are friendlier to large-scale training than BN-based CNNs.
+safe, one reason Transformers are friendlier to large-scale training than BN-based CNNs.
 (ii) Under fp16 loss scaling, scale the loss by $S/k$ and unscale once before clipping and the
 optimizer step; if you unscale per micro-batch you lose the protection. Gradient clipping must
 be applied to the *accumulated* gradient, after all micro-batches, or you have changed the
@@ -136,9 +136,9 @@ $10^{-7}$–$10^{-9}$, below fp16's smallest normal $6\times10^{-5}$, so they fl
 linearity), unscales before the optimizer step, and adapts $S$: double it every $N$ successful
 steps, halve it and *skip the step* whenever an inf/NaN appears. bf16 trades mantissa bits for
 exponent bits and removes the whole mechanism, which is why every large run since ~2021 uses
-bf16. The fp32 **master weight** is not optional in either case: with a bf16 weight of magnitude
-1, an update of $10^{-4}$ is below the 8-bit mantissa's resolution ($2^{-8} \approx 4\times10^{-3}$
-relative) and would be rounded away entirely — the model would silently stop learning.
+bf16. Both schemes still need the fp32 **master weight**: with a bf16 weight of magnitude
+1, an update of $10^{-4}$ falls below the 8-bit mantissa's resolution ($2^{-8} \approx 4\times10^{-3}$
+relative) and rounds away entirely, so the model stops learning without any error being raised.
 
 fp8 literacy: forward activations/weights in E4M3, gradients in E5M2 (they need range more than
 precision), with per-tensor scaling factors updated from recent amax history; typically applied
@@ -161,8 +161,8 @@ $$
 $$
 
 For Llama-2-7B at $s = 4096$, micro-batch 1: none 97 GB, selective 17 GB (+4.8 % FLOPs),
-$\sqrt{L}$ 18.4 GB (+33 %), full 4.0 GB (+33 %). Selective dominates $\sqrt{L}$ here — same
-memory, one seventh of the extra compute — which is precisely Korthikanti et al.'s point.
+$\sqrt{L}$ 18.4 GB (+33 %), full 4.0 GB (+33 %). Selective dominates $\sqrt{L}$ here, same
+memory, one seventh of the extra compute, which is precisely Korthikanti et al.'s point.
 Full recompute is for when you need the last 4 GB, e.g. to raise micro-batch size enough to
 hide communication.
 
@@ -181,7 +181,7 @@ $$
 (the classic Young/Daly first-order result). With $C = 30$ s and $T = 3$ h, $I^\star \approx 13$ min.
 As a cluster grows, $T$ falls roughly linearly in node count, so $I^\star$ falls as $\sqrt{T}$:
 big clusters checkpoint *more* often, and this is why **sharded, asynchronous checkpointing**
-matters — each rank writes only its own shard (making $C$ nearly independent of model size),
+matters, each rank writes only its own shard (making $C$ nearly independent of model size),
 and the write is overlapped with subsequent compute by first copying state to host memory.
 
 Resumability has a second half that people forget: **the data order**. A resumed run must
@@ -222,7 +222,7 @@ def training_days(n_params, tokens, peak_flops, n_gpus, target_mfu):
 ```
 
 `flops_per_token` in `flops.py` counts $2 \times$ matmul parameters (attention projections, MLP,
-and the LM head — the input embedding is a gather, not a matmul) plus $4Lhs$ for the score and
+and the LM head, the input embedding is a gather, not a matmul) plus $4Lhs$ for the score and
 context matmuls, then multiplies by 3 for training (4 with recompute). The test pins
 `hfu / mfu == 4/3` and that `mfu_from_six_nd` matches the definition, so you cannot accidentally
 "improve" MFU by turning on recomputation.
@@ -239,7 +239,7 @@ def accumulated_grads(model, loss_fn, X, y, k):
 
 The whole lesson is the `/ k`. The paired tests assert `max_abs_diff < 1e-6` against the
 full-batch gradient when the model uses LayerNorm, and `> 1e-4` when the identical model uses
-BatchNorm1d — the caveat made executable, so you can show an interviewer the failure rather
+BatchNorm1d, the caveat made executable, so you can show an interviewer the failure rather
 than assert it.
 
 ### 3.3 Selective-checkpointing calculator
@@ -257,21 +257,21 @@ def checkpoint_plans(s, b, h, a, L):
             CheckpointPlan("full", L * I + A, 1.0 / 3.0)]
 ```
 
-`attention_core_fraction` is the ratio $4sh / (8h^2 + 4hd_{ff} + 4sh)$ — the share of a layer's
-forward FLOPs spent in the two $s$-dependent matmuls — and it grows with sequence length, which
+`attention_core_fraction` is the ratio $4sh / (8h^2 + 4hd_{ff} + 4sh)$, the share of a layer's
+forward FLOPs spent in the two $s$-dependent matmuls, and it grows with sequence length, which
 is the honest statement of when selective recompute stops being nearly free.
 
-??? example "Full implementation — `src/mlbook/systems/mfu.py`"
+??? example "Full implementation: `src/mlbook/systems/mfu.py`"
     ```python
     --8<-- "src/mlbook/systems/mfu.py"
     ```
 
-??? example "Full implementation — `src/mlbook/systems/grad_accumulation.py`"
+??? example "Full implementation: `src/mlbook/systems/grad_accumulation.py`"
     ```python
     --8<-- "src/mlbook/systems/grad_accumulation.py"
     ```
 
-??? example "Full implementation — `src/mlbook/systems/activation_checkpointing_calc.py`"
+??? example "Full implementation: `src/mlbook/systems/activation_checkpointing_calc.py`"
     ```python
     --8<-- "src/mlbook/systems/activation_checkpointing_calc.py"
     ```
@@ -285,17 +285,17 @@ $LI + A$ formula for full recompute.
 
 | Symbol | File | Retype from memory? | Target time |
 |---|---|---|---|
-| `mfu`, `hfu`, `training_days` | `src/mlbook/systems/mfu.py` | **Yes** — the MFU calculator | 10 minutes |
-| `flops_per_token`, `matmul_params` | `src/mlbook/systems/flops.py` | **Yes** — FLOPs/token for a Transformer | 10 minutes |
-| `accumulated_grads`, `full_batch_grads` | `src/mlbook/systems/grad_accumulation.py` | **Yes** — the equivalence demo | 10 minutes |
+| `mfu`, `hfu`, `training_days` | `src/mlbook/systems/mfu.py` | **Yes**: the MFU calculator | 10 minutes |
+| `flops_per_token`, `matmul_params` | `src/mlbook/systems/flops.py` | **Yes**: FLOPs/token for a Transformer | 10 minutes |
+| `accumulated_grads`, `full_batch_grads` | `src/mlbook/systems/grad_accumulation.py` | **Yes**: the equivalence demo | 10 minutes |
 | `checkpoint_plans`, `attention_core_fraction` | `src/mlbook/systems/activation_checkpointing_calc.py` | **Yes** | 15 minutes |
-| `make_mlp`, `training_flops`, `six_nd` | same files | Read and understand | — |
+| `make_mlp`, `training_flops`, `six_nd` | same files | Read and understand |: |
 
 Checks: `pytest tests/test_systems_mfu.py tests/test_systems_flops.py tests/test_systems_grad_accumulation.py tests/test_systems_activation_checkpointing.py -q`.
 
 ## 4. Systems view: cost, failure modes, trade-offs
 
-**Diagnosing low MFU — the order to look.**
+**Diagnosing low MFU, the order to look.**
 
 1. **Is the GPU busy at all?** `nvidia-smi` utilisation near 100 % but low MFU means slow
    kernels; utilisation gaps mean starvation (input pipeline, host-side Python, synchronous
@@ -303,7 +303,7 @@ Checks: `pytest tests/test_systems_mfu.py tests/test_systems_flops.py tests/test
 2. **Is it communication?** Profile with the torch profiler and look at NCCL kernel time not
    overlapped with compute. Fix by bucketing, prefetching (FSDP), larger micro-batches, or
    moving the collective onto a faster link.
-3. **Is it the bubble?** Pipeline idle time is $\frac{p-1}{m+p-1}$ — raise $m$ or interleave.
+3. **Is it the bubble?** Pipeline idle time is $\frac{p-1}{m+p-1}$, raise $m$ or interleave.
 4. **Is it kernel efficiency?** Shapes not multiples of 8/64 (see the
    [hardware chapter](04-hardware-memory-roofline.md)), unfused elementwise chains, attention
    without FlashAttention, layer norms dominating.
@@ -344,17 +344,17 @@ are probing when they ask how you would run a two-month job.
 
 ## 5. In production
 
-!!! production "Meta — Llama 3 405B: 54 days, 16K H100s, 466 interruptions"
+!!! production "Meta: Llama 3 405B: 54 days, 16K H100s, 466 interruptions"
     The Llama 3 paper's infrastructure section reports a 54-day pre-training snapshot with 466
     job interruptions: 47 planned, 419 unexpected, with roughly 78 % of the unexpected ones
     attributed to confirmed or suspected hardware issues (GPU failures including HBM the largest
     category), and only three that required significant manual intervention thanks to automated
     detection and recovery. They also describe reducing checkpoint and recovery cost and tuning
     collectives for their fabric. This is the single best public data point for "how often do
-    things break at scale" — quote the shape of it, not invented numbers.
+ things break at scale", quote the shape of it, not invented numbers.
     *Source: Grattafiori et al., "The Llama 3 Herd of Models", 2024, arXiv:2407.21783, §3.3.*
 
-!!! production "Meta — OPT-175B training chronicles (2022)"
+!!! production "Meta: OPT-175B training chronicles (2022)"
     The `metaseq` repository publishes the daily logbook of the 175B run: hardware failures and
     node swaps, loss divergences, LR changes, restarts from checkpoints, and the reasoning at
     the time. It is the most detailed public account of the *operational* reality of a large run
@@ -362,14 +362,14 @@ are probing when they ask how you would run a two-month job.
     *Source: Zhang et al., "OPT: Open Pre-trained Transformer Language Models", arXiv:2205.01068,
     plus the chronicles directory in the metaseq GitHub repository.*
 
-!!! production "Google — PaLM: loss spikes and the mitigation that worked"
+!!! production "Google: PaLM: loss spikes and the mitigation that worked"
     PaLM's report documents ~20 loss spikes during training. Restarting from a checkpoint ~100
     steps before the spike and skipping 200–500 data batches avoided the spike, while replaying
-    the same batches did not reproduce it — evidence that the spike arose from a specific
+ the same batches did not reproduce it, evidence that the spike arose from a specific
     interaction of model state and batch, not from corrupt data alone.
     *Source: Chowdhery et al., "PaLM: Scaling Language Modeling with Pathways", arXiv:2204.02311.*
 
-!!! production "NVIDIA — selective activation recomputation in Megatron-LM"
+!!! production "NVIDIA: selective activation recomputation in Megatron-LM"
     Rather than recomputing whole layers, Megatron recomputes only the attention
     score/softmax/dropout region, which dominates activation memory at long sequence length but
     is a small share of FLOPs. Reported results cut activation memory ~5× while adding only a
@@ -377,7 +377,7 @@ are probing when they ask how you would run a two-month job.
     *Source: Korthikanti et al., "Reducing Activation Recomputation in Large Transformer Models",
     MLSys 2023, arXiv:2205.05198.*
 
-!!! production "Microsoft — DeepSpeed/ZeRO checkpointing and offload"
+!!! production "Microsoft: DeepSpeed/ZeRO checkpointing and offload"
     DeepSpeed popularised sharded (per-rank) checkpoints so that write time and file size scale
     with $1/N$, plus optimizer-state offload to CPU/NVMe for memory-bound runs. The engineering
     point for an interview: the checkpoint's cost is what sets the optimal cadence
@@ -391,12 +391,12 @@ are probing when they ask how you would run a two-month job.
     check whether the GPUs are idle or merely slow: a profiler trace with gaps between steps
     points at the input pipeline or host-side synchronisation (`.item()`, logging, metric
     computation); continuous kernel activity with low MFU points at kernel efficiency. Next I
-    look at exposed NCCL time — if the gradient all-reduce or FSDP all-gather is not overlapped,
+ look at exposed NCCL time, if the gradient all-reduce or FSDP all-gather is not overlapped,
     I increase micro-batch size or enable prefetch. Then the pipeline bubble: $\frac{p-1}{m+p-1}$
     with the actual $p$ and $m$ tells me if 20 % of the time is structural. Finally I compare
     HFU to MFU: if HFU is 24 % and MFU 18 %, a third of my compute is recomputation and I should
     move from full to selective checkpointing. **Staff follow-up:** "what if everything looks
-    balanced but one rank is 15 % slower?" — that is a straggler; step time is the max over
+ balanced but one rank is 15 % slower?" That is a straggler; step time is the max over
     ranks, so I'd histogram per-rank step times, check clocks/thermals and link rates, and
     drain that node.
 
@@ -408,7 +408,7 @@ are probing when they ask how you would run a two-month job.
     are not bitwise identical. It is *slower* than a real large batch because you pay the fixed
     per-kernel overhead $k$ times, but it hides communication better, since the all-reduce only
     fires on the last micro-batch (`no_sync` on the others). **Follow-up:** "so why not always
-    accumulate instead of data-parallelism?" — accumulation adds no parallel compute; it only
+ accumulate instead of data-parallelism?" Accumulation adds no parallel compute; it only
     trades time for memory.
 
 !!! interview "Explain fp16 loss scaling. Why doesn't bf16 need it?"
@@ -417,9 +417,9 @@ are probing when they ask how you would run a two-month job.
     layers. Multiplying the loss by $S$ scales all gradients by $S$ (chain rule), moving them
     into range; you unscale before clipping and the step, and adapt $S$ by doubling on success
     and halving with a skipped step on inf/NaN. bf16 keeps fp32's 8 exponent bits, so the range
-    problem disappears; you lose mantissa precision instead, which matters for accumulation —
+    problem disappears; you lose mantissa precision instead, so long summations drift:
     hence fp32 accumulate in tensor cores and an fp32 master weight. **Follow-up:** "why is the
-    master weight fp32 even in bf16?" — bf16 has 8 mantissa bits, so updates smaller than ~$2^{-8}$
+ master weight fp32 even in bf16?" Bf16 has 8 mantissa bits, so updates smaller than ~$2^{-8}$
     relative to the weight round away; over many steps the model would stop moving.
 
 !!! interview "How often would you checkpoint a 405B run on 16K GPUs?"
@@ -429,30 +429,30 @@ are probing when they ask how you would run a two-month job.
     checkpointing each rank writes its own shard and the GPU→host copy is overlapped, so $C$ is
     tens of seconds. That gives $I^\star$ of roughly 10–20 minutes. I'd also make sure the
     checkpoint includes the sampler/data-order state and the RNG state, or a resume silently
-    re-trains on seen data. **Follow-up:** "what if checkpoint writes stall the job?" — write to
+ re-trains on seen data. **Follow-up:** "what if checkpoint writes stall the job?" Write to
     a host buffer synchronously (fast) and flush to storage asynchronously, stagger ranks to
     avoid a storage thundering herd, and keep only the last $k$ plus periodic milestones.
 
 !!! interview "The loss spikes at step 84k. What do you do, in order?"
     First: confirm it's real and not a logging artifact, and look at the gradient norm in the
     preceding steps and at which ranks diverged. Immediate action is to rewind to the last good
-    checkpoint — continuing on a diverged model wastes the run. Then restart with the data
+ checkpoint, continuing on a diverged model wastes the run. Then restart with the data
     window shifted (skip a few hundred batches / change the shuffle seed) rather than replaying
     the same batches, which is what PaLM reported works. If spikes recur I lower the peak LR
     or extend warmup, and check for the usual structural culprits: unbounded attention logits
     (add QK-norm), a drifting softmax normaliser (add z-loss), fp16 anywhere in the softmax, or
     a bad shard of data. **Follow-up:** "how do you tell a data problem from an optimisation
-    problem?" — if the spike reproduces on the same batches from an earlier checkpoint it's the
+ problem?" If the spike reproduces on the same batches from an earlier checkpoint it's the
     data; if it does not, it's an optimisation/state interaction.
 
 !!! interview "Why is the input pipeline so often the bottleneck, and how do you prove it is?"
     Because the GPU's throughput has grown far faster than per-core CPU throughput and PCIe
     bandwidth, and because tokenisation, decoding and augmentation are CPU-bound and easy to
     accidentally put in the hot path. Proof: run the training loop on a synthetic tensor of the
-    right shape — if MFU jumps, it is the loader. Secondary evidence: gaps before each step in
+ right shape, if MFU jumps, it is the loader. Secondary evidence: gaps before each step in
     the profiler, worker processes pegged at 100 % CPU, or a host-to-device copy that is not on
     a pinned buffer (unpinned copies are staged through an extra host copy and cannot overlap).
-    **Follow-up:** "how do you shard data across 1024 ranks without collisions?" — pre-shard
+ **Follow-up:** "how do you shard data across 1024 ranks without collisions?" Pre-shard
     into files, assign shards by rank with a deterministic function of (epoch seed, rank), and
     keep the per-rank offset in the checkpoint so resumes are exact.
 
@@ -462,7 +462,7 @@ are probing when they ask how you would run a two-month job.
 
     ??? success "Solution"
         $46.08\times10^9$ FLOPs/token $\times\,12{,}000 = 5.53\times10^{14}$ FLOP/s, divided by
-        $9.89\times10^{14}$ = **56 %**. (Using $6N$ only would say 49 % — state which convention
+ $9.89\times10^{14}$ = **56 %**. (Using $6N$ only would say 49 %, state which convention
         you used.) `mfu(12000, LLAMA2_7B, 4096, 989e12)` returns 0.559.
 
 2. ★ With $C = 40$ s and an observed MTBF of 2.5 h, what checkpoint interval minimises waste, and
@@ -480,7 +480,7 @@ are probing when they ask how you would run a two-month job.
         layer FLOPs; with $8h^2 + 4h\cdot4h = 24h^2$ of projection+MLP FLOPs versus $4sh$, that is
         $4sh > 0.43\cdot 24h^2$, i.e. $s \gtrsim 2.6h \approx 10{,}600$. The attention core grows
         linearly in $s$ while the rest is constant per token, so long-context training makes
-        recomputation progressively less free — the argument for FlashAttention, which avoids the
+ recomputation progressively less free, the argument for FlashAttention, which avoids the
         recompute entirely by never materialising the scores.
 
 4. ★★ Modify `grad_accumulation.py` to simulate fp16 loss scaling: scale by $S = 1024$, accumulate,
@@ -501,7 +501,7 @@ are probing when they ask how you would run a two-month job.
         Step time is $\max_r t_r$, so expected throughput is $1/\E[\max_r t_r]$. With $N-1$ healthy
         ranks the job also loses $1/N$ of its compute, so dropping wins when
         $\E[\max_{N} t] / \E[\max_{N-1} t] > N/(N-1)$. For large $N$ the max is dominated by the
-        straggler, so dropping wins for roughly $\delta > 1/(N-1)$ — with 1024 ranks, a rank only
+ straggler, so dropping wins for roughly $\delta > 1/(N-1)$, with 1024 ranks, a rank only
         0.1 % slow is already worth investigating, which is why per-rank step-time monitoring is
         standard.
 

@@ -8,7 +8,7 @@
 > candidate who drives the conversation, commits to decisions with evidence, and can
 > change any of them when the interviewer moves the constraints.
 
-## TL;DR — the whiteboard in 60 seconds
+## TL;DR: the whiteboard in 60 seconds
 
 ```mermaid
 flowchart LR
@@ -181,7 +181,7 @@ anything with drift), and the known pitfalls. Online: A/B with a pre-registered
 north-star and guardrails, enough power, and a long-term holdout for anything that
 changes user behaviour. Add monitoring (input distributions, prediction
 distributions, calibration, latency, label arrival) and the retraining trigger.
-Say explicitly how you would diagnose "better offline, flat online" — the
+Say explicitly how you would diagnose "better offline, flat online". The
 [follow-ups](#10-staff-level-follow-ups) below give the model answer.
 
 ![Offline metric improvement vs online A/B outcome (illustrative)](../assets/figures/part17_offline_online.png){ width="600" }
@@ -279,7 +279,7 @@ GPUs (see the [ads chapter](03-ads-ctr-prediction.md)).
 scored item in the forward pass. A 100M-parameter ranker: $2 \times 10^8$ FLOPs/item.
 An A100 delivers ~312 TFLOP/s dense bf16 on paper; at a realistic 30 % utilisation
 that is ~$10^{14}$ FLOP/s, so ~$5 \times 10^5$ items/s per GPU. Scoring 75M items/s at
-peak needs ~150 GPUs for the ranker alone — plus headroom, plus the pre-ranker on
+peak needs ~150 GPUs for the ranker alone, plus headroom, plus the pre-ranker on
 10× more items with a 100× cheaper model. The
 [roofline chapter](../part14-systems/04-hardware-memory-roofline.md) derives where
 the 30 % comes from.
@@ -295,7 +295,7 @@ budgets retrieval and rewriting to be small next to it. See
 
 **Cost per 1k inferences.** (GPU $/hour ÷ 3600) ÷ throughput × 1000. At a nominal
 $2/hour and $5 \times 10^5$ items/s, one thousand ranker inferences cost ~$10^{-6}$
-dollars — ranking is cheap per item and expensive only in aggregate. For an LLM
+dollars, ranking is cheap per item and expensive only in aggregate. For an LLM
 answer of 500 output tokens at ~1,000 tokens/s per GPU (batched), each answer holds
 the GPU for ~0.5 GPU-seconds, ≈ $0.0003, so ~$0.30 per 1k answers before retrieval,
 guardrails and retries; a frontier-size model is 10–50× that. This arithmetic is what
@@ -332,7 +332,7 @@ matters.
 | Reciting a paper as if it were your design | Interviewers can tell | Use the paper as *evidence for* your decision, not as the decision. |
 
 Sculley et al., "Hidden Technical Debt in Machine Learning Systems" (NeurIPS 2015)
-is the canonical catalogue of what goes wrong after launch — entanglement ("changing
+is the canonical catalogue of what goes wrong after launch, entanglement ("changing
 anything changes everything"), undeclared consumers, feedback loops, pipeline jungles,
 configuration debt. Mentioning one of its named debts when discussing failure modes is
 a cheap, credible signal.
@@ -348,7 +348,7 @@ OCR / ML-platform background maps onto every chapter:
 | Detection models with per-class AP by range, hard-negative mining | Any funnel: the pre-ranker is a "cheap detector", ranking is "hard-negative mining at scale" | "In detection we learned that mining negatives from what the previous model got wrong mattered more than architecture; the same holds for retrieval negatives here." |
 | OCR pipelines with confidence-thresholded human review | Fraud, moderation, document extraction, LLM guardrails | "We set the auto-accept threshold from the cost of a wrong field, not from F1, and monitored the review rate as a drift signal." |
 | Data engines: triggers, auto-labelling, active learning | Feed cold start, moderation adversarial drift, AV perception | "Fleet triggers gave us the long tail; I'd use the same idea to mine the model's disagreements with reviewers here." |
-| Edge deployment, quantisation, latency budgets | Any serving section; on-device OCR; AV | "We had 30 ms on a mobile NPU; int8 and a distilled backbone got us there with 0.4 points of accuracy — I'd budget the same way." |
+| Edge deployment, quantisation, latency budgets | Any serving section; on-device OCR; AV | "We had 30 ms on a mobile NPU; int8 and a distilled backbone got us there with 0.4 points of accuracy: I'd budget the same way." |
 | Feature/label pipelines with training–serving skew bugs | Platform, ads, fraud | "The skew we shipped came from a timezone difference between batch and stream; that is why I log served features." |
 | Shadow mode and regression suites before OTA | Any evaluation section | "We required parity on a scenario bank before any OTA; I'd run the new ranker in shadow for a week and compare score distributions." |
 
@@ -383,42 +383,42 @@ walkthrough in the interview's order.
 **Interviewer.** "Sellers on our marketplace re-post the same item under new
 listings to game freshness. Design a system to detect duplicate listings."
 
-**Candidate — clarify.** "Is the goal to remove duplicates, or to merge them for
+**Candidate, clarify.** "Is the goal to remove duplicates, or to merge them for
 ranking? Removing is irreversible, so I'd want a review step; merging is reversible.
-What is the daily listing volume and how fast must a duplicate be caught — before it
+What is the daily listing volume and how fast must a duplicate be caught, before it
 is ever shown, or within an hour? Do we already have listing-image embeddings?"
 Assume 5M new listings/day (≈ 60/s), catch within 10 minutes, images and text
 available, a review team exists.
 
-**Candidate — metrics.** North star: fraction of duplicate impressions served
+**Candidate, metrics.** North star: fraction of duplicate impressions served
 (measured by audit sampling); guardrails: false-merge rate on distinct listings,
 reviewer volume, seller appeal rate; offline: precision/recall of pairwise duplicate
 classification on an adjudicated set, and recall of the candidate-generation stage.
 
-**Candidate — data.** Labels from three sources: seller-confirmed re-posts (clean,
+**Candidate, data.** Labels from three sources: seller-confirmed re-posts (clean,
 biased toward honest sellers), reviewer decisions (expensive, ~thousands/day),
 and weak labels from near-identical images and text (noisy, plentiful). Positional
 bias is irrelevant here, but *selection bias* is not: reviewers only see what the
 current detector flags, so I would add random audits of unflagged listings to
 estimate recall.
 
-**Candidate — model.** Two stages: candidate generation by ANN over image embeddings
+**Candidate, model.** Two stages: candidate generation by ANN over image embeddings
 and a text/hash blocking key (seller id + normalised title), then a pairwise
 classifier (GBDT on similarity features, or a small cross-encoder on image pairs and
 text) that outputs a calibrated duplicate probability. Threshold high → auto-merge,
 middle band → review queue, low → pass.
 
-**Candidate — serve.** Streaming: at listing creation, compute embeddings (GPU, ~10
+**Candidate, serve.** Streaming: at listing creation, compute embeddings (GPU, ~10
 ms), query ANN (~5 ms) for the top-50 neighbours within the same seller and globally,
 score pairs (~5 ms), write a decision. Fallback if the embedding service is down:
 hash-only blocking. Retrain weekly; refresh the index continuously.
 
-**Candidate — evaluate.** Offline PR curve on the adjudicated set, with the review
+**Candidate, evaluate.** Offline PR curve on the adjudicated set, with the review
 threshold chosen from reviewer capacity; online A/B on duplicate-impression rate with
 seller-appeal rate as guardrail; monitor the flag rate, since a sudden change means
 either a new attack or a broken embedding.
 
-!!! tip "How to say it in the interview — the two-stage decision"
+!!! tip "How to say it in the interview: the two-stage decision"
     "I'd split this into candidate generation and pairwise verification rather than
     train one classifier over all listing pairs, because the pair space is quadratic
     and I can't afford a cross-encoder on it; the same funnel logic that Facebook

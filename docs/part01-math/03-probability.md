@@ -99,7 +99,7 @@ $$
 $$
 
 *What it means:* total uncertainty splits into "how noisy $X$ is once you know $Y$" and "how much knowing
-$Y$ moves the mean". With $Y$ = the training set, this is the bias–variance decomposition's variance term
+$Y$ moves the mean". With $Y$ = the training set, the second term is the bias-variance decomposition's variance term
 ([chapter 04](04-statistics.md)); with $Y$ = the minibatch, it explains why the gradient's variance is
 $\propto 1/B$; with $Y$ = the ensemble member, it separates aleatoric from epistemic uncertainty
 ([Part XIII](../part13-retrieval-eval-reliability/03-uncertainty-reliability.md)).
@@ -162,8 +162,8 @@ same formula with $x_a$ = function values at test points and $x_b$ = observed va
 
 You only ever have uniforms $u \sim U[0, 1)$; everything else is a transformation.
 
-* **Inverse CDF.** $x = F^{-1}(u)$ has CDF $F$. For a categorical, `searchsorted(cumsum(p), u)`, this is what
-  `torch.multinomial` and every token sampler does, and it is $O(\log K)$ per sample after an $O(K)$ cumsum.
+* **Inverse CDF.** $x = F^{-1}(u)$ has CDF $F$. For a categorical, `searchsorted(cumsum(p), u)` is what
+  `torch.multinomial` and every token sampler does, at $O(\log K)$ per sample after an $O(K)$ cumsum.
 * **Box–Muller.** $z_0 = \sqrt{-2\ln u_1}\cos 2\pi u_2$, $z_1 = \sqrt{-2\ln u_1}\sin 2\pi u_2$ are independent standard
   normals (polar coordinates of a 2-D Gaussian: radius$^2$ is Exponential($\tfrac12$), angle is uniform).
 * **Multivariate.** $x = \mu + Lz$ with $\Sigma = LL^\top$, $z \sim \mathcal N(0, I)$: $\mathrm{Cov}(Lz) = LL^\top$.
@@ -311,7 +311,7 @@ top-$k$/top-$p$ filtering first is both a quality and a cost decision. Monte Car
 !!! production "Yahoo!: Thompson sampling for news article recommendation"
     O. Chapelle & L. Li, "An Empirical Evaluation of Thompson Sampling", NeurIPS 2011. On the Yahoo! Front Page
     Today Module (article selection with click feedback), Thompson sampling with Beta and logistic-regression
- posteriors matched or beat UCB variants, and (the operational point) was far more robust to *delayed*
+    posteriors matched or beat UCB variants and, the operational point, was far more robust to *delayed*
     feedback because it does not require the reward before choosing the next action. *Rejected alternative:*
     $\epsilon$-greedy, which wastes a fixed fraction of traffic forever; UCB, which needs tuned confidence widths
     and degrades under batch updates. The paper's simulations and the bandit framing are the standard reference
@@ -338,7 +338,7 @@ top-$k$/top-$p$ filtering first is both a quality and a cost decision. Monte Car
 !!! production "Topic models at scale: LDA and the Dirichlet prior"
     D. Blei, A. Ng & M. Jordan, "Latent Dirichlet Allocation", *JMLR* 3, 2003. Documents are mixtures over
     topics with a Dirichlet prior ($\alpha < 1$ makes documents sparse in topics) and topics are Dirichlet-distributed
- over words. The posterior over topic assignments is intractable (§2.2's denominator) so the paper uses
+    over words. The posterior over topic assignments is intractable, which is §2.2's denominator, so the paper uses
     variational inference (the ELBO). LDA ran in production for years for document clustering and
     interpretable content features; its parameterisation is the canonical example of "Dirichlet as a prior over
     a categorical".
@@ -358,7 +358,7 @@ top-$k$/top-$p$ filtering first is both a quality and a cost decision. Monte Car
     (2) lower-bound $\log p(x)$ with the ELBO and optimise a tractable $q$ (VAEs, LDA); (3) sample from the
     unnormalised posterior with MCMC (only ratios of $p(x\mid z)p(z)$ needed). A fourth: contrastive objectives
     that replace the normaliser with a finite set of negatives (InfoNCE). **Staff follow-up:** *which one does
- an LLM's softmax use?* None, $V$ is finite so the normaliser is a sum over 128k logits; the cost shows up as
+    an LLM's softmax use?* None of them. $V$ is finite, so the normaliser is a sum over 128k logits; the cost shows up as
     the output matmul, and the "hard denominator" reappears only when the vocabulary becomes an open set (retrieval).
 
 !!! interview "Condition a Gaussian: state the formula and explain every term."
@@ -392,9 +392,9 @@ top-$k$/top-$p$ filtering first is both a quality and a cost decision. Monte Car
     Members converge to the same function; label noise remains.
 
 !!! interview "Why is the multivariate Gaussian everywhere?"
- Three reasons that survive scrutiny: (1) the CLT, sums of many small effects are Gaussian; (2) it is the maximum-entropy
+    Three reasons that survive scrutiny: (1) the CLT, since sums of many small effects are Gaussian; (2) it is the maximum-entropy
     distribution given a mean and covariance, so it is the least-assuming model when only second moments are known;
- (3) closure, linear maps, marginals, conditionals and products of Gaussians are Gaussian, so inference stays in
+    (3) closure: linear maps, marginals, conditionals and products of Gaussians are all Gaussian, so inference stays in
     closed form. **Staff follow-up:** *what is the price?* Thin tails: one outlier moves the mean and inflates the
     covariance; real residuals (box regression errors, financial returns) are often heavy-tailed, hence Huber/L1 losses.
 
@@ -413,7 +413,7 @@ top-$k$/top-$p$ filtering first is both a quality and a cost decision. Monte Car
 **★★ 3.** Derive the posterior of $\text{Beta}(a, b)$ after $s$ successes and $f$ failures, and its mean. Explain label smoothing as a Dirichlet pseudo-count.
 
 ??? success "Solution"
- Posterior $\propto p^{s}(1-p)^{f}\cdot p^{a-1}(1-p)^{b-1} = p^{a+s-1}(1-p)^{b+f-1}$, i.e. $\text{Beta}(a+s, b+f)$, mean $\frac{a+s}{a+b+s+f}$: the empirical rate shrunk towards $\frac{a}{a+b}$ with strength $a + b$ "pseudo-observations". Label smoothing replaces a one-hot target with $(1-\epsilon)\,\text{onehot} + \epsilon/K$, which is the posterior mean of a Dirichlet($\alpha$) prior with $\alpha_k \propto \epsilon/K$ after observing one label, a pseudo-count spread across classes.
+    Posterior $\propto p^{s}(1-p)^{f}\cdot p^{a-1}(1-p)^{b-1} = p^{a+s-1}(1-p)^{b+f-1}$, i.e. $\text{Beta}(a+s, b+f)$, mean $\frac{a+s}{a+b+s+f}$: the empirical rate shrunk towards $\frac{a}{a+b}$ with strength $a + b$ "pseudo-observations". Label smoothing replaces a one-hot target with $(1-\epsilon)\,\text{onehot} + \epsilon/K$, which is the posterior mean of a Dirichlet($\alpha$) prior with $\alpha_k \propto \epsilon/K$ after observing one label, a pseudo-count spread across classes.
 
 **★★ 4 (coding).** Verify the law of total variance numerically: sample $Y \sim \text{Categorical}(0.3, 0.7)$, then $X\mid Y = y \sim \mathcal N(\mu_y, \sigma_y^2)$ with $\mu = (0, 3)$, $\sigma = (1, 2)$. Compare $\mathrm{Var}(X)$ from $10^6$ samples with $\E[\mathrm{Var}(X\mid Y)] + \mathrm{Var}(\E[X\mid Y])$.
 
@@ -434,7 +434,7 @@ top-$k$/top-$p$ filtering first is both a quality and a cost decision. Monte Car
 **★★ 5.** For the 2-D Gaussian with unit variances and correlation $\rho$, show $\mathrm{Var}(x_1\mid x_2) = 1 - \rho^2$ and interpret $\rho^2$.
 
 ??? success "Solution"
- $\Sigma_{a\mid b} = \Sigma_{aa} - \Sigma_{ab}\Sigma_{bb}^{-1}\Sigma_{ba} = 1 - \rho\cdot1\cdot\rho = 1 - \rho^2$. So $\rho^2$ is the fraction of $x_1$'s variance explained by knowing $x_2$, the $R^2$ of the linear regression of $x_1$ on $x_2$.
+    $\Sigma_{a\mid b} = \Sigma_{aa} - \Sigma_{ab}\Sigma_{bb}^{-1}\Sigma_{ba} = 1 - \rho\cdot1\cdot\rho = 1 - \rho^2$. So $\rho^2$ is the fraction of $x_1$'s variance explained by knowing $x_2$, the $R^2$ of the linear regression of $x_1$ on $x_2$.
 
 **★★★ 6 (coding).** Implement one step of a Gaussian-process posterior using `gaussian_condition`: kernel $k(x, x') = \exp(-(x-x')^2/2\ell^2)$, $\ell = 0.5$, training points $x_b = (-1, 0, 1)$ with noiseless $y_b = \sin(2x_b)$, test points a grid of 50 in $[-2, 2]$. Plot (or assert) that the posterior variance is $\approx 0$ at the training points and grows away from them.
 
@@ -458,7 +458,7 @@ top-$k$/top-$p$ filtering first is both a quality and a cost decision. Monte Car
 **★★★ 7.** Show that the Poisson distribution is the $n\to\infty$, $p = \lambda/n$ limit of the Binomial, and explain when a detector's per-cell object counts would *not* be Poisson.
 
 ??? success "Solution"
- $\binom{n}{k}(\lambda/n)^k(1-\lambda/n)^{n-k} = \frac{n(n-1)\cdots(n-k+1)}{n^k}\cdot\frac{\lambda^k}{k!}\cdot(1-\lambda/n)^{n}(1-\lambda/n)^{-k}$. As $n\to\infty$: the first factor $\to 1$, $(1-\lambda/n)^n \to e^{-\lambda}$, the last $\to 1$, leaving $\lambda^k e^{-\lambda}/k!$. Not Poisson when events are not independent with a constant rate: cars cluster (overdispersion, variance $>$ mean), pedestrians walk in groups, occlusion caps the count (underdispersion), or the rate varies across the image (a mixture, again overdispersed). Use a negative binomial or a spatially varying rate.
+    $\binom{n}{k}(\lambda/n)^k(1-\lambda/n)^{n-k} = \frac{n(n-1)\cdots(n-k+1)}{n^k}\cdot\frac{\lambda^k}{k!}\cdot(1-\lambda/n)^{n}(1-\lambda/n)^{-k}$. As $n\to\infty$: the first factor $\to 1$, $(1-\lambda/n)^n \to e^{-\lambda}$, the last $\to 1$, leaving $\lambda^k e^{-\lambda}/k!$. Not Poisson when events are not independent with a constant rate: cars cluster (overdispersion, variance $>$ mean), pedestrians walk in groups, occlusion caps the count (underdispersion), or the rate varies across the image (a mixture, again overdispersed). Use a negative binomial or a spatially varying rate.
 
 ## References
 

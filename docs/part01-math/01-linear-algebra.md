@@ -4,9 +4,9 @@
 > followed by a nonlinearity, and every interviewer who asks "why does LoRA work",
 > "why do we scale by $\sqrt{d_k}$", "is this matrix invertible", or "how would you
 > compress this embedding table" is asking a linear-algebra question in disguise. Strong
-> signal is not reciting definitions; it is moving fluently between a matrix, the
-> geometry it induces, and the cost of computing with it, and knowing which
-> decomposition answers which question.
+> signal means moving fluently between a matrix, the geometry it induces, and the cost of
+> computing with it, and knowing which decomposition answers which question. Reciting
+> definitions scores nothing.
 
 ## TL;DR: the interview card
 
@@ -237,7 +237,7 @@ table. Details and the empirical picture are in [fine-tuning & LoRA](../part06-l
 ### 2.8 Kronecker and tensor products
 
 $(A \otimes B)$ has blocks $A_{ij} B$. The key identity is $\mathrm{vec}(AXB) = (B^\top \otimes A)\,\mathrm{vec}(X)$,
-which turns a matrix equation into a linear system on the flattened matrix, it is how one writes the
+which turns a matrix equation into a linear system on the flattened matrix. That is how one writes the
 Hessian of a linear layer's weights, and how K-FAC and Shampoo ([chapter 06](06-optimization.md))
 approximate curvature as a Kronecker product of two small matrices instead of one enormous one.
 
@@ -391,7 +391,7 @@ takes $O(\kappa)$ iterations ([chapter 06](06-optimization.md)).
 !!! production "Netflix Prize: matrix factorisation for recommendation"
     Koren, Bell & Volinsky, "Matrix Factorization Techniques for Recommender Systems", *IEEE Computer*, 2009.
     The user–item rating matrix ($\sim$480k users $\times$ 17.7k movies, 99% missing) was modelled as
- $R \approx P Q^\top$ with rank $\sim$ 20–200 latent factors, an SVD-shaped low-rank model fitted
+    $R \approx P Q^\top$ with rank $\sim$ 20 to 200 latent factors: an SVD-shaped low-rank model fitted
     by SGD or alternating least squares on the *observed* entries only, with L2 regularisation.
     *Why:* neighbourhood methods could not share statistical strength across sparse users; a rank-$k$
     model has $k(n_u + n_i)$ parameters instead of $n_u n_i$, generalises, and the factors are
@@ -406,7 +406,7 @@ takes $O(\kappa)$ iterations ([chapter 06](06-optimization.md)).
     weights; LoRA reduces trainable parameters by up to $10^4\times$ and optimizer memory by $\sim 3\times$,
     and merges into $W_0$ at inference for zero added latency. *Rejected alternatives:* adapter layers
     (add inference latency), prefix tuning (consumes context length, harder to optimise). The paper's
- analysis of $\Delta W$ shows its top singular directions dominate, Eckart–Young in the wild.
+    analysis of $\Delta W$ shows its top singular directions dominate, which is Eckart-Young in the wild.
 
 !!! production "Spectral normalisation for GAN discriminators (Preferred Networks)"
     Miyato et al., "Spectral Normalization for Generative Adversarial Networks", ICLR 2018 (arXiv:1802.05957).
@@ -420,7 +420,7 @@ takes $O(\kappa)$ iterations ([chapter 06](06-optimization.md)).
     "Simple Online and Realtime Tracking with a Deep Association Metric", ICIP 2017 (arXiv:1703.07402);
     Weng et al., "3D Multi-Object Tracking: A Baseline and New Evaluation Metrics", IROS 2020 (arXiv:1907.03961).
     Each track carries a state mean and a PSD covariance $P$; predict $P \leftarrow FPF^\top + Q$ and
- update with the Kalman gain $K = PH^\top(HPH^\top + R)^{-1}$, the Gaussian conditioning formula of
+    update with the Kalman gain $K = PH^\top(HPH^\top + R)^{-1}$, which is the Gaussian conditioning formula of
     [chapter 03](03-probability.md). PSD-ness of $P$ is what makes the Mahalanobis gating distance used for
     detection–track association a valid metric; numerical drift that breaks PSD-ness is a classic
     production bug fixed by symmetrising ($P \leftarrow (P + P^\top)/2$) or using the Joseph form.
@@ -451,9 +451,9 @@ takes $O(\kappa)$ iterations ([chapter 06](06-optimization.md)).
 !!! interview "Why divide attention scores by $\sqrt{d_k}$?"
     Because $q^\top k = \sum_i q_i k_i$ has variance $d_k$ for unit-variance independent entries; without
     the scaling the logits grow with head width, softmax saturates, and its Jacobian
- $\diag(a) - aa^\top$ goes to zero, no gradient. Scaling keeps logits $O(1)$ at init. **Staff follow-up:**
+    $\diag(a) - aa^\top$ goes to zero, so there is no gradient. Scaling keeps logits $O(1)$ at init. **Staff follow-up:**
     *what if $Q$ and $K$ are not unit-variance later in training?* Then the scaling is wrong in the other
- direction, this is why QK-normalisation (LayerNorm/RMSNorm on $Q$ and $K$) was adopted in several
+    direction. That is why QK-normalisation (LayerNorm/RMSNorm on $Q$ and $K$) was adopted in several
     2023–24 LLM recipes ([chapter 06](06-optimization.md) and [Part VI](../part06-llm-training/03-large-model-architecture.md)).
 
 !!! interview "Eigen-decomposition vs SVD: when does each exist, and which do you reach for?"
@@ -462,7 +462,7 @@ takes $O(\kappa)$ iterations ([chapter 06](06-optimization.md)).
     matrix, including rectangular and rank-deficient. For symmetric PSD matrices the two coincide.
     Reach for SVD when you want optimal low-rank approximation, the pseudoinverse, or numerical robustness;
     for eigen when you have a symmetric operator and want its invariant directions (covariance, Hessian, graph Laplacian).
- **Staff follow-up:** *your Hessian has a negative eigenvalue at a point where the gradient is zero, what is it?*
+    **Staff follow-up:** *your Hessian has a negative eigenvalue at a point where the gradient is zero, what is it?*
     A saddle; the eigenvector is a descent direction.
 
 !!! interview "Why does LoRA work, and what is its failure mode?"

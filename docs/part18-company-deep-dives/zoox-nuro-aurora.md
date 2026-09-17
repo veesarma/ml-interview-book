@@ -7,10 +7,10 @@
 > a long-range FMCW lidar on Class 8 trucks and argued its safety in a public
 > safety case. Their interviews test whether you can reason from the product
 > constraint (vehicle geometry, who owns the fleet, highway speed) to the perception,
-> prediction and safety design — and whether you distinguish what they have published
+> prediction and safety design, and whether you distinguish what they have published
 > from what you are guessing.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - **Zoox** (Amazon): purpose-built bidirectional robotaxi; four symmetric corner
   sensor pods (cameras, lidar, radar, long-wave infrared, microphones) with
@@ -212,7 +212,7 @@ decides when to ask, and every request is a labelled hard case for the data engi
     I would measure requests per thousand miles, time-to-resolution, and the fraction
     that stop being requests after the next model release."
 
-### 3.4 Nuro: a licensable, AI-first driver — CIMRL, unified perception, and a compiler
+### 3.4 Nuro: a licensable, AI-first driver: CIMRL, unified perception, and a compiler
 
 **The problem.** Licensing a driver means it must generalise across partner vehicles
 and compute, and it must be safe in closed loop, not merely human-like in open loop.
@@ -271,8 +271,8 @@ addition to range, and the company states it can see over 450 metres and detect 
 pedestrian at night seconds earlier than a human at highway speed. Per-point velocity
 turns a static point cloud into a partially dynamic one, which simplifies detection
 of moving objects at range and reduces dependence on temporal accumulation. Aurora
-describes the technology in newsroom posts ("FMCW lidar: the self-driving
-game-changer"; "FirstLight lidar on a chip"). Detection and fusion math:
+describes the technology in two newsroom posts, one on why it chose FMCW lidar and
+one on putting FirstLight on a chip. Detection and fusion math:
 [3D perception](../part04-vision/07-3d-perception.md), [Sensor fusion](../part11-perception-autonomy/03-sensor-fusion.md).
 
 **The trade-off.** FMCW gives velocity and long range and is less susceptible to
@@ -547,26 +547,26 @@ night operations (2025).
 
 **Zoox**
 
-* Zoox journal, "Perception" — [zoox.com/journal/perception](https://zoox.com/journal/perception)
-* Zoox journal, sensor staleness — [zoox.com/journal/sensor-staleness-zoox](https://zoox.com/journal/sensor-staleness-zoox)
-* Zoox journal, public robotaxi service in Las Vegas (Sept 2025) — [zoox.com/journal/las-vegas](https://zoox.com/journal/las-vegas)
-* Zoox journal, testing in Austin and Miami (2024) — [zoox.com/journal/austin-miami-2024/](https://zoox.com/journal/austin-miami-2024/); Seattle (2021) — [zoox.com/journal/seattle](https://zoox.com/journal/seattle)
+* Zoox journal, "Perception". [zoox.com/journal/perception](https://zoox.com/journal/perception)
+* Zoox journal, sensor staleness. [zoox.com/journal/sensor-staleness-zoox](https://zoox.com/journal/sensor-staleness-zoox)
+* Zoox journal, public robotaxi service in Las Vegas (Sept 2025). [zoox.com/journal/las-vegas](https://zoox.com/journal/las-vegas)
+* Zoox journal, testing in Austin and Miami (2024). [zoox.com/journal/austin-miami-2024/](https://zoox.com/journal/austin-miami-2024/); Seattle (2021). [zoox.com/journal/seattle](https://zoox.com/journal/seattle)
 * Zoox TeleGuidance and the Zoox safety report: cited by name (URLs not verified).
 
 **Nuro**
 
-* Nuro blog — [nuro.ai/blog](https://www.nuro.ai/blog)
-* "CIMRL: Combining Imitation and Reinforcement Learning for Safe Autonomous Driving" — [blog post](https://www.nuro.ai/blog/cimrl-combining-imitation-reinforcement-learning-for-safe-autonomous-driving), [arXiv:2406.08878](https://arxiv.org/abs/2406.08878)
-* "Unified Perception Model" — [nuro.ai/blog/unified-perception-model](https://www.nuro.ai/blog/unified-perception-model)
-* "FTL Model Compiler Framework" — [nuro.ai/blog/ftl-model-compiler-framework](https://www.nuro.ai/blog/ftl-model-compiler-framework)
+* Nuro blog. [nuro.ai/blog](https://www.nuro.ai/blog)
+* "CIMRL: Combining Imitation and Reinforcement Learning for Safe Autonomous Driving". [blog post](https://www.nuro.ai/blog/cimrl-combining-imitation-reinforcement-learning-for-safe-autonomous-driving), [arXiv:2406.08878](https://arxiv.org/abs/2406.08878)
+* "Unified Perception Model". [nuro.ai/blog/unified-perception-model](https://www.nuro.ai/blog/unified-perception-model)
+* "FTL Model Compiler Framework". [nuro.ai/blog/ftl-model-compiler-framework](https://www.nuro.ai/blog/ftl-model-compiler-framework)
 * Nuro–Uber–Lucid robotaxi programme (2025): company announcements, cited by name.
 
 **Aurora**
 
-* Aurora — [aurora.tech](https://aurora.tech)
-* "Aurora's Verifiable AI Approach to Self-Driving" (Chris Urmson, June 2024) — [blog.aurora.tech/engineering/aurora-verifiable-ai-approach-to-selfdriving](https://blog.aurora.tech/engineering/aurora-verifiable-ai-approach-to-selfdriving)
-* "AI Alignment: Ensuring the Aurora Driver is Safe and Human-Like" (Drew Bagnell, 2024) — [blog.aurora.tech/engineering/the-future-of-ai-in-selfdriving](https://blog.aurora.tech/engineering/the-future-of-ai-in-selfdriving)
-* "AI Transparency: The Why and How" (Drew Bagnell, 2024) — [blog.aurora.tech/engineering/the-why-and-how-of-transparency](https://blog.aurora.tech/engineering/the-why-and-how-of-transparency)
-* "Aurora Unveils First-Ever Safety Case Framework" (2020) — [aurora.tech/blog/aurora-unveils-first-ever-safety-case-framework](https://aurora.tech/blog/aurora-unveils-first-ever-safety-case-framework); the framework — [safetycaseframework.aurora.tech](https://safetycaseframework.aurora.tech/)
-* "FMCW Lidar: The Self-Driving Game-Changer" — [aurora.tech/newsroom/fmcw-lidar-the-self-driving-game-changer](https://aurora.tech/newsroom/fmcw-lidar-the-self-driving-game-changer); "FirstLight Lidar on a Chip" — [aurora.tech/newsroom/firstlight-lidar-on-a-chip](https://aurora.tech/newsroom/firstlight-lidar-on-a-chip)
-* "The Road Never Sleeps: Aurora's Trucks Go Driverless Day and Night" (Aug 2025) — [aurora.tech/newsroom/…](https://aurora.tech/newsroom/the-road-never-sleeps-auroras-trucks-go-driverless-day-and-night); "Aurora Begins Commercial Driverless Trucking in Texas" (May 2025): newsroom, cited by name.
+* Aurora. [aurora.tech](https://aurora.tech)
+* "Aurora's Verifiable AI Approach to Self-Driving" (Chris Urmson, June 2024). [blog.aurora.tech/engineering/aurora-verifiable-ai-approach-to-selfdriving](https://blog.aurora.tech/engineering/aurora-verifiable-ai-approach-to-selfdriving)
+* "AI Alignment: Ensuring the Aurora Driver is Safe and Human-Like" (Drew Bagnell, 2024). [blog.aurora.tech/engineering/the-future-of-ai-in-selfdriving](https://blog.aurora.tech/engineering/the-future-of-ai-in-selfdriving)
+* "AI Transparency: The Why and How" (Drew Bagnell, 2024). [blog.aurora.tech/engineering/the-why-and-how-of-transparency](https://blog.aurora.tech/engineering/the-why-and-how-of-transparency)
+* "Aurora Unveils First-Ever Safety Case Framework" (2020). [aurora.tech/blog/aurora-unveils-first-ever-safety-case-framework](https://aurora.tech/blog/aurora-unveils-first-ever-safety-case-framework); the framework. [safetycaseframework.aurora.tech](https://safetycaseframework.aurora.tech/)
+* Aurora newsroom on why FMCW lidar suits self-driving: [aurora.tech newsroom post](https://aurora.tech/newsroom/fmcw-lidar-the-self-driving-game-changer); "FirstLight Lidar on a Chip". [aurora.tech/newsroom/firstlight-lidar-on-a-chip](https://aurora.tech/newsroom/firstlight-lidar-on-a-chip)
+* "The Road Never Sleeps: Aurora's Trucks Go Driverless Day and Night" (Aug 2025). [aurora.tech/newsroom/…](https://aurora.tech/newsroom/the-road-never-sleeps-auroras-trucks-go-driverless-day-and-night); "Aurora Begins Commercial Driverless Trucking in Texas" (May 2025): newsroom, cited by name.

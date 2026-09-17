@@ -5,13 +5,13 @@
 > the signal is in knowing *why* PR-AUC and not ROC-AUC under 1:1000 imbalance, how COCO
 > interpolates AP, why pass@1 estimated as "did the first sample pass" is biased, how to
 > tell whether a 1.2-point benchmark delta is real, and how to validate an LLM judge
-> against humans. Every system-design round ends with "how would you know it works?" —
+> against humans. Every system-design round ends with "how would you know it works?", 
 > this chapter is that answer.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 * ROC-AUC $= P(s^+ > s^-) + \tfrac12 P(s^+ = s^-)$: a **rank statistic**, invariant to
-  class prevalence. That invariance is the bug under heavy imbalance — PR-AUC moves when
+ class prevalence. That invariance is the bug under heavy imbalance, PR-AUC moves when
   your false positives flood the positives, ROC-AUC barely does. Baseline PR-AUC is the
   positive rate $\pi$; baseline ROC-AUC is always 0.5.
 * Choose the threshold from costs, not from 0.5: for a calibrated $p$, predict positive
@@ -25,7 +25,7 @@
   same GT is a false positive), then area under the precision envelope. VOC07 samples 11
   recall points, VOC2010+/COCO use the monotone envelope; COCO mAP averages over
   IoU $\in \{0.50, 0.55, \dots, 0.95\}$ and over classes.
-* OCR: CER/WER are edit distance over characters/words normalised by reference length —
+* OCR: CER/WER are edit distance over characters/words normalised by reference length, 
   they can exceed 1. End-to-end spotting requires box IoU **and** exact transcription.
 * FID is the Fréchet distance between two Gaussians fitted to features:
   $\norm{\mu_1-\mu_2}^2 + \tr(\Sigma_1 + \Sigma_2 - 2(\Sigma_1\Sigma_2)^{1/2})$; it is
@@ -63,7 +63,7 @@ Read the metrics straight off the table.
   $1 + 1/\log_2 3 + 1/\log_2 4 = 2.13$; NDCG $= 0.70$.
 
 Now duplicate every *negative* 100 times (same scores). Nothing about the model changed.
-ROC-AUC is unchanged at 0.762 — it only compares positives to negatives pairwise. But
+ROC-AUC is unchanged at 0.762, it only compares positives to negatives pairwise. But
 precision@3 is still $2/3$ only if the duplicated negatives score below rank 3; in a real
 1:1000 problem those extra negatives spread across the score range and precision
 collapses. That asymmetry is the whole argument of §2.2 and the reason fraud, moderation,
@@ -109,7 +109,7 @@ P_{\text{macro}} = \frac1K \sum_k \frac{TP_k}{TP_k + FP_k}.
 $$
 
 In single-label multiclass every error is simultaneously one FP and one FN, so
-$P_{\text{micro}} = R_{\text{micro}} = F_{1,\text{micro}} = \text{accuracy}$ — quoting
+$P_{\text{micro}} = R_{\text{micro}} = F_{1,\text{micro}} = \text{accuracy}$, quoting
 "micro-F1" there is quoting accuracy. Macro treats a class with 20 examples the same as
 one with 2 million, which is what you want when the tail is the product (rare traffic
 signs, rare fraud typologies). **Weighted** macro (weight by support) is a compromise
@@ -155,7 +155,7 @@ $$
 The likelihood-ratio term is scaled by the **prior odds** $\frac{1-\pi}{\pi}$. At
 $\pi = 10^{-3}$ you need $\text{FPR}/\text{TPR} < 10^{-3}$ merely to reach precision 0.5.
 A random classifier has $\text{AP} = \pi$, so PR curves must always be reported with
-$\pi$ next to them — an AP of 0.3 is excellent at $\pi = 0.001$ and terrible at $\pi = 0.5$.
+$\pi$ next to them, an AP of 0.3 is excellent at $\pi = 0.001$ and terrible at $\pi = 0.5$.
 
 $$
 \boxed{\;\text{PR-AUC baseline} = \pi,\qquad \text{ROC-AUC baseline} = 0.5\;}
@@ -164,7 +164,7 @@ $$
 **Decision rule.** Use ROC-AUC when classes are roughly balanced or when you care about
 ranking quality independent of the operating prior (e.g. comparing model versions that
 will be re-thresholded anyway). Use PR-AUC (or precision at fixed recall, or recall at
-fixed precision — better still) when positives are rare and the cost of a false positive
+fixed precision, better still) when positives are rare and the cost of a false positive
 is borne per-instance. Note also that AP is *not* the area under the interpolated curve:
 our implementation uses the step-wise sum $\sum_t (R_t - R_{t-1})P_t$, which is the
 standard definition and avoids the optimistic bias of linear interpolation between PR
@@ -178,7 +178,7 @@ $\sum_i g(r_i)\,d(i)$ for gain $g$ and discount $d$. Järvelin and Kekäläinen 
 $d(i) = 1/\log_b(i+1)$ because it decays slowly (positions 9 and 10 still differ, unlike
 $1/i$ which is brutal) and is smooth; $b=2$ is convention. Burges' exponential gain
 $g(r) = 2^r - 1$ makes a grade-3 document worth $7$ and a grade-1 worth $1$, so highly
-relevant items dominate — appropriate when graded relevance is real.
+relevant items dominate, appropriate when graded relevance is real.
 
 $$
 \text{DCG@}k = \sum_{i=1}^{k} \frac{2^{r_i}-1}{\log_2(i+1)},\qquad
@@ -200,7 +200,7 @@ rate@k** is the blunt instrument for recommendation candidate generation.
 which were produced by the *current* policy: items the current system never showed have
 no labels, so a new model that surfaces them is penalised (position and presentation
 bias). Fixes: inverse-propensity weighting of logged clicks, randomised exploration
-buckets, and — the honest one — interleaving or an A/B test (§4.5).
+buckets, and (the honest one) interleaving or an A/B test (§4.5).
 
 ### 2.4 Detection: IoU, matching, and the AP interpolations
 
@@ -233,7 +233,7 @@ $$
 \boxed{\;\text{AP} = \sum_{i}\big(R_i - R_{i-1}\big)\,P_{\text{env}}(R_i)\;}
 $$
 
-i.e. the exact area under the monotone envelope — the limit of the 11-point rule as the
+i.e. the exact area under the monotone envelope, the limit of the 11-point rule as the
 number of sample points goes to infinity, and never smaller than it in general.
 
 **COCO, 101-point:** sample $r \in \{0, 0.01, \dots, 1\}$ on the envelope. With 101 points
@@ -295,7 +295,7 @@ $$
 \boxed{\;\text{CER} = \frac{S + D + I}{N_{\text{ref chars}}},\qquad \text{WER} = \frac{S+D+I}{N_{\text{ref words}}}\;}
 $$
 
-Both are unbounded above (insertions can exceed the reference length) — a model that
+Both are unbounded above (insertions can exceed the reference length), a model that
 emits garbage can score CER 3.0. Report the operation breakdown (S/D/I) because it is
 diagnostic: many deletions means the detector is missing text regions; many substitutions
 means the recogniser is weak; many insertions means hallucinated or duplicated text.
@@ -324,11 +324,11 @@ and the maximum achievable cross-covariance trace over joint Gaussians is
 $\tr\big((\Sigma_1^{1/2}\Sigma_2\Sigma_1^{1/2})^{1/2}\big)$, attained by the linear map
 $\tilde Y = \Sigma_1^{-1/2}(\Sigma_1^{1/2}\Sigma_2\Sigma_1^{1/2})^{1/2}\Sigma_1^{-1/2}\tilde X$.
 Note $\tr((\Sigma_1\Sigma_2)^{1/2}) = \tr((\Sigma_1^{1/2}\Sigma_2\Sigma_1^{1/2})^{1/2})$,
-and the right-hand form is symmetric PSD, so it is computable with `eigh` alone — which is
+and the right-hand form is symmetric PSD, so it is computable with `eigh` alone, which is
 how the implementation avoids `scipy.linalg.sqrtm` on a non-symmetric product.
 
 FID applies this to Inception-v3 pool3 features (2048-dim) of real and generated images.
-Properties to state: it is a *biased* estimator — the covariance estimate improves with
+Properties to state: it is a *biased* estimator, the covariance estimate improves with
 $N$, so FID falls as you add samples; 50 000 samples is the convention precisely so
 numbers are comparable. It is sensitive to the feature extractor (a different Inception
 checkpoint or resize filter shifts it), and it conflates fidelity with diversity: a model
@@ -345,7 +345,7 @@ comparability with old work.
 prompt adherence, not quality; it inherits every bias of the CLIP checkpoint and can be
 gamed by writing text into the image. **LPIPS** (literacy) is a *perceptual* distance
 between a pair of images: distances between deep features, linearly calibrated on human
-2AFC judgments — use it for reconstruction/restoration tasks where you have a reference,
+2AFC judgments, use it for reconstruction/restoration tasks where you have a reference,
 never for unconditional generation. For anything that ships, human evaluation with a
 fixed rubric and inter-rater agreement remains the ground truth.
 
@@ -359,9 +359,9 @@ ticket)? Candidates who collapse these into "we ran MMLU" lose the round.
 
 **Exact match and its normalisation.** EM after SQuAD-style normalisation (lower-case,
 strip punctuation and articles, collapse whitespace) is brittle but *unambiguous* and
-cheap — good for factoid QA, useless for free-form answers. Unit-test evaluation (run the
+cheap, good for factoid QA, useless for free-form answers. Unit-test evaluation (run the
 generated code against hidden tests) is the gold standard where it applies because it is
-objective and hard to game — which is why HumanEval, MBPP and SWE-bench are built that way.
+objective and hard to game, which is why HumanEval, MBPP and SWE-bench are built that way.
 
 **pass@k, unbiased.** Generate $n \ge k$ samples per problem, count $c$ correct. The
 quantity of interest is the probability that a random size-$k$ subset contains at least
@@ -385,11 +385,11 @@ $$
 
 with the convention pass@k $= 1$ when $n - c < k$. Sanity checks: $k=1$ gives $c/n$;
 $c=0$ gives 0; $c = n$ gives 1. Estimating pass@10 by drawing exactly 10 samples is
-unbiased too but has much higher variance — the point of the estimator is to reuse $n=100$
+unbiased too but has much higher variance, the point of the estimator is to reuse $n=100$
 samples for every $k$.
 
 **Pairwise preference and Bradley–Terry.** Model $P(i \succ j) = \frac{p_i}{p_i+p_j}$
-with strengths $p_i = e^{\theta_i}$, so $P(i \succ j) = \sigma(\theta_i - \theta_j)$ —
+with strengths $p_i = e^{\theta_i}$, so $P(i \succ j) = \sigma(\theta_i - \theta_j)$, 
 logistic regression on the difference of latent abilities. The log-likelihood
 $\sum_{ij} w_{ij}\log\frac{p_i}{p_i+p_j}$ is concave in $\theta$ and maximised by the
 Zermelo/MM iteration
@@ -436,8 +436,8 @@ out a private eval, rotate items, and report the human-expert ceiling alongside 
 both miscalibrated, in different directions, and RLHF tends to make models *more*
 confident. Measure with ECE on a multiple-choice set (see
 [Uncertainty §2.3](03-uncertainty-reliability.md#23-calibration-ece-and-its-binning-pitfalls))
-and consider temperature scaling of the choice logits. Selective prediction — abstain
-below a confidence threshold, report the risk–coverage curve — is usually what the product
+and consider temperature scaling of the choice logits. Selective prediction, abstain
+below a confidence threshold, report the risk–coverage curve, is usually what the product
 needs, not a better point estimate.
 
 **Robustness and adversarial evaluation.** Paraphrase invariance, distractor sentences,
@@ -450,7 +450,7 @@ Report the *worst* slice, not the mean, when the failure is a safety failure.
 You ran two models on $n$ questions and model A scored 71.4 % against model B's 70.1 %.
 Is that real? With $n = 500$ the standard error of a single proportion is
 $\sqrt{0.7\cdot0.3/500} \approx 2.0$ points, so *each* number has a $\pm 4$-point 95 %
-interval — but the comparison is much tighter than that, because the models saw the
+interval, but the comparison is much tighter than that, because the models saw the
 **same** questions. Let $d_i = a_i - b_i \in \{-1,0,1\}$ be the per-question difference.
 Then
 
@@ -459,8 +459,8 @@ $$
 $$
 
 and the covariance is large (both models get easy questions right), so the paired variance
-is far smaller. This is the central point of Anthropic's "Adding Error Bars to Evals": use
-the paired analysis, report the CI of the difference.
+is far smaller. Anthropic's "Adding Error Bars to Evals" argues for exactly this: run the
+paired analysis and report the CI of the difference rather than two marginal intervals.
 
 **Paired bootstrap.** Resample question indices with replacement $B$ times *using the same
 indices for both models*, compute $\bar d^{(b)}$, and take the 2.5/97.5 percentiles. The
@@ -481,7 +481,7 @@ clusters of size $m$ and intra-cluster correlation $\rho$.
 **Two more sources of variance interviewers like.** (a) *Sampling variance of the model*:
 run each question $k$ times at $T>0$ and average, or evaluate at $T=0$ and say so.
 (b) *Multiple comparisons*: if you test 20 benchmarks, one will look significant at
-$\alpha=0.05$ by chance — pre-register the primary metric or correct (Bonferroni/BH).
+$\alpha=0.05$ by chance, pre-register the primary metric or correct (Bonferroni/BH).
 
 ### 2.9 Agent evaluation
 
@@ -501,12 +501,12 @@ rewards lucky recoveries equally with clean execution. A staff-level agent eval 
 | Safety | irreversible-action rate, guardrail violations | rule checks on the action log |
 
 Benchmarks to name: **SWE-bench** (resolve real GitHub issues; graded by the repository's
-own tests — objective, but sensitive to environment setup and to solutions leaking in
+own tests, objective, but sensitive to environment setup and to solutions leaking in
 issue comments, which SWE-bench Verified addressed by human-filtering the instances),
 **WebArena** (self-hosted websites with programmatic success checks, so the environment is
 reproducible), **$\tau$-bench** (tool-agent-user interaction in retail/airline domains
 with a simulated user and database-state checks; it popularised pass^k for reliability).
-Trajectory-level rubrics — an LLM judge scoring a rubric over the whole trace — are useful
+Trajectory-level rubrics (an LLM judge scoring a rubric over the whole trace) are useful
 where programmatic checks do not exist, and inherit every judge caveat from §2.7.
 
 ## 3. Implementation
@@ -542,7 +542,7 @@ against `np.trapezoid` on the ROC curve and against `scipy.stats.mannwhitneyu`. 
 `distinct` trick handles ties: all examples sharing a score must move across the threshold
 together, otherwise you invent a precision the model cannot deliver.
 
-`average_precision` then sums $(R_t - R_{t-1})P_t$ — step-wise, no interpolation.
+`average_precision` then sums $(R_t - R_{t-1})P_t$, step-wise, no interpolation.
 `best_threshold_for_cost` sweeps every distinct score and returns the cost minimiser,
 which the test checks against the Bayes rule $p^\star = c_{FP}/(c_{FP}+c_{FN})$.
 
@@ -564,7 +564,7 @@ def ndcg_at_k(ranked_rels: np.ndarray, k: int) -> float:
 
 `np.arange(2, len(r)+2)` is the $\log_2(i+1)$ discount written without an off-by-one:
 position $i=1$ gets $\log_2 2 = 1$. The ideal ranking is computed from the *same* array,
-so NDCG@k of an already-sorted list is exactly 1 — the first test.
+so NDCG@k of an already-sorted list is exactly 1, the first test.
 
 ### 3.3 Detection AP
 
@@ -606,8 +606,8 @@ ground truth (NaN rather than 0, which would silently drag mAP down).
 **How you'd test it.** `tests/test_evaluation_detection_map.py` builds a four-detection,
 three-GT case by hand: one TP, one duplicate (FP), one miss (FP), one TP. The expected
 TP/FP vectors, the precision/recall arrays, and all three AP conventions are written out
-by hand in the test — $\text{AP}_{\text{all}} = \frac13 + \frac13\cdot\frac12 = 0.5$ and
-$\text{AP}_{11} = (4\cdot 1 + 3\cdot 0.5)/11$ — so a regression in the matching logic is
+by hand in the test, $\text{AP}_{\text{all}} = \frac13 + \frac13\cdot\frac12 = 0.5$ and
+$\text{AP}_{11} = (4\cdot 1 + 3\cdot 0.5)/11$, so a regression in the matching logic is
 caught immediately.
 
 ### 3.4 CER/WER with an operation breakdown
@@ -694,37 +694,37 @@ normal approximation $3.92\,\text{SE}$, that the paired test finds a planted 15 
 reports $p \ge 0.99$ for a system compared against itself, and that clustered SE exceeds
 the i.i.d. SE by more than 2× on data with strong cluster effects.
 
-??? example "Full implementation — `src/mlbook/evaluation/classification_metrics.py`"
+??? example "Full implementation: `src/mlbook/evaluation/classification_metrics.py`"
     ```python
     --8<-- "src/mlbook/evaluation/classification_metrics.py"
     ```
 
-??? example "Full implementation — `src/mlbook/evaluation/ranking_metrics.py`"
+??? example "Full implementation: `src/mlbook/evaluation/ranking_metrics.py`"
     ```python
     --8<-- "src/mlbook/evaluation/ranking_metrics.py"
     ```
 
-??? example "Full implementation — `src/mlbook/evaluation/detection_map.py`"
+??? example "Full implementation: `src/mlbook/evaluation/detection_map.py`"
     ```python
     --8<-- "src/mlbook/evaluation/detection_map.py"
     ```
 
-??? example "Full implementation — `src/mlbook/evaluation/text_metrics.py`"
+??? example "Full implementation: `src/mlbook/evaluation/text_metrics.py`"
     ```python
     --8<-- "src/mlbook/evaluation/text_metrics.py"
     ```
 
-??? example "Full implementation — `src/mlbook/evaluation/generative_metrics.py`"
+??? example "Full implementation: `src/mlbook/evaluation/generative_metrics.py`"
     ```python
     --8<-- "src/mlbook/evaluation/generative_metrics.py"
     ```
 
-??? example "Full implementation — `src/mlbook/evaluation/llm_metrics.py`"
+??? example "Full implementation: `src/mlbook/evaluation/llm_metrics.py`"
     ```python
     --8<-- "src/mlbook/evaluation/llm_metrics.py"
     ```
 
-??? example "Full implementation — `src/mlbook/evaluation/harness.py`"
+??? example "Full implementation: `src/mlbook/evaluation/harness.py`"
     ```python
     --8<-- "src/mlbook/evaluation/harness.py"
     ```
@@ -752,7 +752,7 @@ Run `pytest tests/test_evaluation_generative_metrics.py -q` to see the FID ident
 
 | Situation | Report | Why not the obvious one |
 |---|---|---|
-| Balanced binary, model selection | ROC-AUC + accuracy at the chosen threshold | — |
+| Balanced binary, model selection | ROC-AUC + accuracy at the chosen threshold |: |
 | Rare positives (fraud, defects, moderation) | PR-AUC, precision at fixed recall, recall at fixed precision, with $\pi$ stated | ROC-AUC hides the false-positive flood |
 | Cost-asymmetric decision | Expected cost at the tuned threshold; risk–coverage curve | A single F1 hides the operating point |
 | Multiclass, long tail | Macro-F1 + per-class table | Micro-F1 = accuracy = the head classes |
@@ -773,7 +773,7 @@ model version; a judge pass doubles it; swapping order for position-bias control
 it again; $k=10$ samples for pass@k multiplies by 10. That is why teams run a fast smoke
 eval (hundreds of items) on every commit, the full suite nightly, and human eval on a
 sampled subset weekly. Cache judge verdicts keyed by (judge version, prompt, response
-pair) — they are deterministic enough at $T=0$ to reuse and it saves most of the bill.
+pair), they are deterministic enough at $T=0$ to reuse and it saves most of the bill.
 
 ### 4.3 Slicing beats averages
 
@@ -816,7 +816,7 @@ surrogate trap (clicks up, satisfaction down).
 and group B ranking 2, show *every* user a single list formed by interleaving both
 rankings (team-draft or balanced interleaving) and attribute each click to the ranker that
 contributed the item. Because the comparison is within-user, it removes between-user
-variance and is dramatically more sensitive — Netflix reported using interleaving as a
+variance and is dramatically more sensitive, Netflix reported using interleaving as a
 fast first-stage filter on personalisation algorithms before committing to full A/B tests,
 with the A/B test remaining the arbiter of the member-level metric. Costs: it only works
 for ranking, the interleaving policy can introduce its own bias, and it measures relative
@@ -836,7 +836,7 @@ preference, not absolute engagement.
 
 ## 5. In production
 
-!!! production "Anthropic — adding error bars to evals (2024)"
+!!! production "Anthropic: adding error bars to evals (2024)"
     **Problem.** Model evaluations are reported as point estimates, and teams routinely
     treat one-point differences as real. **Built.** A statistical recommendation set for
     eval reporting: treat questions as draws from a super-population, report standard
@@ -847,7 +847,7 @@ preference, not absolute engagement.
     eval-driven development optimises noise. Paper/post: "Adding Error Bars to Evals: A
     Statistical Approach to Language Model Evaluations", Anthropic, 2024 (arXiv:2411.00640).
 
-!!! production "LMSYS — Chatbot Arena (2024)"
+!!! production "LMSYS: Chatbot Arena (2024)"
     **Problem.** Static benchmarks saturate and do not measure open-ended human
     preference. **Built.** A crowdsourced platform where users compare two anonymous
     models side by side and vote; ratings are fitted with a Bradley–Terry model
@@ -859,7 +859,7 @@ preference, not absolute engagement.
     Evaluating LLMs by Human Preference", arXiv:2403.04132; the judge-bias analysis is in
     "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena", arXiv:2306.05685.
 
-!!! production "Stanford CRFM — HELM (2022)"
+!!! production "Stanford CRFM: HELM (2022)"
     **Problem.** Benchmarks reported one number on one scenario, so "which model is best"
     was unanswerable and coverage of harms was accidental. **Built.** A *matrix*
     evaluation: scenarios × metrics, where every scenario is measured on accuracy,
@@ -868,17 +868,17 @@ preference, not absolute engagement.
     makes trade-offs visible (a model can win accuracy and lose calibration) and prevents
     cherry-picking. Paper: "Holistic Evaluation of Language Models", arXiv:2211.09110.
 
-!!! production "OpenAI — Codex and the pass@k estimator (2021)"
+!!! production "OpenAI: Codex and the pass@k estimator (2021)"
     **Problem.** Functional-correctness evaluation of generated code is stochastic;
     reporting "did the single sample pass" wastes information and under-states capability
     for sampling-based use. **Built.** HumanEval, a hand-written benchmark with hidden
     unit tests, plus the unbiased pass@k estimator computed from $n \gg k$ samples per
-    problem — and the explicit note that the naive $1-(1-\hat p)^k$ plug-in is biased.
+ problem, and the explicit note that the naive $1-(1-\hat p)^k$ plug-in is biased.
     **Why.** Unit tests are objective and hard to game; the estimator makes pass@1 and
     pass@100 comparable from one sampling run. Paper: "Evaluating Large Language Models
     Trained on Code", arXiv:2107.03374.
 
-!!! production "Netflix — interleaving for personalisation (2017)"
+!!! production "Netflix: interleaving for personalisation (2017)"
     **Problem.** A/B tests on personalisation algorithms need large populations and long
     run times, so the number of ideas a team can test per quarter is the bottleneck.
     **Built.** A two-stage experimentation process: interleaving (each member sees a
@@ -890,7 +890,7 @@ preference, not absolute engagement.
     Faster on Personalization Algorithms at Netflix Using Interleaving", Netflix
     Technology Blog, 2017.
 
-!!! production "Google — Rules of Machine Learning"
+!!! production "Google: Rules of Machine Learning"
     **Problem.** Teams optimise the metric that is easy to compute rather than the one
     the product needs. **Built.** A set of engineering rules, several of which are
     evaluation rules: measure before you model (Rule 2: instrument and log first), keep
@@ -900,21 +900,21 @@ preference, not absolute engagement.
     statistical. Document: Martin Zinkevich, "Rules of Machine Learning: Best Practices
     for ML Engineering", Google (developers.google.com machine-learning guides).
 
-!!! production "Princeton / Stanford — SWE-bench and SWE-bench Verified"
+!!! production "Princeton / Stanford: SWE-bench and SWE-bench Verified"
     **Problem.** Coding benchmarks were short, synthetic functions; real software work is
     repository-scale. **Built.** SWE-bench takes real GitHub issues and their merged pull
     requests, and grades a model's patch by running the repository's own tests (FAIL→PASS
     and PASS→PASS sets). **What broke.** Some instances were unsolvable from the issue
     text alone, some tests were flaky, and some solutions leaked into issue comments; the
     subsequent human-validated subset (SWE-bench Verified, built with OpenAI) filtered
-    these. **Why it matters for interviews.** It is the canonical example of "the
-    benchmark's construction is part of the result". Paper: "SWE-bench: Can Language
+    these. **What to take from it.** The benchmark's construction is part of the result, and
+    an interviewer will expect you to know how SWE-bench Verified differs from the original. Paper: "SWE-bench: Can Language
     Models Resolve Real-World GitHub Issues?", ICLR 2024, arXiv:2310.06770.
 
 ## 6. Interview questions and strong answers
 
 !!! interview "Q1. Your fraud model has ROC-AUC 0.98 and the business says it is unusable. Explain."
-    **Answer.** ROC-AUC is $P(\text{score}^+ > \text{score}^-)$ — a ranking statistic that
+ **Answer.** ROC-AUC is $P(\text{score}^+ > \text{score}^-)$, a ranking statistic that
     conditions on the true class and is therefore blind to prevalence. At $\pi = 10^{-3}$,
     an FPR of 1 % at TPR 0.9 means 10 false positives for every true positive, so precision
     is about 8 %. I would re-report the PR curve with $\pi$ stated, pick the operating
@@ -958,7 +958,7 @@ preference, not absolute engagement.
 !!! interview "Q4. You want to use an LLM as a judge. How do you know it is any good?"
     **Answer.** Treat it as a classifier and validate it. Collect a stratified human-labelled
     sample (including hard and near-tie cases), compute raw agreement *and* Cohen's
-    $\kappa$, and compare against human–human agreement — that is your ceiling. Measure
+ $\kappa$, and compare against human–human agreement, that is your ceiling. Measure
     the known biases explicitly: swap the presentation order and report swap-consistency;
     regress the verdict on response length to quantify verbosity bias; check whether the
     judge prefers its own family. Mitigate with two-order evaluation, a reference answer
@@ -974,7 +974,7 @@ preference, not absolute engagement.
     **Answer.** Not without an interval. The per-model SE is about 2 points, but the right
     analysis is paired: compute per-question differences $d_i$ and bootstrap $\bar d$ using
     the same resampled indices for both models. The covariance between models is high, so
-    the paired CI is much narrower than the two marginal CIs suggest — overlapping marginal
+ the paired CI is much narrower than the two marginal CIs suggest, overlapping marginal
     CIs do **not** imply no difference. If the questions come from 50 source documents,
     cluster the bootstrap by document, which will widen the interval. Then check slices and
     guardrails, and if the decision is a product decision, run an online test.
@@ -982,7 +982,7 @@ preference, not absolute engagement.
     benchmark cannot resolve it: either collect more items (variance scales as $1/n$, so
     resolving a 1.3-point difference needs roughly 4× the data if the current half-width
     is 1.5), reduce response sampling noise by averaging $k$ samples per question, or pick
-    on a different axis — cost, latency, calibration, worst-slice performance.
+ on a different axis, cost, latency, calibration, worst-slice performance.
 
 !!! interview "Q6. Design the evaluation for an OCR + document-understanding product."
     **Answer.** Three layers. *Component*: detection (precision/recall at IoU 0.5 on text
@@ -1070,7 +1070,7 @@ duplication while AP is not.
     The envelope is $\max$ from the right: 1.0 for $r \le 0.5$, 0.667 for $0.5 < r \le 1$.
     All-point AP $= 0.5\cdot 1 + 0.5 \cdot 0.667 = 0.833$. VOC07: recall points
     $\{0,\dots,0.5\}$ take precision 1 (6 points), $\{0.6,\dots,1.0\}$ take 0.667 (5
-    points), giving $(6 + 5\cdot 0.667)/11 = 0.848$ — note the 11-point rule is *higher*
+ points), giving $(6 + 5\cdot 0.667)/11 = 0.848$, note the 11-point rule is *higher*
     here because coarse sampling lands favourably. Build the `Detection`/`GroundTruth`
     objects and call `ap_all_points`/`ap_voc07` on the output of
     `precision_recall_from_matches` to confirm.
@@ -1081,7 +1081,7 @@ what would you measure next?
 
 ??? success "Solution"
     Same CER, very different failure modes. B deletes: it is dropping whole regions (a
-    detection problem — missed lines, cropped columns), which is catastrophic for field
+ detection problem, missed lines, cropped columns), which is catastrophic for field
     extraction because an absent field cannot be corrected by a reviewer who does not know
     it is missing. A substitutes: characters are wrong but present, so a downstream
     validator (checksum, field format, dictionary) can flag them and a human can fix them
@@ -1113,7 +1113,7 @@ and compare it with `paired_bootstrap_test` on the same data.
     The permutation test assumes exchangeability of the sign of $d_i$ under the null and
     gives an exact p-value; the bootstrap gives a CI for the effect size as well. Report
     the bootstrap CI (effect size is what a decision needs) and use the permutation p-value
-    as a cross-check — they should agree closely when $n$ is a few hundred.
+ as a cross-check, they should agree closely when $n$ is a few hundred.
 
 **★★★ Exercise 6.** You are asked to evaluate a coding agent. Write the eval plan: the
 metrics, the sample size for a 5-point detectable difference, and three ways the plan
@@ -1127,14 +1127,14 @@ could mislead you.
     *Sample size.* For a paired binary comparison with success around 0.4 and a 5-point
     target, the paired SD of $d_i$ is roughly $\sqrt{2p(1-p)(1-\rho)}$; with $\rho \approx 0.5$
     that is $\approx 0.49$, so $n \approx (1.96+0.84)^2(0.49)^2/0.05^2 \approx 750$
-    instances — or fewer if you reduce sampling noise by averaging $k$ runs per instance.
+ instances, or fewer if you reduce sampling noise by averaging $k$ runs per instance.
     Say the number *and* the assumption.
     *Three ways it misleads.* (1) Contamination: the fix may be in the model's training
     data (check the repository's commit date against the training cutoff, and test on
     freshly created instances). (2) Environment leakage: the agent may read the test files
     and special-case them; sandbox and check the diff. (3) Success without reliability:
     a 40 % pass@1 agent that succeeds on a different 40 % each run is useless in a
-    workflow — which is what pass^k exposes.
+ workflow, which is what pass^k exposes.
 
 ## References
 

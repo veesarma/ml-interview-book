@@ -1,4 +1,4 @@
-# Part XVII — ML system design
+# Part XVII: ML system design
 
 > **Why this part exists.** The ML system design round is where staff-level offers are
 > won or lost. The interviewer is not checking whether you know what a two-tower model
@@ -77,8 +77,8 @@ means the TL;DR and follow-ups.
 
 ## A mock-interview practice plan (three weeks)
 
-The goal is not to memorise twelve designs; it is to make the *method* automatic and
-to have evidence ready for every decision. Each session is 60 minutes: 45 minutes
+The goal is to make the *method* automatic and to have evidence ready for every
+decision, rather than to memorise twelve designs. Each session is 60 minutes: 45 minutes
 speaking to a whiteboard (or a blank document), 15 minutes reviewing against the
 chapter.
 

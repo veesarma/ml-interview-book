@@ -5,13 +5,13 @@
 > Airbnb for listing search ("rank homes for a query with dates and guests"), Amazon
 > for product search, LinkedIn for people/job search, Etsy and Pinterest for their
 > marketplaces. The business problem is: given a short, ambiguous query, return the
-> ten results that satisfy the intent — where "satisfy" is measured by human relevance
+> ten results that satisfy the intent, where "satisfy" is measured by human relevance
 > judgments *and* by what people click, book or buy, and the two disagree. The
 > interviewer is checking whether you can separate query understanding, retrieval and
 > ranking; whether you know learning-to-rank losses and NDCG; and whether you can put
 > a BERT-class model in the funnel without blowing the latency budget.
 
-## TL;DR — the whiteboard in 60 seconds
+## TL;DR: the whiteboard in 60 seconds
 
 ```mermaid
 flowchart LR
@@ -65,7 +65,7 @@ price range, filters), optional context (user history, location, device), return
 a ranked page of results with facets, spelling suggestions and possibly sponsored
 results. Support pagination, filters, and zero-result handling.
 
-**Non-functional — ask for or assume.**
+**Non-functional, ask for or assume.**
 
 | Quantity | Ask | Defensible assumption |
 |---|---|---|
@@ -90,13 +90,13 @@ results. Support pagination, filters, and zero-result handling.
 
 **Questions a staff engineer asks.**
 
-1. "What is the unit of success — a click, a booking, a stay that gets a five-star
+1. "What is the unit of success, a click, a booking, a stay that gets a five-star
    review? Longer-horizon labels are cleaner but sparser."
 2. "Are there hard constraints (availability, jurisdiction) that must be applied at
-   retrieval?" — because a ranker cannot recover a document the index filtered out.
-3. "How much of the corpus is textual vs structured? Do we have images?" — this
+   retrieval?" A ranker cannot recover a document the index filtered out.
+3. "How much of the corpus is textual vs structured? Do we have images?" That
    decides whether a cross-encoder or a GBDT is the stage-2 model.
-4. "How head-heavy is the query distribution?" — the top queries can be cached and
+4. "How head-heavy is the query distribution?" The top queries can be cached and
    hand-tuned; the tail needs generalisation and embedding retrieval.
 5. "Do we have rater budget? How many judged queries per week?"
 
@@ -239,7 +239,7 @@ LambdaRank to LambdaMART: An Overview") shows empirically that following these
 
 ![RankNet cost and |ΔNDCG| swap weights](../assets/figures/part17_lambdarank.png){ width="760" }
 
-*Left: the pairwise cost and the magnitude of its gradient — pairs already ordered
+*Left: the pairwise cost and the magnitude of its gradient, pairs already ordered
 with a large margin contribute almost nothing. Right: the |ΔNDCG| multiplier for
 swapping two documents; only swaps involving the top few positions carry weight,
 which is what makes LambdaRank optimise the top of the list.*
@@ -357,7 +357,7 @@ string.
 **Cost.** Retrieval is CPU and memory (index size); stage-2 is the GPU bill. At 20k
 QPS × 200 candidates × a 50M-parameter ranker, the ranker needs $4 \times 10^{6}$
 items/s ≈ ~10 GPUs at $5 \times 10^5$ items/s each; the cross-encoder at 30 documents
-× ~$10^{10}$ FLOPs each is another $6 \times 10^{15}$ FLOP/s, i.e. ~60 GPUs — which
+× ~$10^{10}$ FLOPs each is another $6 \times 10^{15}$ FLOP/s, i.e. ~60 GPUs, which
 is why it is optional and gated.
 
 **Degradation.** Cross-encoder timeout → stage-2 order; stage-2 timeout → stage-1
@@ -372,7 +372,7 @@ BM25 for the rest.
   intent class, market). Watch for rater disagreement; use graded labels and
   measure inter-rater agreement.
 - Propensity-weighted NDCG/MRR on click logs (unbiased under the click model; noisy
-  at low positions — clip the weights).
+    at low positions, so clip the weights).
 - Retrieval recall@k against judged relevant documents and against the final
   ranker's top choices on the union of sources.
 - Per-segment regressions: a global NDCG gain that comes with a loss on a market or
@@ -423,9 +423,9 @@ incident.
 - *Personalisation on navigational queries*: intent gate plus a metric of
   "expected result missing" on navigational queries.
 
-## 7. How real companies did it — as mock interviews
+## 7. How real companies did it: as mock interviews
 
-### 7.1 Airbnb — "rank listings for a query with dates and guests"
+### 7.1 Airbnb: "rank listings for a query with dates and guests"
 
 **Interviewer prompt.** "A guest searches for a city and dates. We have millions of
 listings. Rank them so the guest books, and the host accepts. We currently use a
@@ -445,21 +445,21 @@ scoring. *Evaluate*: offline NDCG of the booked listing, online A/B on bookings.
 (KDD 2019, arXiv:1810.09591) describes the move from GBDT to neural networks: a
 simple single-hidden-layer NN that matched the GBDT first, then a pairwise
 LambdaRank-style NN trained on booked-vs-unbooked pairs, then a deep NN; and,
-importantly, what failed — listing-id embeddings that overfit, a multi-task model
-on long views that did not improve bookings — plus lessons on feature
+importantly, what failed, listing-id embeddings that overfit, a multi-task model
+on long views that did not improve bookings, plus lessons on feature
 normalisation and distribution smoothness. Haldar et al., "Improving Deep Learning
 for Airbnb Search" (KDD 2020, arXiv:2002.05515) covers cold-start handling for new
 listings and position bias handled with a position feature and dropout. Abdool et
 al., "Learning To Rank Diversely At Airbnb" (CIKM 2023, arXiv:2210.07774) reports
 gains from ranking that accounts for the other listings in the result set.
 
-!!! tip "How to say it in the interview — GBDT to neural, in stages"
+!!! tip "How to say it in the interview: GBDT to neural, in stages"
     "I'd keep the GBDT as the baseline and the stage-1 ranker, and introduce a
     neural stage-2 ranker only after a simple NN reproduces the GBDT's offline
     metric, because Airbnb reported in 'Applying Deep Learning to Airbnb Search'
     (KDD 2019) that their first successes came from a small network and a pairwise
-    booking loss, and that their early ambitious attempts — listing-id embeddings
-    and a multi-task long-view model — overfit or did not move bookings. The
+    booking loss. The same paper lists what failed: listing-id embeddings
+    overfit, and a multi-task long-view model did not move bookings. The
     alternative is to jump straight to a deep model with id embeddings; the
     trade-off is that with sparse bookings per listing the embeddings memorise, so
     I'd start with content features and add ids only for listings with enough
@@ -468,7 +468,7 @@ gains from ranking that accounts for the other listings in the result set.
     infrastructure and the position effect on a results page is close to
     separable; I'd flip to IPS if we already logged randomised swaps."
 
-### 7.2 Facebook Search — "add semantic retrieval without breaking exact match"
+### 7.2 Facebook Search: "add semantic retrieval without breaking exact match"
 
 **Interviewer prompt.** "People search Facebook for friends, groups and events with
 short, ambiguous queries. Our inverted index misses semantic matches. Add
@@ -488,24 +488,24 @@ Search" (KDD 2020, arXiv:2006.11632) describes the unified embedding model, the
 finding that non-click impressions as negatives performed much worse than random
 negatives, hard negative mining (online in-batch and offline ANN-based), hybrid
 retrieval inside their inverted-index system, embedding quantisation, and
-"later-stage optimisation" — retraining ranking stages so that the new retrieval
+"later-stage optimisation", retraining ranking stages so that the new retrieval
 candidates are ranked well.
 
-!!! tip "How to say it in the interview — negatives and the funnel handshake"
+!!! tip "How to say it in the interview: negatives and the funnel handshake"
     "For the embedding retriever I'd train with random negatives plus ANN-mined hard
     negatives, and I would not use impressed-but-unclicked documents as negatives,
     because Facebook reported in 'Embedding-based Retrieval in Facebook Search'
-    (KDD 2020) that doing so hurt badly — those documents were already good enough
+    (KDD 2020) that doing so hurt badly. Those documents were already good enough
     to be retrieved, so they teach the retriever to reject relevant items. The
     alternative, impression negatives, is tempting because it matches the serving
     distribution, but it matches the *ranker's* problem, not the retriever's. The
     second decision from the same paper: after adding a retrieval source I'd retrain
     the rankers on the new candidate distribution, because otherwise the ranker has
     never seen the semantic matches and the A/B is flat even though recall rose. The
-    cost is a coupled release; the alternative — shipping retrieval alone — is how
+    cost is a coupled release; the alternative (shipping retrieval alone) is how
     good retrievers get written off."
 
-### 7.3 Amazon — "product search that understands the query"
+### 7.3 Amazon: "product search that understands the query"
 
 **Interviewer prompt.** "Customers type short queries; products have titles,
 attributes and behaviour. Lexical matching misses synonyms and paraphrases. Build a
@@ -524,7 +524,7 @@ Amazon's product search, trained on behavioural data with purchases as positives
 a loss that distinguishes impressed-not-purchased from random negatives, and
 reports improved recall over lexical matching.
 
-!!! tip "How to say it in the interview — behavioural labels for retrieval"
+!!! tip "How to say it in the interview: behavioural labels for retrieval"
     "For a marketplace I'd train the semantic retriever on purchases, not clicks,
     because Amazon's 'Semantic Product Search' (KDD 2019) trained on purchase pairs
     and reports that this produced a retriever that complements lexical matching
@@ -533,7 +533,7 @@ reports improved recall over lexical matching.
     tail, which I'd address with content features on the product tower so
     unpurchased products still get sensible vectors."
 
-### 7.4 LinkedIn — "search where the text is the product"
+### 7.4 LinkedIn: "search where the text is the product"
 
 **Interviewer prompt.** "People, jobs and help-centre search have long text on both
 sides. Use a BERT-class model without breaking latency, and keep the search fair
@@ -554,18 +554,18 @@ Recommendation Systems with Application to LinkedIn Talent Search" (KDD 2019,
 arXiv:1905.01989) describes a re-ranking approach that enforces representation
 constraints in recruiter search results, deployed at LinkedIn.
 
-!!! tip "How to say it in the interview — BERT within the budget"
+!!! tip "How to say it in the interview: BERT within the budget"
     "I'd use a BERT-class model where both sides are text, but as a two-tower or
     late-interaction model with document embeddings precomputed, and reserve a full
     cross-encoder for the top few dozen results. LinkedIn's DeText (CIKM 2020) is
     the evidence that BERT-based ranking can be served in production search when
-    the document side is precomputed; the alternative — a cross-encoder over every
-    retrieved document — is the accuracy ceiling but costs a transformer pass per
-    document per query. For people search I'd add a fairness-aware re-ranker,
+    the document side is precomputed. The alternative is a cross-encoder over every
+    retrieved document. That is the accuracy ceiling, and it costs a transformer
+    pass per document per query. For people search I'd add a fairness-aware re-ranker,
     because LinkedIn reported in their KDD 2019 paper that representation
     constraints could be enforced in re-ranking without hurting business metrics."
 
-### 7.5 Etsy — "one embedding for retrieval, personalised"
+### 7.5 Etsy: "one embedding for retrieval, personalised"
 
 **Interviewer prompt.** "Etsy's inventory is long-tail and hand-made; queries are
 vague ('cottagecore gift'). Build personalised embedding retrieval."
@@ -580,11 +580,11 @@ Retrieval in Etsy Search" (2023, arXiv:2306.11424) describes a unified two-tower
 model with multimodal product representations and personalised query
 representations, and reports online improvements in Etsy search.
 
-!!! tip "How to say it in the interview — where personalisation enters"
+!!! tip "How to say it in the interview: where personalisation enters"
     "For a taste-driven marketplace I'd personalise at retrieval, putting user
     features into the query tower, because Etsy reported in 'Unified Embedding
     Based Personalized Retrieval in Etsy Search' (2023) that a personalised unified
-    embedding improved online results — and if personalisation only lives in the
+    embedding improved online results. If personalisation only lives in the
     ranker, the candidates the user would love were never retrieved. The
     alternative, personalisation only in stage 2, is safer for navigational intent,
     so I'd gate it by intent class. The trade-off is that per-user query embeddings
@@ -618,7 +618,7 @@ representations, and reports online improvements in Etsy search.
     but small). Ranker-as-judge: run the final ranker over the union of old and new
     candidates on a sample and measure what fraction of the top-10 came from the new
     source. Online: A/B the union, and retrain the ranker on the new candidate
-    distribution first, as Facebook's EBR paper recommends — otherwise the ranker
+    distribution first, as Facebook's EBR paper recommends, otherwise the ranker
     has never seen semantic matches and buries them.
 
 !!! interview "The interviewer says: make it work for a query language you have no labels for."
@@ -648,8 +648,8 @@ representations, and reports online improvements in Etsy search.
 !!! interview "How do you personalise without breaking navigational queries?"
     Intent classification gates the personalisation features (set to missing for
     navigational intent), the ranker is trained with those features randomly
-    masked so it handles their absence, and a guardrail metric — "expected result
-    present in top-3 for navigational queries" — blocks launches. Airbnb's and
+    masked so it handles their absence, and a guardrail metric ("expected result
+    present in top-3 for navigational queries") blocks launches. Airbnb's and
     Etsy's papers both put personalisation in the model as features rather than as
     rules, which is what lets the A/B test decide its weight per segment.
 

@@ -1,4 +1,4 @@
-# Part XVIII — Company deep dives
+# Part XVIII: Company deep dives
 
 > **Why this matters at staff level.** Staff interviews at these companies are not
 > abstract. The system-design prompt is their own product ("design the perception
@@ -92,12 +92,12 @@ for each company, plus the technique parts they lean on.
 
 **Autonomy, robotics, hardware and frontier labs**
 
-* [Tesla (Autopilot / FSD / Optimus)](tesla.md) — vision-only multi-camera BEV → occupancy → end-to-end FSD V12; the data engine; Dojo; Optimus.
-* [Waymo](waymo.md) — lidar-centric fusion, Wayformer / MotionLM prediction, Waymax and closed-loop evaluation, EMMA, the safety framework and rider-only metrics.
-* [Zoox, Nuro, Aurora & robotaxi peers](zoox-nuro-aurora.md) — a purpose-built bidirectional vehicle, a licensable AI-first driver, and a verifiable-AI trucking stack.
-* [NVIDIA (DRIVE, Cosmos, Isaac)](nvidia.md) — DRIVE platform, Hydra-MDP, Cosmos world foundation models, GR00T, TensorRT-LLM / Dynamo, training infra.
-* [OpenAI, Anthropic & DeepMind](frontier-labs.md) — pretraining and scaling, post-training (RLHF / Constitutional AI / RLVR / reasoning), evals and safety frameworks, inference, multimodal, agents.
-* [Scale AI & data engines](scale-ai-data-engines.md) — the data-engine business, RLHF data, SEAL evaluations, AV labelling and auto-labelling, label cost/quality trade-offs.
+* [Tesla (Autopilot / FSD / Optimus)](tesla.md). vision-only multi-camera BEV → occupancy → end-to-end FSD V12; the data engine; Dojo; Optimus.
+* [Waymo](waymo.md). lidar-centric fusion, Wayformer / MotionLM prediction, Waymax and closed-loop evaluation, EMMA, the safety framework and rider-only metrics.
+* [Zoox, Nuro, Aurora & robotaxi peers](zoox-nuro-aurora.md). a purpose-built bidirectional vehicle, a licensable AI-first driver, and a verifiable-AI trucking stack.
+* [NVIDIA (DRIVE, Cosmos, Isaac)](nvidia.md). DRIVE platform, Hydra-MDP, Cosmos world foundation models, GR00T, TensorRT-LLM / Dynamo, training infra.
+* [OpenAI, Anthropic & DeepMind](frontier-labs.md). pretraining and scaling, post-training (RLHF / Constitutional AI / RLVR / reasoning), evals and safety frameworks, inference, multimodal, agents.
+* [Scale AI & data engines](scale-ai-data-engines.md). the data-engine business, RLHF data, SEAL evaluations, AV labelling and auto-labelling, label cost/quality trade-offs.
 
 **Consumer, marketplace and fintech** (written by the other author of this part)
 

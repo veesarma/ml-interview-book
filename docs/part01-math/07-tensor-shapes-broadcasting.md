@@ -397,11 +397,11 @@ $O(T^2)$ attention memory that FlashAttention exists to avoid ([Part VI](../part
 !!! production "Meta: PyTorch's `scaled_dot_product_attention` and the shape contract"
     A. Paszke et al., "PyTorch: An Imperative Style, High-Performance Deep Learning Library", NeurIPS 2019
     (arXiv:1912.01703). PyTorch's fused attention takes $(N, \dots, L, E)$ tensors with the head axis already
- batched (i.e. it requires you to have done the `view → transpose` of §2.5) and accepts an `attn_mask`
+    batched (i.e. it requires you to have done the `view → transpose` of §2.5) and accepts an `attn_mask`
     that must be *broadcastable* to $(N, \text{heads}, L, S)$, or the `is_causal` flag instead. That API is a
     direct encoding of this chapter's rules, and the reason the tests here compare against it: if your shapes
     are right, the reference matches to $10^{-10}$; if they are subtly wrong, it does not. The kernel also
- illustrates the copy argument, it avoids materialising the $(N,H,L,S)$ score matrix at all.
+    illustrates the copy argument: it avoids materialising the $(N,H,L,S)$ score matrix at all.
 
 !!! production "Stanford / Together: FlashAttention: the $O(T^2)$ intermediate is the enemy"
     T. Dao et al., "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness", NeurIPS 2022
@@ -410,16 +410,16 @@ $O(T^2)$ attention memory that FlashAttention exists to avoid ([Part VI](../part
     matrix never leaves SRAM, turning attention from HBM-bandwidth-bound to compute-bound and reducing memory
     from $O(T^2)$ to $O(T)$. *Why it belongs in a shapes chapter:* the broadcasting that makes
     `S + mask` so convenient is exactly what materialises the tensor you cannot afford, and the fix is to reason
- about which intermediates are written to memory, the skill this chapter trains.
+    about which intermediates are written to memory, which is the skill this chapter trains.
 
 !!! production "Google: einsum as the substrate for sharded models"
     The XLA/JAX stack (`jax.numpy.einsum`, `einsum_v2` in TensorFlow) expresses model layers as einsum equations
- precisely so that a compiler can reason about which index is sharded across which device mesh axis, the
+    precisely so that a compiler can reason about which index is sharded across which device mesh axis, the
     `GSPMD`/`jax.sharding` approach described in Y. Xu et al., "GSPMD: General and Scalable Parallelization for
     ML Computation Graphs", 2021 (arXiv:2105.04663), and used for PaLM (arXiv:2204.02311). *Why einsum and not
     `@`:* an einsum string names every axis, so a partitioning annotation like "shard the `h` axis across the
     model-parallel mesh dimension" is unambiguous. *Trade-off:* readability for humans versus analysability for
- compilers, which is why this book writes `@` in teaching code and why frontier training stacks write einsum.
+    compilers. That is why this book writes `@` in teaching code while frontier training stacks write einsum.
 
 !!! production "The einops convention: naming axes to prevent the interleaving bug"
     A. Rogozhnikov, "Einops: Clear and Reliable Tensor Manipulations with Einstein-like Notation", ICLR 2022.
@@ -444,8 +444,8 @@ $O(T^2)$ attention memory that FlashAttention exists to avoid ([Part VI](../part
 !!! interview "You see `x.reshape(B, H, T, d_head)` in a code review. What do you say?"
     That it is almost certainly a bug. The head axis must come from splitting the *feature* axis, so the only
     correct sequence is `reshape(B,T,H,d_head)` then `transpose(1,2)`. Reshaping straight to $(B,H,T,d)$
- reinterprets the flat buffer so that the first $T\cdot d_{\text{head}}$ values, several whole tokens across
- all heads, become "head 0". It trains (the model compensates) and quietly costs accuracy. I'd add the unit
+    reinterprets the flat buffer so that the first $T\cdot d_{\text{head}}$ values (several whole tokens across
+    all heads) become "head 0". It trains (the model compensates) and quietly costs accuracy. I'd add the unit
     test that asserts head $h$ of token $t$ equals `x[b, t, h*d_head:(h+1)*d_head]`. **Staff follow-up:** *how
     would you prevent it structurally?* `einops.rearrange(x, "b t (h d) -> b h t d", h=H)` makes the grouping
     explicit, or a shape-annotated helper like `split_heads` that everyone calls.
@@ -455,15 +455,15 @@ $O(T^2)$ attention memory that FlashAttention exists to avoid ([Part VI](../part
     the same memory repeatedly (stride 0, no copy); anything else is an error. So `(3,4) + (4,)` adds the vector
     to every row, and `(3,1) * (1,4)` produces a full outer product from 7 numbers. **Staff follow-up:** *give me
     a bug it causes.* `x - x.mean(axis=1)` on a square matrix: the `(N,)` means align with the last axis, so you
- subtract row means from columns. It does not raise. `keepdims=True` makes it `(N,1)` and correct, which is
+    subtract row means from columns. It does not raise. `keepdims=True` makes it `(N,1)` and correct, which is
     why every reduction in this book carries it.
 
 !!! interview "Read me this einsum: `\"bhtd,bhsd->bhts\"`."
     Batch `b` and head `h` are carried through both operands and the output, so they are batch axes. `t` indexes
     the first operand's third axis (queries) and `s` the second's (keys); both appear in the output, so they are
- kept. `d` appears in both inputs and not in the output, so it is summed, the contraction. Net:
+    kept. `d` appears in both inputs and not in the output, so it is summed: that is the contraction. Net:
     $S_{bhts} = \sum_d Q_{bhtd}K_{bhsd}$, i.e. $QK^\top$ per head. **Staff follow-up:** *what is the
- corresponding backward?* `dQ = einsum("bhts,bhsd->bhtd", dS, K)` and `dK = einsum("bhts,bhtd->bhsd", dS, Q)`, 
+    corresponding backward?* `dQ = einsum("bhts,bhsd->bhtd", dS, K)` and `dK = einsum("bhts,bhtd->bhsd", dS, Q)`, 
     swap which index is contracted; it matches the $dQ = dS\,K$, $dK = dS^\top Q$ of
     [chapter 02](02-calculus-matrix-calculus.md).
 
@@ -476,8 +476,8 @@ $O(T^2)$ attention memory that FlashAttention exists to avoid ([Part VI](../part
     sequence axis.
 
 !!! interview "A causal mask and a padding mask. Give me the shapes and how they combine."
- Causal $(1,1,T,T)$, shared across batch and heads, zero on/below the diagonal, $-\infty$ above. Padding
- $(B,1,1,T)$, per example, per key, shared across heads and queries, built as
+    Causal $(1,1,T,T)$, shared across batch and heads, with zero on and below the diagonal and $-\infty$ above. Padding
+    $(B,1,1,T)$, per example, per key, shared across heads and queries, built as
     `arange(T)[None,:] < lengths[:,None]`. Add them: $(1,1,T,T) + (B,1,1,T) \rightarrow (B,1,T,T)$, which then
     broadcasts against the scores $(B,H,T,T)$. Both applied before the softmax so masked entries get exactly zero
     probability. **Staff follow-up:** *what breaks in fp16?* $-\infty$ minus the row max is NaN when a row is
@@ -485,7 +485,7 @@ $O(T^2)$ attention memory that FlashAttention exists to avoid ([Part VI](../part
     diagonal guarantees it for causal masks, but not for a padded query in a right-padded batch).
 
 !!! interview "`view` vs `reshape` vs `permute`: when does each copy?"
- `permute`/`transpose` never copy (strides only). `view` never copies, it raises if the tensor is not
+    `permute`/`transpose` never copy (strides only). `view` never copies; it raises if the tensor is not
     contiguous. `reshape` returns a view when it can and copies when it cannot. Some teams mandate `view`
     precisely so that hidden copies become loud errors. **Staff follow-up:** *what about `expand` vs `repeat`?*
     `expand` sets stride 0 and is free but shares memory (never write into it); `repeat` materialises. Prefer
@@ -512,22 +512,22 @@ timed drills in [Part XVI](../part16-coding-canon/02-shape-drills.md).
 | j | `(B,T,V).take_along_axis((B,T)[:,:,None], axis=-1)` | ? |
 
 ??? success "Solutions"
- **a** `(8,7,6,5)`, right-align, pad to `(1,7,1,5)`, every pair has a 1 or matches.
- **b** Error: right-aligned, `3` vs `4` mismatch. (Note `(3,3) + (3,)` would *not* error, and would be the wrong answer if you meant rows.)
+    **a** `(8,7,6,5)`. Right-align, pad to `(1,7,1,5)`; every pair has a 1 or matches.
+    **b** Error: right-aligned, `3` vs `4` mismatch. (Note `(3,3) + (3,)` would *not* error, and would be the wrong answer if you meant rows.)
     **c** `(3,4) * (4,1)` → pad to `(1,4)` vs... no: right-align `(3,4)` and `(4,1)` gives pairs `(3,4)` and `(4,1)` → `4` vs `1` broadcasts, `3` vs `4` errors. **Error.**
- **d** `(B,T,k)`, the weight has no batch dims and broadcasts.
- **e** `(B,H,T,S)`, leading dims are batch.
- **f** `(B,H,d,T)`, the `1` batch dim broadcasts over `B`; contraction is `d` with `d`.
- **g** `(B,H,T,T)`, the padding mask stretches over heads and queries.
+    **d** `(B,T,k)`. The weight has no batch dims and broadcasts.
+    **e** `(B,H,T,S)`. Leading dims are batch.
+    **f** `(B,H,d,T)`. The `1` batch dim broadcasts over `B`; contraction is `d` with `d`.
+    **g** `(B,H,T,T)`. The padding mask stretches over heads and queries.
     **h** Error in intent, valid in shape only if `N == K`: `.sum(axis=1)` is `(N,)`, which right-aligns against the `K` axis. Use `keepdims=True` → `(N,1)` → `(N,K)`.
- **i** `(2,12)` but the *contents* are not what a plain `reshape(2,12)` would give, the transpose reordered elements first, and since the result is non-contiguous NumPy copies (in torch, `view` would raise).
+    **i** `(2,12)`, but the *contents* are not what a plain `reshape(2,12)` would give: the transpose reordered elements first, and since the result is non-contiguous NumPy copies (in torch, `view` would raise).
     **j** `(B,T,1)`; add `[:, :, 0]` to get `(B,T)`.
 
 **★ 2 (drill).** For `x` of shape `(B, T, H*d_head)`, write the two-step conversion to `(B, H, T, d_head)` and
 the inverse, and say which steps copy.
 
 ??? success "Solution"
- Forward: `x.reshape(B, T, H, d_head)` (free (splitting the last, contiguous axis) then `.transpose(0,2,1,3)` (free) strides only). Inverse: `.transpose(0,2,1,3)` (free) then `.reshape(B, T, H*d_head)` — **this one copies**, because the transposed tensor's memory order no longer matches the target's linear order. In torch the second step must be `.contiguous().view(...)` or `.reshape(...)`.
+    Forward: `x.reshape(B, T, H, d_head)` is free, because it splits the last axis, which is contiguous; `.transpose(0,2,1,3)` is free too, since it only rewrites strides. Inverse: `.transpose(0,2,1,3)` is free, then `.reshape(B, T, H*d_head)` copies, because the transposed tensor's memory order no longer matches the target's linear order. In torch that second step must be `.contiguous().view(...)` or `.reshape(...)`.
 
 **★★ 3.** Explain why `x - x.mean(axis=1)` can be wrong but never raises for a square `x`, and what the
 correct expression is for centring rows, columns, and the whole array.
@@ -607,13 +607,13 @@ time. Verify against `cross_entropy_from_logits` and report the peak extra memor
     assert np.isclose(chunked_cross_entropy(logits, targets, 64),
                       cross_entropy_from_logits(logits, targets))
     ```
- Peak extra memory is $O(\text{chunk}\times V)$ instead of $O(N\times V)$, the same idea as fused/chunked loss kernels, and the reason a 128k-vocab model can compute its loss at all.
+    Peak extra memory is $O(\text{chunk}\times V)$ instead of $O(N\times V)$: the same idea as fused/chunked loss kernels, and the reason a 128k-vocab model can compute its loss at all.
 
 **★★★ 7.** A colleague reports that swapping `einsum("bhtd,bhsd->bhts", Q, K)` for `Q @ K.transpose(-1,-2)`
 changed their throughput by 20% with identical outputs. Give two plausible mechanisms and how you would confirm.
 
 ??? success "Solution"
- (1) **Layout/kernel selection**: `einsum` may lower to a different contraction path or insert a transpose/copy to reach a BLAS-friendly layout, whereas `@` on a strided view may hit a batched-GEMM kernel directly (or vice versa, which direction wins depends on the backend and dtype). (2) **Fusion boundaries**: under `torch.compile`/XLA, one form may fuse with the neighbouring scale and mask while the other creates a materialised intermediate, changing HBM traffic rather than FLOPs. Confirm by profiling (`torch.profiler`, Nsight) and looking at the kernel names and the bytes moved, not the FLOPs; check `.is_contiguous()` and strides on the inputs; and test both at several shapes, since the winner typically flips with $T$ and $d_{\text{head}}$.
+    (1) **Layout/kernel selection**: `einsum` may lower to a different contraction path or insert a transpose/copy to reach a BLAS-friendly layout, whereas `@` on a strided view may hit a batched-GEMM kernel directly (or vice versa, which direction wins depends on the backend and dtype). (2) **Fusion boundaries**: under `torch.compile`/XLA, one form may fuse with the neighbouring scale and mask while the other creates a materialised intermediate, changing HBM traffic rather than FLOPs. Confirm by profiling (`torch.profiler`, Nsight) and looking at the kernel names and the bytes moved, not the FLOPs; check `.is_contiguous()` and strides on the inputs; and test both at several shapes, since the winner typically flips with $T$ and $d_{\text{head}}$.
 
 ## References
 

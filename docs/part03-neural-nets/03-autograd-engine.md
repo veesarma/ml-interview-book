@@ -8,7 +8,7 @@
 > graph, `requires_grad`, `no_grad`, in-place checks, hooks) and JAX (functional
 > `grad`, `jit`, `vmap`) differ from what you built and why.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - A `Tensor` holds `data`, `grad`, the parent tensors `_prev` and a closure `_backward` that adds this node's VJP into the parents' `grad`.
 - `backward()`: topological sort of the DAG from the root; seed `root.grad = 1`; call each node's `_backward` in reverse order. Gradients **accumulate** (`+=`) because a tensor can feed several ops.
@@ -54,7 +54,7 @@ captures those by reference, which is both the simplest implementation and exact
 what PyTorch's `ctx.save_for_backward` formalises.
 
 **Why a topological sort?** A node's `_backward` reads `out.grad`, which must be
-*complete* — every downstream consumer must have added its contribution first. Reverse
+*complete*, every downstream consumer must have added its contribution first. Reverse
 topological order guarantees that. Executing in "creation order reversed" is only
 correct if creation order was itself topological, which it is for eager execution
 but not in general (e.g. graphs assembled out of order), so the engine sorts.
@@ -91,7 +91,7 @@ axis that is 1 in $s$ but not in $s'$.
 **`log_softmax` VJP.** $\ell_k = a_k - \log\sum_j e^{a_j}$, so
 $\partial \ell_k/\partial a_i = 1[i=k] - p_i$. For upstream $\bar\ell$:
 $\bar a_i = \sum_k \bar\ell_k(1[i=k] - p_i) = \bar\ell_i - p_i\sum_k \bar\ell_k$. With
-$\bar\ell = -\mathrm{onehot}(y)/N$ this gives $(p - y)/N$ — the fused cross-entropy
+$\bar\ell = -\mathrm{onehot}(y)/N$ this gives $(p - y)/N$, the fused cross-entropy
 gradient falls out of two primitives.
 
 **Correctness of the traversal.** Let $v_1, \dots, v_n$ be a topological order of the
@@ -162,7 +162,7 @@ def unbroadcast(grad, shape):
 
 Every op follows this template: compute, build a node with parents, define the
 closure, attach, return. `sub`, `neg` and `truediv` are composed from `add`, `mul`
-and `pow` so they need no closures of their own — a small example of the "few
+and `pow` so they need no closures of their own, a small example of the "few
 primitives, many derived ops" design that real frameworks use.
 
 ```python
@@ -179,7 +179,7 @@ primitives, many derived ops" design that real frameworks use.
 
 `swapaxes(-1, -2)` is the batched transpose; `unbroadcast` handles a weight that was
 shared across a batch of matmuls (e.g. `(4, 2, 3) @ (3, 5)`), summing its gradient
-over the batch — the same bias rule again.
+over the batch, the same bias rule again.
 
 ```python
     def sum(self, axis=None, keepdims=False):
@@ -237,7 +237,7 @@ def cross_entropy(logits, y):
     return -(logp * Tensor(onehot)).sum() * (1.0 / n)            # scalar
 ```
 
-With the engine, the loss is four ops and needs no backward of its own — the whole
+With the engine, the loss is four ops and needs no backward of its own, the whole
 point.
 
 **How you'd test it.** Build the *same* random graph in this engine and in PyTorch
@@ -248,7 +248,7 @@ reshape / transpose / mean; batched matmul with a broadcast weight; plus two
 graph-structure checks (a tensor used twice accumulates; a diamond graph is ordered
 correctly) and one op-by-op parametrised sweep.
 
-??? example "Full implementation — `src/mlbook/nn/autograd.py`"
+??? example "Full implementation: `src/mlbook/nn/autograd.py`"
     ```python
     --8<-- "src/mlbook/nn/autograd.py"
     ```
@@ -266,7 +266,7 @@ correctly) and one op-by-op parametrised sweep.
 
 Fine to just read: `_as_tensor`, the `__r*__` reflected operators, `__repr__`.
 
-Full drill — **tensor autograd engine with broadcasting, matmul and a 2-layer MLP
+Full drill: **tensor autograd engine with broadcasting, matmul and a 2-layer MLP
 verified against torch: 45 minutes.** Grader: `pytest tests/test_nn_autograd.py -q`.
 
 ## 4. Systems view: cost, failure modes, trade-offs
@@ -305,7 +305,7 @@ Consequences:
 - `jit(f)` compiles the traced program with XLA; Python control flow that depends on
   values must use `lax.cond`/`lax.scan` because the trace happens once.
 - `vmap(f)` vectorises a per-example function into a batched one *automatically*,
-  including through `grad` — per-example gradients are `vmap(grad(f))`, which PyTorch
+  including through `grad`, per-example gradients are `vmap(grad(f))`, which PyTorch
   needed `torch.func` to get.
 - `jvp` (forward mode) and `vjp` (reverse mode) are both first-class, so
   Hessian-vector products are `jvp(grad(f))`. Source: [the Autodiff Cookbook](https://docs.jax.dev/en/latest/notebooks/autodiff_cookbook.html).
@@ -319,7 +319,7 @@ faster, more predictable programs on TPUs/GPUs, at the cost of purity constraint
 - **Overhead.** Each op allocates a node, a closure and NumPy temporaries; for a
   toy MLP that is fine, for anything real it is the reason frameworks fuse ops and
   run the engine in C++.
-- **Memory.** Closures keep *every* input alive until `backward()` runs — the
+- **Memory.** Closures keep *every* input alive until `backward()` runs, the
   activation-memory issue of chapter 2, with no freeing as backward proceeds. Adding
   `del`/`None`-ing after a node runs is the first optimisation a real engine makes.
 - **Recursion.** A recursive topological sort overflows on long chains; the engine is
@@ -327,7 +327,7 @@ faster, more predictable programs on TPUs/GPUs, at the cost of purity constraint
 - **Double `backward()`.** Calling `backward()` twice on the same graph *adds* the
   gradients again (no freeing, no error). PyTorch frees the graph to make this loud.
 - **Aliasing.** `Tensor(np_array)` does not copy; mutating the array after building
-  the graph corrupts the backward — the in-place hazard that PyTorch's version
+  the graph corrupts the backward, the in-place hazard that PyTorch's version
   counter exists to catch.
 
 **When to use what.**
@@ -341,7 +341,7 @@ faster, more predictable programs on TPUs/GPUs, at the cost of purity constraint
 
 ## 5. In production
 
-!!! production "PyTorch — a dynamic C++ autograd engine behind an eager Python API"
+!!! production "PyTorch: a dynamic C++ autograd engine behind an eager Python API"
     PyTorch's autograd records a graph of `Function` nodes as operations execute,
     then traverses it from roots to leaves applying the chain rule; the notes describe
     `requires_grad` propagation, `no_grad`/`inference_mode`, in-place correctness
@@ -351,7 +351,7 @@ faster, more predictable programs on TPUs/GPUs, at the cost of purity constraint
     [Autograd mechanics](https://docs.pytorch.org/docs/stable/notes/autograd.html);
     [Overview of the PyTorch autograd engine](https://pytorch.org/blog/overview-of-pytorch-autograd-engine/).
 
-!!! production "JAX — composable function transformations on pure programs"
+!!! production "JAX: composable function transformations on pure programs"
     JAX exposes `grad`, `jit`, `vmap` and `jvp`/`vjp` as transformations of pure
     Python functions, traced to XLA; the Autodiff Cookbook demonstrates
     higher-order derivatives (`grad(grad(f))`), Hessian-vector products via
@@ -361,10 +361,10 @@ faster, more predictable programs on TPUs/GPUs, at the cost of purity constraint
     [docs.jax.dev autodiff cookbook](https://docs.jax.dev/en/latest/notebooks/autodiff_cookbook.html);
     [github.com/jax-ml/jax](https://github.com/jax-ml/jax).
 
-!!! production "Meta — DDP hooks into autograd to overlap communication with backward"
+!!! production "Meta: DDP hooks into autograd to overlap communication with backward"
     PyTorch's `DistributedDataParallel` registers autograd hooks on parameters so
     that as soon as a bucket of gradients is ready during backward, its all-reduce
-    launches on a separate stream while the rest of backward continues — the
+    launches on a separate stream while the rest of backward continues, the
     gradient-computation/communication overlap that makes data parallelism scale.
     This is only possible because the engine exposes per-tensor gradient hooks
     and executes nodes in a known order. See [Part XIV, distributed training](../part14-systems/01-distributed-training.md)
@@ -376,8 +376,8 @@ faster, more predictable programs on TPUs/GPUs, at the cost of purity constraint
     During the forward pass each op that touches a `requires_grad` tensor created a
     `grad_fn` node with edges to its inputs' nodes and saved whatever its backward
     needs (via `ctx.save_for_backward` or equivalently in C++). `backward()` seeds the
-    root with a cotangent of 1, then the engine executes nodes in dependency order —
-    a node runs once all its consumers have delivered their contributions — each
+    root with a cotangent of 1, then the engine executes nodes in dependency order,
+    a node runs once all its consumers have delivered their contributions, each
     computing a VJP and accumulating into the next nodes' buffers. When a leaf is
     reached its `.grad` is accumulated (`+=`). Saved tensors are released as nodes
     finish unless `retain_graph=True`. **Staff follow-up:** what does DDP add?
@@ -389,7 +389,7 @@ faster, more predictable programs on TPUs/GPUs, at the cost of purity constraint
     intermediates the gradient is used to propagate further and then dropped to save
     memory. Call `x.retain_grad()` before backward, or register a hook
     (`x.register_hook(lambda g: ...)`) to observe or modify it in flight. In my
-    engine every node keeps `.grad`, which is simpler and wastes memory — the
+    engine every node keeps `.grad`, which is simpler and wastes memory, the
     trade PyTorch makes the other way.
 
 !!! interview "Implement `unbroadcast`. Why is it needed?"
@@ -398,20 +398,20 @@ faster, more predictable programs on TPUs/GPUs, at the cost of purity constraint
     gradient has more dims than the original shape, sum over axis 0 (the prepended
     axes); then for each axis where the original had size 1 and the gradient does not,
     sum with `keepdims=True`. Without it, `x + b` with `b` of shape `(d,)` would try
-    to add an `(N, d)` gradient into a `(d,)` buffer — a shape error in the best case.
+    to add an `(N, d)` gradient into a `(d,)` buffer, a shape error in the best case.
     **Staff follow-up:** where else does the same rule appear? The bias gradient,
     a weight shared across a batched matmul, embedding rows used by many tokens
     (scatter-add), and weight tying in language models.
 
 !!! interview "What breaks if you forget the topological sort and just run closures in reverse creation order?"
-    Nothing, *if* creation order was topological — which eager execution guarantees,
+Nothing, *if* creation order was topological, which eager execution guarantees,
     since an op cannot run before its inputs exist. It breaks when nodes are
     created but wired out of order (graph rewriting, lazy construction), or when you
     want to start backward from a node that is not the last created. The sort also
     lets you skip subgraphs that do not lead to the root, and it is what guarantees
     each node's gradient is complete before its closure reads it.
 
-!!! interview "PyTorch vs JAX for a new large training stack — how do you choose?"
+!!! interview "PyTorch vs JAX for a new large training stack: how do you choose?"
     PyTorch: dynamic graphs, in-place ops, hooks, debuggability, the widest ecosystem
     (FSDP, torch.compile, Triton kernels); the default for GPU shops. JAX: pure
     functions with `jit`/`vmap`/`grad`/`pjit` that compose and compile through XLA,

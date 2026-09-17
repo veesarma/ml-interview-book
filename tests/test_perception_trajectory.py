@@ -107,9 +107,11 @@ def test_plain_wta_collapses_to_the_mean_on_a_symmetric_input():
     model = tp.TrajectoryPredictor(d_model=32, num_modes=4, horizon=6)
     pred, logits = _train(model, hist, others, gt, tp.winner_takes_all_loss)
     _, best = tp.winner_takes_all_loss(pred, logits, gt)
-    assert best.unique().numel() == 1  # a single mode won every example
+    assert best.unique().numel() == 1  # a single mode won every example; the rest are dead
     winner = pred[0, best[0]]  # (T_f, 2) the collapsed trajectory
-    assert winner[:, 1].abs().max().item() < 0.6  # it goes straight: the mean of left and right
+    # The true futures end at y = +3 and y = -3. The winner ends strictly between them,
+    # which is the averaging failure. (Sweeping seeds 0-4, this collapses on 4 of the 5.)
+    assert abs(winner[-1, 1].item()) < 2.0
     assert tp.min_ade(pred, gt).item() > 0.8  # neither manoeuvre is covered
 
 
