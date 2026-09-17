@@ -178,7 +178,7 @@ nearest-neighbour search (see [retrieval & RAG](../part13-retrieval-eval-reliabi
 for the index families).
 
 *The objective.* Treat retrieval as extreme multiclass classification over the corpus
-(Covington et al., RecSys 2016): the probability that user $u$ engages with item $i$
+(Covington et al., [RecSys 2016](https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/)): the probability that user $u$ engages with item $i$
 is a softmax over all items:
 
 $$
@@ -194,7 +194,7 @@ drawn from the *engagement* distribution, so popular items appear as negatives f
 more often than uniform sampling would produce, and the model learns to suppress
 them.
 
-*The logQ correction (Yi et al., RecSys 2019).* The full denominator is an
+*The logQ correction (Yi et al., [RecSys 2019](https://dl.acm.org/doi/10.1145/3298689.3346996)).* The full denominator is an
 expectation under any proposal $q$:
 
 $$
@@ -237,7 +237,7 @@ the ranker: a two-tower or a small MLP over a dozen dense features and the retri
 score, trained to imitate the ranker's ordering on the retrieval distribution
 (knowledge distillation on the *candidate* distribution, not on impressions,
 because impressions only cover what the old pre-ranker let through). Meta's
-Instagram Explore post (Meta Engineering, August 2023) describes exactly this: a
+Instagram Explore post ([Meta Engineering, August 2023](https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/)) describes exactly this: a
 lightweight first-stage ranker trained to approximate the heavier second-stage
 model, so that the expensive model runs on far fewer candidates.
 
@@ -248,7 +248,7 @@ outputs one prediction per interaction type. Three design questions:
 
 **(a) How do the heads share capacity?** *Shared-bottom* (one trunk, $T$ heads) is
 simple but suffers negative transfer when tasks conflict (like vs hide). *MMoE* (Ma
-et al., KDD 2018) replaces the trunk with $E$ experts and gives each task its own
+et al., [KDD 2018](https://research.google/pubs/modeling-task-relationships-in-multi-task-learning-with-multi-gate-mixture-of-experts/)) replaces the trunk with $E$ experts and gives each task its own
 softmax gate over experts:
 
 $$
@@ -256,10 +256,10 @@ h_t(x) = \sum_{e=1}^{E} g_{t,e}(x)\, f_e(x), \qquad g_t(x) = \softmax(W_t x),
 \qquad \hat p_t = \sigma(\text{tower}_t(h_t(x))).
 $$
 
-*PLE* (Tang et al., RecSys 2020) goes further with task-specific *and* shared experts
+*PLE* (Tang et al., [RecSys 2020](https://dl.acm.org/doi/10.1145/3383313.3412236)) goes further with task-specific *and* shared experts
 in layered extraction, which its authors introduced to fix the "seesaw" pattern where
 improving one task degrades another. YouTube's watch-next ranker (Zhao et al.,
-RecSys 2019) uses MMoE to separate *engagement* tasks (clicks, watch time) from
+[RecSys 2019](https://research.google/pubs/recommending-what-video-to-watch-next-a-multitask-ranking-system/)) uses MMoE to separate *engagement* tasks (clicks, watch time) from
 *satisfaction* tasks (likes, survey responses).
 
 **(b) What is the loss per head?** Binary cross-entropy for click-like events;
@@ -330,7 +330,7 @@ $$
 
 sometimes a product of powers $\prod_t \hat p_t^{\,w_t}$ (which behaves like a
 geometric mean and punishes items that are terrible on any one head). Meta's Feed
-post (Meta Engineering, January 2021) describes predicting the probability of
+post ([Meta Engineering, January 2021](https://engineering.fb.com/2021/01/26/ml-applications/news-feed-ranking/)) describes predicting the probability of
 several actions and combining them into a single relevance score using weights;
 the weights encode product policy (a comment is worth more than a like; a hide is
 worth a large negative). Three facts to state:
@@ -355,15 +355,15 @@ inspectable; it is the layer product managers will change most often.
 ### 3.8 Cold start and exploration
 
 - *New items*: content-only item tower (text/image encoders, see [CLIP](../part08-multimodal/03-clip-contrastive.md))
-  plus a small forced-exposure budget so they collect labels; ByteDance's public
-  description of TikTok's recommendation says signals like completing a video are
+  plus a small forced-exposure budget so they collect labels; ByteDance's [public
+  description of TikTok's recommendation](https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you) says signals like completing a video are
   weighted heavily, which is why the first impressions of a new video matter.
 - *New users*: onboarding choices, context (country, language, device), and a
   popularity prior; move to personalised retrieval after a handful of events.
 - *Exploration*: a fixed slice of slots chosen by a bandit (Thompson sampling over
   candidates with uncertain scores) or by uniform randomisation; both create the
   propensities needed for counterfactual evaluation. Netflix's artwork
-  personalisation (Netflix Tech Blog, December 2017) is the canonical
+  personalisation ([Netflix Tech Blog, December 2017](https://netflixtechblog.com/artwork-personalization-c589f074ad76)) is the canonical
   contextual-bandit deployment in a recommendation product.
 
 ### 3.9 Creator-side fairness
@@ -519,8 +519,8 @@ odds estimate expected watch time. *Serve*: nearest-neighbour lookup for candida
 the ranking network scores hundreds. *Evaluate*: offline precision/recall/ranking
 loss for triage, live A/B for the decision.
 
-**What the source says.** Covington, Adams & Sargin, "Deep Neural Networks for
-YouTube Recommendations" (RecSys 2016) describes the two-stage design, the sampled
+**What the source says.** Covington, Adams & Sargin, ["Deep Neural Networks for
+YouTube Recommendations"](https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/) (RecSys 2016) describes the two-stage design, the sampled
 softmax candidate generator served via nearest-neighbour search, the "example age"
 feature that removed the model's bias toward stale content, the choice to predict a
 *held-out next watch* rather than a random held-out watch (to avoid leaking future
@@ -533,7 +533,7 @@ information), and watch-time-weighted logistic regression for ranking.
     works well for popular items but has no way to embed a brand-new video or a
     rarely watched one. The trade-off is that a factorised score can't model
     user–item interactions, so I lean on the ranker for that. YouTube reported in
-    'Deep Neural Networks for YouTube Recommendations' (RecSys 2016) that framing
+    'Deep Neural Networks for YouTube Recommendations' ([RecSys 2016](https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/)) that framing
     candidate generation as extreme multiclass classification with sampled softmax,
     and serving it as nearest-neighbour lookup, let them recommend from a corpus of
     millions within their latency budget. Adding an 'example age' feature
@@ -556,8 +556,8 @@ a value model that combines them with product-owned weights. *Serve*: prediction
 computed per post per user in the request path. *Evaluate*: A/B on engagement and
 survey metrics.
 
-**What the source says.** Meta Engineering, "How machine learning powers Facebook's
-News Feed ranking algorithm" (January 2021) describes the inventory → lightweight
+**What the source says.** Meta Engineering, ["How machine learning powers Facebook's
+News Feed ranking algorithm"](https://engineering.fb.com/2021/01/26/ml-applications/news-feed-ranking/) (January 2021) describes the inventory → lightweight
 model → neural-network ranking pipeline, the prediction of multiple action
 probabilities, their combination into a single score, and the use of surveys to
 tune ranking toward posts people say are worth their time.
@@ -571,7 +571,7 @@ tune ranking toward posts people say are worth their time.
     survey signals that don't exist per impression. The trade-off is that the heads
     must be calibrated and the weights must be re-tuned by A/B whenever the mix
     changes. Meta described this design in 'How machine learning powers Facebook's
-    News Feed ranking algorithm' (2021): action predictions combined into a
+    News Feed ranking algorithm' ([2021](https://engineering.fb.com/2021/01/26/ml-applications/news-feed-ranking/)): action predictions combined into a
     relevance score, with surveys used to steer the weights toward what people find
     valuable. I'd add a long-term holdout, because the weights that win a two-week
     test are not always the ones that keep people a year."
@@ -590,8 +590,8 @@ multi-label second-stage ranker; a final re-ranking pass for diversity and rules
 *Serve*: the first-stage ranker keeps the second stage's candidate count small.
 *Evaluate*: A/B.
 
-**What the source says.** Meta Engineering, "Scaling the Instagram Explore
-recommendations system" (August 2023) describes the multi-stage funnel (retrieval,
+**What the source says.** Meta Engineering, ["Scaling the Instagram Explore
+recommendations system"](https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/) (August 2023) describes the multi-stage funnel (retrieval,
 first-stage ranking, second-stage ranking, final re-ranking), two-tower retrieval, and
 a first-stage ranker trained to approximate the second-stage model's output so the
 expensive model runs on fewer candidates.
@@ -603,7 +603,7 @@ expensive model runs on fewer candidates.
     costs nothing but throws away cross features and makes the funnel's recall depend
     on the weakest model. The trade-off is another model to train, monitor and keep
     consistent with its teacher. Instagram described this in 'Scaling the Instagram
-    Explore recommendations system' (2023): a lightweight first-stage ranker that
+    Explore recommendations system' ([2023](https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/)): a lightweight first-stage ranker that
     approximates the second-stage model so the second stage only sees a small set.
     I'd revisit if the ranker became cheap enough to score everything the retriever
     returns."
@@ -815,22 +815,22 @@ reports online metric gains from deployment on Meta surfaces.
 
 ## References
 
-- Covington, P., Adams, J., Sargin, E. "Deep Neural Networks for YouTube Recommendations." RecSys 2016.
-- Yi, X. et al. "Sampling-Bias-Corrected Neural Modeling for Large Corpus Item Recommendations." RecSys 2019.
-- Zhao, Z. et al. "Recommending What Video to Watch Next: A Multitask Ranking System." RecSys 2019.
-- Ma, J. et al. "Modeling Task Relationships in Multi-task Learning with Multi-gate Mixture-of-Experts." KDD 2018.
-- Tang, H. et al. "Progressive Layered Extraction (PLE): A Novel Multi-Task Learning (MTL) Model for Personalized Recommendations." RecSys 2020.
+- Covington, P., Adams, J., Sargin, E. "Deep Neural Networks for YouTube Recommendations." RecSys 2016 ([research.google](https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/)).
+- Yi, X. et al. "Sampling-Bias-Corrected Neural Modeling for Large Corpus Item Recommendations." RecSys 2019 ([dl.acm.org](https://dl.acm.org/doi/10.1145/3298689.3346996)).
+- Zhao, Z. et al. "Recommending What Video to Watch Next: A Multitask Ranking System." RecSys 2019 ([research.google](https://research.google/pubs/recommending-what-video-to-watch-next-a-multitask-ranking-system/)).
+- Ma, J. et al. "Modeling Task Relationships in Multi-task Learning with Multi-gate Mixture-of-Experts." KDD 2018 ([research.google](https://research.google/pubs/modeling-task-relationships-in-multi-task-learning-with-multi-gate-mixture-of-experts/)).
+- Tang, H. et al. "Progressive Layered Extraction (PLE): A Novel Multi-Task Learning (MTL) Model for Personalized Recommendations." RecSys 2020 ([dl.acm.org](https://dl.acm.org/doi/10.1145/3383313.3412236)).
 - Zhou, G. et al. "Deep Interest Network for Click-Through Rate Prediction." KDD 2018 ([arXiv:1706.06978](https://arxiv.org/abs/1706.06978)); "Deep Interest Evolution Network." AAAI 2019 ([arXiv:1809.03672](https://arxiv.org/abs/1809.03672)).
 - Pi, Q. et al. "Search-based User Interest Modeling with Lifelong Sequential Behavior Data for Click-Through Rate Prediction." CIKM 2020 ([arXiv:2006.05639](https://arxiv.org/abs/2006.05639)).
 - Chang, J. et al. "TWIN: TWo-stage Interest Network for Lifelong User Behavior Modeling in CTR Prediction at Kuaishou." KDD 2023 ([arXiv:2302.02352](https://arxiv.org/abs/2302.02352)).
-- Meta Engineering. "How machine learning powers Facebook's News Feed ranking algorithm." January 2021.
-- Meta Engineering. "Scaling the Instagram Explore recommendations system." August 2023.
+- Meta Engineering. "How machine learning powers Facebook's News Feed ranking algorithm." January 2021 ([engineering.fb.com](https://engineering.fb.com/2021/01/26/ml-applications/news-feed-ranking/)).
+- Meta Engineering. "Scaling the Instagram Explore recommendations system." August 2023 ([engineering.fb.com](https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/)).
 - Liu, Z. et al. "Monolith: Real Time Recommendation System With Collisionless Embedding Table." 2022 ([arXiv:2209.07663](https://arxiv.org/abs/2209.07663)).
 - Ying, R. et al. "Graph Convolutional Neural Networks for Web-Scale Recommender Systems." KDD 2018 ([arXiv:1806.01973](https://arxiv.org/abs/1806.01973)).
 - Pancha, N. et al. "PinnerFormer: Sequence Modeling for User Representation at Pinterest." KDD 2022 ([arXiv:2205.04507](https://arxiv.org/abs/2205.04507)).
 - Zhai, J. et al. "Actions Speak Louder than Words: Trillion-Parameter Sequential Transducers for Generative Recommendations." ICML 2024 ([arXiv:2402.17152](https://arxiv.org/abs/2402.17152)).
 - Joachims, T., Swaminathan, A., Schnabel, T. "Unbiased Learning-to-Rank with Biased Feedback." WSDM 2017.
 - Singh, A., Joachims, T. "Fairness of Exposure in Rankings." KDD 2018.
-- Netflix Technology Blog. "Artwork Personalization at Netflix." December 2017.
-- TikTok Newsroom. "How TikTok recommends videos #ForYou." June 2020.
+- Netflix Technology Blog. "Artwork Personalization at Netflix." December 2017 ([netflixtechblog.com](https://netflixtechblog.com/artwork-personalization-c589f074ad76)).
+- TikTok Newsroom. "How TikTok recommends videos #ForYou." June 2020 ([newsroom.tiktok.com](https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you)).
 - Sculley, D. et al. "Hidden Technical Debt in Machine Learning Systems." NeurIPS 2015.

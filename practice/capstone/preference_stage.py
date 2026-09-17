@@ -108,18 +108,43 @@ def grpo_loss(logp: torch.Tensor, logp_old: torch.Tensor, advantages: torch.Tens
 
 @torch.no_grad()
 def sample_group(model: TinyVLM, examples: list[task.Example], group_size: int, temperature: float=1.0, generator: torch.Generator | None=None) -> tuple[list[task.Example], list[str], torch.Tensor]:
-    """Sample ``G`` answers for each of ``P`` prompts.
+    """Sample ``G`` answers for each of ``P`` prompts and score them with the verifier.
 
-    Returns ``(repeated_examples, sampled_answers, rewards)`` with
-    ``len == P * G`` and ``rewards`` shaped ``(P, G)``.
+    Returns ``(repeated_examples, sampled_answers, rewards)``, the first two of
+    length ``P * G`` in prompt-major order and ``rewards`` shaped ``(P, G)``.
+
+    One forward pass covers the whole group because a response here is a single
+    token, so all ``G`` samples are draws from the same categorical. With
+    multi-token responses you have to decode each sample separately and this
+    shortcut disappears, which is why generation dominates the wall clock of
+    every real RLHF run.
     """
     raise NotImplementedError('TODO: implement sample_group (see the reference in src/mlbook)')
 
-def run_grpo(policy: TinyVLM, reference: TinyVLM, examples: list[task.Example], steps: int=60, prompts_per_step: int=16, group_size: int=8, inner_epochs: int=2, lr: float=0.0002, clip_eps: float=0.2, kl_coef: float=0.02, temperature: float=1.0, seed: int=0) -> dict[str, object]:
-    """Sample, score with the verifier, normalise within the group, update.
+def informative_groups(rewards: torch.Tensor) -> torch.Tensor:
+    """Mask of groups that carry a gradient. ``(P, G)`` rewards -> ``(P,)`` bool.
 
-    Each step is one full on-policy iteration: generation, reward, advantage,
-    then ``inner_epochs`` gradient steps on the same batch under the clip. That
-    ordering is the part worth being able to recite.
+    A group where every sample earned the same reward has zero advantage for
+    every token in it, so it contributes exactly nothing to the update while
+    still costing a full generation and two forward passes. With a binary
+    verifier and a policy that is confidently right on the easy prompts and
+    confidently wrong on the hard ones, most groups are degenerate: on the
+    capstone task after SFT, 59% of groups at ``G = 4`` are all-right or
+    all-wrong. Dropping them and refilling the batch from fresh prompts is
+    DAPO's dynamic sampling, and it is the difference between a GRPO step that
+    moves the policy and one that adds noise.
+    """
+    raise NotImplementedError('TODO: implement informative_groups (see the reference in src/mlbook)')
+
+def run_grpo(policy: TinyVLM, reference: TinyVLM, examples: list[task.Example], steps: int=25, prompts_per_step: int=6, group_size: int=8, inner_epochs: int=2, lr: float=0.0001, clip_eps: float=0.2, kl_coef: float=0.02, temperature: float=1.0, oversample: int=4, filter_degenerate: bool=True, seed: int=0) -> dict[str, object]:
+    """Sample, score with the verifier, drop the degenerate groups, normalise, update.
+
+    Each step is one on-policy iteration: draw ``oversample * prompts_per_step``
+    prompts, sample a group of ``G`` for each, keep up to ``prompts_per_step``
+    groups whose rewards are not all equal, then take ``inner_epochs`` gradient
+    steps on that batch under the PPO clip. The report includes
+    ``informative_group_rate``, which is the fraction of sampled groups that
+    survived the filter; when it collapses toward zero the policy has either
+    solved the prompts or given up on them, and the run has stopped learning.
     """
     raise NotImplementedError('TODO: implement run_grpo (see the reference in src/mlbook)')

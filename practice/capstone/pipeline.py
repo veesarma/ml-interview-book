@@ -57,11 +57,14 @@ class PipelineConfig:
     dpo_batch_size: int = 24
     dpo_lr: float = 0.0002
     dpo_beta: float = 0.1
-    grpo_steps: int = 25
-    grpo_prompts_per_step: int = 8
-    grpo_group_size: int = 6
-    grpo_lr: float = 0.0001
-    grpo_temperature: float = 1.0
+    grpo_steps: int = 30
+    grpo_prompts_per_step: int = 6
+    grpo_group_size: int = 8
+    grpo_oversample: int = 4
+    'Prompts drawn per step, as a multiple of ``grpo_prompts_per_step``. Only\n    groups whose samples did not all score the same survive into the batch, so\n    the extra draws are what keep the batch full.'
+    grpo_lr: float = 0.0003
+    grpo_temperature: float = 0.7
+    'Sampling temperature for the group. GRPO maximises the expected reward of\n    a *sample*, so a temperature far from the one you decode at optimises a\n    distribution you never serve: at 1.0 the mean accuracy change over five\n    seeds was -0.004, at 0.7 it was +0.019.'
     grpo_kl_coef: float = 0.02
     tool_confidence: float = 0.9
 

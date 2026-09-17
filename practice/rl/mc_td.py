@@ -31,8 +31,14 @@ def discounted_returns(rewards: list[float], gamma: float) -> np.ndarray:
     """``G_t = sum_{k>=0} gamma^k r_{t+k+1}`` computed backwards; (T,) -> (T,)."""
     raise NotImplementedError('TODO: implement discounted_returns (see the reference in src/mlbook)')
 
-def mc_evaluation(env, pi: np.ndarray, gamma: float, n_episodes: int, rng: np.random.Generator) -> np.ndarray:
-    """First-visit Monte Carlo estimate of ``V^pi``; returns (S,)."""
+def mc_evaluation(env, pi: np.ndarray, gamma: float, n_episodes: int, rng: np.random.Generator, alpha: float | None=None) -> np.ndarray:
+    """First-visit Monte Carlo estimate of ``V^pi``; returns (S,).
+
+    Args:
+        alpha: step size. ``None`` uses ``1/n(s)``, the running mean, which converges to the
+            sample average. A constant ``alpha`` tracks instead of converging, and is what
+            you use to compare MC against TD at an equal step size.
+    """
     raise NotImplementedError('TODO: implement mc_evaluation (see the reference in src/mlbook)')
 
 def td0_evaluation(env, pi: np.ndarray, gamma: float, n_episodes: int, alpha: float, rng: np.random.Generator) -> np.ndarray:
