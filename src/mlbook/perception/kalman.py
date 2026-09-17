@@ -71,8 +71,20 @@ class KalmanFilter:
 
 
 def covariance_ellipse(P2: np.ndarray, n_std: float = 2.0, n_points: int = 64) -> np.ndarray:
-    """Points (n_points, 2) on the ``n_std``-sigma ellipse of a 2×2 covariance (for figures)."""
-    vals, vecs = np.linalg.eigh(P2)  # (2,), (2, 2)
-    theta = np.linspace(0.0, 2.0 * np.pi, n_points)  # (n_points,)
+    """Points on the ``n_std``-sigma ellipse of a 2×2 covariance (for figures).
+
+    The ellipse is the level set ``{p : pᵀ P⁻¹ p = n_std²}``.  Writing ``P = V Λ Vᵀ`` (eigh),
+    a unit circle scaled by ``n_std·√Λ`` and rotated by ``V`` traces exactly that set.
+
+    Args:
+        P2: (2, 2) symmetric positive semi-definite covariance.
+        n_points: number of *distinct* angles; the returned polygon repeats the first point
+            at the end so it closes, hence shape ``(n_points + 1, 2)``.  Angles are sampled
+            with ``endpoint=False`` so that a power-of-two ``n_points`` lands exactly on the
+            principal axes (a closed ``linspace`` would miss them and shrink the drawn axes).
+    """
+    vals, vecs = np.linalg.eigh(P2)  # (2,) ascending eigenvalues, (2, 2) eigenvectors in columns
+    theta = np.linspace(0.0, 2.0 * np.pi, n_points, endpoint=False)  # (n_points,)
     circle = np.stack([np.cos(theta), np.sin(theta)], axis=1)  # (n_points, 2)
-    return circle * (n_std * np.sqrt(np.maximum(vals, 0.0))) @ vecs.T  # (n_points, 2)
+    pts = circle * (n_std * np.sqrt(np.maximum(vals, 0.0))) @ vecs.T  # (n_points, 2)
+    return np.concatenate([pts, pts[:1]], axis=0)  # (n_points + 1, 2) closed polygon

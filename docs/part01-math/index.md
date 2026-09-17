@@ -1,4 +1,4 @@
-# Part I — The mathematical language of ML
+# Part I: The mathematical language of ML
 
 Everything in this book is written in one language: linear maps on tensors, gradients
 of scalar losses, probability distributions over data and parameters, and the
@@ -49,12 +49,12 @@ flowchart LR
 
 Read in this order; each item is 45–60 minutes.
 
-1. **[01 §2](01-linear-algebra.md#2-the-math)** — normal equations, PCA both ways, attention as matrices. Redo the three boxed derivations on paper.
-2. **[02 §2.5–2.6](02-calculus-matrix-calculus.md#2-the-math)** — the attention backward pass. Then run `pytest tests/test_math_calculus.py -k attention_backward -q` and read the test.
-3. **[05 §2](05-information-theory.md#2-the-math)** — cross-entropy = MLE, KL non-negativity, forward vs reverse KL (look at the figure until it is obvious).
-4. **[06 §2–3](06-optimization.md#2-the-math)** — Adam with bias correction, AdamW vs L2, the schedule zoo. Retype `Adam` and `AdamW` from memory.
-5. **[07 shape drill](07-tensor-shapes-broadcasting.md#7-exercises)** — do all drills without running code, then check.
-6. **[04 §5](04-statistics.md#5-in-production)** — how Netflix, Airbnb and Microsoft actually run A/B tests; know CUPED and sequential testing by name.
+1. **[01 §2](01-linear-algebra.md#2-the-math)**. normal equations, PCA both ways, attention as matrices. Redo the three boxed derivations on paper.
+2. **[02 §2.5–2.6](02-calculus-matrix-calculus.md#2-the-math)**. the attention backward pass. Then run `pytest tests/test_math_calculus.py -k attention_backward -q` and read the test.
+3. **[05 §2](05-information-theory.md#2-the-math)**. cross-entropy = MLE, KL non-negativity, forward vs reverse KL (look at the figure until it is obvious).
+4. **[06 §2–3](06-optimization.md#2-the-math)**. Adam with bias correction, AdamW vs L2, the schedule zoo. Retype `Adam` and `AdamW` from memory.
+5. **[07 shape drill](07-tensor-shapes-broadcasting.md#7-exercises)**. do all drills without running code, then check.
+6. **[04 §5](04-statistics.md#5-in-production)**. how Netflix, Airbnb and Microsoft actually run A/B tests; know CUPED and sequential testing by name.
 7. Every chapter's **TL;DR card** the morning of the interview.
 
 ## Retype-by-hand targets across Part I

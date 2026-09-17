@@ -122,7 +122,7 @@ def gan_train_step(gen: Generator, disc: Discriminator, opt_g: torch.optim.Optim
     opt_g.zero_grad()
     g_loss.backward()
     opt_g.step()
-    return float(d_loss), float(g_loss)
+    return float(d_loss.detach()), float(g_loss.detach())
 
 
 def spectral_norm_power_iteration(w: torch.Tensor, u: torch.Tensor, n_iter: int = 1) -> tuple[torch.Tensor, torch.Tensor]:

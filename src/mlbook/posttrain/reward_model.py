@@ -94,5 +94,5 @@ def train_reward_model(
         opt.zero_grad()
         loss.backward()
         opt.step()
-        losses.append(float(loss))
+        losses.append(float(loss.detach()))
     return losses

@@ -8,7 +8,7 @@
 > geometry it induces, and the cost of computing with it, and knowing which
 > decomposition answers which question.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Data is row-major: $X \in \R^{N \times d}$, a linear layer is $XW + b$ with $W \in \R^{d \times k}$. Matmul is composition of linear maps: $(XW_1)W_2 = X(W_1W_2)$.
 - Least squares: $\min_w \norm{Xw - y}^2 \Rightarrow X^\top X w = X^\top y$. Solution is the orthogonal projection of $y$ onto $\mathrm{col}(X)$; residual $\perp$ every column.
@@ -37,11 +37,11 @@ it two ways, because both are used constantly:
   from the corresponding row of $X$. Row 1 of $XW$ is $1\cdot(1,0) + 2\cdot(0,1) + 0\cdot(1,1) = (1, 2)$.
 * **Column view**: each output column is a linear combination of the *columns of $X$* with
   coefficients from the corresponding column of $W$. That is why $\mathrm{col}(XW) \subseteq \mathrm{col}(X)$
-  and $\mathrm{rank}(XW) \le \min(\mathrm{rank}\,X, \mathrm{rank}\,W)$ — a product cannot create directions that were not already there.
+ and $\mathrm{rank}(XW) \le \min(\mathrm{rank}\,X, \mathrm{rank}\,W)$, a product cannot create directions that were not already there.
 
 The second reading is the whole story of low rank: if $W = BA$ with $B\in\R^{3\times 1}$, every column
 of $XW$ is a multiple of the single vector $XB$. You have lost two of three possible output directions
-— but if the useful signal lived in one direction anyway, you lost nothing and saved parameters.
+, but if the useful signal lived in one direction anyway, you lost nothing and saved parameters.
 
 A **basis** is a minimal set of vectors whose span is a space; the **span** of a set is all linear
 combinations; vectors are **linearly independent** if no combination other than all-zero gives $0$.
@@ -50,7 +50,7 @@ The **null space** is $\{x : Ax = 0\}$; every direction in it is invisible to $A
 the input dimension splits exactly into "seen" and "killed": $\mathrm{rank} + \mathrm{nullity} = n$.
 
 **Transpose** swaps the roles of rows and columns: $(AB)^\top = B^\top A^\top$, and
-$\langle Ax, y\rangle = \langle x, A^\top y\rangle$ — the transpose is how a linear map acts on
+$\langle Ax, y\rangle = \langle x, A^\top y\rangle$, the transpose is how a linear map acts on
 gradients flowing backwards, which is why backprop is full of transposes. The **inverse** exists
 only for square, full-rank matrices; the **pseudoinverse** $A^+$ exists for any matrix and gives
 the minimum-norm least-squares solution $A^+ y$.
@@ -58,7 +58,7 @@ the minimum-norm least-squares solution $A^+ y$.
 ![Projection onto a line, and least squares as projection onto the column space](../assets/figures/part01_projection.png){ width="720" }
 
 *Left: the projection of $v$ onto the line through $u$ is the closest point on that line; the
-residual is orthogonal to $u$. Right: least squares is the same picture one dimension up — $Xw^\star$
+residual is orthogonal to $u$. Right: least squares is the same picture one dimension up, $Xw^\star$
 is the closest point in $\mathrm{col}(X)$ to $y$, and $y - Xw^\star$ is orthogonal to the whole plane.*
 
 ## 2. The math
@@ -84,7 +84,7 @@ $$
 \boxed{\;X^\top X\, w^\star = X^\top y\;}
 $$
 
-*What it means:* $X^\top(y - Xw^\star) = 0$ — the residual is orthogonal to every column of $X$, so
+*What it means:* $X^\top(y - Xw^\star) = 0$, the residual is orthogonal to every column of $X$, so
 $Xw^\star$ is the orthogonal projection of $y$ onto $\mathrm{col}(X)$. The projection matrix is
 $P = X(X^\top X)^{-1}X^\top$; it is symmetric ($P^\top = P$) and idempotent ($P^2 = P$, projecting
 twice changes nothing), and $\tr P = d$ = the dimension you projected onto. $X^\top X$ is invertible
@@ -116,7 +116,7 @@ and the reason spectral normalisation divides each $W$ by its $\sigma_1$ estimat
 
 $Av = \lambda v$ with $v \ne 0$. For a real **symmetric** $A$, the spectral theorem gives
 $A = Q\Lambda Q^\top$ with orthonormal eigenvectors and real eigenvalues. The quadratic form
-$x^\top A x$ is then $\sum_i \lambda_i (q_i^\top x)^2$ — a weighted sum of squared coordinates in
+$x^\top A x$ is then $\sum_i \lambda_i (q_i^\top x)^2$, a weighted sum of squared coordinates in
 the eigenbasis. Therefore
 
 $$
@@ -129,7 +129,7 @@ Three PSD matrices you meet daily:
    A zero eigenvalue means the data lies in a lower-dimensional affine subspace.
 2. **Kernel / Gram** $K = \Phi\Phi^\top$: $x^\top K x = \norm{\Phi^\top x}^2$.
 3. **Hessian at a local minimum**: the second-order Taylor term $\tfrac12 \delta^\top H \delta$ must be
-   non-negative in every direction; a negative eigenvalue means a descent direction exists — a
+ non-negative in every direction; a negative eigenvalue means a descent direction exists, a
    saddle ([chapter 06](06-optimization.md)).
 
 $\tr A = \sum_i A_{ii} = \sum_i \lambda_i$ and $\det A = \prod_i \lambda_i$; $\det$ is the volume
@@ -186,13 +186,13 @@ $$
 
 so $w$ is an eigenvector, and the objective at a solution is $w^\top\Sigma w = \lambda w^\top w = \lambda$.
 Maximising picks the *top* eigenvalue. Subsequent components repeat the argument with the extra constraint
-$w \perp w_1$, giving the next eigenvectors. The constraint $\norm{w} = 1$ is essential — without it the
+$w \perp w_1$, giving the next eigenvectors. The constraint $\norm{w} = 1$ is essential, without it the
 objective is unbounded.
 
 **Via SVD.** $X_c = U S V^\top \Rightarrow \Sigma = V \frac{S^2}{N-1} V^\top$, which is already an
 eigen-decomposition: right singular vectors are the principal directions and $\sigma_i^2/(N-1)$ the
 explained variances. Projected coordinates are $X_c V_k = U_k S_k$. *What it means:* you never need to
-form $\Sigma$ — a thin SVD of $X_c$ (cost $O(Nd^2)$) is more numerically stable than eigen-decomposing
+form $\Sigma$, a thin SVD of $X_c$ (cost $O(Nd^2)$) is more numerically stable than eigen-decomposing
 $X_c^\top X_c$, whose condition number is the *square* of $X_c$'s. Both routes are implemented and tested
 to agree below.
 
@@ -206,14 +206,14 @@ A = \softmax_{\text{rows}}(S), \qquad
 Y = AV \in \R^{T\times d_v}.
 $$
 
-* $QK^\top$ is a **cross-Gram matrix**: entry $(i, j)$ is the inner product of query $i$ with key $j$ —
+* $QK^\top$ is a **cross-Gram matrix**: entry $(i, j)$ is the inner product of query $i$ with key $j$, 
   similarity, not distance. If $Q = K$ it is exactly a Gram matrix and is PSD.
 * The **$\sqrt{d_k}$ scaling**: if the entries of $q$ and $k$ are independent with zero mean and unit
   variance, $q^\top k$ has variance $d_k$. Dividing by $\sqrt{d_k}$ keeps the scores $O(1)$ so the softmax
   is not saturated at initialisation (saturated softmax $\Rightarrow$ vanishing gradients, see
   [chapter 02](02-calculus-matrix-calculus.md)).
 * **Row softmax** turns each row into a probability vector: $A$ is row-stochastic, $A\mathbf{1} = \mathbf{1}$.
-* $Y = AV$ makes every output row a **convex combination of value rows** — a weighted average, so
+* $Y = AV$ makes every output row a **convex combination of value rows**, a weighted average, so
   outputs live inside the convex hull of the values. Attention cannot extrapolate outside the value set;
   the output projection after it can.
 * Cost: $QK^\top$ is $O(T^2 d_k)$ time and $O(T^2)$ memory per head; $AV$ is $O(T^2 d_v)$. The $T^2$
@@ -228,7 +228,7 @@ that nothing in attention is more exotic than a Gram matrix, a row normalisation
 
 Fine-tuning changes $W_0 \in \R^{d\times k}$ by $\Delta W$. LoRA's hypothesis is that $\Delta W$ has low
 *intrinsic* rank, so parameterise $\Delta W = BA$, $B \in \R^{d\times r}$, $A \in \R^{r\times k}$, $r \ll d, k$.
-Forward: $h = xW_0 + (xB)A$ — two skinny matmuls instead of one wide one, $r(d+k)$ trainable parameters
+Forward: $h = xW_0 + (xB)A$, two skinny matmuls instead of one wide one, $r(d+k)$ trainable parameters
 instead of $dk$. For $d = k = 4096$, $r = 8$: $65{,}536$ vs $16.8$M, a $256\times$ reduction. At inference
 you can merge $W_0 + BA$ so there is no extra latency. Eckart–Young tells you what you give up: if the
 true update's singular values decay slowly, a rank-$r$ adapter leaves $\sum_{i>r}\sigma_i^2$ of it on the
@@ -237,7 +237,7 @@ table. Details and the empirical picture are in [fine-tuning & LoRA](../part06-l
 ### 2.8 Kronecker and tensor products
 
 $(A \otimes B)$ has blocks $A_{ij} B$. The key identity is $\mathrm{vec}(AXB) = (B^\top \otimes A)\,\mathrm{vec}(X)$,
-which turns a matrix equation into a linear system on the flattened matrix — it is how one writes the
+which turns a matrix equation into a linear system on the flattened matrix, it is how one writes the
 Hessian of a linear layer's weights, and how K-FAC and Shampoo ([chapter 06](06-optimization.md))
 approximate curvature as a Kronecker product of two small matrices instead of one enormous one.
 
@@ -282,7 +282,7 @@ def pca_svd(X: np.ndarray, k: int) -> tuple[np.ndarray, np.ndarray]:
 ```
 
 `eigh` (symmetric solver) not `eig`: it is faster, returns real sorted eigenvalues, and guarantees
-orthonormal eigenvectors. Note the `ascending` order from `eigh` — a common off-by-reversal bug.
+orthonormal eigenvectors. Note the `ascending` order from `eigh`, a common off-by-reversal bug.
 
 Eckart–Young, spectral norm by power iteration, and attention as three matrix ops:
 
@@ -314,7 +314,7 @@ def attention_numpy(Q: np.ndarray, K: np.ndarray, V: np.ndarray) -> tuple[np.nda
     return Y, A
 ```
 
-`(Uk * sk)` broadcasts the $k$ singular values across the columns of $U_k$ — a scaled-column product
+`(Uk * sk)` broadcasts the $k$ singular values across the columns of $U_k$, a scaled-column product
 without materialising $\diag(s_k)$. Power iteration on $A^\top A$ converges at rate
 $(\sigma_2/\sigma_1)^{2t}$; spectral-normalised GANs run *one* iteration per training step and reuse the
 vector, which is enough because $W$ changes slowly.
@@ -324,7 +324,7 @@ rank-deficient matrix), `np.linalg.norm(A, 2)` (spectral norm), `torch.nn.functi
 (attention), and the Eckart–Young identity $\norm{A - A_k}_F^2 = \sum_{i>k}\sigma_i^2$ plus a random
 rank-$k$ competitor that must do worse. Idempotence and symmetry of $P$. Both PCA routes agree.
 
-??? example "Full implementation — `src/mlbook/math/linalg.py`"
+??? example "Full implementation: `src/mlbook/math/linalg.py`"
     ```python
     --8<-- "src/mlbook/math/linalg.py"
     ```
@@ -354,11 +354,11 @@ Each symbol has its own `test_<symbol>` function, so `pytest tests/test_math_lin
 
 **FLOPs.** Matmul $(m\times k)(k\times n)$ costs $2mkn$ FLOPs. Solving $X^\top X w = X^\top y$: $O(Nd^2)$ to
 form $X^\top X$, $O(d^3)$ to factor. Thin SVD of $N\times d$: $O(Nd^2)$. Full eigendecomposition of
-$d\times d$: $O(d^3)$. Power iteration: $O(\text{nnz}(A))$ per step — the only option at $d \sim 10^6$.
+$d\times d$: $O(d^3)$. Power iteration: $O(\text{nnz}(A))$ per step, the only option at $d \sim 10^6$.
 Randomised SVD (Halko, Martinsson & Tropp, SIAM Review 2011) gets a rank-$k$ approximation in
 $O(mn\log k)$ and is what you use on an embedding table with $10^8$ rows.
 
-**Memory.** $QK^\top$ is $T^2$ per head per example: at $T = 128$k, $H = 32$, bf16 that is $2\cdot 128\text{k}^2\cdot 32 \approx 1$ TB — hence attention kernels never materialise it.
+**Memory.** $QK^\top$ is $T^2$ per head per example: at $T = 128$k, $H = 32$, bf16 that is $2\cdot 128\text{k}^2\cdot 32 \approx 1$ TB, hence attention kernels never materialise it.
 
 **Conditioning.** $\kappa(A) = \sigma_1/\sigma_n$. Solving $Ax = b$ loses roughly $\log_{10}\kappa$ digits.
 $\kappa(X^\top X) = \kappa(X)^2$, which is why you standardise features before least squares, why
@@ -388,10 +388,10 @@ takes $O(\kappa)$ iterations ([chapter 06](06-optimization.md)).
 
 ## 5. In production
 
-!!! production "Netflix Prize — matrix factorisation for recommendation"
+!!! production "Netflix Prize: matrix factorisation for recommendation"
     Koren, Bell & Volinsky, "Matrix Factorization Techniques for Recommender Systems", *IEEE Computer*, 2009.
     The user–item rating matrix ($\sim$480k users $\times$ 17.7k movies, 99% missing) was modelled as
-    $R \approx P Q^\top$ with rank $\sim$ 20–200 latent factors — an SVD-shaped low-rank model fitted
+ $R \approx P Q^\top$ with rank $\sim$ 20–200 latent factors, an SVD-shaped low-rank model fitted
     by SGD or alternating least squares on the *observed* entries only, with L2 regularisation.
     *Why:* neighbourhood methods could not share statistical strength across sparse users; a rank-$k$
     model has $k(n_u + n_i)$ parameters instead of $n_u n_i$, generalises, and the factors are
@@ -399,14 +399,14 @@ takes $O(\kappa)$ iterations ([chapter 06](06-optimization.md)).
     which is both $O(n_u n_i)$ and biased by the imputation. The same structure underlies every modern
     two-tower retrieval model ([Part XVII](../part17-ml-system-design/01-recommendation-feed-ranking.md)).
 
-!!! production "Microsoft — LoRA for adapting GPT-3-class models"
+!!! production "Microsoft: LoRA for adapting GPT-3-class models"
     Hu et al., "LoRA: Low-Rank Adaptation of Large Language Models", ICLR 2022 (arXiv:2106.09685).
     Freezes $W_0$ and trains $BA$ with $r$ as small as 1–8 on attention projections. *Why:* full fine-tuning
     of a 175B model needs a separate 350 GB checkpoint per task and optimizer state $\sim 3\times$ the
     weights; LoRA reduces trainable parameters by up to $10^4\times$ and optimizer memory by $\sim 3\times$,
     and merges into $W_0$ at inference for zero added latency. *Rejected alternatives:* adapter layers
     (add inference latency), prefix tuning (consumes context length, harder to optimise). The paper's
-    analysis of $\Delta W$ shows its top singular directions dominate — Eckart–Young in the wild.
+ analysis of $\Delta W$ shows its top singular directions dominate, Eckart–Young in the wild.
 
 !!! production "Spectral normalisation for GAN discriminators (Preferred Networks)"
     Miyato et al., "Spectral Normalization for Generative Adversarial Networks", ICLR 2018 (arXiv:1802.05957).
@@ -420,7 +420,7 @@ takes $O(\kappa)$ iterations ([chapter 06](06-optimization.md)).
     "Simple Online and Realtime Tracking with a Deep Association Metric", ICIP 2017 (arXiv:1703.07402);
     Weng et al., "3D Multi-Object Tracking: A Baseline and New Evaluation Metrics", IROS 2020 (arXiv:1907.03961).
     Each track carries a state mean and a PSD covariance $P$; predict $P \leftarrow FPF^\top + Q$ and
-    update with the Kalman gain $K = PH^\top(HPH^\top + R)^{-1}$ — the Gaussian conditioning formula of
+ update with the Kalman gain $K = PH^\top(HPH^\top + R)^{-1}$, the Gaussian conditioning formula of
     [chapter 03](03-probability.md). PSD-ness of $P$ is what makes the Mahalanobis gating distance used for
     detection–track association a valid metric; numerical drift that breaks PSD-ness is a classic
     production bug fixed by symmetrising ($P \leftarrow (P + P^\top)/2$) or using the Joseph form.
@@ -451,9 +451,9 @@ takes $O(\kappa)$ iterations ([chapter 06](06-optimization.md)).
 !!! interview "Why divide attention scores by $\sqrt{d_k}$?"
     Because $q^\top k = \sum_i q_i k_i$ has variance $d_k$ for unit-variance independent entries; without
     the scaling the logits grow with head width, softmax saturates, and its Jacobian
-    $\diag(a) - aa^\top$ goes to zero — no gradient. Scaling keeps logits $O(1)$ at init. **Staff follow-up:**
+ $\diag(a) - aa^\top$ goes to zero, no gradient. Scaling keeps logits $O(1)$ at init. **Staff follow-up:**
     *what if $Q$ and $K$ are not unit-variance later in training?* Then the scaling is wrong in the other
-    direction — this is why QK-normalisation (LayerNorm/RMSNorm on $Q$ and $K$) was adopted in several
+ direction, this is why QK-normalisation (LayerNorm/RMSNorm on $Q$ and $K$) was adopted in several
     2023–24 LLM recipes ([chapter 06](06-optimization.md) and [Part VI](../part06-llm-training/03-large-model-architecture.md)).
 
 !!! interview "Eigen-decomposition vs SVD: when does each exist, and which do you reach for?"
@@ -462,7 +462,7 @@ takes $O(\kappa)$ iterations ([chapter 06](06-optimization.md)).
     matrix, including rectangular and rank-deficient. For symmetric PSD matrices the two coincide.
     Reach for SVD when you want optimal low-rank approximation, the pseudoinverse, or numerical robustness;
     for eigen when you have a symmetric operator and want its invariant directions (covariance, Hessian, graph Laplacian).
-    **Staff follow-up:** *your Hessian has a negative eigenvalue at a point where the gradient is zero — what is it?*
+ **Staff follow-up:** *your Hessian has a negative eigenvalue at a point where the gradient is zero, what is it?*
     A saddle; the eigenvector is a descent direction.
 
 !!! interview "Why does LoRA work, and what is its failure mode?"

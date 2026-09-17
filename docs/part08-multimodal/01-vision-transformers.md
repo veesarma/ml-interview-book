@@ -8,57 +8,57 @@
 > cost as a function of resolution and patch size, explain *precisely* why Swin needs a
 > mask after the cyclic shift, and say when you would still ship a ConvNet.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - An image $x \in \R^{C\times H\times W}$ becomes $N = HW/P^2$ tokens; each $P\times P\times C$
   patch is flattened and mapped by one shared matrix $E \in \R^{P^2C\times d}$. That is
   exactly `Conv2d(C, d, kernel_size=P, stride=P)`.
-- Sequence: $[\text{CLS};\, z_1;\dots;z_N] + E_{pos} \in \R^{(N+1)\times d}$, then $L$ pre-norm
+  - Sequence: $[\text{CLS};\, z_1;\dots;z_N] + E_{pos} \in \R^{(N+1)\times d}$, then $L$ pre-norm
   Transformer blocks, then a head on CLS (or on the mean of the patch tokens).
-- Per-layer cost in multiply-adds: $12Nd^2 + 2N^2d$. Halving $P$ quadruples $N$ and
+  - Per-layer cost in multiply-adds: $12Nd^2 + 2N^2d$. Halving $P$ quadruples $N$ and
   multiplies the quadratic term by 16.
-- ViTs have less inductive bias than CNNs (no locality, no translation equivariance
+  - ViTs have less inductive bias than CNNs (no locality, no translation equivariance
   beyond the patch grid), so they are data-hungry: ViT beats ResNets only with
   JFT-scale pretraining or with DeiT-style augmentation + distillation on ImageNet-1k.
-- Resolution change: interpolate the learned $\sqrt{N}\times\sqrt{N}$ position grid
+  - Resolution change: interpolate the learned $\sqrt{N}\times\sqrt{N}$ position grid
   (bicubic) and keep the patch embedding; FlexiViT resizes the patch kernel; NaViT packs
   variable-resolution images into one sequence.
-- Swin: attention inside $M\times M$ windows costs $O(hw\,M^2 d)$ instead of $O((hw)^2 d)$;
+  - Swin: attention inside $M\times M$ windows costs $O(hw\,M^2 d)$ instead of $O((hw)^2 d)$;
   alternate blocks shift the grid by $M/2$ via `torch.roll`, and a mask blocks attention
   between tokens that wrapped around and tokens that did not. Patch merging halves
   resolution and doubles width, producing a feature pyramid for detection.
-- Registers: extra learned tokens that soak up global information so background patches
+  - Registers: extra learned tokens that soak up global information so background patches
   stop being used as scratch space; ViT-22B needs QK-normalisation and parallel blocks to
   train stably.
-- ConvNeXt: a ResNet with ViT-era design choices matches Swin at similar FLOPs, so the
+  - ConvNeXt: a ResNet with ViT-era design choices matches Swin at similar FLOPs, so the
   gain came from training recipe and macro design, not from attention per se.
 
-## 1. Intuition first
+  ## 1. Intuition first
 
-Take a $1\times 8\times 8$ grayscale image and a patch size $P = 4$. There are
-$N = (8/4)^2 = 4$ patches. Each is a $4\times 4$ block, flattened to a 16-vector. One
-linear map $E \in \R^{16\times d}$ (the *same* $E$ for every patch) turns each into a
-$d$-dimensional token. Prepend a learned CLS token and add a position embedding, and you
-have a 5-token sequence a Transformer can read.
+  Take a $1\times 8\times 8$ grayscale image and a patch size $P = 4$. There are
+  $N = (8/4)^2 = 4$ patches. Each is a $4\times 4$ block, flattened to a 16-vector. One
+  linear map $E \in \R^{16\times d}$ (the *same* $E$ for every patch) turns each into a
+  $d$-dimensional token. Prepend a learned CLS token and add a position embedding, and you
+  have a 5-token sequence a Transformer can read.
 
-![Patchification of an 8×8 image into four 4×4 patches, then four tokens plus CLS](../assets/figures/part08_patchification.png){ width="760" }
+  ![Patchification of an 8×8 image into four 4×4 patches, then four tokens plus CLS](../assets/figures/part08_patchification.png){ width="760" }
 
-*Look at the middle panel: the four flattened vectors are the rows of a $4\times 16$
-matrix, and the right panel is that matrix multiplied by $E$. Nothing in the Transformer
-knows that patches 0 and 1 are neighbours; only the position embedding can tell it.*
+  *Look at the middle panel: the four flattened vectors are the rows of a $4\times 16$
+  matrix, and the right panel is that matrix multiplied by $E$. Nothing in the Transformer
+  knows that patches 0 and 1 are neighbours; only the position embedding can tell it.*
 
-Two things follow from this picture and drive the whole chapter.
+  Two things follow from this picture and drive the whole chapter.
 
-First, **the linear patch map is a convolution.** A conv with kernel $P$ and stride $P$
-visits the same non-overlapping blocks and applies the same weights, so the two are
-identical modules with reshaped weights. The test in §3 checks that to $10^{-5}$.
+  First, **the linear patch map is a convolution.** A conv with kernel $P$ and stride $P$
+  visits the same non-overlapping blocks and applies the same weights, so the two are
+  identical modules with reshaped weights. The test in §3 checks that to $10^{-5}$.
 
-Second, **the sequence length is set by resolution and patch size, not by content.**
-A ViT-B/16 at $224^2$ sees $N = 196$ tokens. At $448^2$ it sees $784$; with $P = 8$
-at $448^2$ it sees $3136$. Attention cost is quadratic in $N$, so "just use higher
-resolution" is a decision with a bill attached, and much of the engineering in this
-part (Swin windows, token compression in VLMs, factorised video attention) exists to
-pay that bill.
+  Second, **the sequence length is set by resolution and patch size, not by content.**
+  A ViT-B/16 at $224^2$ sees $N = 196$ tokens. At $448^2$ it sees $784$; with $P = 8$
+  at $448^2$ it sees $3136$. Attention cost is quadratic in $N$, so "just use higher
+  resolution" is a decision with a bill attached, and much of the engineering in this
+  part (Swin windows, token compression in VLMs, factorised video attention) exists to
+  pay that bill.
 
 ```mermaid
 flowchart LR
@@ -116,8 +116,8 @@ The derivation of why $\sqrt{d_{head}}$ and the gradient of softmax attention li
 [attention mathematics](../part05-sequence-transformers/03-attention-mathematics.md); we
 do not repeat it. The classifier reads either the CLS row,
 $\hat y = \text{LN}(X^{(L)})_0 W_{head}$, or the mean of the patch rows (global average
-pooling, GAP). The two are equivalent in expressiveness — CLS is a learned query that
-can attend to whatever it needs, GAP is a fixed uniform query — and they differ in
+pooling, GAP). The two are equivalent in expressiveness, CLS is a learned query that
+can attend to whatever it needs, GAP is a fixed uniform query, and they differ in
 optimisation: CLS-pooled ViTs are slightly more sensitive to learning rate, GAP-pooled
 ones (used in the ViT paper's ablations and in SigLIP-style encoders with an attention
 pooling head) transfer more predictably to dense tasks because every patch token carries
@@ -161,12 +161,12 @@ To fine-tune at a new resolution, treat the learned $\sqrt N\times\sqrt N\times 
 $d$-channel image and resample it bicubically to $\sqrt{N'}\times\sqrt{N'}$. The patch
 embedding is unchanged. This works because neighbouring position vectors are similar
 (the grid is smooth), so interpolation produces plausible embeddings for positions the
-model never saw. It does not work across large ratios (2× is routine; 8× degrades) — this
+model never saw. It does not work across large ratios (2× is routine; 8× degrades), this
 is the motivation for FlexiViT (train with random patch sizes, resize the kernel $E$ with a
 pseudo-inverse so the *token* stays comparable) and NaViT (keep native resolution and
 aspect ratio, use factorised row/column position embeddings, and pack several images'
 tokens into one fixed-length sequence with an attention mask that blocks cross-image
-attention — the same packing trick used for LLM pretraining in
+attention, the same packing trick used for LLM pretraining in
 [Part VI](../part06-llm-training/01-pretraining-data-objective.md)).
 
 ### 2.5 Inductive bias, data hunger, and DeiT
@@ -182,7 +182,7 @@ images (ImageNet-21k) and beyond (JFT-300M).
 
 DeiT showed that the data can be replaced by *regularisation and a teacher*. Its recipe:
 heavy augmentation (RandAugment, Mixup, CutMix, random erasing, repeated augmentation),
-stochastic depth, and a **distillation token** — a second learned token whose output is
+stochastic depth, and a **distillation token**, a second learned token whose output is
 trained with cross-entropy against the hard label of a ConvNet teacher:
 
 $$
@@ -212,7 +212,7 @@ new window straddles four old ones. Implementing the shift naively creates
 $(h/M+1)(w/M+1)$ windows of unequal size. Swin's trick is a **cyclic shift**:
 `torch.roll(x, (-M/2, -M/2), dims=(1, 2))` moves the top $M/2$ rows to the bottom and the
 left $M/2$ columns to the right, after which the ordinary $M$-aligned partition gives the
-shifted windows — except that windows on the bottom and right edges now contain tokens
+shifted windows, except that windows on the bottom and right edges now contain tokens
 that *wrapped around* from the opposite side of the image and are not spatial
 neighbours of the tokens they sit next to.
 
@@ -251,11 +251,11 @@ $$
 $$
 
 Because the bias depends on relative offset, the same table serves every window and
-every image size — an inductive bias for translation equivariance re-introduced by hand.
+every image size, an inductive bias for translation equivariance re-introduced by hand.
 
 **Patch merging.** Between stages, concatenate each $2\times 2$ group of neighbouring tokens
 ($4d$ channels), LayerNorm, and project $4d \to 2d$. Resolution halves, width doubles, and the
-four stages emit features at strides 4, 8, 16, 32 — a feature pyramid a detector or
+four stages emit features at strides 4, 8, 16, 32, a feature pyramid a detector or
 segmenter can consume through FPN exactly as with a ResNet (see
 [object detection](../part04-vision/04-detection.md)).
 
@@ -455,17 +455,17 @@ and a mask that is broadcast over the batch by viewing `(B*nW, H, L, L)` as
 `(B, nW, H, L, L)`. `PatchMerging` slices the four $2\times2$ sub-grids with strides
 (`x[:, 0::2, 0::2]`, ...) and concatenates them before the $4d \to 2d$ linear.
 
-??? example "Full implementation — `src/mlbook/multimodal/patch_embed.py`"
+??? example "Full implementation: `src/mlbook/multimodal/patch_embed.py`"
     ```python
     --8<-- "src/mlbook/multimodal/patch_embed.py"
     ```
 
-??? example "Full implementation — `src/mlbook/multimodal/vit.py`"
+??? example "Full implementation: `src/mlbook/multimodal/vit.py`"
     ```python
     --8<-- "src/mlbook/multimodal/vit.py"
     ```
 
-??? example "Full implementation — `src/mlbook/multimodal/swin_window.py`"
+??? example "Full implementation: `src/mlbook/multimodal/swin_window.py`"
     ```python
     --8<-- "src/mlbook/multimodal/swin_window.py"
     ```
@@ -492,7 +492,7 @@ Reproduce these from memory, in this order, then run the checks.
 | `TinyViT` (`tokens` + `forward`) | `src/mlbook/multimodal/vit.py` | **Yes** | PatchEmbed + ViT together: 25 min |
 | `window_partition`, `window_reverse`, `region_ids`, `shifted_window_mask` | `src/mlbook/multimodal/swin_window.py` | **Yes** | 20 min |
 | `interpolate_pos_embed` | `src/mlbook/multimodal/patch_embed.py` | Yes (short) | 5 min |
-| `sinusoidal_2d_pos_embed`, `relative_position_index`, `WindowAttention`, `SwinBlock`, `PatchMerging`, `DistillableViT` | same files | Read; retype only if targeting a vision-heavy loop | — |
+| `sinusoidal_2d_pos_embed`, `relative_position_index`, `WindowAttention`, `SwinBlock`, `PatchMerging`, `DistillableViT` | same files | Read; retype only if targeting a vision-heavy loop |: |
 
 Checks: `python -m pytest tests/test_multimodal_attention.py -q`,
 `python -m pytest tests/test_multimodal_vit.py -q`, `python -m pytest tests/test_multimodal_swin.py -q`.
@@ -514,7 +514,7 @@ removes the materialisation and is the default for ViTs at high resolution.
 
 **Data.** Rule of thumb from the ViT and DeiT results: below ~1M labelled images, use a
 ConvNet or a ViT with the DeiT recipe and a distillation teacher; above ~10M, a plain ViT
-wins and keeps winning with scale; in between, self-supervised pretraining (MAE, DINOv2 —
+wins and keeps winning with scale; in between, self-supervised pretraining (MAE, DINOv2, 
 [Part X](../part10-self-supervised/01-self-supervised-learning.md)) closes the gap.
 
 **Failure modes.**
@@ -523,31 +523,31 @@ wins and keeps winning with scale; in between, self-supervised pretraining (MAE,
   interpolating position embeddings → shape error or, worse, silently wrong positions
   if you truncate. Always resample $E_{pos}$; verify with a fixed image that the top-1
   prediction is stable across the change.
-* *Aspect-ratio squashing.* Resizing a $1600\times 400$ document to $224\times 224$ destroys
+  * *Aspect-ratio squashing.* Resizing a $1600\times 400$ document to $224\times 224$ destroys
   text. Use tiling (AnyRes in [chapter 4](04-vlm-architecture.md)), NaViT-style native
   resolution, or a windowed backbone.
-* *Patch-boundary artifacts.* A ViT's features are piecewise constant at patch
+  * *Patch-boundary artifacts.* A ViT's features are piecewise constant at patch
   granularity; dense outputs (segmentation, depth) need a decoder that upsamples with
   skip connections or a Swin/ConvNeXt backbone with a pyramid.
-* *Attention collapse / high-norm tokens* in large models: symptoms are noisy attention
+  * *Attention collapse / high-norm tokens* in large models: symptoms are noisy attention
   maps and unstable dense transfer; fixes are registers and QK-norm.
-* *Training divergence at scale*: loss spikes after warm-up in wide ViTs; fixes are
+  * *Training divergence at scale*: loss spikes after warm-up in wide ViTs; fixes are
   QK-norm, lower learning rate for the patch embedding, and gradient clipping.
 
-**When to use what.**
+  **When to use what.**
 
-| Situation | Choose | Decision rule |
-|---|---|---|
-| Classification / retrieval backbone, ≥10M images or a strong SSL checkpoint | Plain ViT (B/L at $P=14$–$16$) | Simplest, scales best, feeds Transformers downstream |
-| Detection / segmentation at $\geq 800$ px | Swin or ConvNeXt (pyramid) or ViTDet | Need strides 4–32 features and sub-quadratic attention |
-| Edge device with conv accelerators, fixed resolution | ConvNeXt / RegNet | INT8 conv kernels are mature; attention rarely is on NPUs |
-| Backbone that must feed a language model | ViT (CLIP/SigLIP-pretrained) | The LLM wants a token grid with language-aligned features |
-| Variable resolution / aspect ratio inputs (documents, multi-camera) | NaViT-style packing or tiling | Avoids squashing; packing keeps GPU utilisation high |
-| < 1M labelled images, no SSL checkpoint | ConvNet or DeiT recipe with a ConvNet teacher | Inductive bias from the teacher replaces the data |
+  | Situation | Choose | Decision rule |
+  |---|---|---|
+  | Classification / retrieval backbone, ≥10M images or a strong SSL checkpoint | Plain ViT (B/L at $P=14$–$16$) | Simplest, scales best, feeds Transformers downstream |
+  | Detection / segmentation at $\geq 800$ px | Swin or ConvNeXt (pyramid) or ViTDet | Need strides 4–32 features and sub-quadratic attention |
+  | Edge device with conv accelerators, fixed resolution | ConvNeXt / RegNet | INT8 conv kernels are mature; attention rarely is on NPUs |
+  | Backbone that must feed a language model | ViT (CLIP/SigLIP-pretrained) | The LLM wants a token grid with language-aligned features |
+  | Variable resolution / aspect ratio inputs (documents, multi-camera) | NaViT-style packing or tiling | Avoids squashing; packing keeps GPU utilisation high |
+  | < 1M labelled images, no SSL checkpoint | ConvNet or DeiT recipe with a ConvNet teacher | Inductive bias from the teacher replaces the data |
 
-## 5. In production
+  ## 5. In production
 
-!!! production "Meta (FAIR) — Segment Anything: a plain ViT-H backbone at 1024 px"
+  !!! production "Meta (FAIR): Segment Anything: a plain ViT-H backbone at 1024 px"
     SAM's image encoder is an MAE-pretrained ViT-H with $P = 16$ at $1024\times1024$
     ($N = 4096$), using windowed attention ($14\times14$ windows) in most blocks and four
     equally spaced global-attention blocks, following ViTDet. The trade-off they took: a
@@ -557,7 +557,7 @@ wins and keeps winning with scale; in between, self-supervised pretraining (MAE,
     (arXiv:2304.02643); *Exploring Plain Vision Transformer Backbones for Object
     Detection*, Li et al., ECCV 2022 (arXiv:2203.16527).
 
-!!! production "Google — ViT-22B and the SigLIP encoders used by PaliGemma"
+    !!! production "Google: ViT-22B and the SigLIP encoders used by PaliGemma"
     Google scaled a plain ViT to 22B parameters by adding QK-normalisation and parallel
     attention/MLP sub-layers, and reports that instability (attention-logit growth) was
     the blocker before those changes, not data. The SigLIP ViTs used as the vision tower in
@@ -566,7 +566,7 @@ wins and keeps winning with scale; in between, self-supervised pretraining (MAE,
     Billion Parameters*, Dehghani et al., ICML 2023 (arXiv:2302.05442); *PaliGemma: A
     versatile 3B VLM for transfer*, Beyer et al., 2024 (arXiv:2407.07726).
 
-!!! production "Meta (FAIR) — DINOv2 with registers as a frozen dense backbone"
+    !!! production "Meta (FAIR): DINOv2 with registers as a frozen dense backbone"
     DINOv2 is a ViT-g trained with self-distillation on a curated 142M-image set and
     served frozen for depth, segmentation and retrieval; the follow-up paper on registers
     was written because dense features of that model showed high-norm artifact tokens in
@@ -576,7 +576,7 @@ wins and keeps winning with scale; in between, self-supervised pretraining (MAE,
     (arXiv:2304.07193); *Vision Transformers Need Registers*, Darcet et al., ICLR 2024
     (arXiv:2309.16588).
 
-!!! production "Tesla — Transformer fusion of multi-camera features (public talk)"
+    !!! production "Tesla: Transformer fusion of multi-camera features (public talk)"
     At Tesla AI Day 2021 the perception team described replacing per-camera detection
     with a Transformer that uses learned bird's-eye-view queries to cross-attend over
     features from eight cameras (the backbone at the time was RegNet-based, not a ViT).
@@ -587,32 +587,32 @@ wins and keeps winning with scale; in between, self-supervised pretraining (MAE,
     [Tesla deep dive](../part18-company-deep-dives/tesla.md) and
     [multi-camera & BEV](../part11-perception-autonomy/02-multi-camera-bev.md).
 
-## 6. Interview questions and strong answers
+    ## 6. Interview questions and strong answers
 
-!!! interview "Why is patch embedding a convolution, and does the ViT have any inductive bias at all?"
+    !!! interview "Why is patch embedding a convolution, and does the ViT have any inductive bias at all?"
     A conv with kernel $P$ and stride $P$ evaluates one dot product per non-overlapping
-    $P\times P\times C$ block with shared weights — exactly the flatten-then-linear map. The
+    $P\times P\times C$ block with shared weights, exactly the flatten-then-linear map. The
     ViT therefore has locality and weight sharing *inside* a patch and no locality
     across patches; the only cross-patch prior is the learned position embedding, which
     starts uninformative. That is the whole inductive-bias story: less prior, more data
     needed, more capacity to learn long-range structure early.
-    **Staff follow-up:** "Your team has 300k labelled images. ViT or ConvNet?" — ConvNet,
+    **Staff follow-up:** "Your team has 300k labelled images. ViT or ConvNet?" ConvNet,
     or a ViT initialised from a self-supervised checkpoint (DINOv2/MAE) and fine-tuned
     with the DeiT augmentation recipe; a ViT trained from scratch at that scale will
     underperform. If the features must feed an LLM, take the pretrained ViT anyway and
     freeze it.
 
-!!! interview "Derive the cost of a ViT block and tell me what happens when I halve the patch size."
+    !!! interview "Derive the cost of a ViT block and tell me what happens when I halve the patch size."
     $12Nd^2$ for the linear layers and $2N^2d$ for attention, with $N = HW/P^2$. Halving $P$
     quadruples $N$: the linear term ×4, the attention term ×16. At ViT-B/16, 224 px the
     attention term is ~4% of the block, so cost roughly quadruples; at 1024 px the
     attention term is already comparable to the MLP and cost grows by closer to ×10.
-    **Staff follow-up:** "What would you do to run at 1024 px?" — windowed attention with
+    **Staff follow-up:** "What would you do to run at 1024 px?", windowed attention with
     a few global blocks (ViTDet), or a hierarchical backbone; FlashAttention for memory;
     and reconsider whether the task needs 1024 px everywhere or only tiles around regions
     of interest.
 
-!!! interview "Explain the Swin shifted-window mask precisely."
+    !!! interview "Explain the Swin shifted-window mask precisely."
     Cyclic shift with `roll(-M/2)` moves the first $M/2$ rows/columns to the end, so a
     regular window partition yields the shifted windows without ragged edges. But the
     last row and column of windows now contain tokens that wrapped around from the
@@ -620,55 +620,55 @@ wins and keeps winning with scale; in between, self-supervised pretraining (MAE,
     wrapped (four regions), roll the labels, and add $-100$ to the logit of any
     (query, key) pair with different labels. Roll back after attention. The mask depends
     only on $(h, w, M, \text{shift})$, so it is computed once per resolution.
-    **Staff follow-up:** "Why not just pad instead of rolling?" — Padding creates up to
+    **Staff follow-up:** "Why not just pad instead of rolling?" Padding creates up to
     $(h/M+1)(w/M+1)$ windows, many partially empty, and wastes compute on padding
     tokens; the roll keeps exactly $hw/M^2$ full windows and pays only for a mask add.
 
-!!! interview "CLS token or global average pooling?"
+    !!! interview "CLS token or global average pooling?"
     Equivalent capacity; CLS is a learned query that attends to what the head needs, GAP
     is a uniform query. In practice GAP (or an attention-pooling head as in SigLIP) is
     more robust to hyperparameters and gives every patch token direct gradient, which
     helps dense transfer. CLS remains standard in CLIP-style encoders; DeiT adds a second
     distillation token alongside CLS.
     **Staff follow-up:** "You are fine-tuning a CLS-pooled ViT for segmentation. Which
-    tokens do you feed the decoder?" — The patch tokens (reshaped to $h\times w$), from
+    tokens do you feed the decoder?" The patch tokens (reshaped to $h\times w$), from
     several depths if the decoder wants multi-scale; the CLS token can be concatenated to
     every patch as global context (as DPT does).
 
-!!! interview "You pretrained at 224 and need to serve at 448. What changes?"
+    !!! interview "You pretrained at 224 and need to serve at 448. What changes?"
     Sequence length ×4; interpolate the position grid bicubically from $14\times14$ to
     $28\times28$; keep the patch embedding; expect a short fine-tune at the new resolution
     to recover accuracy (the "FixRes" effect: train/test resolution discrepancy).
     Attention cost ×16 for that term, memory for scores ×16 without fused kernels.
-    **Staff follow-up:** "And for arbitrary aspect ratios from a document scanner?" —
+    **Staff follow-up:** "And for arbitrary aspect ratios from a document scanner?", 
     Do not squash: tile at the training resolution and encode tiles independently plus a
     downscaled global view, or use NaViT-style packing with factorised (row, column)
     position embeddings and a block-diagonal attention mask.
 
-!!! interview "Why did ConvNeXt matter, and when would you still ship it?"
+    !!! interview "Why did ConvNeXt matter, and when would you still ship it?"
     It isolated the contribution of the training recipe and macro design from attention:
     a ResNet rebuilt with a patchify stem, $7\times7$ depthwise convs, inverted
     bottlenecks, LN/GELU and the Swin schedule matches Swin at every FLOP budget. Ship it
     when inference runs on hardware with mature conv kernels, resolution is fixed, and
     nothing downstream needs a token interface.
-    **Staff follow-up:** "If accuracy is equal, why do VLMs all use ViTs?" — Because
+    **Staff follow-up:** "If accuracy is equal, why do VLMs all use ViTs?" Because
     the output of a ViT is already a sequence of $d$-dimensional tokens aligned with
     language by contrastive pretraining (CLIP/SigLIP); a ConvNet needs an extra
     tokenisation step and has no language-aligned checkpoints at scale.
 
-!!! interview "What are register tokens fixing?"
+    !!! interview "What are register tokens fixing?"
     Large ViTs recycle low-information patch tokens as global scratch space: those tokens
     get very high norms, their attention rows become meaningless, and dense features in
     those positions are corrupted. Registers are extra learned input tokens (no position,
     discarded at the output) that provide that scratch space explicitly. Cost is a few
     tokens; benefit is clean attention maps and better dense transfer.
-    **Staff follow-up:** "How would you detect the problem in your own model?" — Plot
+    **Staff follow-up:** "How would you detect the problem in your own model?" Plot
     per-token output norms over a batch; a heavy tail concentrated in background
     positions, and attention maps that focus on those positions, is the signature.
 
-## 7. Exercises
+    ## 7. Exercises
 
-1. ★ Show that a `Conv2d(C, d, kernel_size=P, stride=P)` has exactly $P^2Cd + d$
+    1. ★ Show that a `Conv2d(C, d, kernel_size=P, stride=P)` has exactly $P^2Cd + d$
    parameters and that it equals `PatchEmbedLinear` in parameter count.
 
     ??? success "Solution"
@@ -676,7 +676,7 @@ wins and keeps winning with scale; in between, self-supervised pretraining (MAE,
         is $(P^2C, d)$ plus $d$. Same count; the test `test_linear_patch_embed_equals_conv`
         copies one into the other with a reshape.
 
-2. ★ For ViT-L/14 ($d = 1024$, 24 layers) at $336^2$, compute $N$ and the fraction of a
+        2. ★ For ViT-L/14 ($d = 1024$, 24 layers) at $336^2$, compute $N$ and the fraction of a
    block's multiply-adds spent in $QK^\top$ and $AV$.
 
     ??? success "Solution"
@@ -685,7 +685,7 @@ wins and keeps winning with scale; in between, self-supervised pretraining (MAE,
         $\approx 8.6\%$. This is the LLaVA-1.5 vision tower; the 576 is the number of visual
         tokens per image that [chapter 4](04-vlm-architecture.md) worries about.
 
-3. ★★ (coding) Write `attention_distance(attn)` that, given an attention map
+        3. ★★ (coding) Write `attention_distance(attn)` that, given an attention map
    `(H, N, N)` over an $\sqrt N\times\sqrt N$ grid, returns the mean Euclidean distance in
    patch units between each query and the keys it attends to, weighted by attention.
    Verify that a uniform attention map over a $4\times4$ grid gives the same value for
@@ -706,10 +706,10 @@ wins and keeps winning with scale; in between, self-supervised pretraining (MAE,
         assert torch.allclose(attention_distance(torch.eye(16)[None]), torch.zeros(1))
         ```
         Plot this per head and per layer for a trained ViT: early layers show a mix of
-        short- and long-distance heads, late layers are mostly long-distance — the ViT
+        short- and long-distance heads, late layers are mostly long-distance, the ViT
         "learns locality" where it helps.
 
-4. ★★ Prove that the Swin two-region-per-axis labelling and the official three-slice
+        4. ★★ Prove that the Swin two-region-per-axis labelling and the official three-slice
    labelling produce the same mask inside every window when $h$ and $w$ are multiples of $M$.
 
     ??? success "Solution"
@@ -720,7 +720,7 @@ wins and keeps winning with scale; in between, self-supervised pretraining (MAE,
         wrapped rows (original rows $[0, s)$) begin. The same holds for columns. Hence
         both labellings partition every window identically.
 
-5. ★★ (coding) Extend `TinyViT` with stochastic depth: in each block, with probability
+        5. ★★ (coding) Extend `TinyViT` with stochastic depth: in each block, with probability
    $p_\ell$ (linearly increasing with depth) skip the residual branch during training and
    scale it by $1/(1-p_\ell)$ otherwise. Check that in `eval()` mode the output equals the
    unmodified block.
@@ -742,7 +742,7 @@ wins and keeps winning with scale; in between, self-supervised pretraining (MAE,
         DeiT uses $p_L \approx 0.1$ for ViT-B and higher for larger models; it is the
         single most important regulariser for ImageNet-1k-only ViT training.
 
-6. ★★★ Implement PVT's spatial-reduction attention: reduce $K, V$ by a factor $R$ with a
+        6. ★★★ Implement PVT's spatial-reduction attention: reduce $K, V$ by a factor $R$ with a
    `Conv2d(d, d, kernel_size=R, stride=R)` on the token grid before the key/value
    projections. Show the attention term becomes $2(hw)^2 d / R^2$ and verify with
    `attention_flops`-style counting on a $16\times16$ grid with $R = 4$.
@@ -756,23 +756,23 @@ wins and keeps winning with scale; in between, self-supervised pretraining (MAE,
         `(B, N/R², d)`, then `w_k`, `w_v` as in `MultiHeadCrossAttention` with `ctx` set to
         the reduced grid.
 
-## References
+        ## References
 
-Sources are listed by title, venue and arXiv identifier (external links could not be
-verified from this build environment; search the title or the identifier).
+        Sources are listed by title, venue and arXiv identifier (external links could not be
+        verified from this build environment; search the title or the identifier).
 
-* Dosovitskiy et al., *An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale*, ICLR 2021. arXiv:2010.11929.
-* Touvron et al., *Training data-efficient image transformers & distillation through attention* (DeiT), ICML 2021. arXiv:2012.12877.
-* Liu et al., *Swin Transformer: Hierarchical Vision Transformer using Shifted Windows*, ICCV 2021. arXiv:2103.14030.
-* Wang et al., *Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions*, ICCV 2021. arXiv:2102.12122.
-* Liu et al., *A ConvNet for the 2020s* (ConvNeXt), CVPR 2022. arXiv:2201.03545.
-* Dehghani et al., *Scaling Vision Transformers to 22 Billion Parameters*, ICML 2023. arXiv:2302.05442.
-* Darcet et al., *Vision Transformers Need Registers*, ICLR 2024. arXiv:2309.16588.
-* Beyer et al., *FlexiViT: One Model for All Patch Sizes*, CVPR 2023. arXiv:2212.08013.
-* Dehghani et al., *Patch n' Pack: NaViT, a Vision Transformer for any Aspect Ratio and Resolution*, NeurIPS 2023. arXiv:2307.06304.
-* Li et al., *Exploring Plain Vision Transformer Backbones for Object Detection* (ViTDet), ECCV 2022. arXiv:2203.16527.
-* He et al., *Masked Autoencoders Are Scalable Vision Learners*, CVPR 2022. arXiv:2111.06377.
-* Oquab et al., *DINOv2: Learning Robust Visual Features without Supervision*, 2023. arXiv:2304.07193.
-* Kirillov et al., *Segment Anything*, ICCV 2023. arXiv:2304.02643.
-* Beyer et al., *PaliGemma: A versatile 3B VLM for transfer*, 2024. arXiv:2407.07726.
-* Tesla AI Day 2021 (public recorded talk), multi-camera Transformer fusion segment.
+        * Dosovitskiy et al., *An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale*, ICLR 2021. arXiv:2010.11929.
+        * Touvron et al., *Training data-efficient image transformers & distillation through attention* (DeiT), ICML 2021. arXiv:2012.12877.
+        * Liu et al., *Swin Transformer: Hierarchical Vision Transformer using Shifted Windows*, ICCV 2021. arXiv:2103.14030.
+        * Wang et al., *Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions*, ICCV 2021. arXiv:2102.12122.
+        * Liu et al., *A ConvNet for the 2020s* (ConvNeXt), CVPR 2022. arXiv:2201.03545.
+        * Dehghani et al., *Scaling Vision Transformers to 22 Billion Parameters*, ICML 2023. arXiv:2302.05442.
+        * Darcet et al., *Vision Transformers Need Registers*, ICLR 2024. arXiv:2309.16588.
+        * Beyer et al., *FlexiViT: One Model for All Patch Sizes*, CVPR 2023. arXiv:2212.08013.
+        * Dehghani et al., *Patch n' Pack: NaViT, a Vision Transformer for any Aspect Ratio and Resolution*, NeurIPS 2023. arXiv:2307.06304.
+        * Li et al., *Exploring Plain Vision Transformer Backbones for Object Detection* (ViTDet), ECCV 2022. arXiv:2203.16527.
+        * He et al., *Masked Autoencoders Are Scalable Vision Learners*, CVPR 2022. arXiv:2111.06377.
+        * Oquab et al., *DINOv2: Learning Robust Visual Features without Supervision*, 2023. arXiv:2304.07193.
+        * Kirillov et al., *Segment Anything*, ICCV 2023. arXiv:2304.02643.
+        * Beyer et al., *PaliGemma: A versatile 3B VLM for transfer*, 2024. arXiv:2407.07726.
+        * Tesla AI Day 2021 (public recorded talk), multi-camera Transformer fusion segment.

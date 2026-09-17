@@ -31,7 +31,7 @@ by section number.
 | Section | What it is for | How to use it |
 |---|---|---|
 | **Why this matters at staff level** | 2–4 sentences on where this shows up in interviews and what strong signal looks like. | Decide in ten seconds whether the chapter is on your critical path. |
-| **TL;DR — the interview card** | 5–10 bullets: the equations, the shapes, the one-line trade-offs, the production users. | Re-read the morning of the interview. Nothing else. |
+| **TL;DR: the interview card** | 5–10 bullets: the equations, the shapes, the one-line trade-offs, the production users. | Re-read the morning of the interview. Nothing else. |
 | **1. Intuition first** | A tiny concrete example (a $2\times 3$ matrix, a 4-token sequence) and a figure, before any general formula. | If you cannot explain the topic with this example, you do not own it yet. |
 | **2. The math** | Derivations without gaps. Results you must reproduce at a whiteboard are boxed. | Cover the page and re-derive each boxed result. This is the study plan's "derivation" list. |
 | **3. Implementation** | Code from `src/mlbook/...` shown inline with a shape comment on every tensor line, then explained paragraph by paragraph, then "how you'd test it". | Close the book and write it from memory. Run the test in `tests/`. |
@@ -50,7 +50,7 @@ sight:
 !!! interview "Interview question"
     Purple boxes hold a question, a model answer, and a staff-level follow-up.
 
-!!! production "Company — what they built"
+!!! production "Company: what they built"
     Green boxes hold a production case study with a link to the primary source.
 
 ## 3. Reading modes
@@ -61,7 +61,7 @@ your calendar.
 * **Cover to cover (6–9 months).** Follow the [study plan](study-plan.md). It sequences
   the chapters so every derivation and implementation unlocks the next one and ends
   with a small multimodal reasoning model and its full post-training pipeline.
-* **The night before.** Read only the *TL;DR — the interview card* of the chapters in
+* **The night before.** Read only the *TL;DR, the interview card* of the chapters in
   the loop you are facing. The [week-before checklist](study-plan.md#the-week-before-checklist)
   tells you which ones.
 * **Coding rounds.** [Part XVI, the coding canon](../part16-coding-canon/index.md):
@@ -85,10 +85,10 @@ book is assigned one of four levels, and the level tells you what "done" means.
 
 | Level | What "done" means | Time signature |
 |---|---|---|
-| **A — derive and implement from memory** | You can reproduce the derivation at a whiteboard with no notes and write a correct, tested implementation from a blank file in under an hour. You can teach it. | Re-derive and re-implement until it is boring. These are the topics interviewers *expect* you to own. |
-| **B — derive and implement with minor reference** | You can carry the derivation with an occasional glance at a formula, and implement it with the paper or the book open for the details you would look up on the job anyway. | Do it once fully, then keep the interview card. |
-| **C — understand mathematically, modify existing implementations** | You can read the derivation and explain why each step holds, follow a reference implementation, and change it (add a loss term, swap a head, change the sampler) without breaking it. | Read the chapter, run the code, do one ★★ exercise. |
-| **D — architectural literacy** | You can name the idea, say what problem it solves, where it sits relative to the Level A/B method that replaced or absorbed it, and when someone might still reach for it. | Read the interview card and section 1. Do not implement. |
+| **A: derive and implement from memory** | You can reproduce the derivation at a whiteboard with no notes and write a correct, tested implementation from a blank file in under an hour. You can teach it. | Re-derive and re-implement until it is boring. These are the topics interviewers *expect* you to own. |
+| **B: derive and implement with minor reference** | You can carry the derivation with an occasional glance at a formula, and implement it with the paper or the book open for the details you would look up on the job anyway. | Do it once fully, then keep the interview card. |
+| **C: understand mathematically, modify existing implementations** | You can read the derivation and explain why each step holds, follow a reference implementation, and change it (add a loss term, swap a head, change the sampler) without breaking it. | Read the chapter, run the code, do one ★★ exercise. |
+| **D: architectural literacy** | You can name the idea, say what problem it solves, where it sits relative to the Level A/B method that replaced or absorbed it, and when someone might still reach for it. | Read the interview card and section 1. Do not implement. |
 
 The assignments below are the contract for the whole book. If a chapter asks more of
 you than its level, do less; if it asks less, do more.

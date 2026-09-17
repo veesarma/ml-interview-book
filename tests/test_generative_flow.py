@@ -1,5 +1,7 @@
 import torch
 
+torch.set_num_threads(1)
+
 from mlbook.generative import flow_matching as FM
 from mlbook.generative.toy_data import distance_to_mixture_modes, gaussian_mixture_2d
 

@@ -1,4 +1,4 @@
-# Part VII — Post-training
+# Part VII: Post-training
 
 Pretraining gives you a model that continues text. Post-training turns it into a
 model that *does what you ask*, refuses what it should, reasons for as long as the
@@ -39,12 +39,12 @@ Every stage is one objective applied to the same autoregressive model:
 
 ## Chapters
 
-1. [Supervised fine-tuning](01-sft.md) — chat templates, assistant-only loss masks, packing with segment masks, data mixtures, synthetic data, why SFT overfits.
-2. [Reward models & preferences](02-reward-models.md) — Bradley–Terry from first principles, RM architecture, calibration, over-optimisation scaling laws, ensembles, LLM-as-judge.
-3. [RLHF with PPO](03-rlhf-ppo.md) — the KL-regularised objective, the clipped surrogate derived, GAE, the four-model memory footprint, generation as the bottleneck.
-4. [DPO and its relatives](04-dpo-and-friends.md) — the closed-form optimum, the substitution that cancels the partition function, implicit rewards, IPO / ORPO / KTO / SimPO.
-5. [Reasoning RL, RLVR & GRPO](05-reasoning-rl-grpo.md) — verifiable rewards, GRPO derived, DAPO / Dr. GRPO, process rewards, reward hacking, RLAIF and Constitutional AI, DeepSeek-R1.
-6. [Test-time compute](06-test-time-compute.md) — chain of thought, self-consistency, best-of-N and its KL cost, beam and tree search, compute-optimal inference, serving cost.
+1. [Supervised fine-tuning](01-sft.md): chat templates, assistant-only loss masks, packing with segment masks, data mixtures, synthetic data, why SFT overfits.
+2. [Reward models & preferences](02-reward-models.md): Bradley–Terry from first principles, RM architecture, calibration, over-optimisation scaling laws, ensembles, LLM-as-judge.
+3. [RLHF with PPO](03-rlhf-ppo.md): the KL-regularised objective, the clipped surrogate derived, GAE, the four-model memory footprint, generation as the bottleneck.
+4. [DPO and its relatives](04-dpo-and-friends.md): the closed-form optimum, the substitution that cancels the partition function, implicit rewards, IPO / ORPO / KTO / SimPO.
+5. [Reasoning RL, RLVR & GRPO](05-reasoning-rl-grpo.md): verifiable rewards, GRPO derived, DAPO / Dr. GRPO, process rewards, reward hacking, RLAIF and Constitutional AI, DeepSeek-R1.
+6. [Test-time compute](06-test-time-compute.md): chain of thought, self-consistency, best-of-N and its KL cost, beam and tree search, compute-optimal inference, serving cost.
 
 ## Prerequisites
 

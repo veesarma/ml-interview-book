@@ -5,12 +5,12 @@
 > reconstruction error) must land on the same eigenvectors, and you should be able
 > to show it. In systems rounds it is the tool for shrinking embeddings before
 > indexing, whitening features, and diagnosing what a representation has learned.
-> t-SNE/UMAP come up as "what does this plot mean" — and the strong answer is
+> t-SNE/UMAP come up as "what does this plot mean", and the strong answer is
 > mostly about what it does *not* mean. Strong signal: both PCA derivations, the SVD
 > implementation, randomized SVD for scale, and a clear statement of when to use
 > PCA vs PQ vs an autoencoder for compression.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Centre $X \in \R^{N\times d}$. Covariance $C = X^TX/(N-1) = V\Lambda V^T$; thin SVD $X = USV^T$ gives $\Lambda = S^2/(N-1)$, principal directions = columns of $V$ = right singular vectors.
 - Variance maximisation: $\max_{\norm{v}=1}v^TCv$ → top eigenvector (Rayleigh quotient); next directions orthogonal, by induction. Reconstruction: $\min_{V_r}\norm{X - XV_rV_r^T}_F^2$ → same $V_r$ (Eckart–Young). Both objectives are the same because $\norm{X}_F^2 = \norm{XV_r}_F^2 + \norm{X - XV_rV_r^T}_F^2$.
@@ -36,7 +36,7 @@ accept.
 ![PCA projection and scree plot](../assets/figures/part02_pca_projection.png){ width="720" }
 
 *Figure. Left: correlated 2-D data with the two principal directions (arrow lengths
-∝ standard deviation along each) and the rank-1 reconstruction (orange) — every
+∝ standard deviation along each) and the rank-1 reconstruction (orange), every
 point snapped onto the PC1 line. Right: a scree plot for a 20-D dataset generated
 from 3 latent factors plus isotropic noise; three components carry ~99% of the
 variance, the rest is a flat noise floor.*
@@ -80,7 +80,7 @@ $$
 $$
 
 using $V_r^TV_r = I$ so that $(V_rV_r^T)^2 = V_rV_r^T$. Minimising the error is
-therefore *identical* to maximising $\sum_jv_j^TCv_j$ over orthonormal $v_j$ — Derivation 1.
+therefore *identical* to maximising $\sum_jv_j^TCv_j$ over orthonormal $v_j$, Derivation 1.
 The optimum is again the top-$r$ eigenvectors, and the minimum error is
 $(N-1)\sum_{i>r}\lambda_i = \sum_{i>r}s_i^2$.
 
@@ -99,7 +99,7 @@ better because forming $X^TX$ squares the condition number.
 
 **Whitening.** $Z = XV_r$ has diagonal covariance $\Lambda_r$; scaling gives
 $Z_w = XV_r\Lambda_r^{-1/2}$ with $\operatorname{Cov}(Z_w) = I_r$. Whitening makes every
-direction equally important — useful before k-means/PQ (so that squared distance is
+direction equally important, useful before k-means/PQ (so that squared distance is
 not dominated by the top component), before ICA, and for conditioning
 ([linear regression §2.3](01-linear-regression.md)). ZCA whitening
 $XV\Lambda^{-1/2}V^T$ is the unique whitening closest to the original coordinates.
@@ -109,7 +109,7 @@ $XV\Lambda^{-1/2}V^T$ is the unique whitening closest to the original coordinate
 With $N = 10^8$ embeddings of $d = 1024$ a full SVD is impossible, but a rank-$r$
 factor with $r = 128$ is what you want. Halko, Martinsson & Tropp:
 
-1. Draw Gaussian $\Omega \in \R^{d\times(r+p)}$ ($p \approx 10$ oversampling); sketch $Y = X\Omega$ (N, r+p) — one pass over $X$.
+1. Draw Gaussian $\Omega \in \R^{d\times(r+p)}$ ($p \approx 10$ oversampling); sketch $Y = X\Omega$ (N, r+p), one pass over $X$.
 2. Power iterations: $Y \leftarrow X(X^TY)$, $q = 1$–$3$ times, re-orthonormalising; this sharpens the decay of the captured spectrum from $s_i$ to $s_i^{2q+1}$ so the sketch ignores the tail.
 3. QR: $Y = QR$, $Q \in \R^{N\times(r+p)}$ orthonormal, spanning (approximately) the top-$(r+p)$ left singular subspace.
 4. Project: $B = Q^TX$ (r+p, d), tiny; compute its SVD $B = \tilde US\tilde V^T$; set $U = Q\tilde U$.
@@ -226,7 +226,7 @@ error equals the dropped variance exactly; whitened coordinates have identity
 covariance; randomized SVD recovers the top-5 singular values of a gapped
 400×50 matrix to relative $10^{-3}$ and its rank-5 reconstruction to 1%.
 
-??? example "Full implementation — `src/mlbook/classical/pca.py`"
+??? example "Full implementation: `src/mlbook/classical/pca.py`"
     ```python
     --8<-- "src/mlbook/classical/pca.py"
     ```
@@ -266,7 +266,7 @@ Failure modes:
 - **Variance ≠ relevance**: the top components carry the most variance, not the most label information; a classifier on the bottom components can beat one on the top. Use LDA/supervised reduction if you have labels.
 - **Non-linear manifolds**: a Swiss roll has 3 significant PCs but intrinsic dimension 2; PCA cannot unroll it. Kernel PCA, autoencoders, or UMAP can.
 - **Outliers** dominate the covariance (their squared distance is huge); robust PCA or clipping first.
-- **Reading t-SNE/UMAP geometry** — sizes, distances, densities — as evidence.
+- **Reading t-SNE/UMAP geometry** (sizes, distances, densities) as evidence.
 - **Re-fitting the projection** when the embedding model changes without re-training the index: the codebooks downstream were trained on the old coordinates.
 
 **When to use what.** Need a cheap, linear, invertible compression whose error you
@@ -275,12 +275,13 @@ whitening/random rotation) to $d' \approx 64$–$256$, then PQ; PCA removes the
 low-variance tail that PQ would waste bytes on. Need to *look* at a representation →
 UMAP or t-SNE, several perplexities, colour by known labels, draw no metric
 conclusions. Need a non-linear latent space you will sample from or edit →
-VAE/autoencoder. Need supervised reduction → LDA (Part II §5) or simply the
-penultimate layer of a classifier.
+VAE/autoencoder. Need supervised reduction → LDA
+([probabilistic models](05-probabilistic-models-em.md)) or the penultimate layer of a
+classifier.
 
 ## 5. In production
 
-!!! production "Meta — FAISS: PCA before product quantisation"
+!!! production "Meta: FAISS: PCA before product quantisation"
     *Problem:* index $10^9$ vectors of $d = 128$–$1024$ within a memory budget.
     *What they built:* the index-factory grammar composes a `PCAR<d'>` pre-transform
     (PCA to $d'$ dims followed by a random rotation so that variance is spread evenly
@@ -288,35 +289,35 @@ penultimate layer of a classifier.
     wiki's guidelines recommend the pre-transform when the input dimension is
     large relative to the code size. *Why PCA and not a learned encoder:* it is a
     linear map with a bounded, known error, trains in seconds on a sample, and its
-    output is exactly what PQ's per-sub-vector k-means needs. FAISS wiki —
+    output is exactly what PQ's per-sub-vector k-means needs. FAISS wiki.
     [The index factory](https://github.com/facebookresearch/faiss/wiki/The-index-factory),
     [Guidelines to choose an index](https://github.com/facebookresearch/faiss/wiki/Guidelines-to-choose-an-index);
-    Johnson, Douze, Jégou 2017 — [arXiv:1702.08734](https://arxiv.org/pdf/1702.08734).
+    Johnson, Douze, Jégou 2017, [arXiv:1702.08734](https://arxiv.org/pdf/1702.08734).
 
-!!! production "Pinterest — one unified visual embedding, compressed for serving"
+!!! production "Pinterest: one unified visual embedding, compressed for serving"
     *Problem:* several product-specific visual embeddings were expensive to
     maintain and improve in lockstep. *What they built:* a single multi-task
     embedding for all visual search products; the accompanying paper discusses
     reducing the embedding dimension for storage and retrieval cost, and the
     engineering post describes the retrieval stack this feeds. Zhai et al.,
-    "Learning a Unified Embedding for Visual Search at Pinterest", KDD 2019 —
-    [arXiv:1908.01707](https://arxiv.org/abs/1908.01707); engineering post —
+    "Learning a Unified Embedding for Visual Search at Pinterest", KDD 2019.
+    [arXiv:1908.01707](https://arxiv.org/abs/1908.01707); engineering post.
     [medium.com/pinterest-engineering](https://medium.com/pinterest-engineering/unifying-visual-embeddings-for-visual-search-at-pinterest-74ea7ea103f0).
     Pinterest's earlier "Visual Search at Pinterest" (KDD 2015,
     [arXiv:1505.07647](https://arxiv.org/abs/1505.07647)) describes the original
     pipeline of CNN features → compact binarised/compressed codes → ANN.
 
-!!! production "Spotify — Annoy over matrix-factorisation vectors"
+!!! production "Spotify: Annoy over matrix-factorisation vectors"
     Spotify's ANN library indexes low-dimensional user/item vectors from matrix
     factorisation (itself a low-rank, PCA-like decomposition of the interaction
     matrix) for music recommendation; the README states the design goal of tiny
     memory-mapped indexes shared across processes. [github.com/spotify/annoy](https://github.com/spotify/annoy).
 
-!!! production "How to Use t-SNE Effectively — Distill (Google PAIR)"
+!!! production "How to Use t-SNE Effectively: Distill (Google PAIR)"
     Not a deployment but the reference every team should read before shipping an
     embedding-visualisation dashboard: interactive examples where perplexity
     changes cluster shapes, cluster sizes and distances mean nothing, and pure
-    noise looks clustered. Wattenberg, Viégas, Johnson, 2016 —
+    noise looks clustered. Wattenberg, Viégas, Johnson, 2016.
     [distill.pub/2016/misread-tsne](https://distill.pub/2016/misread-tsne/).
 
 ## 6. Interview questions and strong answers
@@ -334,7 +335,7 @@ penultimate layer of a classifier.
     Randomized SVD: sketch with a $1024\times138$ Gaussian, 2 power iterations with
     QR, project to a $138\times1024$ matrix, small SVD. Four streaming passes over the
     data, $O(Nd\cdot138)$ FLOPs, embarrassingly parallel across shards (accumulate
-    $A^TY$). Or subsample $10^6$ rows — the covariance estimate converges fast.
+    $A^TY$). Or subsample $10^6$ rows, the covariance estimate converges fast.
     **Follow-up:** *what do power iterations buy?* Error depends on $s_{r+1}/s_r$
     raised to $2q+1$; two iterations turn a slow spectral decay into a sharp one.
 
@@ -347,11 +348,11 @@ penultimate layer of a classifier.
     and hurts recall; FAISS uses PCA + rotation, sometimes a partial whitening.
 
 !!! interview "What does this t-SNE plot tell us?"
-    Which points are near each other in the original space — and only that.
+    Which points are near each other in the original space, and only that.
     Cluster sizes, gaps and shapes depend on perplexity and initialisation; noise
     can look clustered. Ask what perplexity, whether it was run several times, and
     whether the same structure appears in UMAP with different `n_neighbors`.
-    **Follow-up:** *could we use the 2-D coordinates as features?* No — no `transform`
+    **Follow-up:** *could we use the 2-D coordinates as features?* No, no `transform`
     for new points (t-SNE), no metric meaning, and different runs are not aligned.
 
 !!! interview "PCA vs autoencoder for compression?"
@@ -366,7 +367,7 @@ penultimate layer of a classifier.
 !!! interview "Explain whitening and where it helps or hurts."
     $Z_w = XV\Lambda^{-1/2}$, identity covariance. Helps: optimisation conditioning,
     k-means/PQ (isotropic distances), ICA. Hurts: amplifies noise directions with
-    tiny $\lambda_i$ — always add $\epsilon$ and/or truncate to $r$ components first.
+    tiny $\lambda_i$, always add $\epsilon$ and/or truncate to $r$ components first.
 
 ## 7. Exercises
 
@@ -417,12 +418,12 @@ $4\sum_j(p_{ij} - q_{ij})(1 + \norm{y_i - y_j}^2)^{-1}(y_i - y_j)$ and interpret
     Write $d_{ij} = \norm{y_i - y_j}$, $w_{ij} = (1 + d_{ij}^2)^{-1}$, $Z = \sum_{k\ne l}w_{kl}$,
     $q_{ij} = w_{ij}/Z$. $\KL = \sum p_{ij}\log p_{ij} - \sum p_{ij}\log w_{ij} + \log Z$.
     $\partial\log w_{ij}/\partial y_i = -2w_{ij}(y_i - y_j)$ and
-    $\partial\log Z/\partial y_i = -\frac{2}{Z}\sum_j 2w_{ij}^2(y_i - y_j)\cdot\tfrac12\cdot 2$ — carefully,
+    $\partial\log Z/\partial y_i = -\frac{2}{Z}\sum_j 2w_{ij}^2(y_i - y_j)\cdot\tfrac12\cdot 2$, carefully,
     each unordered pair appears twice in $Z$, giving $\partial\log Z/\partial y_i = -4\sum_jq_{ij}w_{ij}(y_i-y_j)$.
     Combining and using $\sum_jp_{ij}$ over both orderings gives
     $4\sum_j(p_{ij} - q_{ij})w_{ij}(y_i - y_j)$. Pairs with $p_{ij} > q_{ij}$ (should be
     closer) attract; pairs with $p_{ij} < q_{ij}$ (too close in the map) repel, but
-    only weakly because $w_{ij}$ decays with distance — that weak long-range
+    only weakly because $w_{ij}$ decays with distance, that weak long-range
     repulsion is why global layout is arbitrary.
 
 **★★★ Exercise 5.** Show that the global minima of the linear autoencoder loss

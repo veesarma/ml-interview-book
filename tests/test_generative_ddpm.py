@@ -2,19 +2,33 @@ import math
 
 import torch
 
+torch.set_num_threads(1)
+
 from mlbook.generative import ddpm as D
 from mlbook.generative.toy_data import distance_to_mixture_modes, gaussian_mixture_2d_labeled
 
 
 def test_schedules_are_valid():
-    for betas in (D.linear_beta_schedule(100), D.cosine_alpha_bar_schedule(100)):
+    # DDPM's β ∈ [1e-4, 0.02] constants are calibrated for T = 1000; that is what makes x_T ≈ N(0, I).
+    for betas in (D.linear_beta_schedule(1000), D.cosine_alpha_bar_schedule(1000)):
         s = D.NoiseSchedule(betas)
         assert torch.all(betas > 0) and torch.all(betas < 1)
-        assert torch.all(s.alpha_bar[1:] <= s.alpha_bar[:-1])  # monotone decreasing
-        assert s.alpha_bar[-1] < 0.05                             # x_T ≈ pure noise
+        assert torch.all(s.alpha_bar[1:] <= s.alpha_bar[:-1])    # monotone decreasing
+        assert s.alpha_bar[-1] < 1e-3                             # x_T ≈ pure noise
     cos = D.NoiseSchedule(D.cosine_alpha_bar_schedule(1000))
     lin = D.NoiseSchedule(D.linear_beta_schedule(1000))
     assert cos.alpha_bar[500] > lin.alpha_bar[500]               # cosine keeps signal longer
+
+
+def test_linear_schedule_needs_its_T_or_terminal_snr_is_not_zero():
+    """Reuse β_end = 0.02 with T = 100 and ᾱ_T ≈ 0.36: the model never sees pure noise in training
+    but is handed pure noise at sampling time.  This is the train/test gap zero-terminal-SNR fixes."""
+    short = D.NoiseSchedule(D.linear_beta_schedule(100))
+    assert short.alpha_bar[-1] > 0.3
+    fixed = D.NoiseSchedule(D.enforce_zero_terminal_snr(D.linear_beta_schedule(100)))
+    assert fixed.alpha_bar[-1].abs() < 1e-6
+    # a schedule stretched to its intended horizon also gets there
+    assert D.NoiseSchedule(D.linear_beta_schedule(100, 1e-3, 0.2)).alpha_bar[-1] < 1e-3
 
 
 def test_enforce_zero_terminal_snr():
@@ -96,12 +110,12 @@ def test_predict_eps_cfg_formula():
     assert torch.allclose(D.predict_eps_cfg(m, x, t, y, 0.0), m(x, t, y))
 
 
-def _train_small_ddpm(n_steps: int = 700):
+def _train_small_ddpm(n_steps: int = 1200):
     T = 100
-    s = D.NoiseSchedule(D.linear_beta_schedule(T, 1e-4, 0.05))
+    s = D.NoiseSchedule(D.cosine_alpha_bar_schedule(T))   # cosine reaches ᾱ_T ≈ 0 even at T = 100
     x, y = gaussian_mixture_2d_labeled(2048, n_modes=4, std=0.1)
     m = D.EpsMLP(d_x=2, n_classes=4, d_hidden=96)
-    opt = torch.optim.Adam(m.parameters(), lr=2e-3)
+    opt = torch.optim.Adam(m.parameters(), lr=3e-3)
     for _ in range(n_steps):
         idx = torch.randint(0, x.shape[0], (256,))
         loss = D.ddpm_loss(m, s, x[idx], y[idx], p_uncond=0.2)

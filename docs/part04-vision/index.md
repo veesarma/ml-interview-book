@@ -1,4 +1,4 @@
-# Part IV — Computer vision
+# Part IV: Computer vision
 
 Vision is where most senior perception engineers have their home turf, which is exactly why interviewers push past the engineering layer into the *why*: why a stride-2 convolution aliases, why a residual connection changes optimisation rather than expressivity, why focal loss needs a prior-initialised bias, why a mask head needs ROIAlign and not ROIPool, why depth error grows with the square of range. This part goes from pixels to 3-D, deriving every result you might be asked to reproduce at a whiteboard and implementing every algorithm you might be asked to code.
 
@@ -16,10 +16,10 @@ Vision is where most senior perception engineers have their home turf, which is 
 
 ## Prerequisites
 
-* [Linear algebra](../part01-math/01-linear-algebra.md) — SVD (8-point, DLT), projections, null spaces.
-* [Calculus & matrix calculus](../part01-math/02-calculus-matrix-calculus.md) — chain rule through reshapes (conv backward), Jacobians (bundle adjustment).
-* [Backpropagation](../part03-neural-nets/02-backpropagation.md) and [normalization](../part03-neural-nets/05-normalization.md) — BatchNorm is inside every block here.
-* [Tensor shapes & broadcasting](../part01-math/07-tensor-shapes-broadcasting.md) — you will read `(B, C, H, W)` on every line.
+* [Linear algebra](../part01-math/01-linear-algebra.md). SVD (8-point, DLT), projections, null spaces.
+* [Calculus & matrix calculus](../part01-math/02-calculus-matrix-calculus.md). chain rule through reshapes (conv backward), Jacobians (bundle adjustment).
+* [Backpropagation](../part03-neural-nets/02-backpropagation.md) and [normalization](../part03-neural-nets/05-normalization.md). BatchNorm is inside every block here.
+* [Tensor shapes & broadcasting](../part01-math/07-tensor-shapes-broadcasting.md). you will read `(B, C, H, W)` on every line.
 
 ## If you have one day
 
@@ -31,7 +31,7 @@ Vision is where most senior perception engineers have their home turf, which is 
 ## How this part connects onward
 
 * Vision Transformers, DETR's Hungarian matching and CLIP live in [Part VIII](../part08-multimodal/index.md); this part explains the *convolutional* baseline they were measured against and the detection vocabulary they inherit.
-* Multi-camera BEV, sensor fusion, tracking and occupancy — the autonomous-vehicle stack — live in [Part XI](../part11-perception-autonomy/index.md); the camera model and 3-D representations here are their foundation.
+* Multi-camera BEV, sensor fusion, tracking and occupancy. the autonomous-vehicle stack. live in [Part XI](../part11-perception-autonomy/index.md); the camera model and 3-D representations here are their foundation.
 * Detection and segmentation metrics (mAP, mIoU, PQ) are defined here and treated as evaluation methodology in [Part XIII](../part13-retrieval-eval-reliability/02-evaluation.md).
 * The [AV perception system design](../part17-ml-system-design/05-perception-system-av.md) and [OCR system design](../part17-ml-system-design/09-ocr-document-understanding.md) chapters assume everything in this part.
 

@@ -103,26 +103,37 @@ def gaussian_log_density(z: torch.Tensor, mu: torch.Tensor, logvar: torch.Tensor
 
 
 def vae_loss(x: torch.Tensor, x_hat: torch.Tensor, mu: torch.Tensor, logvar: torch.Tensor,
-             beta: float = 1.0) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+             beta: float = 1.0, sigma_dec: float = 1.0) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """Negative (beta-)ELBO per example, averaged over the batch.
 
-    recon = ½ ||x − x_hat||²   (unit-variance Gaussian decoder, constants dropped)
+    recon = −log p(x|z) = ||x − x_hat||² / (2 σ²) + d_x (log σ + ½ log 2π)
     kl    = KL(q(z|x) || N(0, I))   (closed form)
     loss  = recon + beta · kl
+
+    ``sigma_dec`` is the fixed standard deviation of the Gaussian decoder and it *is* the
+    rate–distortion knob: 1/σ² multiplies the reconstruction term, so a large σ on data of
+    scale ≫ σ makes ignoring z cheaper than encoding it — posterior collapse.  Reporting a
+    β-VAE with β = 1 and σ = 1 on unnormalised data is the classic way to get a blurry mean.
 
     Args:
         x, x_hat: (B, d_x).  mu, logvar: (B, d_z).
     Returns:
         (loss, recon, kl) scalars.
     """
-    recon = 0.5 * ((x - x_hat) ** 2).sum(dim=1)                # (B,)
+    d_x = x.shape[1]
+    sq = ((x - x_hat) ** 2).sum(dim=1)                         # (B,)
+    const = d_x * (math.log(sigma_dec) + 0.5 * math.log(2 * math.pi))
+    recon = 0.5 * sq / sigma_dec ** 2 + const                  # (B,)  = −log p(x|z)
     kl = gaussian_kl_closed_form(mu, logvar)                   # (B,)
     loss = (recon + beta * kl).mean()
     return loss, recon.mean(), kl.mean()
 
 
-def negative_elbo_estimate(model: VAE, x: torch.Tensor) -> torch.Tensor:
-    """Single-sample estimate of −ELBO(x) including the Gaussian constants (for monitoring).
+def negative_elbo_estimate(model: VAE, x: torch.Tensor, sigma_dec: float = 1.0) -> torch.Tensor:
+    """Single-sample estimate of −ELBO(x) built from ``gaussian_log_density`` (for monitoring).
+
+    Equals ``vae_loss(..., beta=1, sigma_dec=sigma_dec)`` in expectation — a useful cross-check
+    that the closed-form KL and the hand-written Gaussian NLL agree.
 
     Args:
         x: (B, d_x).
@@ -132,6 +143,7 @@ def negative_elbo_estimate(model: VAE, x: torch.Tensor) -> torch.Tensor:
     mu, logvar = model.encode(x)                               # (B, d_z), (B, d_z)
     z = reparameterize(mu, logvar)                             # (B, d_z)
     x_hat = model.decode(z)                                    # (B, d_x)
-    log_px_given_z = gaussian_log_density(x, x_hat, torch.zeros_like(x))  # (B,)  unit variance
+    logvar_dec = torch.full_like(x, 2.0 * math.log(sigma_dec))  # (B, d_x)  log σ²
+    log_px_given_z = gaussian_log_density(x, x_hat, logvar_dec)  # (B,)
     kl = gaussian_kl_closed_form(mu, logvar)                   # (B,)
     return (-log_px_given_z + kl).mean()

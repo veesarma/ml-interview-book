@@ -8,7 +8,7 @@
 > derive the loss, implement MinHash dedup and sequence packing on a whiteboard, and
 > argue for a data mixture with a validation protocol rather than taste.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Objective: $\mathcal{L}(\theta) = -\frac{1}{N}\sum_{b,t}\log p_\theta(x_{b,t+1}\mid x_{b,\le t})$, mean over
   *target* tokens; one causal forward pass scores all $T-1$ targets at once (teacher forcing).
@@ -253,17 +253,17 @@ needed. `document_causal_mask` builds the `(B, T, T)` boolean mask from `doc_ids
 a lower-triangular matrix with `doc_ids[:, :, None] == doc_ids[:, None, :]`, and
 `position_ids_within_document` restarts the counter at every boundary.
 
-??? example "Full implementation — `src/mlbook/llm/data_dedup.py`"
+??? example "Full implementation: `src/mlbook/llm/data_dedup.py`"
     ```python
     --8<-- "src/mlbook/llm/data_dedup.py"
     ```
 
-??? example "Full implementation — `src/mlbook/llm/packing.py`"
+??? example "Full implementation: `src/mlbook/llm/packing.py`"
     ```python
     --8<-- "src/mlbook/llm/packing.py"
     ```
 
-??? example "Full implementation — `src/mlbook/llm/lm_loss.py`"
+??? example "Full implementation: `src/mlbook/llm/lm_loss.py`"
     ```python
     --8<-- "src/mlbook/llm/lm_loss.py"
     ```
@@ -328,7 +328,7 @@ cost but makes the output softmax and embedding matrices larger.
 
 ## 5. In production
 
-!!! production "Meta — Llama 3 data pipeline"
+!!! production "Meta: Llama 3 data pipeline"
     The Llama 3 herd paper (Meta, 2024) pretrains on roughly 15T multilingual tokens. The
     pipeline is a textbook instance of §1: URL-level, document-level and line-level dedup,
     heuristic filters (n-gram coverage, "dirty word" counts, KL-based token distribution
@@ -340,7 +340,7 @@ cost but makes the output softmax and embedding matrices larger.
     the classifier-filtered mix wins per token.
     Source: [The Llama 3 Herd of Models](https://arxiv.org/abs/2407.21783).
 
-!!! production "Hugging Face — FineWeb and FineWeb-Edu"
+!!! production "Hugging Face: FineWeb and FineWeb-Edu"
     FineWeb (2024) is 15T tokens from 96 CommonCrawl snapshots, built with the ablation
     protocol described above: each filter is justified by training small models and comparing
     benchmark curves. Two findings you should be able to quote: per-snapshot MinHash dedup
@@ -351,7 +351,7 @@ cost but makes the output softmax and embedding matrices larger.
     Sources: [FineWeb blog post](https://huggingface.co/spaces/HuggingFaceFW/blogpost-fineweb-v1),
     [The FineWeb Datasets paper](https://huggingface.co/papers/2406.17557).
 
-!!! production "AI2 — Dolma and OLMo"
+!!! production "AI2: Dolma and OLMo"
     Dolma (2024) is a fully open 3T-token corpus (web, code, papers, books, Reddit, Wikipedia)
     with a released toolkit for language ID, quality/toxicity filtering, and dedup, used to
     train OLMo. Its value for you is reproducibility: every stage's filter and its effect is
@@ -359,7 +359,7 @@ cost but makes the output softmax and embedding matrices larger.
     end". OLMo 2 adds a specialised late-stage mix ("Dolmino") introduced during annealing.
     Sources: [Dolma](https://arxiv.org/abs/2402.00159), [2 OLMo 2 Furious](https://arxiv.org/abs/2501.00656).
 
-!!! production "DeepSeek — DeepSeek-V3 pretraining corpus"
+!!! production "DeepSeek: DeepSeek-V3 pretraining corpus"
     DeepSeek-V3 (2024) pretrains on 14.8T tokens with an emphasis on math and programming
     samples and multilingual coverage, uses document packing, and applies a fill-in-the-middle
     objective on a fraction of the data (useful for code completion). It is the reference

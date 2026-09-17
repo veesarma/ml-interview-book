@@ -1,20 +1,20 @@
 # Calculus & matrix calculus
 
 > **Why this matters at staff level.** Backpropagation is the multivariable chain rule applied
-> to matrices, and every "derive the gradient of X" question — through softmax, through attention,
-> through a normalisation layer — is testing whether you can do that without an autograd crutch.
+> to matrices, and every "derive the gradient of X" question, through softmax, through attention,
+> through a normalisation layer, is testing whether you can do that without an autograd crutch.
 > Strong signal: you state your layout convention, derive with shapes written next to every
 > symbol, and then say how you would *verify* the result numerically before trusting it in a
 > custom kernel.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - **Layout: denominator.** $\nabla_\theta L$ has the *same shape as $\theta$* (that is `param.grad`). Jacobians of $f:\R^n\to\R^m$ are $J \in \R^{m\times n}$, $J_{ij} = \partial f_i/\partial x_j$.
 - Directional derivative $D_v f = \nabla f^\top v$; the gradient is the steepest-ascent direction (Cauchy–Schwarz) and is normal to level sets.
-- Chain rule: $\frac{\partial L}{\partial x} = J^\top \frac{\partial L}{\partial y}$ for $y = f(x)$ — backprop is a chain of vector–Jacobian products, never explicit Jacobians.
+- Chain rule: $\frac{\partial L}{\partial x} = J^\top \frac{\partial L}{\partial y}$ for $y = f(x)$, backprop is a chain of vector–Jacobian products, never explicit Jacobians.
 - $\nabla_x\, x^\top A x = (A + A^\top)x$; $\nabla_x\, b^\top x = b$; $\nabla_W \norm{XW - Y}_F^2 = 2X^\top(XW - Y)$; $\nabla_W \tr(AWB) = A^\top B^\top$.
 - Softmax Jacobian $\partial a_i/\partial s_j = a_i(\delta_{ij} - a_j)$; with cross-entropy, $\nabla_s L = a - y$.
-- Attention backward: $dV = A^\top dY$, $dA = dY V^\top$, $dS = A\odot(dA - \mathrm{rowsum}(dA\odot A))$, $dQ = dS\,K/\sqrt{d_k}$, $dK = dS^\top Q/\sqrt{d_k}$. The rowsum equals $\mathrm{rowsum}(dY \odot Y)$ — the trick FlashAttention's backward uses to avoid storing $A$.
+- Attention backward: $dV = A^\top dY$, $dA = dY V^\top$, $dS = A\odot(dA - \mathrm{rowsum}(dA\odot A))$, $dQ = dS\,K/\sqrt{d_k}$, $dK = dS^\top Q/\sqrt{d_k}$. The rowsum equals $\mathrm{rowsum}(dY \odot Y)$, the trick FlashAttention's backward uses to avoid storing $A$.
 - Taylor: $f(x+\delta) \approx f + g^\top\delta + \tfrac12\delta^\top H\delta$. Gradient step minimises the linear term under a step-size penalty; Newton step $-H^{-1}g$ minimises the quadratic.
 - Lagrange: $\nabla f = \lambda\nabla g$ at a constrained optimum; PCA and max-entropy softmax both fall out of it.
 - Gradient check: central difference, $\epsilon \approx 10^{-6}$ in float64, relative error $< 10^{-6}$ good, $> 10^{-3}$ a bug. Never check in float16.
@@ -106,7 +106,7 @@ $$
 \boxed{\;\nabla_W \norm{XW - Y}_F^2 = 2X^\top X W - 2X^\top Y = 2X^\top (XW - Y)\;}
 $$
 
-*What it means:* the gradient is "input transposed times residual" — the same outer-product structure as
+*What it means:* the gradient is "input transposed times residual", the same outer-product structure as
 the toy example, and setting it to zero gives the normal equations of [chapter 01](01-linear-algebra.md).
 Shape check: $(d\times N)(N\times k) = d\times k$ = shape of $W$.
 
@@ -128,7 +128,7 @@ $$
 $$
 
 *What it means:* the gradient at the logits is "prediction minus target", bounded in $[-1, 1]$ per entry,
-and it does not vanish when the softmax saturates in the *wrong* direction — which is why you always fuse
+and it does not vanish when the softmax saturates in the *wrong* direction, which is why you always fuse
 softmax with cross-entropy rather than backpropagating through the softmax alone (the standalone Jacobian
 $\diag(a) - aa^\top$ does go to zero when $a$ is peaked).
 

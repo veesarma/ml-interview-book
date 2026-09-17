@@ -7,7 +7,7 @@
 > optimise, and what the straight-through estimator is. Strong signal is a quantised Linear
 > from scratch and a clear statement of *which* bytes each method saves.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Formats: FP32 = 1/8/23 (sign/exp/mantissa), FP16 = 1/5/10 (max 65,504), BF16 = 1/8/7 (FP32
   range, 3 significant digits), FP8 E4M3 (max 448, no inf) for weights/activations and E5M2
@@ -249,17 +249,17 @@ The `q.detach() + in_range * (z - z.detach())` idiom gives the forward value of 
 gradient of `z` masked to the un-clipped region, which is the boxed STE. `QATLinear` applies
 it per output channel to the master weights each forward.
 
-??? example "Full implementation — `src/mlbook/quant/quantize.py`"
+??? example "Full implementation: `src/mlbook/quant/quantize.py`"
     ```python
     --8<-- "src/mlbook/quant/quantize.py"
     ```
 
-??? example "Full implementation — `src/mlbook/quant/qlinear.py`"
+??? example "Full implementation: `src/mlbook/quant/qlinear.py`"
     ```python
     --8<-- "src/mlbook/quant/qlinear.py"
     ```
 
-??? example "Full implementation — `src/mlbook/quant/fake_quant.py`"
+??? example "Full implementation: `src/mlbook/quant/fake_quant.py`"
     ```python
     --8<-- "src/mlbook/quant/fake_quant.py"
     ```
@@ -332,7 +332,7 @@ most common misunderstanding: quantisation is a memory-traffic optimisation firs
 
 ## 5. In production
 
-!!! production "DeepSeek — FP8 training of DeepSeek-V3"
+!!! production "DeepSeek: FP8 training of DeepSeek-V3"
     The first frontier-scale model trained with FP8 for most matmuls. Tile-wise (1×128)
     activation scales and block-wise (128×128) weight scales handle outliers, and
     accumulation is promoted to FP32 CUDA cores every 128 elements because Hopper tensor
@@ -342,7 +342,7 @@ most common misunderstanding: quantisation is a memory-traffic optimisation firs
     outliers at this scale.
     Source: [DeepSeek-V3 Technical Report](https://arxiv.org/abs/2412.19437).
 
-!!! production "Hugging Face / bitsandbytes — LLM.int8() and NF4"
+!!! production "Hugging Face / bitsandbytes: LLM.int8() and NF4"
     Dettmers et al. (2022) showed emergent outlier features in models above ~6.7B parameters
     and made INT8 inference of 175B models lossless with the mixed decomposition; the
     implementation in bitsandbytes became the default `load_in_8bit`. QLoRA (2023) added
@@ -352,7 +352,7 @@ most common misunderstanding: quantisation is a memory-traffic optimisation firs
     2022, arXiv:2208.07339); *QLoRA: Efficient Finetuning of Quantized LLMs* (NeurIPS 2023,
     arXiv:2305.14314).
 
-!!! production "IST Austria / MIT — GPTQ and AWQ as the serving standard"
+!!! production "IST Austria / MIT: GPTQ and AWQ as the serving standard"
     GPTQ (2022) quantised OPT-175B and BLOOM to 3–4 bits in a few GPU-hours with negligible
     perplexity loss using the Hessian-based update; AWQ (2023) matched or beat it with a
     simpler activation-aware scaling that generalises better across tasks and ships with
@@ -364,7 +364,7 @@ most common misunderstanding: quantisation is a memory-traffic optimisation firs
     for LLM Compression and Acceleration* (MLSys 2024, arXiv:2306.00978); *SmoothQuant*
     (ICML 2023, arXiv:2211.10438).
 
-!!! production "Meta — Llama 3 FP8 and quantised releases"
+!!! production "Meta: Llama 3 FP8 and quantised releases"
     The Llama 3 paper describes FP8 inference for the 405B model with per-row/per-channel
     scales and specific handling of the first and last layers and the outlier-heavy
     attention projections, validated against bf16 on reward-model scores rather than

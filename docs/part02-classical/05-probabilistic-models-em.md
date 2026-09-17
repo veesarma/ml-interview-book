@@ -9,7 +9,7 @@
 > derive EM for a GMM with the monotonicity proof, and explain when you would reach
 > for a mixture in a production uncertainty head or anomaly detector.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Generative: model $p(x\mid y)p(y)$, classify by $\argmax_k\log p(y=k) + \log p(x\mid y=k)$. Discriminative: model $p(y\mid x)$ directly. Generative wins with little data / good model assumptions; discriminative wins asymptotically.
 - Naive Bayes: $p(x\mid y) = \prod_j p(x_j\mid y)$. Multinomial MLE $\theta_{kj} = N_{kj}/N_k$; Laplace smoothing $\boxed{\theta_{kj} = \frac{N_{kj}+\alpha}{N_k + \alpha d}}$ = MAP under a symmetric Dirichlet$(\alpha+1)$ prior. Works as a linear classifier in log-count space.
@@ -18,7 +18,7 @@
 - EM: $\log p(x\mid\theta) \ge \mathcal L(q,\theta) = \E_q[\log p(x,z\mid\theta)] + H(q)$ (Jensen). E-step: $q = p(z\mid x,\theta)$ makes the bound tight. M-step: maximise $\E_q[\log p(x,z\mid\theta)]$. Hence $\boxed{\log p(x\mid\theta_{t+1}) \ge \log p(x\mid\theta_t)}$.
 - Gap: $\log p(x\mid\theta) - \mathcal L(q,\theta) = \KL(q\,\|\,p(z\mid x,\theta)) \ge 0$.
 - K-means = hard EM with $\sigma\to0$; VAE = EM with $q_\phi(z\mid x)$ amortised by an encoder and the M-step replaced by a gradient step on the same ELBO.
-- Failure modes: singular covariances (a component collapses on one point, likelihood $\to\infty$) — add $\epsilon I$; label switching; local optima — k-means++ init and restarts.
+- Failure modes: singular covariances (a component collapses on one point, likelihood $\to\infty$) (add $\epsilon I$; label switching; local optima) k-means++ init and restarts.
 - Production: GMM-UBM speaker verification (Reynolds 2000); mixture density heads for multimodal outputs (Bishop 1994); DAGMM for anomaly detection (ICLR 2018).
 
 ## 1. Intuition first
@@ -27,12 +27,12 @@ Spam filter with two words and Laplace smoothing. Three training emails:
 `free free` (spam), `free meeting` (spam), `meeting meeting meeting` (ham). Word
 counts: spam has `free`×3, `meeting`×1 (total 4); ham has `meeting`×3 (total 3).
 Without smoothing $p(\texttt{free}\mid\text{ham}) = 0/3 = 0$, so any ham email containing
-"free" once gets probability exactly zero — one word vetoes everything. With
+"free" once gets probability exactly zero, one word vetoes everything. With
 $\alpha = 1$ and $d = 2$ words: $p(\texttt{free}\mid\text{ham}) = (0+1)/(3+2) = 0.2$,
 $p(\texttt{meeting}\mid\text{ham}) = 4/5$, $p(\texttt{free}\mid\text{spam}) = 4/6$,
 $p(\texttt{meeting}\mid\text{spam}) = 2/6$. A new email `free free free`: spam score
 $\log\tfrac23 + 3\log\tfrac46 = -1.62$, ham score $\log\tfrac13 + 3\log\tfrac15 = -5.93$. Spam.
-The classifier is a dot product of counts with $\log\theta$ plus a log prior — linear.
+The classifier is a dot product of counts with $\log\theta$ plus a log prior, linear.
 
 Now the unsupervised version: you see heights of adults from a population but not
 their sex, and the histogram has two bumps. A single Gaussian fits badly. Two
@@ -80,7 +80,7 @@ $$
 probability is ever zero, so no single unseen feature can veto a class, and the
 estimate shrinks toward uniform when $N_k$ is small. The decision function
 $\log\pi_k + \sum_jx_j\log\theta_{kj}$ is linear in $x$: Naive Bayes is a linear
-classifier whose weights are set by counting, not by optimisation — which is why it
+classifier whose weights are set by counting, not by optimisation, which is why it
 trains in one pass and is hard to beat with $<1000$ labelled documents.
 
 **Gaussian NB** uses $p(x_j\mid y=k) = \mathcal N(\mu_{kj}, \sigma_{kj}^2)$; it is QDA with
@@ -108,7 +108,7 @@ $$
 $$
 
 *Meaning:* GDA with shared covariance implies exactly the logistic-regression form
-— but the converse is false (logistic regression makes no Gaussian assumption). GDA
+, but the converse is false (logistic regression makes no Gaussian assumption). GDA
 fits $w$ by moment matching in closed form; logistic regression fits it by MLE of the
 conditional. When the Gaussian assumption holds, GDA is more data-efficient
 (asymptotically efficient, needs $O(\log d)$ vs $O(d)$ samples in Ng & Jordan's
@@ -146,7 +146,7 @@ So $\boxed{\log p(x\mid\theta) = \mathcal L(q,\theta) + \KL(q\,\|\,p(z\mid x,\th
 $\mathcal L$ is the evidence lower bound (ELBO). EM is coordinate ascent on $\mathcal L$:
 
 - **E-step:** maximise $\mathcal L$ over $q$ with $\theta_t$ fixed. The KL term is the only thing that depends on $q$, and it is minimised (zero) by $q(z) = p(z\mid x,\theta_t)$. After the E-step the bound is *tight*: $\mathcal L(q_t, \theta_t) = \log p(x\mid\theta_t)$.
-- **M-step:** maximise $\mathcal L$ over $\theta$ with $q_t$ fixed. Since $\mathcal L(q,\theta) = \E_{q}[\log p(x,z\mid\theta)] + H(q)$ and $H(q_t)$ is constant, this is $\theta_{t+1} = \argmax_\theta Q(\theta) := \E_{q_t}[\log p(x,z\mid\theta)]$ — the expected *complete-data* log-likelihood, which is usually a sum of closed-form MLEs.
+- **M-step:** maximise $\mathcal L$ over $\theta$ with $q_t$ fixed. Since $\mathcal L(q,\theta) = \E_{q}[\log p(x,z\mid\theta)] + H(q)$ and $H(q_t)$ is constant, this is $\theta_{t+1} = \argmax_\theta Q(\theta):= \E_{q_t}[\log p(x,z\mid\theta)]$, the expected *complete-data* log-likelihood, which is usually a sum of closed-form MLEs.
 
 **Monotonicity.** $\log p(x\mid\theta_{t+1}) \ge \mathcal L(q_t,\theta_{t+1}) \ge \mathcal L(q_t,\theta_t) = \log p(x\mid\theta_t)$:
 the first inequality because $\mathcal L$ is a lower bound for any $q$, the second
@@ -200,7 +200,7 @@ $q$; the [k-means chapter](04-knn-kmeans.md) proves its convergence directly.
 the exact E-step $p(z\mid x,\theta)$ is intractable. The VAE keeps the *same* ELBO,
 $\E_{q}[\log p_\theta(x\mid z)] - \KL(q\,\|\,p(z))$, but (i) restricts $q$ to a Gaussian family
 $q_\phi(z\mid x)$ whose parameters are produced by an encoder network shared across
-all $x$ ("amortised" inference — one function instead of one $q_i$ per data point),
+all $x$ ("amortised" inference, one function instead of one $q_i$ per data point),
 and (ii) replaces the alternating exact maximisations by joint gradient steps on
 $(\theta,\phi)$ using the reparameterisation trick. The KL gap of §2.4 is now the
 *amortisation + approximation gap*: the bound is no longer tight after the E-step.
@@ -225,7 +225,7 @@ def fit(self, X, y):  # MultinomialNB
 ```
 
 `log_joint` is then a single matmul, `X @ log_theta.T + log_prior`, of shape `(N, K)`
-— the linear classifier of §2.1 made explicit.
+, the linear classifier of §2.1 made explicit.
 
 ```python
 def lda_as_logistic(model):
@@ -238,7 +238,7 @@ def lda_as_logistic(model):
 ```
 
 The test checks that $\sigma(w^Tx + b)$ equals the normalised GDA posterior to $10^{-10}$
-on every training point — §2.2 verified numerically.
+on every training point, §2.2 verified numerically.
 
 ```python
 def log_gaussian(X, mu, Sigma):
@@ -286,17 +286,17 @@ E/M cycle reproduces the closed forms; full EM on 1500 points from a planted
 2-component mixture has a non-decreasing log-likelihood and recovers $\pi$, $\mu$,
 $\Sigma$ within tolerance.
 
-??? example "Full implementation — `src/mlbook/classical/naive_bayes.py`"
+??? example "Full implementation: `src/mlbook/classical/naive_bayes.py`"
     ```python
     --8<-- "src/mlbook/classical/naive_bayes.py"
     ```
 
-??? example "Full implementation — `src/mlbook/classical/gda.py`"
+??? example "Full implementation: `src/mlbook/classical/gda.py`"
     ```python
     --8<-- "src/mlbook/classical/gda.py"
     ```
 
-??? example "Full implementation — `src/mlbook/classical/gmm.py`"
+??? example "Full implementation: `src/mlbook/classical/gmm.py`"
     ```python
     --8<-- "src/mlbook/classical/gmm.py"
     ```
@@ -341,44 +341,44 @@ Failure modes:
 **When to use what.** Fewer than a few thousand labelled examples with reasonable
 independence → Naive Bayes; it is the baseline you should always report. Continuous
 features that look Gaussian per class → LDA (also a great supervised
-dimensionality reduction). Need $p(x)$ itself — to score how unusual a point is, to
+dimensionality reduction). Need $p(x)$ itself, to score how unusual a point is, to
 sample, or to represent multimodal outputs → GMM. Need $p(y\mid x)$ with no
 distributional assumptions and lots of data → logistic regression or trees.
 
 ## 5. In production
 
-!!! production "MIT Lincoln Lab / NIST evaluations — GMM-UBM speaker verification"
+!!! production "MIT Lincoln Lab / NIST evaluations: GMM-UBM speaker verification"
     *Problem:* verify a speaker's identity from a few seconds of speech. *What they
-    built:* a Universal Background Model — a 1024–2048-component GMM over MFCC
-    frames trained with EM on many speakers — then per-speaker models obtained by
+    built:* a Universal Background Model, a 1024–2048-component GMM over MFCC
+    frames trained with EM on many speakers, then per-speaker models obtained by
     Bayesian (MAP) adaptation of the UBM's means from enrolment data; the decision
     is a log-likelihood ratio between the speaker GMM and the UBM. *Why a mixture:*
     frames are a multimodal distribution over phonetic events, and MAP adaptation
     from a shared UBM lets a speaker model be fitted from seconds of audio. This was
     the dominant approach for a decade and the ancestor of i-vectors. Reynolds,
     Quatieri, Dunn, "Speaker Verification Using Adapted Gaussian Mixture Models",
-    *Digital Signal Processing* 10, 2000 —
+    *Digital Signal Processing* 10, 2000.
     [sciencedirect.com](https://www.sciencedirect.com/science/article/pii/S1051200499903615).
 
-!!! production "Mixture density heads — multimodal outputs in perception and planning"
+!!! production "Mixture density heads: multimodal outputs in perception and planning"
     Bishop's Mixture Density Network (1994) puts a GMM on the output of a neural
     network: the net predicts $\pi_k(x)$, $\mu_k(x)$, $\sigma_k(x)$ and is trained by the
     mixture negative log-likelihood. This is the standard head whenever the target
-    is multimodal — trajectory prediction (a car may turn left or right; a single
+    is multimodal, trajectory prediction (a car may turn left or right; a single
     Gaussian predicts "straight into the divider"), inverse kinematics, and
     handwriting synthesis. Bishop, "Mixture Density Networks", Aston University
-    technical report NCRG/94/004, 1994 —
+    technical report NCRG/94/004, 1994.
     [publications.aston.ac.uk](http://publications.aston.ac.uk/373/). See
     [prediction & planning](../part11-perception-autonomy/06-prediction-planning.md).
 
-!!! production "DAGMM — GMM anomaly detection on learned features (ICLR 2018)"
+!!! production "DAGMM: GMM anomaly detection on learned features (ICLR 2018)"
     *Problem:* unsupervised anomaly detection (intrusion, fraud-like tabular data).
     *What they built:* an autoencoder produces a low-dimensional code plus
     reconstruction-error features; a GMM over that space is trained *jointly* with
     the autoencoder using the mixture likelihood, and the anomaly score is the
     negative log-likelihood under the GMM. *Rejected alternative:* decoupled
     two-stage training (compress, then EM), which the paper argues loses
-    information the GMM needs. Zong et al., ICLR 2018 —
+    information the GMM needs. Zong et al., ICLR 2018.
     [openreview.net](https://openreview.net/pdf?id=BJJLHbb0-).
 
 ## 6. Interview questions and strong answers
@@ -390,7 +390,7 @@ distributional assumptions and lots of data → logistic regression or trees.
     **Staff follow-up:** *what if the M-step can only be done approximately?*
     Generalised EM: any $\theta$ that increases $Q$ preserves monotonicity. *And if the
     E-step is intractable?* Variational EM: restrict $q$ to a family; the bound is no
-    longer tight and you optimise the ELBO on both sides — that is the VAE.
+    longer tight and you optimise the ELBO on both sides, that is the VAE.
 
 !!! interview "Write the GMM E and M steps and their cost."
     $r_{ik} \propto \pi_k\mathcal N(x_i;\mu_k,\Sigma_k)$ normalised over $k$ via log-sum-exp;
@@ -399,7 +399,7 @@ distributional assumptions and lots of data → logistic regression or trees.
     **Follow-up:** *what breaks numerically?* A component shrinking onto one point
     ($|\Sigma_k|\to0$, likelihood unbounded); add $\epsilon I$ or a prior.
 
-!!! interview "GDA vs logistic regression — which and when?"
+!!! interview "GDA vs logistic regression: which and when?"
     Both give $\sigma(w^Tx+b)$ but fit $w$ differently: GDA by class means and pooled
     covariance (closed form, uses the Gaussian assumption, more data-efficient when
     it holds), LR by conditional MLE (no assumption on $p(x)$, asymptotically at
@@ -409,9 +409,9 @@ distributional assumptions and lots of data → logistic regression or trees.
     $x^T\Sigma_k^{-1}x$ terms no longer cancel.
 
 !!! interview "Why is Naive Bayes still used, and what is its main failure?"
-    One pass, $O(Kd)$ parameters, works with tiny data, trivially online, and often
+    One pass, $O(Kd)$ parameters, works with tiny data, updates online with a counter increment, and often
     ranks well. Main failure: correlated features double-count evidence so
-    probabilities are extreme — fine for argmax, wrong for thresholds; calibrate
+    probabilities are extreme, fine for argmax, wrong for thresholds; calibrate
     post hoc. **Follow-up:** *what does Laplace smoothing correspond to?* A Dirichlet
     prior; $\alpha$ trades bias toward uniform for protection against zero counts.
 
@@ -428,7 +428,7 @@ distributional assumptions and lots of data → logistic regression or trees.
     log-likelihood; isolation forest; reconstruction error of an autoencoder. A GMM
     gives a calibrated-ish likelihood you can threshold at a chosen false-positive
     rate and explain per component. **Follow-up:** *how do you pick $K$?* BIC or
-    held-out likelihood — but validate against the downstream detection metric on
+    held-out likelihood, but validate against the downstream detection metric on
     the few labelled anomalies you eventually collect.
 
 ## 7. Exercises
@@ -474,7 +474,7 @@ Interpret the second term.
     $\mathcal L = \E_q[\log p(x,z)] + H(q)$ with $q$ factorised over $i$ and
     $q(z_i = k) = r_{ik}$ gives exactly the displayed form; the second term is the
     entropy of the responsibilities. Since $r_{ik}$ is the exact posterior, the KL
-    gap is zero and $\mathcal L = \sum_i\log\sum_k\pi_k\mathcal N_k(x_i)$ — you can verify
+    gap is zero and $\mathcal L = \sum_i\log\sum_k\pi_k\mathcal N_k(x_i)$, you can verify
     numerically that the two expressions agree after every `e_step`. The entropy
     term is what k-means drops by forcing one-hot $q$; it is the "softness bonus"
     that keeps EM from committing prematurely.

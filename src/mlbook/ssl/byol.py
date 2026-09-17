@@ -79,4 +79,4 @@ def byol_step(model: BYOL, opt: torch.optim.Optimizer, x1: torch.Tensor, x2: tor
     loss.backward()
     opt.step()
     model.update_target()
-    return float(loss)
+    return float(loss.detach())

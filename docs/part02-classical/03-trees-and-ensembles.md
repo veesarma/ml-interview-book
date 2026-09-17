@@ -11,11 +11,11 @@
 > name the systems tricks (histograms, leaf-wise growth, GOSS, EFB, ordered target
 > statistics) that make the libraries fast.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - CART: greedy axis-aligned splits. Impurities: entropy $H = -\sum_k p_k\log p_k$, Gini $1 - \sum_k p_k^2$, variance for regression. Gain = parent impurity − size-weighted child impurity. One split search is $O(d\,N\log N)$ (sort + scan); a depth-$D$ tree $\approx O(d\,N\log N\cdot D)$.
 - Trees: zero bias, huge variance; pruning (cost-complexity $\alpha\cdot\#\text{leaves}$) or depth limits trade them.
-- Random forest: bagging + feature subsampling ($\sqrt d$ per split). $\boxed{\operatorname{Var}(\bar f) = \rho\sigma^2 + \tfrac{1-\rho}{M}\sigma^2}$ — feature subsampling lowers $\rho$, which is the term that does not vanish with $M$. OOB error = free validation.
+- Random forest: bagging + feature subsampling ($\sqrt d$ per split). $\boxed{\operatorname{Var}(\bar f) = \rho\sigma^2 + \tfrac{1-\rho}{M}\sigma^2}$, feature subsampling lowers $\rho$, which is the term that does not vanish with $M$. OOB error = free validation.
 - Boosting = functional gradient descent: $F_m = F_{m-1} + \eta f_m$ with $f_m$ fitted to $-\partial\ell/\partial F$ (residuals for squared loss).
 - Newton boosting (XGBoost): second-order expansion $\sum_i g_if(x_i) + \tfrac12h_if(x_i)^2 + \gamma T + \tfrac{\lambda}{2}\sum_j w_j^2$ gives $\boxed{w_j^* = -\tfrac{G_j}{H_j+\lambda}}$, $\text{obj}^* = -\tfrac12\sum_j\tfrac{G_j^2}{H_j+\lambda} + \gamma T$, split gain $\tfrac12\big[\tfrac{G_L^2}{H_L+\lambda} + \tfrac{G_R^2}{H_R+\lambda} - \tfrac{G^2}{H+\lambda}\big] - \gamma$.
 - LightGBM: histogram bins ($O(\#\text{bins})$ per feature per split, histogram subtraction), leaf-wise growth, GOSS (keep large-gradient rows, subsample small ones and up-weight), EFB (bundle mutually exclusive sparse features). CatBoost: ordered target statistics and ordered boosting to remove target leakage; symmetric (oblivious) trees.
@@ -88,7 +88,7 @@ below).
 **Pruning.** Grow deep, then minimise cost-complexity
 $\sum_{\text{leaves}} n_jI_j + \alpha T$ by collapsing subtrees whose removal raises
 impurity by less than $\alpha$ per leaf; pick $\alpha$ by cross-validation. Modern
-practice replaces pruning with `max_depth`, `min_samples_leaf`, and — in boosting —
+practice replaces pruning with `max_depth`, `min_samples_leaf`, and (in boosting)
 the $\gamma$ and $\lambda$ penalties below, which prune during growth.
 
 ### 2.2 Random forests: why averaging helps only if trees disagree
@@ -131,7 +131,7 @@ a tree to the residuals" is gradient descent. For logistic loss
 $\ell = \log(1 + e^{F}) - yF$, $-g_i = y_i - \sigma(F(x_i))$; for absolute loss
 $-g_i = \operatorname{sign}(y_i - F(x_i))$, which is why L1 boosting is robust to outliers.
 Shrinkage $\eta \in [0.01, 0.3]$ is the learning rate, and more rounds with smaller
-$\eta$ generalise better — the same story as SGD.
+$\eta$ generalise better, the same story as SGD.
 
 ![Boosting residuals](../assets/figures/part02_boosting_residuals.png){ width="720" }
 
@@ -167,7 +167,7 @@ $$
 computed on the examples in that leaf. For squared loss $h_i = 1$ and
 $w_j^* = -G_j/(n_j + \lambda)$: the mean residual, shrunk. For logistic loss
 $h_i = p_i(1-p_i)$, so leaves full of confident examples (small $h$) get *larger*
-steps for the same gradient — first-order boosting would not know this.
+steps for the same gradient, first-order boosting would not know this.
 
 $\mathcal L^*$ scores a tree structure. Splitting a leaf with $(G, H)$ into $(G_L, H_L)$ and
 $(G_R, H_R)$ changes the objective by
@@ -181,7 +181,7 @@ applied *during* growth, $\lambda$ shrinks leaf values and damps the gain of lea
 with little curvature mass, and `min_child_weight` bounds $H_L, H_R$ from below (for
 logistic loss that is a bound on $\sum p(1-p)$, i.e. on the leaf's information, not
 just its count). Split search sorts each feature once and computes the gain for
-every threshold from prefix sums of $g$ and $h$ — the implementation below does
+every threshold from prefix sums of $g$ and $h$, the implementation below does
 exactly this in vectorised NumPy.
 
 ### 2.5 The engineering that made boosting fast
@@ -190,7 +190,7 @@ exactly this in vectorised NumPy.
 - **Leaf-wise (best-first) growth.** Instead of growing all leaves at a depth (level-wise), always split the leaf with the largest gain. Reaches lower loss for the same number of leaves; can overfit on small data, hence `num_leaves` and `min_data_in_leaf`.
 - **GOSS (gradient-based one-side sampling).** Keep the top $a\%$ of rows by $|g|$, sample $b\%$ of the rest and multiply their $g, h$ by $(1-a)/b$ so the histogram stays unbiased. Rows with small gradients are already well fit and contribute little to the gain.
 - **EFB (exclusive feature bundling).** Sparse features that are rarely non-zero simultaneously (one-hots) are merged into one dense feature with offset bins; the number of histograms drops from $\#\text{features}$ to $\#\text{bundles}$. Finding the optimal bundling is graph colouring (NP-hard); a greedy approximation with a conflict budget works.
-- **Ordered target statistics (CatBoost).** Replacing a category by its mean target leaks the row's own label into its feature. CatBoost computes each row's statistic from a random permutation of the *preceding* rows only, and uses the same idea (*ordered boosting*) to compute gradients with models that never saw the row, removing the "prediction shift". Oblivious (symmetric) trees use the same split at every node of a level, giving 2^depth leaves indexed by a bit vector — very fast to evaluate.
+- **Ordered target statistics (CatBoost).** Replacing a category by its mean target leaks the row's own label into its feature. CatBoost computes each row's statistic from a random permutation of the *preceding* rows only, and uses the same idea (*ordered boosting*) to compute gradients with models that never saw the row, removing the "prediction shift". Oblivious (symmetric) trees use the same split at every node of a level, giving 2^depth leaves indexed by a bit vector, very fast to evaluate.
 - **Sparsity-aware splits and weighted quantile sketch (XGBoost).** A default direction for missing values learned per split; quantile bins weighted by $h_i$ so that bins carry equal curvature mass.
 
 ### 2.6 When trees beat neural nets on tabular data
@@ -202,7 +202,7 @@ toward smooth functions, while tabular targets are often irregular in a few
 coordinates; trees' piecewise-constant, axis-aligned bias fits that; (2) trees are
 robust to uninformative features (a split on noise has near-zero gain and is
 never taken; an MLP must learn to ignore it); (3) tabular data is not
-rotation-invariant — a random rotation of the features hurts MLPs far less than it
+rotation-invariant, a random rotation of the features hurts MLPs far less than it
 hurts trees, and trees' loss under rotation is exactly the point: the original axes
 carry meaning. Neural nets win when there are $\gg 10^5$ rows, when the features are
 embeddings or raw signals, when you need end-to-end training with other modalities,
@@ -303,7 +303,7 @@ def _best_split(self, X, g, h):
 ```
 
 One sort and two cumulative sums per feature give the gain at every threshold at
-once — §2.4's formula applied to $n - 1$ candidates in a single vectorised line. Leaves
+once, §2.4's formula applied to $n - 1$ candidates in a single vectorised line. Leaves
 are assigned `leaf_weight(g.sum(), h.sum(), lam)` $= -G/(H+\lambda)$ *before* attempting a
 split, so a node that finds no positive-gain split is already a correct leaf.
 
@@ -331,17 +331,17 @@ values; a `NewtonTree` with a planted split returns $-G/(H+\lambda)$ per side; b
 beats a stump by $4\times$ on MSE with a monotone training loss; logistic boosting
 solves XOR with probabilities in $[0,1]$.
 
-??? example "Full implementation — `src/mlbook/classical/decision_tree.py`"
+??? example "Full implementation: `src/mlbook/classical/decision_tree.py`"
     ```python
     --8<-- "src/mlbook/classical/decision_tree.py"
     ```
 
-??? example "Full implementation — `src/mlbook/classical/random_forest.py`"
+??? example "Full implementation: `src/mlbook/classical/random_forest.py`"
     ```python
     --8<-- "src/mlbook/classical/random_forest.py"
     ```
 
-??? example "Full implementation — `src/mlbook/classical/gradient_boosting.py`"
+??? example "Full implementation: `src/mlbook/classical/gradient_boosting.py`"
     ```python
     --8<-- "src/mlbook/classical/gradient_boosting.py"
     ```
@@ -395,47 +395,47 @@ neural model (Facebook), or a NN with a GBDT teacher.
 
 ## 5. In production
 
-!!! production "Airbnb — search ranking: GBDT to neural networks"
+!!! production "Airbnb: search ranking: GBDT to neural networks"
     *Problem:* rank listings for a search. *History:* the initial gains came from a
     gradient-boosted decision tree ranker; those gains plateaued. *What they built:*
-    a sequence of neural rankers, with the paper candid about failures — a first
+    a sequence of neural rankers, with the paper candid about failures, a first
     NN replicating the GBDT with hand-crafted features did *not* beat it; gains came
     from listing-ID embeddings' failure teaching them about overfitting, from
     Lambdarank losses and from feeding the GBDT's prediction as a feature during the
     transition. *Trade-off:* NNs removed feature-engineering bottlenecks and let them
     scale with data, at the price of far more tooling (feature normalisation, output
     monotonicity, debugging). Haldar et al., "Applying Deep Learning to Airbnb
-    Search", KDD 2019 — [arXiv:1810.09591](https://arxiv.org/abs/1810.09591).
+    Search", KDD 2019, [arXiv:1810.09591](https://arxiv.org/abs/1810.09591).
 
-!!! production "Facebook — boosted trees as feature transformers for ads"
+!!! production "Facebook: boosted trees as feature transformers for ads"
     *What they built:* each boosted tree's leaf index becomes a categorical feature
     for a logistic regression; +3% normalised-entropy improvement over either model
     alone; the trees are retrained infrequently, the linear layer online. *Why:*
     trees discover feature crosses without manual engineering; the linear model
-    stays fresh and calibrated. He et al., ADKDD 2014 —
+    stays fresh and calibrated. He et al., ADKDD 2014.
     [ai.meta.com](https://ai.meta.com/research/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/).
 
-!!! production "Stripe — Radar"
+!!! production "Stripe: Radar"
     *What they built:* fraud scoring over 1000+ features in under 100 ms, evolving
     from logistic regression through tree ensembles to a deep network; the post
     describes tree models as the workhorse for years and the DNN transition as
     driven by measured improvements and the ability to learn from Stripe's whole
-    network. Drapeau, 2023 — [stripe.dev](https://stripe.dev/blog/how-we-built-it-stripe-radar).
+    network. Drapeau, 2023, [stripe.dev](https://stripe.dev/blog/how-we-built-it-stripe-radar).
 
-!!! production "Uber — XGBoost ETA baseline, then DeepETA"
+!!! production "Uber: XGBoost ETA baseline, then DeepETA"
     *Problem:* correct the routing engine's ETA with a residual model, globally, in
     milliseconds. *History:* the incumbent was an XGBoost model; DeepETA's stated
     goal was to beat its MAE while serving at Uber scale. *What replaced it:* a
     Transformer-style encoder over bucketised features (the blog explains they
-    discretise continuous inputs — a tree-like inductive bias inside the NN). Uber
-    Engineering, 2022 — [uber.com](https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/).
+    discretise continuous inputs, a tree-like inductive bias inside the NN). Uber
+    Engineering, 2022, [uber.com](https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/).
     Uber's Michelangelo platform post lists tree models among the first-class
-    supported model types — [uber.com](https://www.uber.com/us/en/blog/michelangelo-machine-learning-platform/).
+    supported model types, [uber.com](https://www.uber.com/us/en/blog/michelangelo-machine-learning-platform/).
 
-!!! production "DoorDash — LightGBM for regional forecasting"
+!!! production "DoorDash: LightGBM for regional forecasting"
     DoorDash reformulated supply/demand forecasting as regression and used LightGBM
     to train thousands of regional forecasts in one run, choosing it for iteration
-    speed. DoorDash Engineering — [careersatdoordash.com](https://careersatdoordash.com/blog/managing-supply-and-demand-balance-through-machine-learning/).
+    speed. DoorDash Engineering, [careersatdoordash.com](https://careersatdoordash.com/blog/managing-supply-and-demand-balance-through-machine-learning/).
 
 ## 6. Interview questions and strong answers
 
@@ -445,10 +445,10 @@ neural model (Facebook), or a NN with a GBDT teacher.
     $G_jw + \tfrac12(H_j+\lambda)w^2$, minimised at $w^* = -G_j/(H_j+\lambda)$ with value
     $-\tfrac12G_j^2/(H_j+\lambda)$. Gain of a split = value before − value after − $\gamma$.
     **Staff follow-up:** *why second order?* Newton steps per leaf use the loss's
-    curvature — for logistic loss, leaves of confident examples ($h$ small) get
-    bigger moves — and the same code handles any twice-differentiable loss,
+    curvature, for logistic loss, leaves of confident examples ($h$ small) get
+    bigger moves, and the same code handles any twice-differentiable loss,
     including ranking losses. *What does $\lambda$ do to the gain?* It discounts leaves
-    with small $H$, i.e. few or uninformative examples — a built-in prior against
+    with small $H$, i.e. few or uninformative examples, a built-in prior against
     splits on tiny groups.
 
 !!! interview "Why do random forests work, quantitatively?"
@@ -472,7 +472,7 @@ neural model (Facebook), or a NN with a GBDT teacher.
     small gradients are subsampled and re-weighted, keeping the gain estimate
     unbiased. EFB: bundle mutually exclusive sparse features. **Follow-up:** *what
     does CatBoost fix that these don't?* Target leakage in categorical encodings and
-    the gradient's "prediction shift" — both via ordered statistics on random
+    the gradient's "prediction shift", both via ordered statistics on random
     permutations.
 
 !!! interview "When would you replace the GBDT ranker with a neural net?"
@@ -493,7 +493,7 @@ neural model (Facebook), or a NN with a GBDT teacher.
     XGBoost learns a default direction per split from the rows that have the value
     (sparsity-aware split); LightGBM similarly. Alternatives: impute plus an
     indicator feature, or surrogate splits (CART). Never drop rows silently in a
-    production feature pipeline — the missingness is usually informative.
+    production feature pipeline, the missingness is usually informative.
 
 ## 7. Exercises
 
@@ -547,7 +547,7 @@ forest.
 **★★★ Exercise 5.** Show that gradient boosting with squared loss, shrinkage $\eta$,
 and *linear* weak learners fitted by OLS on the same fixed design $X$ is exactly
 gradient descent on the OLS objective with step $\eta$ preconditioned by $(X^TX)^{-1}$
-— i.e. it converges to the OLS solution and the number of rounds acts as an
+, i.e. it converges to the OLS solution and the number of rounds acts as an
 early-stopping regulariser.
 
 ??? success "Solution"

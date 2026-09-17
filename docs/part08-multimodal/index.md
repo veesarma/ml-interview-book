@@ -1,4 +1,4 @@
-# Part VIII — Vision Transformers and multimodal models
+# Part VIII: Vision Transformers and multimodal models
 
 This part is the bridge from perception to vision-language models. If you have shipped
 detectors, OCR systems or segmentation models, everything you know about images is
@@ -25,55 +25,55 @@ The six chapters derive that bridge piece by piece.
   [Transformer architectures](../part05-sequence-transformers/04-transformer-architectures.md):
   this part re-implements a small attention block for self-containment but does not
   re-derive it.
-* [Convolutions](../part04-vision/02-convolutions.md) and
+  * [Convolutions](../part04-vision/02-convolutions.md) and
   [CNN architectures](../part04-vision/03-cnn-architectures.md): the inductive-bias
   argument in chapter 1 is a comparison against what you already know.
-* [Object detection](../part04-vision/04-detection.md): DETR is defined by what it
+  * [Object detection](../part04-vision/04-detection.md): DETR is defined by what it
   removes (anchors, NMS) from the detectors there.
-* [Efficient attention & the KV cache](../part06-llm-training/04-efficient-attention-kv-cache.md):
+  * [Efficient attention & the KV cache](../part06-llm-training/04-efficient-attention-kv-cache.md):
   chapter 4's cost model for visual tokens is that chapter's arithmetic applied to images.
-* [Information theory](../part01-math/05-information-theory.md): InfoNCE's
+  * [Information theory](../part01-math/05-information-theory.md): InfoNCE's
   mutual-information bound in chapter 3.
 
-## If you have one day
+  ## If you have one day
 
-Read in this order and stop when time runs out; each step is self-contained.
+  Read in this order and stop when time runs out; each step is self-contained.
 
-1. Chapter 1 §1–§3 (patchification, the ViT, the shifted-window mask) — 2 hours. Retype
+  1. Chapter 1 §1–§3 (patchification, the ViT, the shifted-window mask), 2 hours. Retype
    `PatchEmbedLinear` and `TinyViT` from memory.
-2. Chapter 3 §2 (symmetric InfoNCE, temperature, SigLIP) and §3 (mini-CLIP) — 1.5 hours.
+   2. Chapter 3 §2 (symmetric InfoNCE, temperature, SigLIP) and §3 (mini-CLIP), 1.5 hours.
    Retype `clip_loss` and `siglip_loss`.
-3. Chapter 4 §1–§4 (the canonical VLM, the four projectors, the token-count cost model)
-   — 2 hours. Retype `merge_visual_tokens` and one projector.
-4. Chapter 2 §2–§3 (matching cost, Hungarian, DETR loss) — 1.5 hours. Retype `hungarian`.
-5. Chapter 5 §4 (the decision table across the three multimodal strategies) and
-   chapter 6 §2 (factorised attention cost) — 1 hour. Read only.
+   3. Chapter 4 §1–§4 (the canonical VLM, the four projectors, the token-count cost model)
+   , 2 hours. Retype `merge_visual_tokens` and one projector.
+   4. Chapter 2 §2–§3 (matching cost, Hungarian, DETR loss), 1.5 hours. Retype `hungarian`.
+   5. Chapter 5 §4 (the decision table across the three multimodal strategies) and
+   chapter 6 §2 (factorised attention cost), 1 hour. Read only.
 
-## Where this part is used later
+   ## Where this part is used later
 
-* [Part XI — Perception & autonomy](../part11-perception-autonomy/index.md): BEV
+   * [Part XI. Perception & autonomy](../part11-perception-autonomy/index.md): BEV
   Transformers, occupancy networks and world models are ViTs, DETR-style queries and
   video Transformers applied to multi-camera rigs.
-* [Part IX — Generative](../part09-generative/index.md): the latent diffusion
+  * [Part IX. Generative](../part09-generative/index.md): the latent diffusion
   Transformers mentioned in chapter 6 are derived there.
-* [Part XVII — ML system design](../part17-ml-system-design/index.md): the visual search
+  * [Part XVII. ML system design](../part17-ml-system-design/index.md): the visual search
   and OCR/document-understanding designs are CLIP and VLM systems with a serving budget.
 
-## Code map
+  ## Code map
 
-All Part VIII code lives in `src/mlbook/multimodal/` and is tested by
-`tests/test_multimodal_*.py` (`python -m pytest tests/test_multimodal_* -q`):
+  All Part VIII code lives in `src/mlbook/multimodal/` and is tested by
+  `tests/test_multimodal_*.py` (`python -m pytest tests/test_multimodal_* -q`):
 
-| Module | Contents |
-|---|---|
-| `attention_block.py` | explicit multi-head self- and cross-attention, pre-norm block |
-| `patch_embed.py` | `patchify`, linear and conv patch embedding (tested equal), 2-D sinusoidal and interpolated position embeddings |
-| `vit.py` | `TinyViT` (CLS or GAP, registers), `DistillableViT` (DeiT token) |
-| `swin_window.py` | window partition/reverse, `shifted_window_mask`, relative position bias, `SwinBlock`, `PatchMerging` |
-| `hungarian.py` | Kuhn–Munkres in NumPy, tested against `scipy.optimize.linear_sum_assignment` |
-| `detr_loss.py` | pairwise GIoU, matching cost, `hungarian_match`, `detr_loss` |
-| `clip.py` | `MiniCLIP`, `clip_loss`, `siglip_loss`, `zero_shot_classify` |
-| `projectors.py` | `LinearProjector`, `MLPProjector`, `PerceiverResampler`, `QFormer`, `GatedCrossAttentionAdapter` |
-| `vlm.py` | `ToyVisionEncoder`, `TinyCausalLM`, `merge_visual_tokens`, `MiniVLM`, `vlm_lm_loss` |
-| `token_compression.py` | pooling, pixel-shuffle merge, score-based pruning, AnyRes tiling, `visual_token_count` |
-| `video_attention.py` | tubelet embedding, `FactorisedSpaceTimeBlock`, `JointSpaceTimeBlock`, `attention_flops` |
+  | Module | Contents |
+  |---|---|
+  | `attention_block.py` | explicit multi-head self- and cross-attention, pre-norm block |
+  | `patch_embed.py` | `patchify`, linear and conv patch embedding (tested equal), 2-D sinusoidal and interpolated position embeddings |
+  | `vit.py` | `TinyViT` (CLS or GAP, registers), `DistillableViT` (DeiT token) |
+  | `swin_window.py` | window partition/reverse, `shifted_window_mask`, relative position bias, `SwinBlock`, `PatchMerging` |
+  | `hungarian.py` | Kuhn–Munkres in NumPy, tested against `scipy.optimize.linear_sum_assignment` |
+  | `detr_loss.py` | pairwise GIoU, matching cost, `hungarian_match`, `detr_loss` |
+  | `clip.py` | `MiniCLIP`, `clip_loss`, `siglip_loss`, `zero_shot_classify` |
+  | `projectors.py` | `LinearProjector`, `MLPProjector`, `PerceiverResampler`, `QFormer`, `GatedCrossAttentionAdapter` |
+  | `vlm.py` | `ToyVisionEncoder`, `TinyCausalLM`, `merge_visual_tokens`, `MiniVLM`, `vlm_lm_loss` |
+  | `token_compression.py` | pooling, pixel-shuffle merge, score-based pruning, AnyRes tiling, `visual_token_count` |
+  | `video_attention.py` | tubelet embedding, `FactorisedSpaceTimeBlock`, `JointSpaceTimeBlock`, `attention_flops` |

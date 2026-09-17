@@ -3,7 +3,7 @@
 > **Why this matters at staff level.** The SVM dual is the cleanest example of
 > Lagrangian duality you will be asked to derive, the kernel trick is the idea that
 > lets a linear method fit non-linear data without ever computing the features, and
-> kernel smoothing is the direct ancestor of attention — the bridge between this part
+> kernel smoothing is the direct ancestor of attention, the bridge between this part
 > and Transformers. Interviewers use it to separate people who can *derive* (primal
 > → Lagrangian → KKT → dual → support vectors) from people who remember "maximum
 > margin". Strong signal: the full derivation with the KKT conditions and what they
@@ -11,15 +11,15 @@
 > form, and the sentence "softmax attention is Nadaraya–Watson with an exponential
 > kernel".
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Kernel trick: if an algorithm touches data only through inner products $x_i^Tx_j$, replace them with $\kappa(x_i,x_j) = \phi(x_i)^T\phi(x_j)$ and you have run it in feature space without computing $\phi$. Mercer: $\kappa$ is a valid kernel iff every Gram matrix $K_{ij} = \kappa(x_i,x_j)$ is PSD.
 - RBF $\exp(-\gamma\norm{x-x'}^2)$: infinite-dimensional $\phi$, $\gamma$ sets locality. Polynomial $(x^Tx' + c)^p$: all monomials up to degree $p$.
-- Hard-margin primal: $\min\tfrac12\norm{w}^2$ s.t. $y_i(w^Tx_i + b) \ge 1$; margin $= 1/\norm{w}$. Soft margin: $+ C\sum_i\xi_i$, $\xi_i \ge 0$ — equivalently the hinge loss $\tfrac12\norm{w}^2 + C\sum_i\max(0, 1 - y_i(w^Tx_i+b))$.
+- Hard-margin primal: $\min\tfrac12\norm{w}^2$ s.t. $y_i(w^Tx_i + b) \ge 1$; margin $= 1/\norm{w}$. Soft margin: $+ C\sum_i\xi_i$, $\xi_i \ge 0$, equivalently the hinge loss $\tfrac12\norm{w}^2 + C\sum_i\max(0, 1 - y_i(w^Tx_i+b))$.
 - Dual: $\boxed{\max_\alpha\sum_i\alpha_i - \tfrac12\sum_{ij}\alpha_i\alpha_jy_iy_j\kappa(x_i,x_j)\;\text{ s.t. }\;0 \le \alpha_i \le C,\;\sum_i\alpha_iy_i = 0}$; $w = \sum_i\alpha_iy_i\phi(x_i)$; $f(x) = \sum_i\alpha_iy_i\kappa(x_i,x) + b$.
 - KKT complementary slackness: $\alpha_i = 0$ → margin $> 1$ (irrelevant point); $0 < \alpha_i < C$ → exactly on the margin (free SV, use it to compute $b$); $\alpha_i = C$ → inside the margin or misclassified.
 - Primal: $O(Nd)$ per (sub)gradient step, scales in $N$, linear kernels only. Dual: $O(N^2)$ Gram matrix, $O(N^2)$–$O(N^3)$ solve, any kernel, prediction $O(\#\text{SV}\cdot d)$. SMO solves the dual two coordinates at a time in closed form.
-- Kernel ridge regression: $\boxed{\alpha = (K + \lambda I)^{-1}y}$, $f(x) = \sum_i\alpha_i\kappa(x_i,x)$ — from the representer theorem $w = \Phi^T\alpha$. Same as GP regression's posterior mean.
+- Kernel ridge regression: $\boxed{\alpha = (K + \lambda I)^{-1}y}$, $f(x) = \sum_i\alpha_i\kappa(x_i,x)$, from the representer theorem $w = \Phi^T\alpha$. Same as GP regression's posterior mean.
 - Nadaraya–Watson: $f(q) = \frac{\sum_i\kappa(q,x_i)y_i}{\sum_i\kappa(q,x_i)}$. With $\kappa = \exp(q^Tk_i/\sqrt d)$ and $y_i = v_i$ this is exactly softmax attention: query, keys, values.
 - Production: SVMs dominated text and vision classification in the 2000s (LIBSVM/LIBLINEAR), remain the go-to for small-$N$ high-$d$ problems; Platt scaling was invented for them; kernel smoothing lives on as attention in every Transformer.
 
@@ -27,7 +27,7 @@
 
 Two classes on a line: negatives at $x = -3, -2$, positives at $x = 2, 3$. Any threshold
 in $(-2, 2)$ separates them; the one in the middle, $x = 0$, leaves the widest gap
-($2$ on each side) to the nearest points. Those nearest points — $-2$ and $2$ — are
+($2$ on each side) to the nearest points. Those nearest points ($-2$ and $2$) are
 the *support vectors*: move any other point and the answer does not change; move
 one of these and it does. In $d$ dimensions the separator is a hyperplane
 $w^Tx + b = 0$ and the gap is $2/\norm{w}$, so "widest gap" means "smallest $\norm{w}$
@@ -37,11 +37,11 @@ Now the XOR points $(1,1),(-1,-1)$ positive, $(1,-1),(-1,1)$ negative: no line
 separates them. Add a feature $x_1x_2$: positives have $+1$, negatives $-1$, separable
 by a plane in 3-D. The kernel trick says you never need to build that third
 coordinate: the algorithm only needs $\phi(x)^T\phi(x')$, and for $\phi(x) = (x_1, x_2, \sqrt2x_1x_2, \dots)$
-that inner product is $(x^Tx')^2$ — a formula in the *original* coordinates.
+that inner product is $(x^Tx')^2$, a formula in the *original* coordinates.
 
 ![SVM margin](../assets/figures/part02_svm_margin.png){ width="720" }
 
-*Figure. Left: a linear soft-margin SVM (our SMO-lite) — the separator, the two
+*Figure. Left: a linear soft-margin SVM (our SMO-lite), the separator, the two
 margin lines $f = \pm1$, and the three support vectors circled in red; every other
 point could be deleted without changing the fit. Right: an RBF-kernel SVM on a
 circular class boundary with 5% label noise; the circled support vectors line the
@@ -135,7 +135,7 @@ $$
 $$
 
 where we have written $x_i^Tx_j$ as $\kappa(x_i,x_j)$ because that is the *only* way the
-data appears — the kernel trick applies. Strong duality holds (convex problem,
+data appears, the kernel trick applies. Strong duality holds (convex problem,
 Slater's condition satisfied with $\xi$ large), so the dual optimum equals the primal
 optimum.
 
@@ -150,7 +150,7 @@ the three regimes:
 
 *Meaning:* $w$ is a combination of support vectors only. The bias comes from any
 free SV: $b = y_i - \sum_j\alpha_jy_j\kappa(x_j,x_i)$ (average over free SVs numerically).
-Prediction: $f(x) = \sum_{i\in SV}\alpha_iy_i\kappa(x_i,x) + b$, cost $O(|SV|\cdot d)$ — with RBF
+Prediction: $f(x) = \sum_{i\in SV}\alpha_iy_i\kappa(x_i,x) + b$, cost $O(|SV|\cdot d)$, with RBF
 kernels on noisy data $|SV|$ grows linearly with $N$, which is the SVM's main
 scaling problem at inference.
 
@@ -179,7 +179,7 @@ second derivative $\eta = 2K_{ij} - K_{ii} - K_{jj} \le 0$ (by PSD-ness), so the
 maximiser is the Newton step $\alpha_j^{\text{new}} = \alpha_j - y_j(E_i - E_j)/\eta$ with
 $E_i = f(x_i) - y_i$ the current error; clip it to $[L, H]$, set $\alpha_i$ from the constraint,
 update $b$ from the KKT condition of whichever variable is free. Repeat over pairs
-that violate KKT until none does. Every step is analytic — no QP library — and
+that violate KKT until none does. Every step is analytic (no QP library) and
 each costs $O(N)$ (recomputing $f$ at two points), which is why LIBSVM can handle
 $N = 10^5$.
 
@@ -219,7 +219,7 @@ $$
 
 *Meaning:* attention is a Nadaraya–Watson smoother with a learned, asymmetric
 exponential kernel (asymmetric because $q$ and $k$ come from different linear maps
-of the same tokens), and the "keys" are the training set — recomputed per sequence.
+of the same tokens), and the "keys" are the training set, recomputed per sequence.
 Tsai et al. (EMNLP 2019) make this precise and use it to classify positional
 encodings as different choices of kernel. Everything you know about kernel smoothers
 transfers: bandwidth ↔ temperature $\sqrt{d_k}$, the softmax denominator ↔ the
@@ -325,12 +325,12 @@ $\sum\alpha_iy_i = 0$, the box constraints, has support vectors on or inside the
 and free SVs *exactly* on it, and classifies a separable set perfectly; the primal
 subgradient solver agrees in sign; an RBF SVM solves XOR at $>95\%$.
 
-??? example "Full implementation — `src/mlbook/classical/kernels.py`"
+??? example "Full implementation: `src/mlbook/classical/kernels.py`"
     ```python
     --8<-- "src/mlbook/classical/kernels.py"
     ```
 
-??? example "Full implementation — `src/mlbook/classical/svm.py`"
+??? example "Full implementation: `src/mlbook/classical/svm.py`"
     ```python
     --8<-- "src/mlbook/classical/svm.py"
     ```
@@ -370,7 +370,7 @@ Failure modes:
 - **Dual does not scale**: the Gram matrix at $N = 10^6$ is 4 TB in float32. Move to primal + random features, or subsample (Nyström).
 - **No probabilities**: SVM scores are margins; fit Platt scaling on held-out data ([logistic chapter](02-logistic-softmax-regression.md)).
 - **Class imbalance**: hinge loss with one $C$ lets the majority class dominate; use per-class $C_\pm$ (`class_weight`).
-- **Multiclass**: SVMs are binary; one-vs-rest ($K$ models) or one-vs-one ($K(K-1)/2$, LIBSVM's default) — inference cost multiplies accordingly.
+- **Multiclass**: SVMs are binary; one-vs-rest ($K$ models) or one-vs-one ($K(K-1)/2$, LIBSVM's default), inference cost multiplies accordingly.
 - **Kernel ridge with tiny $\lambda$** on near-duplicate points: $K + \lambda I$ is ill-conditioned; use a Cholesky solve with jitter.
 
 **When to use what.** Small $N$ ($\le 10^4$), high $d$, need a strong non-linear
@@ -383,18 +383,18 @@ smoother with learned keys.
 
 ## 5. In production
 
-!!! production "SVMs and Platt scaling — the pre-deep-learning workhorse"
+!!! production "SVMs and Platt scaling: the pre-deep-learning workhorse"
     Cortes & Vapnik's soft-margin SVM (1995) and Platt's SMO (1998) made kernel
     machines practical; LIBSVM/LIBLINEAR became the default for text categorisation,
     spam filtering and early image classification (e.g. the winning entries of
     PASCAL VOC before 2012 used SVMs over bag-of-visual-words features). Platt
     scaling was invented specifically to get probabilities out of them and is now a
-    generic calibration tool. Cortes & Vapnik, *Machine Learning* 20, 1995 —
+    generic calibration tool. Cortes & Vapnik, *Machine Learning* 20, 1995.
     [Springer](https://link.springer.com/article/10.1007/BF00994018); Platt,
-    "Sequential Minimal Optimization", MSR-TR-98-14 —
+    "Sequential Minimal Optimization", MSR-TR-98-14.
     [microsoft.com](https://www.microsoft.com/en-us/research/publication/sequential-minimal-optimization-a-fast-algorithm-for-training-support-vector-machines/).
 
-!!! production "Attention as kernel smoothing — Transformer Dissection (EMNLP 2019)"
+!!! production "Attention as kernel smoothing: Transformer Dissection (EMNLP 2019)"
     Tsai et al. rewrite Transformer attention as a kernel smoother over the inputs
     with the kernel score as similarity, use the formulation to compare positional
     encodings as kernel choices, and derive new attention variants from it; this is
@@ -402,14 +402,14 @@ smoother with learned keys.
     that approximates the exponential kernel with random features.
     [arXiv:1908.11775](https://arxiv.org/abs/1908.11775).
 
-!!! production "Speaker verification — SVMs over GMM supervectors"
+!!! production "Speaker verification: SVMs over GMM supervectors"
     In the GMM-UBM era (previous chapter), a standard improvement was to stack a
     speaker's MAP-adapted GMM means into a "supervector" and train an SVM with a
     kernel derived from the KL divergence between GMMs; this hybrid was a staple of
     NIST speaker-recognition evaluations in the mid-2000s and illustrates the
-    typical production role of kernels — a similarity engineered from a generative
+    typical production role of kernels, a similarity engineered from a generative
     model, fed to a discriminative max-margin classifier. Background: Reynolds et al.
-    2000 — [sciencedirect.com](https://www.sciencedirect.com/science/article/pii/S1051200499903615).
+    2000, [sciencedirect.com](https://www.sciencedirect.com/science/article/pii/S1051200499903615).
 
 ## 6. Interview questions and strong answers
 

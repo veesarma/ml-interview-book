@@ -45,14 +45,14 @@ def main() -> None:
     arrow(ax, 1.8, 4.4, 1.2, 3.7)
     arrow(ax, 2.8, 4.4, 3.6, 3.7)
 
-    box(ax, 0.1, 1.55, 1.0, 1.2, "Off-policy\n\nQ-learning\nDQN, Double,\nDueling, Rainbow", c[3] + "22", 7)
-    box(ax, 1.25, 1.55, 1.0, 1.2, "On-policy\n\nSARSA\nExpected SARSA\nMC control", c[4] + "22", 7)
-    box(ax, 2.55, 1.55, 1.05, 1.2, "On-policy\n\nREINFORCE\nA2C / A3C\nTRPO, PPO", c[4] + "22", 7)
-    box(ax, 3.7, 1.55, 1.0, 1.2, "Off-policy\n\nDDPG, TD3\nSAC\n(continuous)", c[3] + "22", 7)
-    arrow(ax, 0.9, 3.1, 0.6, 2.75)
-    arrow(ax, 1.5, 3.1, 1.75, 2.75)
-    arrow(ax, 3.3, 3.1, 3.07, 2.75)
-    arrow(ax, 3.9, 3.1, 4.2, 2.75)
+    box(ax, 0.05, 1.55, 1.15, 1.2, "Off-policy\n\nQ-learning\nDQN, Double\nDueling, Rainbow", c[3] + "22", 6.6)
+    box(ax, 1.3, 1.55, 1.15, 1.2, "On-policy\n\nSARSA\nExpected SARSA\nMC control", c[4] + "22", 6.6)
+    box(ax, 2.55, 1.55, 1.15, 1.2, "On-policy\n\nREINFORCE\nA2C / A3C\nTRPO, PPO", c[4] + "22", 6.6)
+    box(ax, 3.8, 1.55, 1.15, 1.2, "Off-policy\n\nDDPG, TD3\nSAC\n(continuous)", c[3] + "22", 6.6)
+    arrow(ax, 0.9, 3.1, 0.65, 2.75)
+    arrow(ax, 1.5, 3.1, 1.85, 2.75)
+    arrow(ax, 3.3, 3.1, 3.1, 2.75)
+    arrow(ax, 3.9, 3.1, 4.35, 2.75)
 
     box(ax, 6.8, 3.1, 1.8, 0.6, "Known model\n(planning / DP)", c[2] + "33", 8, True)
     box(ax, 8.9, 3.1, 1.8, 0.6, "Learned model\n(Dyna, world models)", c[2] + "33", 8, True)
@@ -63,15 +63,15 @@ def main() -> None:
     arrow(ax, 7.7, 3.1, 7.65, 2.75)
     arrow(ax, 9.8, 3.1, 9.9, 2.75)
 
-    box(ax, 0.1, 0.25, 4.6, 0.8,
+    box(ax, 0.05, 0.25, 4.95, 0.8,
         "Offline RL (CQL, IQL): off-policy from a fixed dataset, no interaction\n"
         "Imitation (BC, DAgger, GAIL): supervised from expert (s, a) pairs — no reward",
-        "#f4f4f4", 7.5)
-    box(ax, 6.4, 0.25, 4.5, 0.8,
+        "#f4f4f4", 6.8)
+    box(ax, 5.55, 0.25, 4.95, 0.8,
         "Bandits: one-step MDP (no state transitions) — ε-greedy, UCB, Thompson\n"
         "RLHF / GRPO for LLMs: on-policy policy gradient with a learned reward (Part VII)",
-        "#f4f4f4", 7.5)
-    ax.text(5.5, 0.05, "Axes: model-free vs model-based (top), value vs policy (middle), on- vs off-policy (leaves).",
+        "#f4f4f4", 6.8)
+    ax.text(5.3, 0.02, "Axes: model-free vs model-based (top), value vs policy (middle), on- vs off-policy (leaves).",
             ha="center", va="bottom", fontsize=8, color="#555555")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)

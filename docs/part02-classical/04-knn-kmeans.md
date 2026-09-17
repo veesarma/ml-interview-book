@@ -9,14 +9,14 @@
 > Strong signal is implementing both in ten minutes, stating the $O(\log k)$ seeding
 > guarantee, and knowing that FAISS's IVF and PQ indexes are k-means codebooks.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - KNN: no training; predict by majority vote / mean of the $k$ nearest points. Brute force is $O(Nd)$ per query; $k$ controls bias–variance ($k = 1$: zero training error, high variance; $k = N$: the prior).
 - Distances: Euclidean $\sqrt{\norm{q}^2 + \norm{x}^2 - 2q\cdot x}$ (one matmul for all pairs), cosine (normalise then dot), Manhattan. Scale features or the largest-range feature owns the metric.
-- Curse of dimensionality: for i.i.d. points in high $d$, $\frac{\max\text{dist} - \min\text{dist}}{\min\text{dist}} \to 0$ — all neighbours look equally far; kd-trees degrade to brute force beyond $d \approx 10$–20. Real embeddings have low intrinsic dimension, which is why ANN (IVF, HNSW, PQ; [Part XIII](../part13-retrieval-eval-reliability/01-retrieval-and-rag.md)) works.
+- Curse of dimensionality: for i.i.d. points in high $d$, $\frac{\max\text{dist} - \min\text{dist}}{\min\text{dist}} \to 0$. all neighbours look equally far; kd-trees degrade to brute force beyond $d \approx 10$–20. Real embeddings have low intrinsic dimension, which is why ANN (IVF, HNSW, PQ; [Part XIII](../part13-retrieval-eval-reliability/01-retrieval-and-rag.md)) works.
 - K-means objective $J = \sum_i\norm{x_i - \mu_{c_i}}^2$. Lloyd: assign (nearest centroid) then update (mean). Each step is an exact minimisation of $J$ over one block of variables $\Rightarrow$ $J$ is non-increasing; finitely many partitions $\Rightarrow$ terminates. Local minima only; NP-hard in general.
 - Assignment step = Voronoi partition; update step = centroid = minimiser of squared distance. K-means = hard EM for a spherical GMM with $\sigma \to 0$.
-- k-means++: pick the next seed with probability $\propto D(x)^2$. $\boxed{\E[J] \le 8(\ln k + 2)\,J_{\text{opt}}}$ (Arthur & Vassilvitskii 2007) — before any Lloyd iteration.
+- k-means++: pick the next seed with probability $\propto D(x)^2$. $\boxed{\E[J] \le 8(\ln k + 2)\,J_{\text{opt}}}$ (Arthur & Vassilvitskii 2007), before any Lloyd iteration.
 - Choosing $k$: elbow on $J$ (always decreasing), silhouette, gap statistic, or downstream utility (for a codebook, $k$ is set by the memory/recall budget).
 - Mini-batch k-means (Sculley 2010): per-centre learning rate $1/n_j$, orders of magnitude cheaper on web-scale data.
 - Production: FAISS IVF (coarse k-means quantiser, `nlist` centroids) and PQ (k-means with $k = 256$ per sub-vector); SemDeDup uses k-means over embeddings to find near-duplicates at LAION scale; Spotify's Annoy for music recommendation.
@@ -37,7 +37,7 @@ total squared distance, which is why it stopped.
 
 ![Voronoi cells and the k-means objective](../assets/figures/part02_voronoi.png){ width="720" }
 
-*Figure. Left: the final centroids (stars) and their Voronoi cells — the assignment
+*Figure. Left: the final centroids (stars) and their Voronoi cells, the assignment
 step is "which cell are you in"; the k-means++ seeds (crosses) already sit in
 different blobs. Right: the objective $J$ per Lloyd iteration for k-means++ and
 random seeding; both are monotone, the good seeding starts lower and finishes in
@@ -52,7 +52,7 @@ concentration of measure and the multivariate Gaussian
 ### 2.1 KNN as a nonparametric estimator
 
 For classification, KNN estimates $P(y = k\mid x)$ by the fraction of class $k$
-among the $k$ nearest training points — a locally constant density-ratio estimate. For
+among the $k$ nearest training points, a locally constant density-ratio estimate. For
 regression it estimates $\E[y\mid x]$ by the neighbours' mean. Cover and Hart's
 classic result: as $N \to \infty$ with $k = 1$, the error is at most twice the Bayes
 error; with $k \to \infty$, $k/N \to 0$, KNN is Bayes-consistent. Bias grows with $k$ (the
@@ -68,7 +68,7 @@ same ranking; that is why embedding indexes normalise once and use inner product
 
 For $N$ points drawn i.i.d. in $[0,1]^d$, the volume of a ball of radius $r$ scales
 like $r^d$, so to enclose a fixed fraction $f$ of the data you need radius
-$r = f^{1/d}$: with $d = 100$, $f = 0.01$ gives $r = 0.955$ — the "neighbourhood" spans
+$r = f^{1/d}$: with $d = 100$, $f = 0.01$ gives $r = 0.955$, the "neighbourhood" spans
 almost the whole cube. Equivalently, for $x, y$ i.i.d. with independent coordinates,
 $\norm{x - y}^2$ is a sum of $d$ i.i.d. terms, so its mean grows like $d$ and its
 standard deviation like $\sqrt d$; the relative spread of distances collapses as
@@ -137,7 +137,7 @@ $$
 
 an $O(\log k)$-competitive solution in expectation, whereas uniform seeding can be
 arbitrarily bad. Running Lloyd afterwards can only lower $J$. The seeding costs $k$
-passes over the data, $O(Nkd)$ — the same as one Lloyd iteration.
+passes over the data, $O(Nkd)$, the same as one Lloyd iteration.
 
 ### 2.6 Choosing $k$ and scaling up
 
@@ -263,12 +263,12 @@ non-increasing, its final objective equals `kmeans_objective` of the returned st
 and every recovered centre is within $0.2$ of a planted one; k-means++ places one
 seed per blob; mini-batch centres land within $1.0$ of the truth.
 
-??? example "Full implementation — `src/mlbook/classical/knn.py`"
+??? example "Full implementation: `src/mlbook/classical/knn.py`"
     ```python
     --8<-- "src/mlbook/classical/knn.py"
     ```
 
-??? example "Full implementation — `src/mlbook/classical/kmeans.py`"
+??? example "Full implementation: `src/mlbook/classical/kmeans.py`"
     ```python
     --8<-- "src/mlbook/classical/kmeans.py"
     ```
@@ -327,7 +327,7 @@ overlapping or elongated clusters: GMM; unknown $k$ and noise: DBSCAN/HDBSCAN.
 
 ## 5. In production
 
-!!! production "Meta — FAISS: k-means as the coarse quantiser and inside PQ"
+!!! production "Meta: FAISS: k-means as the coarse quantiser and inside PQ"
     *Problem:* nearest-neighbour search over $10^9$ image/text embeddings on a
     handful of GPUs. *What they built:* `IndexIVFPQ`: a k-means coarse quantiser with
     `nlist` centroids partitions the space (search visits `nprobe` inverted lists),
@@ -337,27 +337,27 @@ overlapping or elongated clusters: GMM; unknown $k$ and noise: DBSCAN/HDBSCAN.
     tuned by `nlist`, `nprobe`, $m$ and re-ranking. The FAISS wiki states
     `IndexIVFPQ` is "probably the most useful indexing structure for large-scale
     search". Johnson, Douze, Jégou, "Billion-scale similarity search with GPUs",
-    2017 — [arXiv:1702.08734](https://arxiv.org/pdf/1702.08734); FAISS wiki
+    2017, [arXiv:1702.08734](https://arxiv.org/pdf/1702.08734); FAISS wiki
     "[Faiss indexes](https://github.com/facebookresearch/faiss/wiki/Faiss-indexes)" and
     "[Guidelines to choose an index](https://github.com/facebookresearch/faiss/wiki/Guidelines-to-choose-an-index)";
     Jégou, Douze, Schmid, "Product Quantization for Nearest Neighbor Search", TPAMI 2011.
 
-!!! production "Meta AI — SemDeDup: k-means over embeddings to deduplicate LAION"
+!!! production "Meta AI: SemDeDup: k-means over embeddings to deduplicate LAION"
     *Problem:* web-scale datasets are full of near-duplicates that waste compute.
     *What they built:* embed every image with a pretrained encoder, run k-means over
     the embeddings, and search for semantic duplicates only *within* each cluster
     (pairwise search over $10^8$ items is infeasible; within clusters it is not).
     Removing 50% of LAION this way preserved performance and halved training time.
-    Abbas et al., 2023 — [arXiv:2303.09540](https://arxiv.org/abs/2303.09540).
+    Abbas et al., 2023, [arXiv:2303.09540](https://arxiv.org/abs/2303.09540).
 
-!!! production "Spotify — Annoy for music recommendation"
+!!! production "Spotify: Annoy for music recommendation"
     *What they built:* a tree-based approximate nearest-neighbour library (random
     hyperplane splits, forest of trees, memory-mapped static index files so many
     processes share one copy) used after matrix factorisation to find similar
     tracks/users. *Trade-off stated in the README:* minimal memory footprint and
     instant loading, at the price of exactness. [github.com/spotify/annoy](https://github.com/spotify/annoy).
 
-!!! production "Google — mini-batch k-means at web scale"
+!!! production "Google: mini-batch k-means at web scale"
     Sculley's WWW 2010 paper introduced mini-batch k-means for the "extreme
     requirements for latency, scalability, and sparsity encountered in user-facing
     web applications", reporting orders-of-magnitude lower cost than batch Lloyd with
@@ -381,7 +381,7 @@ overlapping or elongated clusters: GMM; unknown $k$ and noise: DBSCAN/HDBSCAN.
     cannot recover because it is local. Sampling $\propto D^2$ makes every uncovered
     cluster likely to receive a seed; Arthur & Vassilvitskii prove
     $\E[J] \le 8(\ln k + 2)J_{\text{opt}}$ for the seeding alone. **Follow-up:** *cost?*
-    $k$ passes, $O(Nkd)$ — one Lloyd iteration; parallel variants (k-means$\|$) sample
+    $k$ passes, $O(Nkd)$, one Lloyd iteration; parallel variants (k-means$\|$) sample
     many seeds per pass for distributed settings.
 
 !!! interview "Explain the curse of dimensionality for KNN."
@@ -392,10 +392,10 @@ overlapping or elongated clusters: GMM; unknown $k$ and noise: DBSCAN/HDBSCAN.
     Intrinsic dimension is low (data lives near a manifold); neighbours are
     meaningful and graph/quantisation indexes exploit it.
 
-!!! interview "Brute force vs kd-tree vs ANN — pick one for 100M 128-d vectors, 10 ms budget."
+!!! interview "Brute force vs kd-tree vs ANN: pick one for 100M 128-d vectors, 10 ms budget."
     Brute force is $1.3\times10^{10}$ FLOPs per query, too slow on CPU; kd-tree is
     useless at $d = 128$. IVF-PQ: $\sqrt N \approx 10^4$ centroids, probe 32 lists,
-    scan $3\times10^5$ codes with table lookups — well inside 10 ms, memory
+    scan $3\times10^5$ codes with table lookups, well inside 10 ms, memory
     $\approx 100\text{M}\times 16$ bytes. HNSW if RAM allows the graph. Re-rank the top 100
     with exact distances. **Follow-up:** *how do you set `nlist`/`nprobe`?* Sweep
     recall@10 against latency on a held-out query set; the FAISS guidelines page is
@@ -411,7 +411,7 @@ overlapping or elongated clusters: GMM; unknown $k$ and noise: DBSCAN/HDBSCAN.
 
 !!! interview "How do you pick $k$?"
     Not by minimising $J$ (monotone). Elbow, silhouette, gap statistic, stability
-    across resamples, or the downstream metric — for a quantiser $k$ is dictated by
+    across resamples, or the downstream metric, for a quantiser $k$ is dictated by
     the byte budget ($k = 256$) or by $\sqrt N$ for balanced inverted lists.
 
 !!! interview "A single feature with range 0–10⁶ is in your KNN. What happens?"

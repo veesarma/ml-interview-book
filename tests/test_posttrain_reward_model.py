@@ -69,8 +69,17 @@ def test_reward_model_learns_synthetic_preference():
     assert losses[-1] < losses[0]
     assert pairwise_accuracy(r_w, r_l) == 1.0
     assert pairwise_accuracy(r_w, r_l) >= acc_before
-    # the scalar head reads the *last real* token: padding after `lengths` must not change the reward
-    c2 = c.clone()
-    c2[:, 12:] = tok.unk_id  # corrupt only padding positions (all chosen rows are shorter than 12 tokens)
+    # The scalar head reads the *last real* token, and the backbone is causal, so nothing at or
+    # after position `lengths[b]` can affect row b's reward. Corrupt exactly each row's own padding
+    # (per row, not a fixed column: rows here have lengths 7..13).
+    positions = torch.arange(c.shape[1]).unsqueeze(0)          # (1, T)
+    is_padding = positions >= cl.unsqueeze(1)                  # (N, T) True strictly after the last real token
+    c2 = torch.where(is_padding, torch.full_like(c, tok.unk_id), c)  # (N, T)
+    assert int(is_padding.sum()) > 0 and not bool((c2 == c).all())   # the corruption really happened
     with torch.no_grad():
         assert torch.allclose(rm(c2, cl), r_w, atol=1e-5)
+    # ...whereas corrupting the last *real* token of every row does move the reward.
+    c3 = c.clone()
+    c3[torch.arange(c.shape[0]), cl - 1] = tok.unk_id           # (N, T)
+    with torch.no_grad():
+        assert not torch.allclose(rm(c3, cl), r_w, atol=1e-3)

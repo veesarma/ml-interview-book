@@ -1,4 +1,4 @@
-# Part VI — LLM training
+# Part VI: LLM training
 
 > **Why this part matters at staff level.** Interviews at frontier labs and at any company
 > that fine-tunes or serves LLMs probe four things: whether you can *derive* the objective
@@ -49,17 +49,17 @@ Every implementation lives in `src/mlbook/llm/`, `src/mlbook/quant/` and
 
 Read in this order; the times are for a reader who already knows Part V.
 
-1. **Chapter 4, sections 1–3** (KV cache formula, online softmax, blockwise attention) — 90 min.
+1. **Chapter 4, sections 1–3** (KV cache formula, online softmax, blockwise attention), 90 min.
    This is the most frequently asked coding/derivation content in the whole part.
-2. **Chapter 3, GQA and MoE sections** — 60 min. Implement `GroupedQueryAttention` from memory.
-3. **Chapter 2** — 45 min. Be able to derive $N^* \propto C^{a}$ with $a = \beta/(\alpha+\beta)$
+2. **Chapter 3, GQA and MoE sections**, 60 min. Implement `GroupedQueryAttention` from memory.
+3. **Chapter 2**, 45 min. Be able to derive $N^* \propto C^{a}$ with $a = \beta/(\alpha+\beta)$
    at a whiteboard and explain why Llama 3 8B trained on 15T tokens.
-4. **Chapter 6, LoRA section** — 40 min. Write `LoRALinear` with merge/unmerge.
-5. **Chapter 5, sections 1–2** (formats, affine quantisation, outliers) — 40 min.
-6. **Chapter 1 TL;DR and the objective section** — 25 min.
-7. **Chapter 7 TL;DR** — 10 min: the pretrained → mid-training → post-training pipeline diagram.
+4. **Chapter 6, LoRA section**, 40 min. Write `LoRALinear` with merge/unmerge.
+5. **Chapter 5, sections 1–2** (formats, affine quantisation, outliers), 40 min.
+6. **Chapter 1 TL;DR and the objective section**, 25 min.
+7. **Chapter 7 TL;DR**, 10 min: the pretrained → mid-training → post-training pipeline diagram.
 
-Then re-read every chapter's *TL;DR — the interview card* the morning of the interview.
+Then re-read every chapter's *TL;DR, the interview card* the morning of the interview.
 
 ## How this part connects to the rest of the book
 

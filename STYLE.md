@@ -4,7 +4,7 @@ This book has one reader: a senior/staff ML engineer preparing for interviews at
 top companies (autonomy, consumer ranking, fintech, frontier labs). Every chapter
 must let that reader move freely between
 
-    equation → implementation → architecture → training dynamics → distributed system → evaluation → production case study.
+    equation to implementation to architecture to training dynamics to distributed system to evaluation to production case study.
 
 The voice is the best of Karpathy (build it, show the shapes), Sebastian Raschka
 (clean diagrams, honest trade-offs), OpenAI Spinning Up (derive it, then code it),
@@ -22,7 +22,7 @@ every technique is grounded in *when to use it, when not to, and who used it in 
 > **Why this matters at staff level.** 2–4 sentences: where this shows up in interviews
 > (coding round, ML depth round, system design) and what "strong signal" looks like.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 - 5–10 bullets. The equations, the shapes, the one-line trade-offs, the production users.
   This is what the reader re-reads the morning of the interview.
 
@@ -80,7 +80,7 @@ never pad. The reader should be able to *teach* the topic after reading.
 
 ## 3. Code conventions (non-negotiable)
 
-* **Explicit over clever.** Three separate `nn.Linear` for Q, K, V — never a fused
+* **Explicit over clever.** Three separate `nn.Linear` for Q, K, V, never a fused
   `3*d` projection. No `einsum` unless the string is explained term-by-term in a
   comment. No `*args` magic, no metaprogramming, no monkey-patching.
 * **Shape comment on every line that creates or reshapes a tensor**, in the form
@@ -91,7 +91,7 @@ never pad. The reader should be able to *teach* the topic after reading.
 * Functions ≤ ~40 lines; classes small; type hints; docstrings that state **input
   shapes, output shapes, and the equation implemented**.
 * Pure NumPy in `mlbook/*` foundational modules (no scipy unless for a comparison
-  test). PyTorch modules subclass `nn.Module`, take tensors, return tensors — no
+  test). PyTorch modules subclass `nn.Module`, take tensors, return tensors, no
   training loops inside model classes.
 * Every implementation has a test in `tests/` that checks it against a known
   answer, a finite-difference gradient, or a reference PyTorch op (`torch.nn.functional`).
@@ -102,7 +102,7 @@ never pad. The reader should be able to *teach* the topic after reading.
   snippet directive so the book never drifts from the tested code:
 
   ```markdown
-  ??? example "Full implementation — `src/mlbook/transformer/attention.py`"
+  ??? example "Full implementation, `src/mlbook/transformer/attention.py`"
       ```python
       --8<-- "src/mlbook/transformer/attention.py"
       ```
@@ -143,7 +143,7 @@ never pad. The reader should be able to *teach* the topic after reading.
 ## 6. Admonitions available
 
 `!!! note`, `!!! tip`, `!!! warning`, `!!! danger`, `!!! example`,
-`!!! interview "Interview question"` (purple), `!!! production "Company — what they built"` (green),
+`!!! interview "Interview question"` (purple), `!!! production "Company, what they built"` (green),
 collapsible variants with `???`. Content tabs: `=== "NumPy"` / `=== "PyTorch"`.
 
 ## 7. Cross-references
@@ -152,10 +152,93 @@ Link to other chapters with relative paths, e.g.
 `[attention mathematics](../part05-sequence-transformers/03-attention-mathematics.md)`.
 Never duplicate a derivation that lives elsewhere: link it and state the result.
 
-## 8. Do not
+
+## 8. Write like a person, not like a language model (enforced by a linter)
+
+The single fastest way to make this book worthless is for it to read as though a
+machine produced it. A reader who spots the tells stops trusting the content.
+`scripts/check_style.py` runs in CI and fails the build on the patterns below.
+Run it on your own files before you finish:
+
+```bash
+python scripts/check_style.py docs/part05-sequence-transformers   # report
+python scripts/check_style.py --stats                             # counts only
+python scripts/fix_style.py docs/part05-sequence-transformers      # mechanical fixes
+```
+
+`fix_style.py` handles the mechanical cases (em dashes in headings, tables,
+admonition titles and reference lists). Everything else you fix by rewriting the
+sentence, because only the author knows what the sentence meant.
+
+### Banned outright
+
+**No em dashes.** Not one, anywhere, including inside headings, table cells,
+admonition titles and reference lists. Use a comma, a colon, a full stop, or
+parentheses. Em dashes are the loudest tell there is.
+
+**No contrastive-binary template.** "It's not X, it's Y." "This isn't just a
+detector, it's a perception system." "Not only fast but also accurate."
+Interviews are about trade-offs, so you will constantly need contrast: state it
+plainly instead. Write "Decode is bound by memory bandwidth, not compute," not
+"Decode isn't about compute; it's about memory bandwidth."
+
+**No false-candour filler.** "Let's be honest", "honestly", "to be fair",
+"the honest answer is", "let's face it". It implies your other sentences were
+less honest.
+
+**No reveal scaffolding.** "Here's the thing", "here's the kicker", "but here's
+where it gets interesting", "the real question is", "this is where X shines",
+"Enter FlashAttention.", "let me walk you through", "let's unpack this",
+"let's break it down", "think of it like".
+
+**No rhetorical question you then answer.** "Why does this matter? Because..."
+Delete the question and make the assertion.
+
+**No summary-restating close.** "In summary", "In conclusion", "The takeaway",
+"Bottom line", "At the end of the day". Stop on the last substantive sentence.
+
+**No marketing vocabulary.** game-changer, paradigm shift, seamless, cutting-edge,
+revolutionise, bulletproof, battle-tested, first-class citizen, under the hood,
+unlock/unleash/harness the power of, cannot be overstated, double-edged sword,
+silver bullet, tapestry, landscape of, realm of, the world of, journey through,
+delve, dive into, in today's fast-paced world.
+
+**No empty intensifiers.** crucial, pivotal, vital, essential, significantly,
+dramatically, substantially, vastly, simply, trivially, obviously, clearly,
+"it is easy to see". If something matters, say what breaks without it. If
+something is faster, give the factor.
+
+**No decorative emoji**, no ✅/🚀 bullets, no emoji in headings.
+
+**No hedging tics.** "I could be wrong", "as an AI", "it's worth noting",
+"it's important to note". State the claim, or state the uncertainty precisely
+("the talk does not say whether they used X").
+
+### Also avoid, though the linter cannot catch them
+
+* **Forced triads.** Three parallel items because three sounds complete. Use two
+  if there are two, four if there are four.
+* **Epigram endings.** Landing every section on a compact quotable line.
+* **Bold lead-ins on every bullet.** Vary the shape of your paragraphs and lists.
+* **"That said" as a pivot** more than once per chapter.
+* **Analogy inflation.** One good analogy per concept, introduced without fanfare.
+* **Adjective stacking.** "clean, concise, and readable" is three words doing one
+  word's work.
+* **Uniform paragraph length.** Real writing has a two-word sentence next to a
+  forty-word one.
+
+### The test
+
+Read a paragraph aloud. If it sounds like a conference keynote or a product
+launch, rewrite it. If it sounds like a strong engineer explaining something at a
+whiteboard to a colleague they respect, it is right. Aim for the register of
+Karpathy's blog posts and OpenAI Spinning Up: direct, specific, unhurried,
+willing to say "this is fiddly" or "nobody really knows why this works".
+
+## 9. Do not
 
 * Do not run `git` commands (the orchestrator commits).
 * Do not add dependencies beyond numpy, scipy, torch, matplotlib, manim.
 * Do not write "as we all know", "simply", "trivially", "it is easy to see".
 * Do not leave TODOs, placeholders, or lorem ipsum. Ship complete chapters.
-* Do not invent numbers (latencies, accuracies, company metrics) — cite or omit.
+* Do not invent numbers (latencies, accuracies, company metrics), cite or omit.

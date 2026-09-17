@@ -1,4 +1,4 @@
-# Part II — Classical machine learning
+# Part II: Classical machine learning
 
 Classical ML is where interviewers check whether you *derive* or *recite*. Every
 model in this part fits in a few hundred lines of NumPy, every training rule can be
@@ -48,12 +48,12 @@ Read in this order; each step builds on the previous one's solver.
    second-order XGBoost objective. Be able to write $w^* = -G/(H+\lambda)$ and the
    split gain without notes. Skim the LightGBM/CatBoost ideas.
 3. **Late afternoon.** K-means (Lloyd as alternating minimisation) then EM for GMMs
-   (Jensen $\to$ ELBO $\to$ E/M steps) — they are the same argument at two levels of
+   (Jensen $\to$ ELBO $\to$ E/M steps). They are the same argument at two levels of
    softness. PCA §2 as a 30-minute detour: both derivations lead to the top
    eigenvectors.
 4. **Evening.** SVM dual derivation once, slowly, then the "attention is kernel
    smoothing" bridge in §2.6 of the kernel chapter. Finish by re-reading every
-   chapter's *TL;DR — the interview card*.
+   chapter's *TL;DR: the interview card*.
 
 ## Code and tests
 

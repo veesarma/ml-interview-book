@@ -56,10 +56,10 @@ in `tests/`.
 
 ## Reading modes
 
-* **Cover to cover** — follow the [study plan](preface/study-plan.md).
-* **The night before** — read each chapter's *TL;DR — the interview card*.
-* **Coding rounds** — [Part XVI](part16-coding-canon/index.md) and the tests in `tests/`.
-* **System design rounds** — [Part XVII](part17-ml-system-design/index.md), then the company deep dive.
+* **Cover to cover**. follow the [study plan](preface/study-plan.md).
+* **The night before** (read each chapter's *TL;DR) the interview card*.
+* **Coding rounds**. [Part XVI](part16-coding-canon/index.md) and the tests in `tests/`.
+* **System design rounds**. [Part XVII](part17-ml-system-design/index.md), then the company deep dive.
 
 ## Running the code
 

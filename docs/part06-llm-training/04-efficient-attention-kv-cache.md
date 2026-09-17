@@ -7,7 +7,7 @@
 > traffic pattern. Strong signal is the online-softmax derivation with the rescale factor,
 > a working blockwise forward, and the KV-cache formula with numbers.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Naive attention writes $S = QK^\top$ and $P = \softmax(S)$ to HBM: $\Theta(T^2)$ bytes per
   head; the compute is only $\Theta(T^2 d)$ FLOPs at ~1 FLOP/byte on the softmax, so it is
@@ -202,12 +202,12 @@ bytes per token, total cache, the maximum batch at a context given HBM, and pref
 intensities. The test pins Llama-2-7B to exactly 2 GiB at 4k tokens and 64 × 8k of
 Llama-3-70B to exactly 160 GiB.
 
-??? example "Full implementation — `src/mlbook/llm/flash_attention.py`"
+??? example "Full implementation: `src/mlbook/llm/flash_attention.py`"
     ```python
     --8<-- "src/mlbook/llm/flash_attention.py"
     ```
 
-??? example "Full implementation — `src/mlbook/llm/kv_cache_calc.py`"
+??? example "Full implementation: `src/mlbook/llm/kv_cache_calc.py`"
     ```python
     --8<-- "src/mlbook/llm/kv_cache_calc.py"
     ```
@@ -265,7 +265,7 @@ GPU, dominated by matmuls, where FlashAttention's tiling and tensor-core utilisa
 
 ## 5. In production
 
-!!! production "Stanford/Together — FlashAttention"
+!!! production "Stanford/Together: FlashAttention"
     Problem: attention was memory-bound and could not train at long context. Dao et al.
     (2022) made attention IO-aware: tiling, online softmax, recomputation in backward, no
     $T\times T$ materialisation. Result: exact attention with up to 9× fewer HBM accesses,
@@ -277,7 +277,7 @@ GPU, dominated by matmuls, where FlashAttention's tiling and tensor-core utilisa
     (NeurIPS 2022, arXiv:2205.14135); *FlashAttention-2* (arXiv:2307.08691);
     *FlashAttention-3* (arXiv:2407.08608).
 
-!!! production "UC Berkeley — vLLM and PagedAttention"
+!!! production "UC Berkeley: vLLM and PagedAttention"
     Problem: serving systems reserved contiguous cache for `max_len` and lost 60–80% of KV
     memory to fragmentation and reservation. Kwon et al. (2023) borrowed OS paging: blocks,
     block tables, copy-on-write for shared prefixes and beams. vLLM reports 2–4× throughput
@@ -285,13 +285,13 @@ GPU, dominated by matmuls, where FlashAttention's tiling and tensor-core utilisa
     memory pools with compaction, which cannot share prefixes and still fragment.
     Source: [Efficient Memory Management for Large Language Model Serving with PagedAttention](https://arxiv.org/abs/2309.06180).
 
-!!! production "DeepSeek — MLA for cache-bound decode"
+!!! production "DeepSeek: MLA for cache-bound decode"
     DeepSeek-V2 reports a 93.3% KV-cache reduction relative to their dense predecessor and a
     5.76× maximum generation throughput, attributing both to MLA: the cache is what set the
     batch size. V3 keeps MLA and adds FP8 for weights and activations in training.
     Source: [DeepSeek-V2](https://arxiv.org/abs/2405.04434), [DeepSeek-V3](https://arxiv.org/abs/2412.19437).
 
-!!! production "Meta — Llama 3 long context"
+!!! production "Meta: Llama 3 long context"
     Llama 3 extends context to 128k in a late pretraining stage (chapter 7) and reports that
     this requires GQA (8 KV heads) and attention kernels with document masking to be
     feasible; the 405B model's cache at 128k would otherwise be measured in terabytes.

@@ -2,7 +2,7 @@
 
 > **Why this matters at staff level.** DPO is the most-asked derivation in post-training interviews because it is short, exact, and connects three things the interviewer wants you to hold at once: the KL-regularised RL optimum, the Bradley–Terry model, and a supervised loss you can run on an SFT stack. It is also what Llama 3 shipped with. Strong signal is deriving it on a whiteboard without gaps, knowing *why* the partition function cancels, and being honest about when it underperforms on-policy RL.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - KL-regularised RL has a closed-form optimum: $\boxed{\pi^\star(y|x) = \frac{1}{Z(x)}\pi_{\mathrm{ref}}(y|x)\exp\big(r(x,y)/\beta\big)}$. Invert: $r(x,y) = \beta\log\frac{\pi^\star(y|x)}{\pi_{\mathrm{ref}}(y|x)} + \beta\log Z(x)$.
 - Substitute into Bradley–Terry: $Z(x)$ is the same for $y_w$ and $y_l$ and cancels in the difference. Parametrise $\pi^\star$ by $\pi_\theta$:
@@ -15,7 +15,7 @@
 
 ## 1. Intuition first
 
-You have a frozen reference model and one preference pair for a prompt: $y_w$ = "5", $y_l$ = "8" for "2 + 3 =". Under the reference both have log-prob $-2.0$. DPO asks a single question: **by how much should the policy raise the log-odds of $y_w$ relative to $y_l$, compared with the reference?** The answer is a reward gap in disguise. If we believed the reward gap was $\Delta r = 1$ nat and $\beta = 0.5$, the KL-regularised optimum would have $\log\frac{\pi^\star(y_w)}{\pi_{\mathrm{ref}}(y_w)} - \log\frac{\pi^\star(y_l)}{\pi_{\mathrm{ref}}(y_l)} = \Delta r/\beta = 2$ nats: the policy tilts the reference by $e^{r/\beta}$.
+You have a frozen reference model and one preference pair for a prompt: $y_w$ = "5", $y_l$ = "8" for "2 + 3 =". Under the reference both have log-prob $-2.0$. DPO turns on one quantity: **how much the policy raises the log-odds of $y_w$ relative to $y_l$, measured against the reference.** That quantity is a reward gap in disguise. If we believed the reward gap was $\Delta r = 1$ nat and $\beta = 0.5$, the KL-regularised optimum would have $\log\frac{\pi^\star(y_w)}{\pi_{\mathrm{ref}}(y_w)} - \log\frac{\pi^\star(y_l)}{\pi_{\mathrm{ref}}(y_l)} = \Delta r/\beta = 2$ nats: the policy tilts the reference by $e^{r/\beta}$.
 
 Now flip the logic. We do not know $\Delta r$; we have a *label* saying $y_w \succ y_l$. Bradley–Terry says $P(y_w\succ y_l) = \sigma(\Delta r)$. So we can read the reward gap *off the policy*, $\Delta r = \beta[\log\frac{\pi_\theta}{\pi_{\mathrm{ref}}}(y_w) - \log\frac{\pi_\theta}{\pi_{\mathrm{ref}}}(y_l)]$, and do logistic regression on it. The policy *is* the reward model; the RM stage collapses into the RL stage.
 
@@ -178,7 +178,7 @@ Two forward passes through the reference (no grad; in production precomputed onc
 
 **How you'd test it.** (1) Closed form on hand-picked numbers; loss $=\log 2$ at $\pi = \pi_{\mathrm{ref}}$. (2) Gradient signs: $\partial L/\partial\log\pi_\theta(y_w) < 0$, $\partial L/\partial\log\pi_\theta(y_l) > 0$, and the mis-ordered pair gets the larger weight; compare with $-\beta\sigma(-u)/B$ exactly. (3) IPO zero at the target gap; SimPO increases with $\gamma$; ORPO reduces to NLL at $\lambda = 0$; KTO equals $0.5$ at initialisation. (4) 30 steps on four toy pairs: loss falls, chosen log-ratio rises and rejected falls on every pair. `tests/test_posttrain_dpo.py`.
 
-??? example "Full implementation — `src/mlbook/posttrain/dpo.py`"
+??? example "Full implementation: `src/mlbook/posttrain/dpo.py`"
     ```python
     --8<-- "src/mlbook/posttrain/dpo.py"
     ```
@@ -191,7 +191,7 @@ Two forward passes through the reference (no grad; in production precomputed onc
 | `sequence_log_prob` | `src/mlbook/posttrain/toy_lm.py` | yes | 5 minutes |
 | `ipo_loss`, `simpo_loss` | `src/mlbook/posttrain/dpo.py` | yes | 3 minutes each |
 | `kto_loss`, `orpo_loss` | `src/mlbook/posttrain/dpo.py` | read; retype if time allows | 8 minutes each |
-| `dpo_train_step` | `src/mlbook/posttrain/dpo.py` | read only | — |
+| `dpo_train_step` | `src/mlbook/posttrain/dpo.py` | read only |: |
 
 Check with `pytest tests/test_posttrain_dpo.py -q`. Per-symbol tests: `test_dpo_loss_closed_form_and_implicit_rewards`, `test_dpo_gradient_sign_and_weighting`, `test_ipo_simpo_orpo_kto_basic_properties`, `test_dpo_train_step_raises_preferred_log_ratio`; `sequence_log_prob` is covered by the last one and by `tests/test_posttrain_ppo.py`.
 
@@ -224,16 +224,16 @@ Check with `pytest tests/test_posttrain_dpo.py -q`. Per-symbol tests: `test_dpo_
 
 ## 5. In production
 
-!!! production "Meta — Llama 3: DPO rounds, reference reset per round, and two DPO modifications"
+!!! production "Meta: Llama 3: DPO rounds, reference reset per round, and two DPO modifications"
     Llama 3's post-training ran six rounds of SFT → rejection sampling → DPO. Each round's DPO used pairs from the most recent policies with the reference reset to the latest SFT model. Two changes they report: masking out formatting / special tokens (header and end-of-turn) from the DPO loss, because they found those tokens' log-ratios destabilised training (the model learning to repeat or truncate), and adding an NLL term on the chosen response (as in RPO) to stabilise training and keep the format. They chose DPO over PPO citing lower compute and better scaling, with the 405B model trained this way. Source: Grattafiori et al., 2024, [arXiv:2407.21783](https://arxiv.org/abs/2407.21783).
 
-!!! production "Anthropic — Constitutional AI (context): pairs from an AI judge feed either an RM or DPO"
+!!! production "Anthropic: Constitutional AI (context): pairs from an AI judge feed either an RM or DPO"
     Constitutional AI produced its harmlessness preference pairs by asking a model which of two responses better follows a principle; the paper trained a preference model and ran RL. The same AI-labelled pairs are exactly what later open recipes (Zephyr, Tülu) fed to DPO instead, because the pair format is method-agnostic. Source: Bai et al., 2022, [arXiv:2212.08073](https://arxiv.org/abs/2212.08073).
 
-!!! production "Allen AI — Tülu 3: length-normalised DPO, then RLVR"
+!!! production "Allen AI: Tülu 3: length-normalised DPO, then RLVR"
     Tülu 3's recipe is SFT → DPO on on-policy pairs (responses sampled from the SFT model and other models, judged by GPT-4-class models) → RLVR. They report choosing *length-normalised* DPO after comparing variants (DPO, SimPO, length-normalised DPO), finding it the best trade-off on their evaluation suite, and that on-policy pairs mattered. Source: Lambert et al., *Tülu 3: Pushing Frontiers in Open Language Model Post-Training*, 2024 (arXiv 2411.15124).
 
-!!! production "Hugging Face — Zephyr: DPO on AI-labelled pairs"
+!!! production "Hugging Face: Zephyr: DPO on AI-labelled pairs"
     Zephyr-7B applied DPO on the UltraFeedback dataset (responses from many models, scored by GPT-4, chosen = best score, rejected = random other) after SFT on distilled dialogues, reaching strong MT-Bench scores for its size without human labels. Source: Tunstall et al., *Zephyr: Direct Distillation of LM Alignment*, 2023 (arXiv 2310.16944).
 
 ## 6. Interview questions and strong answers

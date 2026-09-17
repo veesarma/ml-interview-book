@@ -3,6 +3,8 @@ import math
 
 import torch
 
+torch.set_num_threads(1)  # tiny tensors: multi-threading costs more than it saves
+
 from mlbook.generative import autoencoder as ae
 from mlbook.generative import vae as V
 from mlbook.generative import vqvae as VQ
@@ -16,7 +18,7 @@ def test_autoencoder_shapes_and_reconstruction_improves():
     assert model.encode(x).shape == (64, 2) and model(x).shape == (64, 4)
     opt = torch.optim.Adam(model.parameters(), lr=1e-2)
     before = ae.reconstruction_loss(x, model(x)).item()
-    for _ in range(200):
+    for _ in range(300):
         loss = ae.reconstruction_loss(x, model(x))
         opt.zero_grad(); loss.backward(); opt.step()
     assert loss.item() < 0.5 * before
@@ -78,28 +80,61 @@ def test_gaussian_log_density_matches_torch_distributions():
 
 def test_vae_loss_components():
     x = torch.randn(8, 2); x_hat = x.clone(); mu = torch.zeros(8, 4); logvar = torch.zeros(8, 4)
+    const = 2 * 0.5 * math.log(2 * math.pi)  # d_x · ½ log 2π with sigma_dec = 1
     loss, recon, kl = V.vae_loss(x, x_hat, mu, logvar, beta=1.0)
-    assert recon.item() == 0.0 and kl.item() == 0.0 and loss.item() == 0.0
+    assert torch.isclose(recon, torch.tensor(const)) and kl.item() == 0.0
+    assert torch.isclose(loss, torch.tensor(const))
     loss_b, _, _ = V.vae_loss(x, x_hat + 1.0, torch.ones(8, 4), logvar, beta=2.0)
-    # recon = ½·2 = 1 per example ; kl = ½·4·1 = 2 per example ; loss = 1 + 2·2 = 5
-    assert torch.isclose(loss_b, torch.tensor(5.0))
+    # recon = ½·2 + const = 1 + const ; kl = ½·4·1 = 2 ; loss = 1 + const + 2·2 = 5 + const
+    assert torch.isclose(loss_b, torch.tensor(5.0 + const))
+
+
+def test_negative_elbo_estimate_agrees_with_vae_loss():
+    torch.manual_seed(1)
+    model = V.VAE(d_x=2, d_z=2, d_hidden=16)
+    x = torch.randn(256, 2)
+    est = torch.stack([V.negative_elbo_estimate(model, x, sigma_dec=0.5) for _ in range(20)]).mean()
+    direct = torch.stack([V.vae_loss(x, model(x)[0], *model.encode(x), sigma_dec=0.5)[0] for _ in range(20)]).mean()
+    assert torch.isclose(est, direct, rtol=0.05)
+
+
+def test_decoder_sigma_is_the_rate_distortion_knob():
+    """sigma_dec trades rate (KL, nats through the bottleneck) against distortion (MSE).
+
+    Data is 4 modes on a radius-2 circle: naming the mode costs log 4 = 1.39 nats, so a model
+    whose KL is below that cannot even be encoding which mode the point came from.
+    """
+    x = gaussian_mixture_2d(512, n_modes=4, std=0.2)
+    kl_by_sigma, mse_by_sigma = {}, {}
+    for sigma in (1.0, 0.3, 0.1):
+        torch.manual_seed(0)
+        model = V.VAE(d_x=2, d_z=2, d_hidden=64)
+        opt = torch.optim.Adam(model.parameters(), lr=5e-3)
+        for _ in range(400):
+            x_hat, mu, logvar = model(x)
+            loss, recon, kl = V.vae_loss(x, x_hat, mu, logvar, sigma_dec=sigma)
+            opt.zero_grad(); loss.backward(); opt.step()
+        kl_by_sigma[sigma] = kl.item()
+        mse_by_sigma[sigma] = ((x - model(x)[0]) ** 2).sum(dim=1).mean().item()
+    assert kl_by_sigma[1.0] < kl_by_sigma[0.3] < kl_by_sigma[0.1]     # rate rises as sigma falls
+    assert mse_by_sigma[1.0] > mse_by_sigma[0.3] > mse_by_sigma[0.1]  # distortion falls
+    assert kl_by_sigma[1.0] < math.log(4.0)   # sigma = 1: not even the mode index gets through
+    assert mse_by_sigma[0.1] < 0.1            # sigma = 0.1: the latent is genuinely used
 
 
 def test_vae_negative_elbo_decreases_on_synthetic_data():
     x = gaussian_mixture_2d(512, n_modes=4, std=0.2)
     model = V.VAE(d_x=2, d_z=2, d_hidden=64)
-    opt = torch.optim.Adam(model.parameters(), lr=3e-3)
+    opt = torch.optim.Adam(model.parameters(), lr=5e-3)
     x_hat, mu, logvar = model(x)
-    first = V.vae_loss(x, x_hat, mu, logvar)[0].item()
+    first = V.vae_loss(x, x_hat, mu, logvar, sigma_dec=0.1)[0].item()
     for _ in range(500):
         x_hat, mu, logvar = model(x)
-        loss, recon, kl = V.vae_loss(x, x_hat, mu, logvar)
+        loss, recon, kl = V.vae_loss(x, x_hat, mu, logvar, sigma_dec=0.1)
         opt.zero_grad(); loss.backward(); opt.step()
-    # the unit-variance decoder caps how low −ELBO can go on radius-2 data (KL ≈ log 4 to pick a mode),
-    # so check a solid but achievable improvement and that reconstruction did the work
-    assert loss.item() < 0.85 * first
-    assert recon.item() < 0.5
-    assert torch.isfinite(V.negative_elbo_estimate(model, x))
+    assert loss.item() < 0.2 * first
+    assert recon.item() < 0.3 * first   # reconstruction, not the KL, did the work
+    assert torch.isfinite(V.negative_elbo_estimate(model, x, sigma_dec=0.1))
 
 
 # ---------------------------------------------------------------- vqvae.py
@@ -139,7 +174,7 @@ def test_codebook_perplexity_bounds():
 def test_vqvae_trains():
     x = gaussian_mixture_2d(256, n_modes=4, std=0.1)
     model = VQ.VQVAE(d_x=2, d_code=4, n_codes=8)
-    opt = torch.optim.Adam(model.parameters(), lr=3e-3)
+    opt = torch.optim.Adam(model.parameters(), lr=5e-3)
     x_hat, vq_loss, _ = model(x)
     first = VQ.vqvae_loss(x, x_hat, vq_loss).item()
     for _ in range(300):

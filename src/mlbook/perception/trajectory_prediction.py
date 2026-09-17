@@ -72,28 +72,44 @@ class SocialAttention(nn.Module):
 
 
 class MultimodalTrajectoryHead(nn.Module):
-    """Scene embedding (B, d) → ``M`` trajectories (B, M, T_f, 2) and mode logits (B, M)."""
+    """Scene embedding (B, d) → ``M`` trajectories (B, M, T_f, 2) and mode logits (B, M).
 
-    def __init__(self, d_model: int, num_modes: int, horizon: int):
+    With ``anchors`` (M, T_f, 2) the head predicts a *residual* from each anchor
+    (MultiPath, MTR): mode ``m`` outputs ``anchor_m + Δ_m``.  The anchor both initialises
+    each mode in a different part of trajectory space and — through
+    ``anchor_wta_loss`` — gives a mode assignment that does not depend on the current
+    (possibly collapsed) predictions.
+    """
+
+    def __init__(self, d_model: int, num_modes: int, horizon: int, anchors: torch.Tensor | None = None):
         super().__init__()
         self.m, self.t = num_modes, horizon
         self.traj = nn.Linear(d_model, num_modes * horizon * 2)
         self.mode = nn.Linear(d_model, num_modes)
+        if anchors is not None:
+            if anchors.shape != (num_modes, horizon, 2):
+                raise ValueError(f"anchors must be (M, T_f, 2) = {(num_modes, horizon, 2)}")
+            self.register_buffer("anchors", anchors)  # (M, T_f, 2) fixed, not learned
+        else:
+            self.anchors = None
 
     def forward(self, h: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         b = h.shape[0]
-        traj = self.traj(h).view(b, self.m, self.t, 2)  # (B, M, T_f, 2)
+        traj = self.traj(h).view(b, self.m, self.t, 2)  # (B, M, T_f, 2) residual if anchored
+        if self.anchors is not None:
+            traj = traj + self.anchors.unsqueeze(0)  # (B, M, T_f, 2)
         return traj, self.mode(h)  # (B, M, T_f, 2), (B, M)
 
 
 class TrajectoryPredictor(nn.Module):
     """History of target + others → multimodal future.  Wires the four pieces above."""
 
-    def __init__(self, d_model: int = 64, num_modes: int = 6, horizon: int = 12):
+    def __init__(self, d_model: int = 64, num_modes: int = 6, horizon: int = 12,
+                 anchors: torch.Tensor | None = None):
         super().__init__()
         self.enc = PolylineEncoder(2, d_model)
         self.social = SocialAttention(d_model)
-        self.head = MultimodalTrajectoryHead(d_model, num_modes, horizon)
+        self.head = MultimodalTrajectoryHead(d_model, num_modes, horizon, anchors)
 
     def forward(self, hist: torch.Tensor, others: torch.Tensor, valid: torch.Tensor | None = None) -> tuple[torch.Tensor, torch.Tensor]:
         """hist (B, T_h, 2), others (B, A, T_h, 2) in the agent frame → ((B, M, T_f, 2), (B, M))."""
@@ -126,6 +142,64 @@ def winner_takes_all_loss(pred: torch.Tensor, logits: torch.Tensor, gt: torch.Te
         best = ade_per_mode(pred, gt).argmin(dim=1)  # (B,)
     idx = best.view(-1, 1, 1, 1).expand(-1, 1, pred.shape[2], 2)  # (B, 1, T, 2)
     chosen = pred.gather(1, idx).squeeze(1)  # (B, T, 2) the winning mode's trajectory
+    reg = F.smooth_l1_loss(chosen, gt)
+    cls = F.cross_entropy(logits, best)
+    return reg + cls, best
+
+
+# ---------------------------------------------------------------------------
+# Anchors: the standard cure for winner-takes-all mode collapse
+# ---------------------------------------------------------------------------
+
+
+def kmeans_trajectory_anchors(trajectories: torch.Tensor, num_anchors: int, n_iters: int = 25,
+                              seed: int = 0) -> torch.Tensor:
+    """k-means over whole future trajectories → ``num_anchors`` prototypes (M, T_f, 2).
+
+    MultiPath fits these once on the training set (each anchor is a "go straight", "turn
+    left at 6 m/s", … manoeuvre) and keeps them fixed.  Distance is the ADE between
+    trajectories, i.e. Euclidean distance in the flattened ``2·T_f`` space.
+
+    Args:
+        trajectories: (N, T_f, 2) ground-truth futures in the agent frame.
+    """
+    n, t, _ = trajectories.shape
+    flat = trajectories.reshape(n, t * 2)  # (N, 2·T_f)
+    g = torch.Generator().manual_seed(seed)
+    centres = flat[torch.randperm(n, generator=g)[:num_anchors]].clone()  # (M, 2·T_f) k-means++ would be better
+    for _ in range(n_iters):
+        d = torch.cdist(flat, centres)  # (N, M) Euclidean distance to every centre
+        assign = d.argmin(dim=1)  # (N,)
+        for m in range(num_anchors):
+            members = flat[assign == m]  # (n_m, 2·T_f)
+            if members.numel():
+                centres[m] = members.mean(0)  # (2·T_f,)
+    return centres.view(num_anchors, t, 2)  # (M, T_f, 2)
+
+
+def anchor_assignment(gt: torch.Tensor, anchors: torch.Tensor) -> torch.Tensor:
+    """Index of the anchor closest to each ground-truth future: (B, T_f, 2), (M, T_f, 2) → (B,)."""
+    d = (anchors.unsqueeze(0) - gt.unsqueeze(1)).norm(dim=-1).mean(dim=-1)  # (B, M) ADE to each anchor
+    return d.argmin(dim=1)  # (B,)
+
+
+def anchor_wta_loss(pred: torch.Tensor, logits: torch.Tensor, gt: torch.Tensor,
+                    anchors: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    """WTA whose winner is chosen by the **anchor**, not by the current prediction.
+
+    ``m* = argmin_m ADE(anchor_m, τ)``; then ``L = Huber(μ_{m*}, τ) + CE(π, m*)``.
+
+    Plain :func:`winner_takes_all_loss` picks the winner from the model's own output, which
+    is a feedback loop: whichever mode happens to be nearest at initialisation keeps winning,
+    gets dragged to the *mean* of the futures it wins, and the other modes never receive
+    gradient (dead modes).  The anchor assignment is fixed by the data, so two futures that
+    belong to different manoeuvres always train different modes.
+
+    Returns (loss, m* (B,)).
+    """
+    best = anchor_assignment(gt, anchors)  # (B,) no gradient: anchors are constants
+    idx = best.view(-1, 1, 1, 1).expand(-1, 1, pred.shape[2], 2)  # (B, 1, T_f, 2)
+    chosen = pred.gather(1, idx).squeeze(1)  # (B, T_f, 2)
     reg = F.smooth_l1_loss(chosen, gt)
     cls = F.cross_entropy(logits, best)
     return reg + cls, best

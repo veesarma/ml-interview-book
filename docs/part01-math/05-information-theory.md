@@ -4,11 +4,11 @@
 > report is a perplexity; the penalty that keeps an RLHF policy sane is a KL; the objective that
 > trains CLIP is a mutual-information bound; the argument for why a 7B model "knows" what it knows
 > is a bits-per-parameter count. Interviewers use information theory to check whether you
-> understand *what the numbers mean* — why cross-entropy is maximum likelihood, why KL is
+> understand *what the numbers mean*, why cross-entropy is maximum likelihood, why KL is
 > asymmetric and which direction you want, why perplexities across tokenizers are not comparable.
 > Strong signal is deriving these in a few lines and then connecting each to a concrete training decision.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Entropy $H(p) = -\sum_x p(x)\log p(x)$: expected surprise, minimum average code length. Max at uniform ($\log K$), zero for a point mass. Bits with $\log_2$, nats with $\ln$.
 - Cross-entropy $H(p, q) = -\sum_x p(x)\log q(x) = H(p) + \KL(p\,\|\,q)$: code length when you believe $q$ but data is $p$.
@@ -16,11 +16,11 @@
 - Minimising cross-entropy against the empirical distribution $=$ maximising likelihood $=$ minimising $\KL(\hat p_{\text{data}}\,\|\,q_\theta)$. Exactly.
 - Forward KL $\KL(p\|q)$ is **mode-covering** (q must put mass wherever p does: MLE, teacher-sampled distillation). Reverse KL $\KL(q\|p)$ is **mode-seeking** (q avoids where p is small: variational inference, the RLHF penalty $\KL(\pi_\theta\|\pi_{\text{ref}})$, MiniLLM-style distillation).
 - Conditional entropy $H(Y\mid X) = H(X, Y) - H(X)$; mutual information $I(X;Y) = H(Y) - H(Y\mid X) = \KL(p(x,y)\,\|\,p(x)p(y))\ge 0$.
-- InfoNCE with $N$ negatives: $I(a; b) \ge \log N - \mathcal L_{\text{NCE}}$. The bound saturates at $\log N$ — batch size is a ceiling on what contrastive learning can measure.
+- InfoNCE with $N$ negatives: $I(a; b) \ge \log N - \mathcal L_{\text{NCE}}$. The bound saturates at $\log N$, batch size is a ceiling on what contrastive learning can measure.
 - Perplexity $= \exp(\text{mean per-token NLL in nats})$: the effective branching factor. Bits-per-byte $= \frac{\sum\text{NLL}/\ln 2}{\text{bytes}}$ is tokenizer-independent; per-token perplexity is not.
 - Jensen–Shannon $\mathrm{JS}(p, q) = \tfrac12\KL(p\|m) + \tfrac12\KL(q\|m)$, $m = \frac{p+q}{2}$: symmetric, bounded by $\log 2$, the original GAN objective.
 - Entropy bonus $+\beta H(\pi(\cdot\mid s))$ in PPO keeps the policy from collapsing; KL penalty keeps it near a reference. Different tools for different failure modes.
-- Knowledge capacity: Allen-Zhu & Li (2024) measure $\approx 2$ bits of factual knowledge per parameter when a fact is seen enough times — $7\text{B}$ params $\approx 14$ Gbit of facts, if trained long enough.
+- Knowledge capacity: Allen-Zhu & Li (2024) measure $\approx 2$ bits of factual knowledge per parameter when a fact is seen enough times, $7\text{B}$ params $\approx 14$ Gbit of facts, if trained long enough.
 
 ## 1. Intuition first
 
@@ -28,10 +28,10 @@ A four-token vocabulary with true next-token distribution $p = (0.5, 0.25, 0.125
 gives the first token 1 bit, the second 2, the last two 3 each: average $0.5\cdot1 + 0.25\cdot2 + 2\cdot0.125\cdot3 = 1.75$ bits.
 That is $H(p)$. If your model believes $q = (0.25, 0.25, 0.25, 0.25)$ it uses 2 bits per token no matter what:
 $H(p, q) = 2$. The waste, $0.25$ bits, is $\KL(p\|q)$. Now swap them: data uniform, model $p$. The uniform
-data hits the 3-bit codes half the time: $H(q, p) = \tfrac14(1 + 2 + 3 + 3) = 2.25$, so $\KL(q\|p) = 0.25$ — equal here
+data hits the 3-bit codes half the time: $H(q, p) = \tfrac14(1 + 2 + 3 + 3) = 2.25$, so $\KL(q\|p) = 0.25$, equal here
 by coincidence, but change $p$ to $(0.7, 0.1, 0.1, 0.1)$ and the two directions differ (0.36 vs 0.44 bits). And
 if $q$ assigns probability *zero* to a token that $p$ can produce, $\KL(p\|q) = \infty$: you would need an infinite
-code. That asymmetry — infinite penalty for missing a mode in one direction, no penalty at all in the other — is
+code. That asymmetry (infinite penalty for missing a mode in one direction, no penalty at all in the other) is
 the whole forward-vs-reverse story.
 
 Perplexity makes cross-entropy tangible: $2^{1.75} \approx 3.4$ means the model is "as uncertain as a fair
@@ -42,7 +42,7 @@ equally likely options per *byte*, which on a 4-byte average token is a per-toke
 
 *A single Gaussian $q$ fitted to a bimodal $p$. Left: minimising the forward KL $\KL(p\|q)$ forces $q$ to
 cover both modes and it ends up wide and centred on the empty middle. Right: minimising the reverse KL
-$\KL(q\|p)$ makes $q$ sit on one mode and ignore the other — it is only penalised for putting mass where
+$\KL(q\|p)$ makes $q$ sit on one mode and ignore the other, it is only penalised for putting mass where
 $p$ has none, not for missing mass. Computed by grid search with `fit_gaussian_to_mixture_kl`.*
 
 ## 2. The math
@@ -75,8 +75,8 @@ Equality in Jensen requires $q(x)/p(x)$ constant on the support of $p$, and equa
 $q$ to have no mass outside it; together, $p = q$. $\square$
 
 *What it means:* the code built for $q$ is never shorter than the code built for the truth, and
-$H(p, q) \ge H(p)$ with the gap exactly $\KL$. It also means $\KL$ is *not* symmetric — the proof used $p$ as the
-averaging distribution — and does not satisfy the triangle inequality. Two useful closed forms:
+$H(p, q) \ge H(p)$ with the gap exactly $\KL$. It also means $\KL$ is *not* symmetric, the proof used $p$ as the
+averaging distribution, and does not satisfy the triangle inequality. Two useful closed forms:
 
 * Two Bernoullis: $\KL = p\log\frac{p}{q} + (1-p)\log\frac{1-p}{1-q}$.
 * Two diagonal Gaussians: $\KL\big(\mathcal N(\mu_1, \sigma_1^2)\,\|\,\mathcal N(\mu_2, \sigma_2^2)\big) = \tfrac12\sum_i\Big[\log\frac{\sigma_{2,i}^2}{\sigma_{1,i}^2} + \frac{\sigma_{1,i}^2 + (\mu_{1,i}-\mu_{2,i})^2}{\sigma_{2,i}^2} - 1\Big]$
@@ -100,7 +100,7 @@ $$
 $$
 
 *What it means:* training a classifier or a language model with cross-entropy is fitting $q_\theta$ to the data
-distribution in the **forward** KL — mode-covering. The model is punished infinitely for assigning zero
+distribution in the **forward** KL, mode-covering. The model is punished infinitely for assigning zero
 probability to something that occurred, and only mildly for spreading mass onto things that never occur. That is
 why MLE-trained generative models hallucinate plausible-but-wrong continuations rather than refusing: covering
 beats precision under this objective. For conditional models the same holds per token:
@@ -119,14 +119,14 @@ Minimising over $q$:
   ignore modes. Requires samples from $q$ and the ability to *score* them under $p$ (up to a constant). Variational
   inference (ELBO), the RLHF penalty, and on-policy distillation are reverse-KL.
 
-In RLHF the objective is $\E_{x\sim\pi_\theta}[r(x)] - \beta\,\KL(\pi_\theta\,\|\,\pi_{\text{ref}})$ — the KL is
+In RLHF the objective is $\E_{x\sim\pi_\theta}[r(x)] - \beta\,\KL(\pi_\theta\,\|\,\pi_{\text{ref}})$, the KL is
 computed on samples from the *policy* and scored by the reference. Mode-seeking is what you want: the policy may
 sharpen onto a subset of the reference's behaviours (high-reward ones) but is penalised heavily for producing text
 the reference finds implausible. It is estimated per token as $\log\pi_\theta(y_t\mid\cdot) - \log\pi_{\text{ref}}(y_t\mid\cdot)$
 on sampled $y$, the Monte Carlo estimator of the reverse KL ([Part VII](../part07-post-training/03-rlhf-ppo.md)).
 In distillation, forward KL from teacher samples (Gemma 2's recipe) inherits the teacher's breadth; reverse
 KL on student samples (MiniLLM, on-policy GKD) trades breadth for a student that does not produce things the
-teacher would find unlikely — measurably better for small students on open-ended generation.
+teacher would find unlikely, measurably better for small students on open-ended generation.
 
 ### 2.5 Conditional entropy, mutual information, InfoNCE
 
@@ -154,7 +154,7 @@ $$
 the sum over $N-1$ negatives concentrates around $(N-1)\E_{p(b)}[p(b\mid a)/p(b)] = N-1$, so the loss is about
 $\E[-\log\frac{p(b|a)/p(b)}{p(b|a)/p(b) + N - 1}] \ge -\E[\log\frac{p(b|a)}{p(b)}] + \log N$, i.e. $\mathcal L \ge \log N - I$).
 *What it means:* the loss can never go below $\log N - I$, and the bound can never certify more than $\log N$ nats
-of information — with a batch of 32k pairs that is $\approx 10.4$ nats. This is the information-theoretic reason
+of information, with a batch of 32k pairs that is $\approx 10.4$ nats. This is the information-theoretic reason
 CLIP-style training wants huge batches, and why the temperature matters (it controls how sharp the critic can be).
 [CLIP & contrastive learning](../part08-multimodal/03-clip-contrastive.md) builds on this.
 
@@ -175,7 +175,7 @@ $$
 
 A model at 1.0 BPB with 4 bytes/token has per-token perplexity $2^4 = 16$; the same model evaluated with a
 tokenizer averaging 3 bytes/token would show $2^3 = 8$ without being any better. This is also the compression
-view: a language model at $b$ BPB, combined with arithmetic coding, compresses text to $b/8$ of its size —
+view: a language model at $b$ BPB, combined with arithmetic coding, compresses text to $b/8$ of its size, 
 Delétang et al. (2023) show LLMs are competitive compressors even of images and audio bytes.
 
 ### 2.7 How many bits does a 7B model need to store X?
@@ -186,7 +186,7 @@ $\sim 200$ options $\approx 8$ bits; a 10-digit phone number $\approx 33$ bits. 
 experiments ("Physics of Language Models: Part 3.3, Knowledge Capacity Scaling Laws", 2024) find that transformers
 store about **2 bits of such knowledge per parameter** when each fact is seen $\sim$ 1000 times in training, dropping
 to $\sim$ 1 bit/param at 100 exposures, and that int8 quantisation does not reduce capacity while int4 does. So a 7B
-model has room for on the order of $1.4\times10^{10}$ bits — roughly a billion 10-bit facts — *if* the training data
+model has room for on the order of $1.4\times10^{10}$ bits (roughly a billion 10-bit facts) *if* the training data
 repeats them enough. A 200-bit fact seen once is not stored; it is compressed into the general model. This is the
 quantitative backing for the interview intuition "small models know fewer things, not fewer skills", and for why
 retrieval ([Part XIII](../part13-retrieval-eval-reliability/01-retrieval-and-rag.md)) is the right tool for facts.
@@ -199,7 +199,7 @@ at optimum equals $2\,\mathrm{JS}(p_{\text{data}}, p_G) - \log 4$; the saturatio
 the vanishing-gradient problem that Wasserstein GANs fixed ([Part IX](../part09-generative/02-gans.md)).
 
 In RL, adding $\beta H(\pi(\cdot\mid s))$ to the objective (PPO's entropy bonus, SAC's maximum-entropy framework)
-penalises premature collapse to a deterministic policy — it keeps exploration alive and is a regulariser against
+penalises premature collapse to a deterministic policy, it keeps exploration alive and is a regulariser against
 overfitting the reward. In RLHF, entropy of the token distribution typically *falls* during training (the policy
 sharpens); a KL-to-reference penalty limits how far it can move, an entropy bonus limits how sharp it can get.
 They are not substitutes.
@@ -261,7 +261,7 @@ def infonce_loss(z_a: np.ndarray, z_b: np.ndarray, temperature: float = 0.07) ->
 ```
 
 The $(N, N)$ logits matrix is the cross-Gram matrix of [chapter 01](01-linear-algebra.md); positives are on the
-diagonal, and every off-diagonal entry is a negative — $N-1$ negatives per example for free. The symmetric loss
+diagonal, and every off-diagonal entry is a negative, $N-1$ negatives per example for free. The symmetric loss
 (rows and columns) is what CLIP uses; `temperature=0.07` is CLIP's initial value (learned thereafter).
 
 Perplexity and bits per byte:
@@ -283,7 +283,7 @@ against two `F.cross_entropy` calls on the logits and its transpose; `mutual_inf
 perfectly dependent tables and $I = H(Y) - H(Y\mid X)$; the perplexity/BPB relationship on a hand-built example;
 the forward/reverse fit lands on the expected mode-covering vs mode-seeking solutions.
 
-??? example "Full implementation — `src/mlbook/math/info_theory.py`"
+??? example "Full implementation: `src/mlbook/math/info_theory.py`"
     ```python
     --8<-- "src/mlbook/math/info_theory.py"
     ```
@@ -309,8 +309,8 @@ pytest tests/test_math_info_theory.py -k "entropy or kl_divergence or mutual_inf
 ## 4. Systems view: cost, failure modes, trade-offs
 
 **Cost.** Cross-entropy over a vocabulary $V$ costs $O(V)$ per token for the log-sum-exp, and the output-layer
-matmul is $O(d\,V)$ — for $V = 128$k and $d = 4096$ that layer alone is $\sim 0.5$ GFLOP per token, a meaningful
-share of a small model. Memory: the $(B\cdot T, V)$ logits in fp32 for $B\cdot T = 32$k tokens is 16 GB — hence
+matmul is $O(d\,V)$, for $V = 128$k and $d = 4096$ that layer alone is $\sim 0.5$ GFLOP per token, a meaningful
+share of a small model. Memory: the $(B\cdot T, V)$ logits in fp32 for $B\cdot T = 32$k tokens is 16 GB, hence
 chunked/fused cross-entropy kernels that never materialise full logits. InfoNCE is $O(N^2 d)$ for the similarity
 matrix; at $N = 32$k and $d = 1024$ it is $\sim 1$ TFLOP per step and $4$ GB of logits, which is why CLIP-scale
 training shards the similarity matrix across devices.
@@ -337,25 +337,25 @@ training shards the similarity matrix across devices.
 
 ## 5. In production
 
-!!! production "OpenAI — the KL penalty in InstructGPT / RLHF"
+!!! production "OpenAI: the KL penalty in InstructGPT / RLHF"
     L. Ouyang et al., "Training language models to follow instructions with human feedback", NeurIPS 2022
     (arXiv:2203.02155). The RL objective is $\E[r_\theta(x, y)] - \beta\log\frac{\pi_\theta(y|x)}{\pi_{\text{SFT}}(y|x)}$
     plus a pretraining-loss term; the log-ratio is the per-sample estimate of the *reverse* KL to the SFT model.
     *Why reverse KL:* it is computable on the policy's own samples and it lets the policy sharpen onto high-reward
-    behaviours while forbidding text the SFT model finds implausible — the mode-seeking property is the feature.
+ behaviours while forbidding text the SFT model finds implausible, the mode-seeking property is the feature.
     *Why the pretraining mix:* the KL term alone did not prevent regressions on public NLP benchmarks ("alignment tax").
     Later systems adopt a target-KL controller for $\beta$ ([RLHF with PPO](../part07-post-training/03-rlhf-ppo.md)).
 
-!!! production "OpenAI — CLIP and the InfoNCE bound at scale"
+!!! production "OpenAI: CLIP and the InfoNCE bound at scale"
     A. Radford et al., "Learning Transferable Visual Models From Natural Language Supervision", ICML 2021
     (arXiv:2103.00020), building on A. van den Oord et al., "Representation Learning with Contrastive Predictive
     Coding", 2018 (arXiv:1807.03748). CLIP trains image and text encoders with the symmetric InfoNCE loss over
     batches of 32,768 image–text pairs and a learned temperature initialised at $0.07$. *Why contrastive rather than
     generative captioning:* the paper reports an order-of-magnitude efficiency gain in zero-shot transfer per compute.
-    *Why the batch size:* the $\log N$ ceiling of §2.5 — more negatives per step means more information the objective can
+ *Why the batch size:* the $\log N$ ceiling of §2.5, more negatives per step means more information the objective can
     measure. The similarity matrix is sharded across accelerators so that the $N\times N$ logits never live on one device.
 
-!!! production "Google DeepMind — distillation as forward KL in Gemma 2; reverse KL in MiniLLM / GKD"
+!!! production "Google DeepMind: distillation as forward KL in Gemma 2; reverse KL in MiniLLM / GKD"
     Gemma Team, "Gemma 2: Improving Open Language Models at a Practical Size", 2024 (arXiv:2408.00118): the 2B and 9B
     models are trained by minimising the forward KL to a larger teacher's next-token distribution over the
     pretraining corpus, which the report finds better than training from scratch on the same token budget.
@@ -366,7 +366,7 @@ training shards the similarity matrix across devices.
     (cheap, parallel); on-policy methods need student sampling plus teacher scoring each step (2–3× the cost) but
     close the exposure-bias gap.
 
-!!! production "EleutherAI — bits per byte as the comparable LM metric"
+!!! production "EleutherAI: bits per byte as the comparable LM metric"
     L. Gao et al., "The Pile: An 800GB Dataset of Diverse Text for Language Modeling", 2020 (arXiv:2101.00027).
     The Pile's evaluation protocol reports bits per byte (and per-UTF-8-byte perplexity) precisely because GPT-2,
     GPT-3 and later models use different tokenizers. G. Delétang et al., "Language Modeling Is Compression", ICLR
@@ -374,7 +374,7 @@ training shards the similarity matrix across devices.
     compressor whose compression ratio is its BPB, and Chinchilla-scale models compress ImageNet patches and
     LibriSpeech audio better than PNG and FLAC.
 
-!!! production "OpenAI — the entropy bonus in PPO"
+!!! production "OpenAI: the entropy bonus in PPO"
     J. Schulman et al., "Proximal Policy Optimization Algorithms", 2017 (arXiv:1707.06347). The PPO loss adds
     $c_2\,H[\pi_\theta](s_t)$ (coefficient $0.01$ in the Atari experiments, $0$ for continuous control) to
     discourage premature determinism. In RLHF for LLMs the entropy coefficient is typically zero and the reverse-KL
@@ -386,17 +386,17 @@ training shards the similarity matrix across devices.
 
 !!! interview "Prove that minimising cross-entropy is maximum likelihood."
     With the empirical distribution $\hat p$, $H(\hat p, q_\theta) = -\frac1N\sum_i\log q_\theta(x_i)$, the negative mean
-    log-likelihood — an identity, not an approximation. Since $H(\hat p, q) = H(\hat p) + \KL(\hat p\|q)$ and $H(\hat p)$ is constant
+ log-likelihood, an identity, not an approximation. Since $H(\hat p, q) = H(\hat p) + \KL(\hat p\|q)$ and $H(\hat p)$ is constant
     in $\theta$, this also minimises the *forward* KL from data to model. **Staff follow-up:** *what does the forward
     direction imply about the trained model's behaviour?* Mode-covering: it must put mass on every observed outcome, so it
-    prefers being broad to being wrong — the root of "plausible hallucinations" and of why RLHF (reverse KL) sharpens outputs.
+ prefers being broad to being wrong, the root of "plausible hallucinations" and of why RLHF (reverse KL) sharpens outputs.
 
 !!! interview "KL is asymmetric. Give one setting where you want each direction and explain why."
     Forward $\KL(p\|q)$ for density estimation/MLE and teacher-data distillation: you have samples from $p$ and want $q$
     to cover them. Reverse $\KL(q\|p)$ for variational inference and the RLHF penalty: you can sample from $q$ and score
     under $p$ up to a constant, and you want $q$ to stay inside $p$'s support even at the cost of missing modes.
     **Staff follow-up:** *the RLHF KL term is estimated how, and what is wrong with the naive estimator?* Per token
-    $\log\pi_\theta - \log\pi_{\text{ref}}$ on sampled tokens — unbiased for the reverse KL but high variance and can go
+ $\log\pi_\theta - \log\pi_{\text{ref}}$ on sampled tokens, unbiased for the reverse KL but high variance and can go
     negative on a sample; the estimator $r - \log r - 1$ with $r = \pi_{\text{ref}}/\pi_\theta$ is non-negative and lower variance.
 
 !!! interview "Two models report perplexity 8 and 12 on the same text. Which is better?"
@@ -418,15 +418,15 @@ training shards the similarity matrix across devices.
     $10^{10}$ bits; a 10-bit fact seen once is not memorised. Design consequence: parametric memory is for frequent,
     stable knowledge; long-tail and fresh facts go in retrieval, and fine-tuning to "teach facts" is unreliable
     unless the facts are heavily repeated. **Staff follow-up:** *does quantisation cut capacity?* The same work finds
-    int8 preserves it and int4 loses a meaningful fraction — which matters for how you compress a knowledge-heavy model.
+ int8 preserves it and int4 loses a meaningful fraction, which matters for how you compress a knowledge-heavy model.
 
-!!! interview "Entropy bonus vs KL penalty — are they interchangeable?"
+!!! interview "Entropy bonus vs KL penalty: are they interchangeable?"
     No. The KL penalty bounds distance to a *reference* (which behaviours are allowed); the entropy bonus bounds
     *sharpness* (how deterministic). A policy can have low KL to the reference and collapsed entropy on a subset of
     prompts, or high entropy while wandering far from the reference. In LLM RLHF the KL term dominates; in reasoning RL
     with verifiable rewards, entropy collapse is the observed failure and entropy-aware tricks return.
     **Staff follow-up:** *what happens to $\beta$ in a target-KL controller when the reward model is hackable?*
-    The policy finds high-reward, high-KL regions; the controller raises $\beta$, which throttles learning — the KL
+ The policy finds high-reward, high-KL regions; the controller raises $\beta$, which throttles learning, the KL
     curve is your reward-hacking alarm.
 
 ## 7. Exercises
@@ -439,14 +439,14 @@ training shards the similarity matrix across devices.
 **★ 2.** Show that $I(X; Y) = H(X) + H(Y) - H(X, Y)$ and that $I(X; X) = H(X)$.
 
 ??? success "Solution"
-    $I = \sum p(x,y)\log\frac{p(x,y)}{p(x)p(y)} = \sum p(x,y)[\log p(x,y) - \log p(x) - \log p(y)] = -H(X,Y) + H(X) + H(Y)$. With $Y = X$: $H(X, X) = H(X)$, so $I = H(X)$ — a variable carries all of its own entropy as information about itself.
+ $I = \sum p(x,y)\log\frac{p(x,y)}{p(x)p(y)} = \sum p(x,y)[\log p(x,y) - \log p(x) - \log p(y)] = -H(X,Y) + H(X) + H(Y)$. With $Y = X$: $H(X, X) = H(X)$, so $I = H(X)$, a variable carries all of its own entropy as information about itself.
 
 **★★ 3.** Derive the closed-form KL between two diagonal Gaussians (§2.2) and check it reduces to $\tfrac12(\mu^2 + \sigma^2 - \log\sigma^2 - 1)$ for the VAE case.
 
 ??? success "Solution"
     $\E_p[\log p - \log q]$ with $\log p = -\tfrac12\log(2\pi\sigma_1^2) - \frac{(x-\mu_1)^2}{2\sigma_1^2}$ and similarly for $q$. $\E_p[(x-\mu_1)^2] = \sigma_1^2$; $\E_p[(x-\mu_2)^2] = \sigma_1^2 + (\mu_1-\mu_2)^2$. Result: $\tfrac12[\log\frac{\sigma_2^2}{\sigma_1^2} + \frac{\sigma_1^2 + (\mu_1-\mu_2)^2}{\sigma_2^2} - 1]$. With $\mu_2 = 0, \sigma_2 = 1$: $\tfrac12[-\log\sigma_1^2 + \sigma_1^2 + \mu_1^2 - 1]$, summed over dimensions.
 
-**★★ 4 (coding).** Using `kl_divergence`, verify numerically that $\KL(p\|q)$ for $p$ a two-mode mixture and $q$ a single Gaussian is minimised by a wide $q$, and that $\KL(q\|p)$ is minimised by a narrow one — reproduce the figure's two fits with `fit_gaussian_to_mixture_kl` and print $(\mu, \sigma)$ for each.
+**★★ 4 (coding).** Using `kl_divergence`, verify numerically that $\KL(p\|q)$ for $p$ a two-mode mixture and $q$ a single Gaussian is minimised by a wide $q$, and that $\KL(q\|p)$ is minimised by a narrow one, reproduce the figure's two fits with `fit_gaussian_to_mixture_kl` and print $(\mu, \sigma)$ for each.
 
 ??? success "Solution"
     ```python
@@ -463,7 +463,7 @@ training shards the similarity matrix across devices.
 **★★ 5.** A model scores 0.9 bits per byte. Its tokenizer averages 4.2 bytes per token. What per-token perplexity does it report, and what would it report with a 3.1-bytes-per-token tokenizer *if its distribution over strings were unchanged*?
 
 ??? success "Solution"
-    $2^{0.9\times4.2} = 2^{3.78} \approx 13.7$; with 3.1 bytes/token, $2^{0.9\times3.1} = 2^{2.79} \approx 6.9$. Same model, same text, half the perplexity — which is why per-token perplexity is not a comparison metric.
+ $2^{0.9\times4.2} = 2^{3.78} \approx 13.7$; with 3.1 bytes/token, $2^{0.9\times3.1} = 2^{2.79} \approx 6.9$. Same model, same text, half the perplexity, which is why per-token perplexity is not a comparison metric.
 
 **★★★ 6.** Prove that InfoNCE's optimal critic is $f^\star(a, b) = \log\frac{p(b|a)}{p(b)} + c(a)$, and explain why the bound cannot exceed $\log N$.
 

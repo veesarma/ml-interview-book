@@ -76,18 +76,52 @@ def orpo_loss(
     return nll - lam * F.logsigmoid(log_odds_chosen - log_odds_rejected).mean()  # scalar
 
 
+def kto_reference_point(pi: torch.Tensor, ref: torch.Tensor, beta: float) -> torch.Tensor:
+    """The KTO reference point ``z_0 = max(0, beta * mean[log pi - log pi_ref])``, detached.
+
+    In the paper ``z_0`` estimates ``beta * KL(pi || pi_ref)`` from *mismatched* ``(x, y')`` pairs
+    (a response shuffled to a different prompt), so that it measures how far the policy has moved
+    overall rather than how good these particular examples are. Passing those mismatched log-probs
+    here reproduces that estimator; passing the batch's own log-probs gives the cheap in-batch
+    approximation. It is clamped at 0 and never back-propagated through.
+
+    Args:
+        pi, ref: (B,) summed log-probs under policy / reference.
+    Returns:
+        scalar reference point.
+    """
+    return (beta * (pi - ref)).mean().detach().clamp(min=0.0)  # scalar
+
+
 def kto_loss(
-    pi: torch.Tensor, ref: torch.Tensor, desirable: torch.Tensor, beta: float, lambda_d: float = 1.0, lambda_u: float = 1.0
+    pi: torch.Tensor,
+    ref: torch.Tensor,
+    desirable: torch.Tensor,
+    beta: float,
+    lambda_d: float = 1.0,
+    lambda_u: float = 1.0,
+    z0: torch.Tensor | float | None = None,
 ) -> torch.Tensor:
     """KTO on *unpaired* examples: each response is labelled desirable (1) or undesirable (0).
 
-    ``z0`` (the reference point) is the batch-mean implicit reward, clamped at 0 and detached.
+    ``L = mean[lambda_y - v]`` with ``v = lambda_D sigma(beta(r - z0))`` for desirable examples and
+    ``v = lambda_U sigma(z0 - beta r)`` for undesirable ones, where ``r = beta(log pi - log pi_ref)``
+    is the implicit reward. A desirable example is rewarded for sitting *above* the reference point
+    ``z0`` and an undesirable one for sitting below it; ``lambda_U > lambda_D`` encodes loss aversion.
+
     Args:
         pi, ref: (B,) summed log-probs under policy / reference.
         desirable: (B,) float in {0, 1}.
+        z0: the reference point. Defaults to :func:`kto_reference_point` on this batch, which is
+            degenerate when every example has the same implicit reward (it then equals that reward);
+            pass an explicit estimate from mismatched pairs to reproduce the paper.
+    Returns:
+        scalar loss.
     """
     reward = beta * (pi - ref)  # (B,) implicit reward
-    z0 = reward.mean().detach().clamp(min=0.0)  # scalar reference point
+    if z0 is None:
+        z0 = kto_reference_point(pi, ref, beta)  # scalar
+    z0 = torch.as_tensor(z0, dtype=reward.dtype, device=reward.device)  # scalar
     value_d = lambda_d * torch.sigmoid(reward - z0)  # (B,) gain if desirable
     value_u = lambda_u * torch.sigmoid(z0 - reward)  # (B,) loss-aversion if undesirable
     value = desirable * value_d + (1.0 - desirable) * value_u  # (B,)

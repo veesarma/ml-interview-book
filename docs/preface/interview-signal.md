@@ -48,7 +48,7 @@ guidance and structured guides like Hello Interview's
 say interviewers are looking for, expressed as observable behaviours. Score each
 row 1–4; a staff-level round has no row below 3 and at least two rows at 4.
 
-| Competency | 1 — Weak | 2 — Mixed | 3 — Senior | 4 — Staff |
+| Competency | 1: Weak | 2: Mixed | 3: Senior | 4: Staff |
 |---|---|---|---|---|
 | **Problem framing** | Starts solving immediately. | Asks a few clarifying questions, then follows the prompt literally. | Defines the objective, constraints and success metric before designing. | Identifies the assumption in the prompt that changes the answer most, and negotiates it with the interviewer. |
 | **Technical depth** | Names techniques without mechanism. | Explains the mechanism; stumbles on "why". | Derives or implements correctly; explains why it works. | Explains why it works, *when it stops working*, and what the second-order effects are. |
@@ -126,7 +126,7 @@ dot-product attention with a causal mask".
     "The follow-ups you would ask are a KV cache for decoding, where the mask becomes
     a single row and $K, V$ are appended per step, and memory at long context, where
     the $T^2$ scores never need to be materialised if you compute softmax online in
-    tiles — that is what FlashAttention does. Which one would you like?"
+ tiles, that is what FlashAttention does. Which one would you like?"
 
 The staff answer is not longer because it says more things; it is longer because
 each thing it says is a decision with a reason.
@@ -213,7 +213,7 @@ KV-cache memory?"
 !!! example "Staff answer"
     "Start from the number: per sequence the cache is
     $2 \cdot L \cdot H_{kv} \cdot d_\text{head} \cdot T \cdot \text{bytes}$, so the levers are
-    the number of KV heads, the precision, and the sequence length — and the fourth,
+ the number of KV heads, the precision, and the sequence length, and the fourth,
     hidden lever is *how many sequences you hold at once*, because the cache is what
     caps batch size and therefore throughput in the memory-bound decode regime.
     Reducing $H_{kv}$ (GQA, or MQA in the limit) is a *training-time* decision: it
@@ -225,7 +225,7 @@ KV-cache memory?"
     the asymptotics, but they change the model's behaviour, so they need an
     evaluation on tasks that require long-range recall. Paging does not reduce bytes;
     it reduces waste from fragmentation and pre-allocation, and it is what lets you
-    run larger batches — so if the goal is throughput rather than fitting one long
+ run larger batches, so if the goal is throughput rather than fitting one long
     sequence, paging plus continuous batching is what I would do first because it
     has no quality cost. My decision depends on which constraint we are actually
     hitting: if it is one sequence not fitting, quantise then window; if it is
@@ -259,8 +259,8 @@ wild west" of interviews for its inconsistency across companies, and recommends 
 delivery framework precisely because structure is what survives an unfamiliar
 prompt ([Hello Interview: ML system design in a hurry](https://www.hellointerview.com/learn/ml-system-design/in-a-hurry/introduction)).
 Their framework moves from requirements to a high-level design to deep dives, and
-weights the ML-specific pieces — problem formulation, data and labels, features,
-model, evaluation, serving — over generic distributed-systems detail. Part XVII of
+weights the ML-specific pieces, problem formulation, data and labels, features,
+model, evaluation, serving, over generic distributed-systems detail. Part XVII of
 this book uses the same skeleton.
 
 **Senior versus staff on the same question.** The question is "design the
@@ -294,8 +294,8 @@ perception system for a delivery robot that operates on sidewalks".
     on vulnerable road users by range, lighting and occlusion; a scenario-based
     closed-loop test in simulation because open-loop mAP does not predict freezing
     behaviour; a shadow-mode deployment before any behaviour change ships. Then the
-    bottleneck at 10×: "at ten cities the long tail is city-specific — curb
-    geometry, signage, weather — and the labelling budget, not the model, becomes the
+ bottleneck at 10×: "at ten cities the long tail is city-specific, curb
+ geometry, signage, weather, and the labelling budget, not the model, becomes the
     constraint, so I would build the slice-based triage now rather than later."
 
 **Common failure patterns.**
@@ -323,8 +323,8 @@ works through this with a template, and each design chapter in
 ## Round 4: Behavioral and leadership on ML projects
 
 **What is actually being graded.** Whether you have *done* the thing the level
-requires — owned an outcome, made decisions with incomplete information, changed
-what other people did, been wrong and recovered — and whether you can tell the truth
+requires, owned an outcome, made decisions with incomplete information, changed
+what other people did, been wrong and recovered, and whether you can tell the truth
 about it precisely. Amazon's process is the most explicit public example: a large
 part of the loop is behavioural questions tied to its published Leadership
 Principles, answered in the STAR (situation, task, action, result) structure
@@ -351,7 +351,7 @@ time your model underperformed in production".
     volume. That was my system and my monitoring design, so the first thing I owned
     was the detection gap, not the model. I made two decisions. Short term, I had us
     fine-tune on a few thousand labelled examples of the new type, which recovered
-    accuracy in a week. Long term, I argued for — and got — per-document-type
+ accuracy in a week. Long term, I argued for (and got) per-document-type
     accuracy slices with alerting on any slice above a volume threshold, and a rule
     that a new document type cannot onboard without a labelled evaluation slice. That
     second decision slowed onboarding by about a week per type and the product team
@@ -419,8 +419,8 @@ have not built themselves, so be concrete about the parts that transfer:
 * Training reliability: checkpointing, restarts, the divergence you debugged and
   how ([training systems](../part14-systems/02-training-systems.md)).
 * Monitoring: what you alerted on, what you missed, and what you changed.
-* The platform decision you made *for other teams* — a feature store, an
-  evaluation harness, a standard — and the adoption cost you paid to get it used.
+* The platform decision you made *for other teams*, a feature store, an
+ evaluation harness, a standard, and the adoption cost you paid to get it used.
 
 **The shape of an evidence sentence.** "We had \<constraint\>; I chose \<decision\>
 over \<alternative\> because \<mechanism\>; it moved \<metric\> by \<amount\>; the thing
@@ -439,7 +439,7 @@ Anthropic's guidance is the opposite for live interviews: no AI assistance unles
 they say otherwise, because they want to see how you think in real time
 ([Anthropic careers](https://www.anthropic.com/careers)). Where tools are allowed, the
 grading shifts toward whether you can specify, verify and debug what the tool
-produces — which is the same shape-and-test discipline this book teaches.
+produces, which is the same shape-and-test discipline this book teaches.
 
 ## Preparing for a specific company
 

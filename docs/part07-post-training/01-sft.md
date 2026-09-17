@@ -2,7 +2,7 @@
 
 > **Why this matters at staff level.** SFT is the first thing every post-training pipeline does and the thing most teams get subtly wrong: the loss is the same next-token cross-entropy as pretraining, so the whole craft lives in *which tokens you train on*, *how you pack them*, and *what data you mix*. In ML-depth rounds you will be asked to write the label mask and the packed attention mask on a whiteboard; in system-design rounds you will be asked why an SFT run overfits after one epoch and how you would build the data engine. Strong signal is knowing the template byte-for-byte, the mask off by one, and having an opinion on synthetic data.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - SFT data is $(x, y)$: a prompt (possibly multi-turn) and a demonstration. The objective is unchanged from pretraining: $L = -\frac{1}{|A|}\sum_{t \in A} \log \pi_\theta(y_t \mid y_{<t})$ where $A$ is the set of **assistant-token positions**. User and system tokens are context, not targets (`labels = -100`).
 - A chat template inserts role markers as special tokens: `<|system|> … <|end|> <|user|> … <|end|> <|assistant|> … <|end|>`. The model must learn to emit `<|end|>` after its turn, so that token *is* in the loss.
@@ -195,16 +195,16 @@ def train_sft(model, batches, epochs=1, lr=3e-3, use_packed_mask=True):
             opt.step()
 ```
 
-Nothing here is specific to SFT except the two tensors that enter it. In a real run you add a cosine schedule with warm-up, a small LR ($10^{-5}$ full fine-tuning; $10^{-4}$ for LoRA), gradient checkpointing and a variable-length attention kernel instead of the dense mask.
+The only SFT-specific parts are the two tensors passed in, `input_ids` and `labels`. In a real run you add a cosine schedule with warm-up, a small LR ($10^{-5}$ full fine-tuning; $10^{-4}$ for LoRA), gradient checkpointing and a variable-length attention kernel instead of the dense mask.
 
 **How you'd test it.** (1) Build a labels tensor by hand for a 5-token row and compare. (2) Add 100 to the logits at masked positions and check the loss does not move. (3) Pack two examples, zero the positional embedding, and check the second example's logits equal its stand-alone logits to $10^{-5}$. (4) Train on two examples for 60 steps and check the argmax after `<|assistant|>` is the demonstrated token. All four are in `tests/test_posttrain_sft.py`.
 
-??? example "Full implementation — `src/mlbook/posttrain/sft.py`"
+??? example "Full implementation: `src/mlbook/posttrain/sft.py`"
     ```python
     --8<-- "src/mlbook/posttrain/sft.py"
     ```
 
-??? example "Chat template — `src/mlbook/posttrain/chat_template.py`"
+??? example "Chat template: `src/mlbook/posttrain/chat_template.py`"
     ```python
     --8<-- "src/mlbook/posttrain/chat_template.py"
     ```
@@ -218,7 +218,7 @@ Nothing here is specific to SFT except the two tensors that enter it. In a real 
 | `sft_loss` | `src/mlbook/posttrain/sft.py` | yes | 3 minutes |
 | `packed_attention_mask` | `src/mlbook/posttrain/sft.py` | yes | 5 minutes |
 | `pack_examples` | `src/mlbook/posttrain/sft.py` | read; retype only if you have time | 15 minutes |
-| `render_chat`, `ToyTokenizer`, `train_sft` | `chat_template.py`, `sft.py` | read only | — |
+| `render_chat`, `ToyTokenizer`, `train_sft` | `chat_template.py`, `sft.py` | read only |: |
 
 Check with `pytest tests/test_posttrain_sft.py tests/test_posttrain_chat_template.py -q`. Each symbol has its own test: `test_assistant_only_labels_shift_and_mask`, `test_sft_loss_excludes_masked_tokens`, `test_packed_attention_mask_blocks_cross_example_attention`, `test_pack_examples_segments_and_labels`, `test_tokenize_chat_marks_only_assistant_tokens`.
 
@@ -255,16 +255,16 @@ Check with `pytest tests/test_posttrain_sft.py tests/test_posttrain_chat_templat
 
 ## 5. In production
 
-!!! production "OpenAI — InstructGPT: SFT as the first of three stages"
+!!! production "OpenAI: InstructGPT: SFT as the first of three stages"
     The problem: GPT-3 continued text rather than following instructions. OpenAI collected about 13k labeler-written demonstrations, fine-tuned GPT-3 on them for 16 epochs with a cosine schedule (they found held-out validation loss overfit after 1 epoch but human preference kept improving), then trained a reward model and ran PPO. The SFT model alone was already strongly preferred to the 175B base model; the 1.3B RLHF model was preferred to 175B GPT-3. The trade-off they accepted: a small, expensive, curated demonstration set over a large scraped one. Source: Ouyang et al., *Training language models to follow instructions with human feedback*, 2022, [arXiv:2203.02155](https://arxiv.org/abs/2203.02155).
 
-!!! production "Meta — Llama 2-Chat: quality over quantity"
+!!! production "Meta: Llama 2-Chat: quality over quantity"
     Meta started with public instruction data, found it lacking in diversity and quality, and switched to a smaller set of about 27,540 vendor-annotated high-quality examples, reporting that a limited set of clean demonstrations was enough and that annotation quality mattered more than volume. They fine-tuned for 2 epochs at LR $2\times10^{-5}$, batch 64, length 4096, with packing and the loss zeroed on prompt tokens. Only assistant tokens were back-propagated. Source: Touvron et al., *Llama 2: Open Foundation and Fine-Tuned Chat Models*, 2023, [arXiv:2307.09288](https://arxiv.org/abs/2307.09288).
 
-!!! production "Meta — Llama 3: SFT data from rejection sampling, six rounds"
+!!! production "Meta: Llama 3: SFT data from rejection sampling, six rounds"
     Llama 3's post-training loop is SFT → rejection sampling → DPO, repeated six times. SFT data came from human demonstrations *and* from rejection-sampled model outputs scored by a reward model, plus synthetic data for code, math and tools, with the mixture weights tuned per capability. They report ablations on data quality filtering and on using model-based classifiers to prune low-quality samples. Source: Grattafiori et al., *The Llama 3 Herd of Models*, 2024, [arXiv:2407.21783](https://arxiv.org/abs/2407.21783).
 
-!!! production "DeepSeek — R1: cold-start SFT before reasoning RL"
+!!! production "DeepSeek: R1: cold-start SFT before reasoning RL"
     DeepSeek-R1-Zero applied RL directly to the base model and produced strong reasoning with poor readability and language mixing. The R1 recipe adds a short *cold-start* SFT phase on a few thousand long chain-of-thought examples so that RL starts from a readable, well-formatted policy, then a second SFT round on rejection-sampled RL outputs mixed with general data. Source: DeepSeek-AI, *DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning*, 2025 (arXiv 2501.12948).
 
 ## 6. Interview questions and strong answers

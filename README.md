@@ -4,7 +4,7 @@
 
 A book-format compendium (MkDocs Material, deployable to GitHub Pages) covering the
 mathematics, from-scratch implementations, systems trade-offs, and production case
-studies behind modern machine learning — with dedicated parts on ML system design
+studies behind modern machine learning, with dedicated parts on ML system design
 and company-specific deep dives.
 
 > Read it at **https://veesarma.github.io/ml-interview-book/** once GitHub Pages is
@@ -46,6 +46,8 @@ tests/              every implementation is tested against a reference
 figures/            matplotlib scripts that generate docs/assets/figures/*.png
 manim/scenes/       Manim scenes for animated/still explanatory figures
 STYLE.md            the authoring contract every chapter follows
+scripts/            style linter and practice-stub generator
+practice/           signature-only stubs for retyping the canon by hand
 ```
 
 ## Run it locally
@@ -57,5 +59,6 @@ pytest -q                      # run all implementation tests
 mkdocs serve                   # http://127.0.0.1:8000
 ```
 
-Regenerate figures with `make figures`; render a Manim still with
+Check the prose against the AI-tell linter with `make style` (it runs in CI and
+enforces STYLE.md section 8). Regenerate figures with `make figures`; render a Manim still with
 `manim -qm -s --format=png manim/scenes/<file>.py <SceneName>`.

@@ -9,7 +9,7 @@
 > and softmax), explain Newton/IRLS, name what class imbalance and thresholds do to
 > a calibrated model, and cite where it runs in production.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Bernoulli MLE: $p = \sigma(z)$, $z = Xw$, $\sigma(z) = 1/(1+e^{-z})$, log-odds $\log\frac{p}{1-p} = z$. Negative log-likelihood is the binary cross-entropy $L = -\tfrac1N\sum_i [y_i\log p_i + (1-y_i)\log(1-p_i)]$.
 - $\sigma'(z) = \sigma(z)(1-\sigma(z))$; gradient $\boxed{\nabla_w L = \tfrac1N X^T(p - y)}$; Hessian $\boxed{H = \tfrac1N X^T\diag(p\odot(1-p))X}$, PSD $\Rightarrow$ convex.
@@ -39,7 +39,7 @@ model says $p = \sigma(-2), \sigma(-1), \sigma(1), \sigma(3) = 0.12, 0.27, 0.73,
 and the likelihood is $(1-0.12)(1-0.27)(0.73)(0.95) \approx 0.45$. Maximising this
 product over $w$ is logistic regression. The decision boundary is where $z = 0$,
 i.e. $x = 2$; it is a *line* in feature space (a hyperplane in $d$ dimensions), so the
-model is linear — only the loss and the output map changed.
+model is linear, only the loss and the output map changed.
 
 With $K > 2$ classes we keep one linear score $z_k$ per class and normalise with the
 softmax; the sigmoid is the $K = 2$ special case with $z = z_1 - z_0$.
@@ -97,7 +97,7 @@ $$
 $$
 
 Every $p_i(1-p_i) \in (0, \tfrac14]$ is positive, so $v^THv = \tfrac1N\sum_i p_i(1-p_i)(x_i^Tv)^2 \ge 0$:
-$H$ is PSD and $L$ is convex — any local minimum is global, and gradient descent with
+$H$ is PSD and $L$ is convex, any local minimum is global, and gradient descent with
 a small enough step converges. Adding $\tfrac{\lambda}{2}\norm{w}^2$ makes it strictly
 convex with a unique minimiser.
 
@@ -133,7 +133,7 @@ With 1% positives an unweighted model learns an intercept near $\log(0.01/0.99)$
 and is *calibrated*: it says 1% because 1% is true. Reweighting each class to
 $N/(2N_c)$ (`balanced_class_weights`) is equivalent to changing the prior; the
 fitted intercept shifts by $\approx \log\frac{N_0}{N_1}$ and the model now reports
-$\approx 50\%$ for an average example — useful for the *ranking* metric you optimise
+$\approx 50\%$ for an average example, useful for the *ranking* metric you optimise
 under, harmful if anyone consumes the probabilities.
 
 Decide from costs instead. If a false positive costs $c_{FP}$ and a false negative
@@ -147,7 +147,7 @@ signal from a rare class), re-calibrate afterwards.
 A model is calibrated if among examples with predicted $p \approx 0.7$, about 70% are
 positive. Logistic regression trained by MLE is calibrated in-distribution (the
 score equation $X^T(p - y) = 0$ with an intercept column forces $\sum_i p_i = \sum_i y_i$).
-Models that are not — SVMs, boosted trees, deep nets with heavy augmentation — are
+Models that are not (SVMs, boosted trees, deep nets with heavy augmentation) are
 fixed post hoc by **Platt scaling**: fit $P(y = 1\mid s) = \sigma(as + b)$ on a held-out
 set, where $s$ is the model's raw score. That is a two-parameter logistic regression,
 solved with the same Newton iteration. **Temperature scaling** for deep nets is the
@@ -183,7 +183,7 @@ $$
 $$
 
 *Meaning:* the $1/p_k$ from the log exactly cancels the $p_k$ from the softmax
-Jacobian, so the gradient never blows up for a confidently wrong prediction — the
+Jacobian, so the gradient never blows up for a confidently wrong prediction, the
 whole point of pairing softmax with cross-entropy (the same cancellation happens for
 sigmoid + BCE, and for any exponential-family output with its canonical link).
 Averaging over a batch and pushing through $Z = XW$:
@@ -268,7 +268,7 @@ def fit_logistic_newton(X, y, n_steps=20, l2=1e-6, sample_weight=None, tol=1e-10
 
 Starting from $w = 0$ (all $p_i = \tfrac12$, maximal curvature) is safe; the tiny
 default `l2` keeps `solve` well-posed on separable data. `platt_scaling(scores, y)`
-stacks `[scores, 1]` into an $(N, 2)$ design and calls this function — Platt scaling
+stacks `[scores, 1]` into an $(N, 2)$ design and calls this function, Platt scaling
 really is logistic regression.
 
 ```python
@@ -302,12 +302,12 @@ $(a, b) = (2, -0.5)$; softmax Jacobian and $\nabla_Z L$ (with smoothing and
 temperature) against finite differences; `fit_softmax_gd` reaches $>95\%$ on three
 Gaussian blobs and label smoothing shrinks $\norm{W}$.
 
-??? example "Full implementation — `src/mlbook/classical/logistic_regression.py`"
+??? example "Full implementation: `src/mlbook/classical/logistic_regression.py`"
     ```python
     --8<-- "src/mlbook/classical/logistic_regression.py"
     ```
 
-??? example "Full implementation — `src/mlbook/classical/softmax_regression.py`"
+??? example "Full implementation: `src/mlbook/classical/softmax_regression.py`"
     ```python
     --8<-- "src/mlbook/classical/softmax_regression.py"
     ```
@@ -338,8 +338,8 @@ Check with `pytest tests/test_classical_logistic.py -q`. Both files from blank:
 | Newton / IRLS | $O(Nd^2 + d^3)$ | 5–10 | $d \le 10^4$; want exact MLE, standard errors |
 | L-BFGS | $O(Nd)$ + $O(md)$ history | 50–200 | $d$ up to $10^6$, dense, batch |
 | SGD / Adagrad / FTRL | $O(\text{nnz}(x_i))$ | one or few passes | streaming, sparse, $N\to\infty$ |
-| One-vs-rest ($K$ heads) | $K\times$ binary cost, parallel | — | many non-exclusive classes, incremental classes |
-| Softmax | $O(NdK)$ per step | — | exclusive classes; $K$ up to vocabulary size |
+| One-vs-rest ($K$ heads) | $K\times$ binary cost, parallel |: | many non-exclusive classes, incremental classes |
+| Softmax | $O(NdK)$ per step |: | exclusive classes; $K$ up to vocabulary size |
 
 Failure modes:
 
@@ -353,7 +353,7 @@ Failure modes:
 
 ## 5. In production
 
-!!! production "Google — FTRL-Proximal logistic regression for ads CTR"
+!!! production "Google: FTRL-Proximal logistic regression for ads CTR"
     *Problem:* $P(\text{click})$ over billions of sparse binary features (query × ad
     crosses), updated online. *What they built:* logistic regression trained with
     FTRL-Proximal (per-coordinate learning rates, L1 for sparsity), with calibration
@@ -361,33 +361,33 @@ Failure modes:
     *Rejected:* plain SGD (worse sparsity for equal accuracy) and heavier models
     (latency/memory). The paper reports that the calibration layer was needed
     because training-set biases and the isotonic/Platt fixes were cheap wins.
-    McMahan et al., KDD 2013 —
+    McMahan et al., KDD 2013.
     [research.google](https://research.google/pubs/ad-click-prediction-a-view-from-the-trenches/).
 
-!!! production "Facebook — GBDT leaves → logistic regression"
+!!! production "Facebook: GBDT leaves → logistic regression"
     *Problem:* ads CTR with 750M daily users. *What they built:* boosted decision
     trees as a feature transformer (each tree's leaf index becomes a one-hot
     feature) feeding a logistic regression trained online; the combination beat
     either model alone by over 3% in normalised entropy. *Trade-off:* trees give
     non-linear feature crosses cheaply; the linear layer gives online updates and
     calibrated probabilities. They also report that data freshness (retraining the
-    linear part daily) matters more than model tweaks. He et al., ADKDD 2014 —
+    linear part daily) matters more than model tweaks. He et al., ADKDD 2014.
     [ai.meta.com](https://ai.meta.com/research/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/).
 
-!!! production "Post-hoc calibration everywhere — Platt (1999), Guo et al. (2017)"
+!!! production "Post-hoc calibration everywhere: Platt (1999), Guo et al. (2017)"
     Platt introduced sigmoid fitting on SVM outputs; Guo et al. showed modern deep
     nets are badly over-confident and that temperature scaling (one parameter,
     a Platt fit with no bias) is "surprisingly effective". Any production classifier
     whose scores drive a threshold, a bid, or a ranking cutoff has one of these
     fitted on a held-out slice. Platt, *Advances in Large Margin Classifiers*, 1999
     (MIT Press; see [Lin, Lin & Weng's note](https://www.csie.ntu.edu.tw/~cjlin/papers/plattprob.pdf) for the numerically stable fit);
-    Guo et al., ICML 2017 — [arXiv:1706.04599](https://arxiv.org/abs/1706.04599).
+    Guo et al., ICML 2017, [arXiv:1706.04599](https://arxiv.org/abs/1706.04599).
 
-!!! production "Stripe — Radar's first model"
+!!! production "Stripe: Radar's first model"
     Stripe describes starting fraud detection with logistic regression before moving
     to tree ensembles and then a deep network, each step justified by measured
     precision/recall gains at fixed latency (their public number: under 100 ms per
-    decision). Drapeau, 2023 — [stripe.dev](https://stripe.dev/blog/how-we-built-it-stripe-radar).
+    decision). Drapeau, 2023, [stripe.dev](https://stripe.dev/blog/how-we-built-it-stripe-radar).
 
 ## 6. Interview questions and strong answers
 
@@ -417,7 +417,7 @@ Failure modes:
     The MLE does not exist; $H$ becomes singular as $p \to \{0,1\}$. Add L2.
 
 !!! interview "Your positive rate is 0.5%. Do you reweight?"
-    Only if the ranking metric (AUC/PR-AUC) demonstrably improves — and then
+    Only if the ranking metric (AUC/PR-AUC) demonstrably improves, and then
     re-calibrate, because reweighting shifts the intercept by $\approx\log(N_0/N_1)$
     and the probabilities become meaningless. Usually better: keep the model
     calibrated and pick the threshold from costs, $t = c_{FP}/(c_{FP}+c_{FN})$.
@@ -426,12 +426,12 @@ Failure modes:
     generative/anomaly formulation ([probabilistic models](05-probabilistic-models-em.md)).
 
 !!! interview "What is Platt scaling, and how is it different from temperature scaling?"
-    Platt: fit $\sigma(as + b)$ on held-out scores by MLE — a 1-D logistic regression,
+    Platt: fit $\sigma(as + b)$ on held-out scores by MLE, a 1-D logistic regression,
     two parameters. Temperature scaling: divide the logit vector by $T$, one
     parameter, no bias, preserves the argmax; it is Platt with $b = 0$ generalised
     to $K$ classes. Both are fit on data the model did not train on. **Follow-up:**
     *when does Platt fail?* When the score-to-probability map is not sigmoid-shaped
-    (e.g. boosted trees with heavy shrinkage) — use isotonic regression given
+    (e.g. boosted trees with heavy shrinkage), use isotonic regression given
     enough data.
 
 !!! interview "Softmax over 100k classes is too slow. Options?"
@@ -507,7 +507,7 @@ $w$ that guarantees monotone decrease.
 ??? success "Solution"
     $\ell''(z) = p(1-p) \le \tfrac14$ (maximised at $p = \tfrac12$). Then
     $H = \tfrac1N X^TRX \preceq \tfrac{1}{4N}X^TX$, so the gradient is Lipschitz with
-    $L = \lambda_{\max}(X^TX)/(4N)$ and $\eta = 1/L = 4N/\lambda_{\max}(X^TX)$ guarantees descent —
+    $L = \lambda_{\max}(X^TX)/(4N)$ and $\eta = 1/L = 4N/\lambda_{\max}(X^TX)$ guarantees descent
     four times the least-squares step of the previous chapter, because the loss is
     flatter.
 

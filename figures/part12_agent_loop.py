@@ -21,10 +21,10 @@ def box(ax, x, y, w, h, text, color, fs=8.5, bold=False):
     ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs, fontweight="bold" if bold else "normal")
 
 
-def arrow(ax, x0, y0, x1, y1, text="", rad=0.0, color="#333333"):
+def arrow(ax, x0, y0, x1, y1, text="", rad=0.0, color="#333333", dx=0.0, dy=0.18, va="bottom"):
     ax.annotate("", xy=(x1, y1), xytext=(x0, y0), arrowprops=dict(arrowstyle="-|>", color=color, lw=1.1, connectionstyle=f"arc3,rad={rad}"))
     if text:
-        ax.text((x0 + x1) / 2, (y0 + y1) / 2 + 0.18, text, ha="center", va="bottom", fontsize=7.5, color=color)
+        ax.text((x0 + x1) / 2 + dx, (y0 + y1) / 2 + dy, text, ha="center", va=va, fontsize=7.5, color=color)
 
 
 def main() -> None:
@@ -41,10 +41,10 @@ def main() -> None:
     box(ax, 0.3, 1.2, 2.2, 1.1, "Trajectory recorder\n(s, a, o)_t → eval by\ntask success, cost, steps", "#f0f0f0", 8)
     arrow(ax, 2.5, 4.1, 3.4, 4.1)
     arrow(ax, 6.6, 4.3, 7.6, 4.3, "act: tool call")
-    arrow(ax, 7.6, 3.8, 6.6, 3.8, "observe: tool result", color=c[2])
-    arrow(ax, 5.0, 3.4, 5.0, 2.3, "append to state", color=c[1])
-    arrow(ax, 5.0, 2.3, 5.0, 3.4, "", rad=0.0, color=c[1])
-    arrow(ax, 8.9, 3.5, 8.9, 2.3, "every call passes through", color=c[3])
+    arrow(ax, 7.6, 3.75, 6.6, 3.75, "observe: tool result", color=c[2], dy=-0.14, va="top")
+    arrow(ax, 5.0, 3.4, 5.0, 2.3, "append to state", color=c[1], dx=1.05, dy=-0.04)
+    arrow(ax, 5.0, 2.3, 5.0, 3.4, "", color=c[1])
+    arrow(ax, 8.9, 3.5, 8.9, 2.3, "every call passes through", color=c[3], dy=-0.02)
     arrow(ax, 3.4, 1.75, 2.5, 1.75, "log", color="#777777")
     ax.text(5.0, 0.55, "Terminates on a final answer or the step budget. The step budget, sandbox and permissioning are the safety envelope (Part XV).", ha="center", fontsize=8, color="#555555")
     ax.text(5.0, 0.2, "Training signal for agentic RL: reward = verifier(task, final state) at the end of the trajectory, credit spread over the tokens of every action.", ha="center", fontsize=8, color="#555555")

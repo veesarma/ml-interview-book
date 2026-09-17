@@ -22,7 +22,7 @@ for eps in [0.0, 0.05, 0.1, 0.2]:
 ax.set_xlabel("logit gap  z_true - z_other")
 ax.set_ylabel("cross-entropy with smoothed target")
 ax.set_ylim(0, 1.2)
-ax.set_title("Hard targets push the gap to infinity; smoothing gives a finite optimum log((K-1)(1-eps)/eps + 1)", fontsize=8.5)
+ax.set_title("Hard targets push the logit gap to infinity;\nsmoothing q = (1-eps) y + eps/K gives a finite optimum at gap = log(K(1-eps)/eps + 1)", fontsize=8.5)
 ax.legend(fontsize=8)
 ax.grid(alpha=0.3)
 fig.tight_layout()

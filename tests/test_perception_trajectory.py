@@ -62,24 +62,68 @@ def test_metrics_minade_minfde_miss_rate():
     assert tp.miss_rate(pred, gt, threshold=2.0) == 1.0
 
 
-def test_trajectory_predictor_learns_a_bimodal_future():
-    torch.manual_seed(0)
-    model = tp.TrajectoryPredictor(d_model=32, num_modes=4, horizon=6)
-    opt = torch.optim.Adam(model.parameters(), lr=5e-3)
-    hist = torch.zeros(64, 4, 2)
-    hist[:, :, 0] = torch.linspace(-3, 0, 4)  # everyone approaches the same junction
-    others = torch.zeros(64, 1, 4, 2)
-    turn_left = torch.arange(64) % 2 == 0
-    gt = torch.zeros(64, 6, 2)
-    gt[:, :, 0] = torch.linspace(1, 6, 6)
-    gt[turn_left, :, 1] = torch.linspace(0.5, 3, 6)
-    gt[~turn_left, :, 1] = -torch.linspace(0.5, 3, 6)
-    for _ in range(150):
+def _bimodal_batch(n=64, horizon=6):
+    """A perfectly ambiguous junction: identical history, half the futures turn left, half right."""
+    hist = torch.zeros(n, 4, 2)
+    hist[:, :, 0] = torch.linspace(-3, 0, 4)  # everyone approaches the same junction identically
+    others = torch.zeros(n, 1, 4, 2)
+    turn_left = torch.arange(n) % 2 == 0
+    gt = torch.zeros(n, horizon, 2)
+    gt[:, :, 0] = torch.linspace(1, 6, horizon)
+    gt[turn_left, :, 1] = torch.linspace(0.5, 3, horizon)
+    gt[~turn_left, :, 1] = -torch.linspace(0.5, 3, horizon)
+    return hist, others, gt
+
+
+def _train(model, hist, others, gt, loss_fn, steps=200, lr=5e-3):
+    opt = torch.optim.Adam(model.parameters(), lr=lr)
+    for _ in range(steps):
         opt.zero_grad()
         pred, logits = model(hist, others)
-        loss, _ = tp.winner_takes_all_loss(pred, logits, gt)
+        loss, _ = loss_fn(pred, logits, gt)
         loss.backward()
         opt.step()
-    pred, logits = model(hist, others)
-    assert tp.min_ade(pred, gt).item() < 0.3  # both futures are covered by some mode
+    return model(hist, others)
+
+
+def test_kmeans_anchors_recover_the_two_manoeuvres():
+    torch.manual_seed(0)
+    _, _, gt = _bimodal_batch()
+    anchors = tp.kmeans_trajectory_anchors(gt, num_anchors=2, n_iters=20)
+    assert anchors.shape == (2, 6, 2)
+    # One anchor turns left (final y > 0), the other right; each matches a real future exactly.
+    finals = sorted(a[-1, 1].item() for a in anchors)
+    assert finals[0] < -2.5 and finals[1] > 2.5
+    assign = tp.anchor_assignment(gt, anchors)
+    assert assign[::2].unique().numel() == 1 and assign[1::2].unique().numel() == 1
+    assert assign[0] != assign[1]  # left-turners and right-turners land on different anchors
+
+
+def test_plain_wta_collapses_to_the_mean_on_a_symmetric_input():
+    """Documents the dead-mode failure that motivates anchors: the winner is chosen by the
+    model's own output, so one mode wins both manoeuvres and is dragged to their average."""
+    torch.manual_seed(0)
+    hist, others, gt = _bimodal_batch()
+    model = tp.TrajectoryPredictor(d_model=32, num_modes=4, horizon=6)
+    pred, logits = _train(model, hist, others, gt, tp.winner_takes_all_loss)
+    _, best = tp.winner_takes_all_loss(pred, logits, gt)
+    assert best.unique().numel() == 1  # a single mode won every example
+    winner = pred[0, best[0]]  # (T_f, 2) the collapsed trajectory
+    assert winner[:, 1].abs().max().item() < 0.6  # it goes straight: the mean of left and right
+    assert tp.min_ade(pred, gt).item() > 0.8  # neither manoeuvre is covered
+
+
+def test_anchored_wta_covers_both_futures():
+    torch.manual_seed(0)
+    hist, others, gt = _bimodal_batch()
+    anchors = tp.kmeans_trajectory_anchors(gt, num_anchors=4, n_iters=20)
+    model = tp.TrajectoryPredictor(d_model=32, num_modes=4, horizon=6, anchors=anchors)
+    loss_fn = lambda pred, logits, g: tp.anchor_wta_loss(pred, logits, g, anchors)  # noqa: E731
+    pred, logits = _train(model, hist, others, gt, loss_fn)
+    assert tp.min_ade(pred, gt).item() < 0.2  # both futures are covered by some mode
     assert tp.miss_rate(pred, gt, threshold=1.0).item() == 0.0
+    # The two manoeuvres are covered by *different* modes, not by one averaged mode.
+    best_left = tp.ade_per_mode(pred[::2], gt[::2]).argmin(dim=1)
+    best_right = tp.ade_per_mode(pred[1::2], gt[1::2]).argmin(dim=1)
+    assert best_left.unique().numel() == 1 and best_right.unique().numel() == 1
+    assert best_left[0] != best_right[0]

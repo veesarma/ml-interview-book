@@ -7,7 +7,7 @@
 > rule comes from and where it breaks (repeated data, inference cost), and being able to fit
 > a law from a handful of small runs instead of quoting one.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Kaplan et al. (2020): loss is a power law in each of $N$ (non-embedding parameters), $D$
   (tokens) and $C$ (compute) over many orders of magnitude; shape (depth/width) matters
@@ -200,7 +200,7 @@ with $10^{-3}$ noise and recovers exponents within 0.03 and $E$ within 0.05, the
 extrapolation to a 5B model within 0.02 nats. When fitting real runs, use the final loss of
 each run *after* its learning-rate decay finished, and span at least two decades of compute.
 
-??? example "Full implementation — `src/mlbook/llm/scaling_laws.py`"
+??? example "Full implementation: `src/mlbook/llm/scaling_laws.py`"
     ```python
     --8<-- "src/mlbook/llm/scaling_laws.py"
     ```
@@ -254,7 +254,7 @@ accuracy, so they could predict downstream scores of the 405B model from small r
 
 ## 5. In production
 
-!!! production "DeepMind — Chinchilla"
+!!! production "DeepMind: Chinchilla"
     Problem: Gopher (280B) had been trained on 300B tokens following Kaplan-style
     allocation. Hoffmann et al. re-ran the analysis with matched schedules on >400 models and
     concluded parameters and tokens should scale equally. They trained Chinchilla (70B, 1.4T
@@ -263,7 +263,7 @@ accuracy, so they could predict downstream scores of the 405B model from small r
     4× smaller model (cheaper inference) at equal cost with better quality.
     Source: [Training Compute-Optimal Large Language Models](https://arxiv.org/abs/2203.15556).
 
-!!! production "Meta — Llama 3 sizing"
+!!! production "Meta: Llama 3 sizing"
     Llama 3 ran its own scaling-law study with runs from $6\times10^{18}$ to $10^{22}$ FLOPs
     and reports that at their flagship budget ($3.8\times10^{25}$ FLOPs) the compute-optimal
     model is about 402B parameters on 16.55T tokens, which is why the 405B model was trained
@@ -272,14 +272,14 @@ accuracy, so they could predict downstream scores of the 405B model from small r
     observed that the iso-FLOP curves are flat near the optimum, making that choice cheap.
     Source: [The Llama 3 Herd of Models](https://arxiv.org/abs/2407.21783).
 
-!!! production "Hugging Face et al. — data-constrained scaling"
+!!! production "Hugging Face et al.: data-constrained scaling"
     Muennighoff et al. trained up to 9B-parameter models with up to 900B tokens of repeated
     data and fit the repetition-discount law of §2.5. The result that matters
     operationally: ≈4 epochs are free, and when unique data is scarce you should train a
     smaller model for more epochs rather than pad the corpus with lower-quality text.
     Source: [Scaling Data-Constrained Language Models](https://arxiv.org/abs/2305.16264).
 
-!!! production "DeepSeek — scaling for MoE"
+!!! production "DeepSeek: scaling for MoE"
     DeepSeek-V3's report describes choosing hyperparameters and the token budget using
     scaling experiments on smaller MoE models, and validates its multi-token-prediction and
     aux-loss-free choices with ablations at 15B and 200B+ total-parameter scales. The

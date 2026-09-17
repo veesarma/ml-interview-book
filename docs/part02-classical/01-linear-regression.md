@@ -9,14 +9,14 @@
 > objective, naming the failure mode of each solver, and knowing where a linear model
 > is still the right production choice.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Model: $\hat{y} = Xw$, $X \in \R^{N \times d}$, $w \in \R^d$. Loss $L(w) = \tfrac{1}{N}\norm{Xw - y}^2$.
 - Gradient $\nabla_w L = \tfrac{2}{N} X^T (Xw - y)$; setting it to zero gives the normal equations $\boxed{X^TX w = X^T y}$.
 - Geometry: $\hat{y} = X(X^TX)^{-1}X^T y$ is the orthogonal projection of $y$ onto the column space of $X$; the residual is orthogonal to every column.
 - Singular $X^TX$ (collinearity, $d > N$): infinitely many minimisers; the pseudoinverse $w = X^+ y = V S^+ U^T y$ picks the minimum-norm one.
 - Gradient descent converges at rate $(1 - \lambda_{\min}/\lambda_{\max})^t$: the **condition number** of $X^TX$ is the whole story. Standardise features.
-- Ridge: $w = (X^TX + \lambda I)^{-1} X^T y$; in the SVD basis each direction is shrunk by $\boxed{s_i^2 / (s_i^2 + \lambda)}$ — small singular directions (noise) are shrunk hardest. Bayesian view: Gaussian prior $w \sim \mathcal N(0, \sigma^2/\lambda\, I)$, ridge = MAP.
+- Ridge: $w = (X^TX + \lambda I)^{-1} X^T y$; in the SVD basis each direction is shrunk by $\boxed{s_i^2 / (s_i^2 + \lambda)}$, small singular directions (noise) are shrunk hardest. Bayesian view: Gaussian prior $w \sim \mathcal N(0, \sigma^2/\lambda\, I)$, ridge = MAP.
 - Lasso: $\tfrac{1}{2N}\norm{Xw-y}^2 + \lambda \norm{w}_1$; the L1 ball has corners on the axes, so the solution lands on them → exact zeros. Coordinate descent: $w_j \leftarrow S(\tfrac{1}{N} x_j^T r_{-j}, \lambda) / (\tfrac{1}{N} x_j^T x_j)$ with soft-threshold $S(z,\lambda) = \operatorname{sign}(z)\max(|z|-\lambda, 0)$.
 - Bias–variance: OLS is unbiased with variance $\sigma^2 (X^TX)^{-1}$; ridge trades a little bias for a large variance reduction along ill-conditioned directions.
 - Production: Google's ad CTR system was a (huge, sparse, online) linear model for years; Stripe's Radar started with logistic regression; Wide & Deep keeps a linear "wide" tower for memorisation. Linear models remain the calibration layer on top of almost every deep model.
@@ -158,7 +158,7 @@ a Laplace prior $p(w_j) \propto e^{-|w_j|/b}$.
 
 Assume $y = Xw_0 + \varepsilon$, $\E[\varepsilon] = 0$, $\operatorname{Cov}(\varepsilon) = \sigma^2 I$.
 
-- OLS: $\E[w^\star] = (X^TX)^{-1}X^T X w_0 = w_0$ (unbiased), $\operatorname{Cov}(w^\star) = \sigma^2 (X^TX)^{-1}$, so the variance along direction $v_i$ is $\sigma^2/s_i^2$ — it explodes in nearly-collinear directions. Gauss–Markov: OLS has the smallest variance among *unbiased linear* estimators.
+- OLS: $\E[w^\star] = (X^TX)^{-1}X^T X w_0 = w_0$ (unbiased), $\operatorname{Cov}(w^\star) = \sigma^2 (X^TX)^{-1}$, so the variance along direction $v_i$ is $\sigma^2/s_i^2$, it explodes in nearly-collinear directions. Gauss–Markov: OLS has the smallest variance among *unbiased linear* estimators.
 - Ridge: $\E[w_\lambda] = (X^TX + \lambda I)^{-1}X^TX\, w_0 \ne w_0$ (biased toward $0$), $\operatorname{Cov}(w_\lambda) = \sigma^2 (X^TX+\lambda I)^{-1} X^TX (X^TX + \lambda I)^{-1}$, whose component along $v_i$ is $\sigma^2 s_i^2/(s_i^2+\lambda)^2 < \sigma^2/s_i^2$.
 
 *Meaning:* along a direction with $s_i^2 \ll \lambda$ ridge trades a bias of size
@@ -213,7 +213,7 @@ every weight at zero is $\lambda_{\max} = \max_j |x_j^T y|/N$.
 
 - **Scaling** changes ridge and lasso solutions (the penalty is not scale-invariant) and the GD convergence rate; it does *not* change the OLS fit. Standardise before penalising; never penalise the intercept.
 - **Collinearity** inflates OLS variance ($\sigma^2/s_i^2$) and makes weights uninterpretable (a pair of near-duplicate features can take $+10^6$ and $-10^6$). Diagnose with the variance inflation factor $\mathrm{VIF}_j = 1/(1 - R_j^2)$ or the condition number. Ridge stabilises; lasso picks one of the duplicates arbitrarily (elastic net, ridge + lasso, keeps groups together).
-- **Interactions and non-linearity** are added as features ($x_1 x_2$, $x^2$, spline bases, hashed crosses): the model stays linear *in $w$*, so every result here still holds. This is how "linear" CTR models capture `(country × ad_id)` effects — Google's paper below has billions of such crossed features.
+- **Interactions and non-linearity** are added as features ($x_1 x_2$, $x^2$, spline bases, hashed crosses): the model stays linear *in $w$*, so every result here still holds. This is how "linear" CTR models capture `(country × ad_id)` effects, Google's paper below has billions of such crossed features.
 
 ## 3. Implementation
 
@@ -255,7 +255,7 @@ def fit_ols_gradient_descent(X, y, lr=None, n_steps=1000):
 ```
 
 The default step is $1/L$ where $L = \tfrac{2}{N}\lambda_{\max}(X^TX)$ is the Lipschitz
-constant of the gradient — the largest step that is guaranteed to decrease the loss
+constant of the gradient, the largest step that is guaranteed to decrease the loss
 every iteration (§2.3).
 
 ```python
@@ -295,7 +295,7 @@ def fit_lasso_coordinate_descent(X, y, lam, n_sweeps=200, tol=1e-8):
 
 Two details matter for speed. The residual is updated incrementally
 ($O(N)$ per coordinate instead of recomputing $Xw$ at $O(Nd)$), so one full sweep is
-$O(Nd)$ — the same as one gradient step, but each coordinate move is exact. And the
+$O(Nd)$, the same as one gradient step, but each coordinate move is exact. And the
 partial residual $r_{-j}$ is obtained by *adding back* the current contribution of
 feature $j$ rather than recomputing a sum over $d - 1$ features.
 
@@ -307,7 +307,7 @@ planted 3-sparse support with exact zeros elsewhere, satisfying the KKT conditio
 $\tfrac{1}{N}x_j^T r = \lambda\operatorname{sign}(w_j)$ on active coordinates, and reducing to
 OLS at $\lambda = 0$.
 
-??? example "Full implementation — `src/mlbook/classical/linear_regression.py`"
+??? example "Full implementation: `src/mlbook/classical/linear_regression.py`"
     ```python
     --8<-- "src/mlbook/classical/linear_regression.py"
     ```
@@ -358,7 +358,7 @@ interpretability, monotonicity guarantees, or a regulator-friendly model → lin
 
 ## 5. In production
 
-!!! production "Google — ad click prediction with FTRL-Proximal"
+!!! production "Google: ad click prediction with FTRL-Proximal"
     *Problem:* predict $P(\text{click})$ for billions of query–ad pairs per day, with
     billions of sparse crossed features, under strict latency and memory limits.
     *What they built:* a **logistic regression** (a linear model on the log-odds; next
@@ -369,28 +369,28 @@ interpretability, monotonicity guarantees, or a regulator-friendly model → lin
     fewer exact zeros for the same accuracy. *Why it matters here:* it is the
     coordinate-wise soft-thresholding of §2.6 applied one example at a time at
     planetary scale. Source: McMahan et al., "Ad Click Prediction: a View from the
-    Trenches", KDD 2013 —
+    Trenches", KDD 2013.
     [research.google](https://research.google/pubs/ad-click-prediction-a-view-from-the-trenches/).
 
-!!! production "Google Play — Wide & Deep"
+!!! production "Google Play: Wide & Deep"
     *Problem:* app recommendation where some feature crosses should be *memorised*
     exactly (`installed_app=netflix AND impression_app=pandora`) and others
     *generalised* via embeddings. *What they built:* a linear "wide" tower over
     hashed cross-product features, jointly trained with a deep tower; the wide part
     is exactly a sparse linear model trained with FTRL. *Trade-off stated in the
     paper:* the deep part over-generalises on rare crosses, the wide part cannot
-    generalise to unseen ones; the sum fixes both. Cheng et al., 2016 —
+    generalise to unseen ones; the sum fixes both. Cheng et al., 2016.
     [arXiv:1606.07792](https://arxiv.org/abs/1606.07792).
 
-!!! production "Stripe — Radar started with logistic regression"
+!!! production "Stripe: Radar started with logistic regression"
     Stripe's fraud system began with simple models (logistic regression) before
     moving to tree ensembles and then deep networks as data volume and tooling
     grew; the engineering post is explicit that the linear baseline came first and
     that model complexity was added only when it paid for itself in the
     precision/recall trade-off that merchants see. Drapeau, "How we built it: Stripe
-    Radar", 2023 — [stripe.dev](https://stripe.dev/blog/how-we-built-it-stripe-radar).
+    Radar", 2023, [stripe.dev](https://stripe.dev/blog/how-we-built-it-stripe-radar).
 
-!!! production "Everyone — the calibration layer"
+!!! production "Everyone: the calibration layer"
     Temperature scaling and Platt scaling, the standard post-hoc calibrators for deep
     classifiers, are one- and two-parameter *linear* models fitted on the model's
     logit (Guo et al., 2017, [arXiv:1706.04599](https://arxiv.org/abs/1706.04599)).
@@ -414,7 +414,7 @@ interpretability, monotonicity guarantees, or a regulator-friendly model → lin
     Diagnose first: duplicated columns, dummy-variable trap, $d > N$. Options in
     order of preference: remove the redundancy (interpretability), ridge (smooth,
     always invertible, closed form), pseudoinverse (minimum-norm solution, what
-    `lstsq` does silently — dangerous because it hides the problem). *Never*
+    `lstsq` does silently, dangerous because it hides the problem). *Never*
     `np.linalg.inv` on a nearly-singular matrix. **Follow-up:** *why does the
     minimum-norm solution generalise reasonably in the $d > N$ regime?* Because
     among all interpolating solutions it has the smallest weights, which is
@@ -425,7 +425,7 @@ interpretability, monotonicity guarantees, or a regulator-friendly model → lin
     Two arguments. Geometric: level sets of the loss meet the L1 ball at its corners
     (on the axes) with positive probability; the L2 ball has no corners. Analytic:
     the coordinate-wise optimum is $S(\rho, \lambda)/a$, which is exactly zero
-    whenever $|\rho| \le \lambda$ — a dead zone of positive width. For ridge the
+    whenever $|\rho| \le \lambda$, a dead zone of positive width. For ridge the
     coordinate update is $\rho/(a + \lambda)$, which is zero only if $\rho = 0$.
     **Follow-up:** *when would you still prefer ridge?* Correlated groups of useful
     features (lasso picks one arbitrarily and is unstable across resamples), when
@@ -437,7 +437,7 @@ interpretability, monotonicity guarantees, or a regulator-friendly model → lin
     $\approx 1$ when $s_i^2 \gg \lambda$ and $\approx s_i^2/\lambda$ when $s_i^2 \ll \lambda$.
     Ridge is a soft version of "drop the low-variance principal components"
     (principal-components regression is the hard version). **Follow-up:** *what is
-    the OLS variance along direction $i$?* $\sigma^2/s_i^2$ — which is why the
+    the OLS variance along direction $i$?* $\sigma^2/s_i^2$, which is why the
     low-$s_i$ directions are exactly the ones ridge should damp.
 
 !!! interview "Gradient descent on a linear model is slow. Why, and what do you do?"

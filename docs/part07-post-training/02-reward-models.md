@@ -2,7 +2,7 @@
 
 > **Why this matters at staff level.** The reward model is the only place in RLHF where human judgement enters, and everything downstream (PPO, best-of-N, rejection sampling, DPO's implicit reward) optimises against it. Interviewers ask you to derive the Bradley–Terry loss from a probabilistic model, to explain why a reward model *must* be over-optimised eventually, and to design the RM data pipeline. Strong signal is treating the RM as a statistical estimator with a finite validity region, not as ground truth.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Preference data: $(x, y_w, y_l)$, a prompt and a preferred / rejected response pair. Rankings of $K$ responses become $\binom{K}{2}$ pairs.
 - Bradley–Terry: $P(y_w \succ y_l \mid x) = \sigma\big(r(x,y_w) - r(x,y_l)\big)$. Maximum likelihood gives $\boxed{L_{\mathrm{RM}} = -\log\sigma\big(r_\phi(x,y_w) - r_\phi(x,y_l)\big)}$: logistic regression on the reward difference with weight fixed at 1 and no bias.
@@ -80,13 +80,13 @@ $$
 
 Putting all pairs from one prompt in one batch also stops the model from overfitting after a single epoch by seeing the same response $K-1$ times in different batches.
 
-**Margins.** With an annotator confidence level (e.g. "significantly better" vs "slightly better") mapped to a margin $m \ge 0$:
+**Margins.** Llama 2 asked annotators to rate their preference on a four-point scale running from "negligibly better" up to a top rating meaning one response was far ahead. Map that rating to a margin $m \ge 0$:
 
 $$
 L_m = -\log\sigma\big(r_w - r_l - m\big).
 $$
 
-The loss now saturates only once the gap exceeds $m$, which separates strongly preferred pairs further. Llama 2 used this and reported it improved helpfulness RM accuracy on the "significantly better" pairs.
+The loss now saturates only once the gap exceeds $m$, which separates strongly preferred pairs further. Llama 2 reported that the margin term improved helpfulness RM accuracy, with the gain concentrated on the pairs annotators had marked as far apart.
 
 **Ties.** A tie label carries information (the two rewards should be close). Options: drop ties (loses data, ~20–30 % on some datasets), treat as two half-weighted pairs in each direction (pushes the gap to 0 but with a poor likelihood), or use a three-outcome model such as Rao–Kupper, $P(\text{tie}) = \frac{(\theta^2-1)e^{r_w + r_l}}{(e^{r_w} + \theta e^{r_l})(\theta e^{r_w} + e^{r_l})}$ with a learned tie width $\theta > 1$.
 
@@ -150,7 +150,7 @@ Chosen and rejected go through the *same* network in two forward passes (in prod
 
 **How you'd test it.** Build a synthetic preference rule ("answers containing `yes` beat answers containing `no`"), train for 60 steps, check pairwise accuracy reaches 100 % on the training pairs, and check padding invariance. `tests/test_posttrain_reward_model.py`.
 
-??? example "Full implementation — `src/mlbook/posttrain/reward_model.py`"
+??? example "Full implementation: `src/mlbook/posttrain/reward_model.py`"
     ```python
     --8<-- "src/mlbook/posttrain/reward_model.py"
     ```
@@ -162,7 +162,7 @@ Chosen and rejected go through the *same* network in two forward passes (in prod
 | `bradley_terry_loss` | `src/mlbook/posttrain/reward_model.py` | yes | 5 minutes (10 with the gradient derivation on paper) |
 | `bradley_terry_prob` | `src/mlbook/posttrain/reward_model.py` | yes | 1 minute |
 | `TinyRewardModel.forward` (last-token gather) | `src/mlbook/posttrain/reward_model.py` | yes | 8 minutes |
-| `train_reward_model`, `pairwise_accuracy` | `src/mlbook/posttrain/reward_model.py` | read only | — |
+| `train_reward_model`, `pairwise_accuracy` | `src/mlbook/posttrain/reward_model.py` | read only |: |
 
 Check with `pytest tests/test_posttrain_reward_model.py -q`. Per-symbol tests: `test_bradley_terry_loss_equals_logistic_regression_on_gap`, `test_margin_increases_loss_until_gap_exceeds_it`, `test_reward_model_learns_synthetic_preference` (covers the forward gather via the padding-invariance assertion).
 
@@ -196,16 +196,16 @@ Check with `pytest tests/test_posttrain_reward_model.py -q`. Per-symbol tests: `
 
 ## 5. In production
 
-!!! production "OpenAI — InstructGPT: a 6B RM trained on all pairs of K-ranked responses"
+!!! production "OpenAI: InstructGPT: a 6B RM trained on all pairs of K-ranked responses"
     Labelers ranked $K = 4$–$9$ responses per prompt. All $\binom{K}{2}$ pairs of one prompt were put in the same batch, which OpenAI found stopped the RM overfitting after one epoch and was computationally cheaper (one forward per response). The RM was a 6B model regardless of policy size; they report the 175B RM was unstable to train. The RM initialised from the SFT model with the unembedding replaced by a scalar head. Source: Ouyang et al., 2022, [arXiv:2203.02155](https://arxiv.org/abs/2203.02155).
 
-!!! production "Meta — Llama 2: two reward models, margins, weekly on-policy batches"
+!!! production "Meta: Llama 2: two reward models, margins, weekly on-policy batches"
     Meta trained separate *helpfulness* and *safety* RMs (a single RM traded the two off badly), initialised from the chat model checkpoints so the RM "knows what the chat model knows". Annotators chose between two responses and rated confidence on a 4-point scale that was mapped to a margin term in the loss. Preference data was collected in weekly batches on samples from the latest policy, over five RLHF iterations, with over one million pairs collected in total. Combination: use the safety RM score when the prompt is flagged unsafe and its score is low, else helpfulness, with a whitening transform before PPO. Source: Touvron et al., 2023, [arXiv:2307.09288](https://arxiv.org/abs/2307.09288).
 
-!!! production "Meta — Llama 3: the RM as a rejection-sampling filter, then DPO"
+!!! production "Meta: Llama 3: the RM as a rejection-sampling filter, then DPO"
     Llama 3 trained an RM on human preference data with a third "edited" response option (annotators could edit the chosen response, giving an edited $\succ$ chosen $\succ$ rejected ranking), used it to pick the best of $K$ samples per prompt for SFT (rejection sampling), and then trained with DPO rather than PPO, citing lower compute and better stability at scale. Source: Grattafiori et al., 2024, [arXiv:2407.21783](https://arxiv.org/abs/2407.21783).
 
-!!! production "Anthropic — Constitutional AI: AI-labelled preferences for harmlessness"
+!!! production "Anthropic: Constitutional AI: AI-labelled preferences for harmlessness"
     For harmlessness, the preference model was trained on comparisons labelled by an AI model following a set of written principles (RLAIF) rather than by humans; helpfulness labels stayed human. This decoupled the cost of harmlessness data from human labelling and made the labelling policy explicit and auditable. Source: Bai et al., 2022, [arXiv:2212.08073](https://arxiv.org/abs/2212.08073).
 
 ## 6. Interview questions and strong answers

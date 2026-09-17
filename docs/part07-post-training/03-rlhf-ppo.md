@@ -2,7 +2,7 @@
 
 > **Why this matters at staff level.** PPO-based RLHF is the reference recipe (InstructGPT, Llama 2, Claude's early generations) and the thing every later method (DPO, GRPO) is defined against. The interview asks you to write the objective, say where the KL penalty enters the per-token reward, derive the clipped surrogate and explain why it approximates a trust region, then switch to systems: four models in memory, generation as the bottleneck, and what you would cut. Strong signal is being able to move between the equation and the memory table without notes.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Objective: $\boxed{\max_\theta\; \E_{x \sim \mathcal D,\, y \sim \pi_\theta(\cdot|x)}\big[r_\phi(x, y)\big] - \beta\, \E_x \KL\big(\pi_\theta(\cdot|x)\,\|\,\pi_{\mathrm{ref}}(\cdot|x)\big)}$, $\beta \approx 0.01$–$0.1$.
 - Tokens are actions $a_t$, the state $s_t$ is the prompt plus the tokens so far, an episode is one response. The sequence reward $r_\phi(x,y)$ lands on the **last** response token; the KL is paid **per token**: $R_t = -\beta\big[\log\pi_\theta(a_t|s_t) - \log\pi_{\mathrm{ref}}(a_t|s_t)\big] + \mathbb 1[t = T]\, r_\phi(x, y)$.
@@ -64,7 +64,7 @@ $$
 \boxed{\;R_t = -\beta\big[\log\pi_\theta(a_t|s_t) - \log\pi_{\mathrm{ref}}(a_t|s_t)\big] + \mathbb 1[t = T]\; r_\phi(x, y)\;}
 $$
 
-This is where the KL enters: not as a separate loss term but as a dense, per-token shaping reward, which is what lets the critic and GAE assign it. (Some implementations add the KL as a loss instead, GRPO-style; chapter 5 discusses the difference.) In practice $\log\pi_\theta$ in $R_t$ is evaluated with the *sampling* policy $\pi_{\mathrm{old}}$ and treated as a constant, so the gradient flows only through the surrogate.
+The KL enters as a dense, per-token shaping reward rather than a separate loss term, which is what lets the critic and GAE assign credit for it. (Some implementations add the KL as a loss instead, GRPO-style; chapter 5 discusses the difference.) In practice $\log\pi_\theta$ in $R_t$ is evaluated with the *sampling* policy $\pi_{\mathrm{old}}$ and treated as a constant, so the gradient flows only through the surrogate.
 
 Why the KL at all? Three reasons that come up in interviews. (1) The RM is only valid near its training distribution (chapter 2 §2.5); the KL keeps the policy there. (2) The reference distribution is a prior over fluent language; without it, reward maximisation finds degenerate high-reward strings. (3) It makes the optimum well defined: with $\beta > 0$ the maximiser is $\pi^\star \propto \pi_{\mathrm{ref}}\exp(r/\beta)$ (chapter 4 derives this), a *tilt* of the reference rather than a delta function.
 
@@ -201,7 +201,7 @@ def ppo_update(policy, critic, opt, roll, scores, beta, clip_eps=0.2, ppo_epochs
 
 **How you'd test it.** (1) `shaped_rewards`: the KL term is zero where policy = reference and the score appears only at the last response index. (2) `gae`: matches a brute-force sum and equals the Monte-Carlo return minus $V$ at $\lambda = 1$. (3) `ppo_clip_loss`: at `logp_new == logp_old` the loss is $-\bar A$ and the gradient equals the vanilla policy gradient; when the ratio is beyond the clip in the advantage's direction the gradient is zero. (4) End to end on the toy LM with a near-uniform reference and the reward "count the token `good`": mean reward rises and the per-sequence KL stays below a bound. `tests/test_posttrain_ppo.py`.
 
-??? example "Full implementation — `src/mlbook/posttrain/ppo_lm.py`"
+??? example "Full implementation: `src/mlbook/posttrain/ppo_lm.py`"
     ```python
     --8<-- "src/mlbook/posttrain/ppo_lm.py"
     ```
@@ -215,7 +215,7 @@ def ppo_update(policy, critic, opt, roll, scores, beta, clip_eps=0.2, ppo_epochs
 | `ppo_clip_loss` | `src/mlbook/posttrain/ppo_lm.py` | yes | 8 minutes |
 | `value_loss` | `src/mlbook/posttrain/ppo_lm.py` | yes | 4 minutes |
 | `AdaptiveKLController.update` | `src/mlbook/posttrain/ppo_lm.py` | yes | 3 minutes |
-| `TinyCritic`, `collect_rollouts`, `ppo_update`, `train_ppo`, `masked_entropy` | `src/mlbook/posttrain/ppo_lm.py` | read only | — |
+| `TinyCritic`, `collect_rollouts`, `ppo_update`, `train_ppo`, `masked_entropy` | `src/mlbook/posttrain/ppo_lm.py` | read only |: |
 
 Check with `pytest tests/test_posttrain_ppo.py -q`. Per-symbol tests: `test_shaped_rewards_places_score_and_kl`, `test_gae_matches_brute_force_and_mc_return`, `test_ppo_clip_loss_gradient_and_clipping`, `test_value_loss_clipping`, `test_kl_controller_moves_beta_toward_target`, `test_train_ppo_increases_reward_with_bounded_kl`.
 
@@ -258,16 +258,16 @@ Against ~16 bytes/param for pretraining, RLHF-PPO is $\gtrsim 2.2\times$ the sta
 
 ## 5. In production
 
-!!! production "OpenAI — InstructGPT: PPO with a pretraining-mix loss"
+!!! production "OpenAI: InstructGPT: PPO with a pretraining-mix loss"
     The 1.3B–175B policies were optimised with PPO against the 6B RM with a per-token KL penalty ($\beta = 0.02$) to the SFT model. Because pure RLHF regressed on public NLP benchmarks (the "alignment tax"), they added the pretraining gradient back in ("PPO-ptx"): $\gamma\,\E_{x\sim\mathcal D_{\mathrm{pretrain}}}[\log\pi_\theta(x)]$ mixed into the objective, which recovered most of the regression. Labelers preferred the 1.3B PPO-ptx model to the 175B GPT-3. Source: Ouyang et al., 2022, [arXiv:2203.02155](https://arxiv.org/abs/2203.02155).
 
-!!! production "Meta — Llama 2-Chat: rejection sampling first, then PPO"
+!!! production "Meta: Llama 2-Chat: rejection sampling first, then PPO"
     Five RLHF iterations. For the first four, Meta used *rejection sampling fine-tuning*: sample $K$ responses per prompt from the current policy, keep the best under the RM, and fine-tune on it. Only in the last iteration did they combine rejection sampling with PPO, reporting that rejection sampling explores more broadly (the max over $K$ samples) while PPO makes finer per-token updates. The PPO reward was a whitened combination of the safety and helpfulness RMs minus a KL term with $\beta = 0.01$. Source: Touvron et al., 2023, [arXiv:2307.09288](https://arxiv.org/abs/2307.09288).
 
-!!! production "Anthropic — Constitutional AI: PPO against an AI-labelled preference model"
+!!! production "Anthropic: Constitutional AI: PPO against an AI-labelled preference model"
     The RL phase of Constitutional AI is standard RLHF PPO except that the harmlessness preference model was trained on AI-generated comparisons guided by a written constitution. The paper reports the resulting models as both more harmless and less evasive than the human-feedback baseline at comparable helpfulness. Source: Bai et al., 2022, [arXiv:2212.08073](https://arxiv.org/abs/2212.08073).
 
-!!! production "Meta — Llama 3: chose DPO over PPO at 405B"
+!!! production "Meta: Llama 3: chose DPO over PPO at 405B"
     Meta reports choosing DPO for the 405B model because it required less compute than on-policy PPO (no critic, no online RM scoring) and was easier to scale, especially for instruction-following. This is the clearest public statement of the systems trade-off in this chapter. Source: Grattafiori et al., 2024, [arXiv:2407.21783](https://arxiv.org/abs/2407.21783).
 
 ## 6. Interview questions and strong answers

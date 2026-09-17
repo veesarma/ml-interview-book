@@ -8,7 +8,7 @@
 > implementing GQA and a top-k MoE from a blank file, and explaining what a selective SSM
 > gives up relative to attention.
 
-## TL;DR — the interview card
+## TL;DR: the interview card
 
 - Dense baseline: pre-norm (RMSNorm) blocks, SwiGLU FFN with $d_{ff}\approx \tfrac{8}{3}d$,
   RoPE, no biases, tied or untied embeddings. Llama 2/3, Mistral, Qwen, Gemma are all this.
@@ -288,22 +288,22 @@ the Mamba recurrence with per-timestep $\bar A_t = e^{\Delta_t A}$ and $\bar B_t
 (Mamba's simplified Euler discretisation of $B$); with constant $\Delta, B, C$ it reduces to
 the LTI recurrence, which is the second test.
 
-??? example "Full implementation — `src/mlbook/llm/moe.py`"
+??? example "Full implementation: `src/mlbook/llm/moe.py`"
     ```python
     --8<-- "src/mlbook/llm/moe.py"
     ```
 
-??? example "Full implementation — `src/mlbook/llm/gqa.py`"
+??? example "Full implementation: `src/mlbook/llm/gqa.py`"
     ```python
     --8<-- "src/mlbook/llm/gqa.py"
     ```
 
-??? example "Full implementation — `src/mlbook/llm/sliding_window.py`"
+??? example "Full implementation: `src/mlbook/llm/sliding_window.py`"
     ```python
     --8<-- "src/mlbook/llm/sliding_window.py"
     ```
 
-??? example "Full implementation — `src/mlbook/llm/ssm.py`"
+??? example "Full implementation: `src/mlbook/llm/ssm.py`"
     ```python
     --8<-- "src/mlbook/llm/ssm.py"
     ```
@@ -383,7 +383,7 @@ in-context retrieval and copying, which hybrids fix by keeping ~1 in 8 layers as
 
 ## 5. In production
 
-!!! production "Mistral AI — Mixtral 8×7B"
+!!! production "Mistral AI: Mixtral 8×7B"
     A sparse MoE with 8 experts per layer, top-2 routing, built on the Mistral 7B block
     (GQA, SWA). 46.7B total parameters, 12.9B used per token; matches or beats Llama 2 70B
     on most benchmarks at roughly the inference cost of a 13B dense model. They chose MoE
@@ -393,7 +393,7 @@ in-context retrieval and copying, which hybrids fix by keeping ~1 in 8 layers as
     Sources: [Mixtral of Experts (paper)](https://arxiv.org/abs/2401.04088),
     [Mixtral blog](https://mistral.ai/news/mixtral-of-experts/).
 
-!!! production "DeepSeek — DeepSeek-V2 and V3"
+!!! production "DeepSeek: DeepSeek-V2 and V3"
     V2 introduced MLA (cache cut by 93.3% relative to their dense 67B model) and DeepSeekMoE
     (fine-grained + shared experts); V3 scaled to 671B total / 37B active parameters with
     256 routed experts, aux-loss-free balancing, multi-token prediction, FP8 training and a
@@ -404,7 +404,7 @@ in-context retrieval and copying, which hybrids fix by keeping ~1 in 8 layers as
     Sources: [DeepSeek-V2](https://arxiv.org/abs/2405.04434),
     [DeepSeek-V3 Technical Report](https://arxiv.org/abs/2412.19437).
 
-!!! production "Meta — GQA in Llama 2 70B and Llama 3"
+!!! production "Meta: GQA in Llama 2 70B and Llama 3"
     Llama 2 used MHA up to 13B and GQA with 8 KV heads at 70B; Llama 3 uses GQA with 8 KV
     heads at all sizes, including 405B (128 query heads, so a 16× cache reduction). The
     stated reason is inference scalability: decode batch size at 8k–128k context is set by
@@ -412,7 +412,7 @@ in-context retrieval and copying, which hybrids fix by keeping ~1 in 8 layers as
     sequences (chapter 1).
     Source: [The Llama 3 Herd of Models](https://arxiv.org/abs/2407.21783).
 
-!!! production "Mistral AI — Mistral 7B sliding window"
+!!! production "Mistral AI: Mistral 7B sliding window"
     Mistral 7B used GQA and a 4096-token sliding window with a rolling cache, reporting a 2×
     attention speed-up at 16k sequence length over vanilla attention with the same kernels,
     and a theoretical receptive field of about 131k tokens over 32 layers. The design was

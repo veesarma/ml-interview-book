@@ -5,7 +5,15 @@ import torch
 import torch.nn.functional as F
 
 from mlbook.posttrain.chat_template import ToyTokenizer, tokenize_chat
-from mlbook.posttrain.dpo import dpo_loss, dpo_train_step, ipo_loss, kto_loss, orpo_loss, simpo_loss
+from mlbook.posttrain.dpo import (
+    dpo_loss,
+    dpo_train_step,
+    ipo_loss,
+    kto_loss,
+    kto_reference_point,
+    orpo_loss,
+    simpo_loss,
+)
 from mlbook.posttrain.toy_lm import TinyCausalLM, ToyLMConfig, sequence_log_prob
 
 
@@ -54,15 +62,27 @@ def test_ipo_simpo_orpo_kto_basic_properties():
     # ORPO: pure NLL term when lam = 0
     assert torch.allclose(orpo_loss(pi_c, pi_r, lens_c, lens_r, lam=0.0), -(pi_c / lens_c).mean())
     assert orpo_loss(pi_c, pi_r, lens_c, lens_r, lam=1.0) != orpo_loss(pi_c, pi_r, lens_c, lens_r, lam=0.0)
-    # KTO: at initialisation (pi == ref) every value is sigma(0) = 0.5 so loss = 0.5
+    # KTO: at initialisation (pi == ref) the reward and z0 are both 0, every value is sigma(0) = 0.5,
+    # so the loss is mean(lambda - 0.5) = 0.5 whatever the labels are.
     pi = torch.tensor([-1.0, -2.0, -3.0])
     assert torch.allclose(kto_loss(pi, pi, torch.tensor([1.0, 0.0, 1.0]), beta=0.1), torch.tensor(0.5))
-    # a desirable example with reward above z0 has a lower loss than an undesirable one at the same reward
+    assert torch.allclose(kto_reference_point(pi, pi, beta=0.1), torch.tensor(0.0))
+    # z0 is the batch-mean implicit reward clamped at 0, and is detached (no gradient path through it).
+    pi_grad = torch.tensor([-1.0, -1.0], requires_grad=True)
+    assert kto_reference_point(pi_grad, torch.tensor([-2.0, -2.0]), beta=0.5).requires_grad is False
+    assert torch.allclose(kto_reference_point(pi_grad, torch.tensor([-2.0, -2.0]), beta=0.5), torch.tensor(0.5))
+    # A response *above* the reference point is what a desirable label wants and an undesirable label
+    # does not: at the same reward the two labels give complementary values. Pass z0 explicitly,
+    # because the in-batch default would equal the reward itself when every row is identical.
     ref = torch.tensor([-2.0, -2.0])
-    pi_hi = torch.tensor([-1.0, -1.0])
-    ld = kto_loss(pi_hi, ref, torch.tensor([1.0, 1.0]), beta=1.0)
-    lu = kto_loss(pi_hi, ref, torch.tensor([0.0, 0.0]), beta=1.0)
+    pi_hi = torch.tensor([-1.0, -1.0])  # implicit reward = beta * 1.0 = 1.0
+    ld = kto_loss(pi_hi, ref, torch.tensor([1.0, 1.0]), beta=1.0, z0=0.0)
+    lu = kto_loss(pi_hi, ref, torch.tensor([0.0, 0.0]), beta=1.0, z0=0.0)
     assert ld < lu
+    assert torch.allclose(ld, 1.0 - torch.sigmoid(torch.tensor(1.0)))
+    assert torch.allclose(lu, 1.0 - torch.sigmoid(torch.tensor(-1.0)))
+    # Loss aversion: weighting undesirable examples more (lambda_u > lambda_d) raises their cost.
+    assert kto_loss(pi_hi, ref, torch.tensor([0.0, 0.0]), beta=1.0, z0=0.0, lambda_u=2.0) > lu
 
 
 def _pairs(tok):

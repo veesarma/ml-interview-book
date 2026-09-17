@@ -1,10 +1,16 @@
-.PHONY: install test serve build figures deploy
+.PHONY: install test style fix-style serve build figures deploy
 
 install:
 	pip install -r requirements.txt && pip install -e .
 
 test:
 	pytest -q
+
+style:
+	python scripts/check_style.py
+
+fix-style:
+	@for d in docs/part*; do python scripts/fix_style.py $$d; done
 
 serve:
 	mkdocs serve
