@@ -186,8 +186,8 @@ $$
 $$
 
 with parameters $L\cdot 2\cdot n_p\cdot H_{kv}\cdot d_h$. Every real token sees $n_p$ extra
-positions, but no extra tokens enter the residual stream. At inference a prefix is simply
-$n_p$ extra entries in the KV cache, i.e. a "virtual prompt" that was never tokenised. It
+positions, but no extra tokens enter the residual stream. At inference a prefix is just
+$n_p$ extra entries in the KV cache: a "virtual prompt" that was never tokenised. It
 costs a little attention compute per token, forever, and it consumes context budget.
 
 **DoRA** (literacy): decompose $W = m\frac{V}{\|V\|_c}$ into a per-column magnitude $m$ and a

@@ -1,10 +1,10 @@
-# Part XII — Reinforcement Learning
+# Part XII: Reinforcement Learning
 
 > **Why this part exists.** Most engineers meet RL backwards: they meet it as "the thing
 > after SFT" in an RLHF diagram, learn the PPO clip formula as an incantation, and then
 > cannot answer why there is a value head at all, or what the advantage is an advantage
-> *over*. This part builds RL the way it is actually built — MDP, return, Bellman,
-> dynamic programming, sampling, function approximation, policy gradients — so that when
+> *over*. This part builds RL in the order it was actually built (MDP, return, Bellman,
+> dynamic programming, sampling, function approximation, policy gradients), so that when
 > you reach [RLHF with PPO](../part07-post-training/03-rlhf-ppo.md),
 > [DPO](../part07-post-training/04-dpo-and-friends.md) and
 > [GRPO](../part07-post-training/05-reasoning-rl-grpo.md) in Part VII, every symbol is
@@ -23,7 +23,7 @@ Read the figure top-down as three independent questions an interviewer is really
 when they ask "which algorithm would you use?":
 
 1. **Do you have a model of the environment?** If you know $P(s'\mid s,a)$ and $R(s,a)$
-   — a simulator you can query, a game's rules, a chip floorplan scorer — you can
+   (a simulator you can query, a game's rules, a chip floorplan scorer), you can
    *plan*: value iteration, policy iteration, MCTS, MPC. If you only have samples, you
    are model-free. Model-based is far more sample-efficient and far more sensitive to
    model error; the classic failure is a policy that exploits a bug in your simulator.
@@ -41,7 +41,7 @@ when they ask "which algorithm would you use?":
    and throw data away after a few epochs.
 
 Two whole families hang off the edges of the tree and matter enormously in production:
-**bandits** (a one-step MDP — no state transitions — which is what most recommender and
+**bandits** (a one-step MDP with no state transitions, which is what most recommender and
 ads "RL" actually is) and **imitation learning** (supervised learning from expert actions,
 which is what most autonomy planners and every LLM SFT stage actually are).
 
@@ -60,15 +60,15 @@ which is what most autonomy planners and every LLM SFT stage actually are).
 
 You do not need Parts IV–XI to read this part. You do need:
 
-* **Probability** — expectation, conditional expectation, variance, the law of total
+* **Probability**: expectation, conditional expectation, variance, the law of total
   expectation, and Beta/Bernoulli conjugacy for Thompson sampling:
   [Part I, Probability](../part01-math/03-probability.md).
-* **Optimization** — SGD, Adam, gradient clipping, learning-rate schedules:
+* **Optimization**: SGD, Adam, gradient clipping, learning-rate schedules:
   [Part I, Optimization](../part01-math/06-optimization.md).
-* **Neural nets and autograd** — MLPs, backprop, and what `.detach()` does:
+* **Neural nets and autograd**: MLPs, backprop, and what `.detach()` does:
   [Part III](../part03-neural-nets/index.md). Chapters 3–6 use PyTorch; chapters 1–2 are
   pure NumPy and need nothing but linear algebra.
-* **Information theory** — KL divergence and entropy, for the entropy bonus, KL
+* **Information theory**: KL divergence and entropy, for the entropy bonus, KL
   early-stopping and MaxEnt IRL: [Part I, Information theory](../part01-math/05-information-theory.md).
 
 Everything else is built here. The environments are implemented from scratch in
@@ -113,7 +113,7 @@ code.
 | 90 min | Ch. 4 §2 all of it: REINFORCE → baseline → GAE → PPO clip | This is the chapter that pays for RLHF, GRPO and every agent question. |
 | 30 min | Ch. 4 §5 the RLHF mapping table | Lets you answer LLM-RL questions without re-deriving anything. |
 | 30 min | Ch. 5 §2 the $O(T^2)$ argument + DAgger | Autonomy interviews and "why not just SFT?" |
-| 20 min | Every chapter's *TL;DR — the interview card* | Last pass, on the train. |
+| 20 min | Every chapter's *TL;DR, the interview card* | Last pass, on the train. |
 
 Then, if you have an evening: type `value_iteration`, `q_learning`, `compute_gae` and
 `ppo_clip_loss` from memory and run the tests. Each chapter's **Retype by hand** section

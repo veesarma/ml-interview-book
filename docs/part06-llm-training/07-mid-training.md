@@ -204,7 +204,7 @@ $$
 which is a direct, explicit trade-off. Empirically $\rho \in [0.05, 0.3]$ retains most general
 ability; $\rho = 0$ reliably regresses it. The second control is the LR: re-warming to the
 *original peak* LR erases more than re-warming to a fraction of it (published CPT recipes
-typically re-warm to 10–50% of peak and decay again). The third is simply fewer tokens.
+typically re-warm to 10–50% of peak and decay again). The third control is token count.
 
 ## 3. Implementation
 
@@ -375,8 +375,8 @@ needle-in-a-haystack), does the capability actually appear?
 !!! production "AI2: OLMo 2 and the Dolmino mid-training mix"
     OLMo 2 makes the mid-training stage explicit and reproducible: an updated pretraining
     mixture plus a specialised late-stage mix ("Dolmino Mix 1124") introduced only during
-    the annealing/curriculum phase, which they report significantly improves downstream
-    benchmarks relative to spending the same tokens on the base mixture. Because OLMo
+    the annealing/curriculum phase, which they report improves downstream benchmarks
+    relative to spending the same token budget on the base mixture. Because OLMo
     releases data, code, and intermediate checkpoints, it is the best public reference for
     *reproducing* a mid-training ablation rather than reading about one.
     Source: [2 OLMo 2 Furious](https://arxiv.org/abs/2501.00656).

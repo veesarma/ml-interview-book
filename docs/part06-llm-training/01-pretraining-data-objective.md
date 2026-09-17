@@ -35,8 +35,8 @@
 
 Take the four-token sequence "the cat sat down" with token ids $[12, 7, 31, 5]$. A causal
 language model is a function that maps a prefix to a distribution over the next token.
-Training data for it is not four separate examples; it is *one* sequence and *three*
-predictions made from it simultaneously:
+That sequence supplies *three* training predictions at once, all from the same forward
+pass:
 
 | position $t$ | prefix seen | target $x_{t+1}$ | contributes |
 |---|---|---|---|
@@ -345,8 +345,8 @@ cost but makes the output softmax and embedding matrices larger.
     protocol described above: each filter is justified by training small models and comparing
     benchmark curves. Two findings you should be able to quote: per-snapshot MinHash dedup
     beat global dedup, and an "educational value" classifier distilled from Llama-3-70B
-    judgements (FineWeb-Edu, 1.3T tokens) dramatically improves knowledge-heavy benchmarks
-    per token. Alternative rejected: trusting existing heuristics from C4/RefinedWeb without
+    judgements (FineWeb-Edu, 1.3T tokens) improves knowledge-heavy benchmarks such as MMLU
+    and ARC at a given token budget. Alternative rejected: trusting existing heuristics from C4/RefinedWeb without
     re-ablating them on the new crawl.
     Sources: [FineWeb blog post](https://huggingface.co/spaces/HuggingFaceFW/blogpost-fineweb-v1),
     [The FineWeb Datasets paper](https://huggingface.co/papers/2406.17557).

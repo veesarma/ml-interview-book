@@ -192,7 +192,7 @@ This dual form exists only because the system is linear and time-invariant.
 all $l$: $O(N^2 T)$ and numerically unstable. S4 restricts $A$ to diagonal-plus-low-rank
 (with the HiPPO initialisation that makes the state approximate the history's Legendre
 coefficients) so $K$ can be computed via a Cauchy kernel in $\tilde O(N + T)$; later
-variants (S4D, Mamba) simply use diagonal $A$, where $K_l = \sum_n C_n\bar A_n^{\,l}\bar B_n$ is a
+variants (S4D, Mamba) drop the low-rank term and keep $A$ diagonal, where $K_l = \sum_n C_n\bar A_n^{\,l}\bar B_n$ is a
 Vandermonde product.
 
 **Selective SSM (Mamba).** Make $\Delta_t, B_t, C_t$ functions of $x_t$ (linear projections;
@@ -203,7 +203,7 @@ convolution disappears and training must run the recurrence, which Mamba does wi
 parallel associative scan fused in SRAM (the same IO-aware idea as FlashAttention).
 Per-token state is $d\times N$ numbers, constant in $T$; attention's per-token state (the
 cache) grows linearly. What the SSM gives up: exact retrieval of an arbitrary past token,
-which attention does trivially. Hybrids (Jamba: Mamba layers with periodic attention and
+which attention gets for free by keeping every key and value. Hybrids (Jamba: Mamba layers with periodic attention and
 MoE layers) keep a few attention layers for retrieval and use SSMs for the bulk.
 
 ### 2.5 Multi-head latent attention (literacy)
@@ -461,7 +461,7 @@ in-context retrieval and copying, which hybrids fix by keeping ~1 in 8 layers as
     that an SSM can't?* Exact lookup of any past token; the SSM's state is a lossy summary,
     which is why hybrids keep some attention layers.
 
-!!! interview "Why does a sliding window not simply lose everything older than $W$?"
+!!! interview "Why does a sliding window not lose everything older than $W$?"
     Each layer moves information forward by up to $W$ positions, so after $L$ layers a token
     can depend on the last $LW$ positions through intermediate representations, at the cost
     of that information being compressed. Empirically retrieval beyond $W$ still degrades,

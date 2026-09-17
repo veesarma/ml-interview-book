@@ -32,7 +32,7 @@
   for streaming or causal generation.
 - The fatal flaw is not accuracy, it is **$O(T)$ sequential steps**: step $t$ cannot start until
   $t-1$ finishes, so a GPU runs $T$ tiny, memory-bound kernels. A Transformer layer does the
- same job in one big batched matmul, same FLOPs, vastly better utilisation. That is the
+ same job in one big batched matmul: same FLOPs, an order of magnitude more throughput. That is the
   motivation for [attention mathematics](03-attention-mathematics.md).
 - Still shipping in production: streaming ASR (RNN-T on-device), tiny always-on models, and
   systems where per-step state must be $O(1)$ in memory rather than growing like a KV cache.
@@ -673,10 +673,10 @@ last one.
     Having replaced GNMT (8 LSTM encoder layers + 8 LSTM decoder layers,
     [Wu et al., 2016](https://arxiv.org/abs/1609.08144)), their 2020 system pairs a **Transformer
     encoder** with an **RNN decoder**. Their stated finding is that most of the Transformer's
-    quality gain came from the encoder, while the RNN decoder was not significantly worse in
- quality *and is much faster at inference*, the decoder is the part that runs step-by-step
-    anyway, so its sequential cost is unavoidable, and an RNN step is cheaper than a Transformer
-    step with a growing KV cache. The hybrid reported an average +5 BLEU across 100+ languages.
+    quality gain came from the encoder, while the RNN decoder held its quality and is faster at
+    inference. The decoder is the part that runs step by step in either architecture, so its
+    sequential cost is unavoidable, and an RNN step is cheaper than a Transformer step that must
+    read a growing KV cache. The hybrid reported an average +5 BLEU across 100+ languages.
     Source: Google Research, ["Recent Advances in Google
     Translate"](https://ai.googleblog.com/2020/06/recent-advances-in-google-translate.html).
 
@@ -825,14 +825,14 @@ $k \in \{5, 25, T\}$. Which $k$ can learn it?
  gradient at the final step never reaches the input at $t=0$, the backward pass is cut at the
  chunk boundary, so the parameters that would encode the bit receive no signal at all. The
     forward state still carries information across chunks, which is why the loss may drift slightly
-    below chance; it is not learning the dependency, it is memorising the marginal. The lesson is
+    below chance. The model is memorising the marginal, not learning the dependency. The lesson is
     the general one: **truncation length is a hard ceiling on the dependency length you can learn.**
 
 **★★ 4. Reversing the source.** Train the RNN on a copy task (output = input, delayed) with and
 without reversing the input sequence. Measure convergence speed.
 
 ??? success "Solution"
-    Reversed converges substantially faster. In the un-reversed version the first output token
+    Reversed converges in roughly half the steps. In the un-reversed version the first output token
     depends on the first input token, $T$ steps away; reversing makes that distance 1 while leaving
     the *average* distance unchanged. Early in training the model can now learn the first few
     alignments, which produces useful gradient for everything else. This reproduces the

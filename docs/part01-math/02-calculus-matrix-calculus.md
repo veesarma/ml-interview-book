@@ -177,11 +177,11 @@ Given $dY = \partial L/\partial Y \in \R^{T\times d_v}$, go backwards one operat
 the toy-example rule "gradient w.r.t. a matmul factor = other factor transposed, on the correct side":
 
 1. $Y = AV$. Perturb $V$: $dL = \langle dY, A\,\delta V\rangle = \langle A^\top dY, \delta V\rangle$, so
-   $$dV = A^\top dY \quad (T\times T)^\top(T\times d_v) = T\times d_v.$$
+   $dV = A^\top dY$, shapes $(T\times T)^\top(T\times d_v) = T\times d_v$.
    Perturb $A$: $dL = \langle dY, \delta A\, V\rangle = \langle dY V^\top, \delta A\rangle$, so
-   $$dA = dY\,V^\top \quad (T\times d_v)(d_v\times T) = T\times T.$$
+   $dA = dY\,V^\top$, shapes $(T\times d_v)(d_v\times T) = T\times T$.
 2. $A = \softmax_{\text{rows}}(S)$. Apply the softmax VJP row by row:
-   $$dS = A \odot \big(dA - \mathrm{rowsum}(dA \odot A)\big) \quad (T\times T),$$
+   $dS = A \odot \big(dA - \mathrm{rowsum}(dA \odot A)\big)$, shape $T\times T$,
    where $\mathrm{rowsum}(\cdot)$ is a $T\times 1$ column broadcast across the row.
 3. $S = QK^\top/\sqrt{d_k}$. Perturb $Q$: $dL = \langle dS, \delta Q\, K^\top\rangle/\sqrt{d_k} = \langle dS\,K, \delta Q\rangle/\sqrt{d_k}$;
    perturb $K$: $dL = \langle dS, Q\,\delta K^\top\rangle/\sqrt{d_k} = \langle dS^\top Q, \delta K\rangle/\sqrt{d_k}$.

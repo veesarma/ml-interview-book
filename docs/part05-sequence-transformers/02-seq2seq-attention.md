@@ -28,7 +28,7 @@
   $T$ steps can be computed with known inputs (and, for a Transformer, in parallel).
 - **Exposure bias**: at inference the model consumes its own outputs, a distribution it never
   trained on, so errors compound. Mitigations: scheduled sampling (anneal from gold to sampled
-  tokens), sequence-level objectives, or simply more data and better models.
+  tokens), sequence-level objectives, or more data and a better model.
 - **Beam search**: keep the $k$ best prefixes by cumulative log-probability. Needs length
   normalisation ($\text{lp} = ((5+L)/6)^\alpha$, GNMT) or it prefers short outputs; large beams can
   *hurt* quality (the "beam search curse") and pure likelihood maximisation produces bland text,

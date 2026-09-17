@@ -1,6 +1,6 @@
 # Airbnb (search ranking journey, Zipline/Chronon, experimentation, trust & safety, listing photo understanding)
 
-> **Why this matters at staff level.** Airbnb has published the most honest multi-year account of applying deep learning to a search-ranking problem — including what failed — and it built the feature platform (Zipline, now open-sourced as Chronon) that other companies copied. Interviewers for search, trust and platform roles expect you to know that journey, to reason about two-sided marketplace ranking (guest and host), and to connect listing photos and text to ranking, categories and trust. Strong signal is telling the story *with the trade-offs* and knowing which lessons transfer.
+> **Why this matters at staff level.** Airbnb has published the most honest multi-year account of applying deep learning to a search-ranking problem (including what failed) and it built the feature platform (Zipline, now open-sourced as Chronon) that other companies copied. Interviewers for search, trust and platform roles expect you to know that journey, to reason about two-sided marketplace ranking (guest and host), and to connect listing photos and text to ranking, categories and trust. Strong signal is telling the story *with the trade-offs* and knowing which lessons transfer.
 
 !!! warning "Sources in this chapter"
     Claims are tied to public Airbnb papers and Airbnb Tech Blog posts, cited by exact title, venue and year in [Sources](#sources). URLs are omitted where they could not be verified in the build environment (STYLE.md §4). Anything not in a public source is marked **inference**.
@@ -11,7 +11,7 @@ Airbnb is a two-sided marketplace for stays and experiences: guests search with 
 
 ![Airbnb search ranking timeline](../assets/figures/part18_consumer_airbnb_timeline.png){ width="720" }
 
-*Figure: the published evolution of Airbnb search ranking, by publication year — from listing embeddings and the first neural rankers (2018–2019), through the second-generation deep-learning paper and diversity work (2020), to diverse and journey-aware ranking (2022–2023) and the open-sourcing of the Chronon feature platform (2024).*
+*Figure: the published evolution of Airbnb search ranking, by publication year, from listing embeddings and the first neural rankers (2018–2019), through the second-generation deep-learning paper and diversity work (2020), to diverse and journey-aware ranking (2022–2023) and the open-sourcing of the Chronon feature platform (2024).*
 
 ## 2. The ML problems that define the company
 
@@ -23,7 +23,7 @@ Airbnb is a two-sided marketplace for stays and experiences: guests search with 
 | Feature platform | Point-in-time correct features for training and consistent online features | "Zipline: Airbnb's Machine Learning Data Management Platform" (Strata 2018); "Chronon, Airbnb's ML Feature Platform, Is Now Open Source" (Airbnb Tech Blog, 2024) |
 | Experimentation | Bookings are rare and delayed; guardrails for hosts | "Experiments at Airbnb" (2014); Airbnb posts on the Experimentation Reporting Framework and guardrails (2017–2021) |
 | Trust and safety | Payment fraud, account takeovers, fake listings, parties; targeted friction instead of blanket blocking | "Architecting a Machine Learning System for Risk" (2014); "Fighting Financial Fraud with Targeted Friction" (2018); Airbnb newsroom on anti-party technology (2022) |
-| Listing photo understanding | Room classification, amenity detection, photo quality; hosts upload unstructured photos | "Categorizing Listing Photos at Airbnb" (2018); "Amenity Detection and Beyond — New Frontiers of Computer Vision at Airbnb" (2019); "WIDeText: A Multimodal Deep Learning Framework" (2020) |
+| Listing photo understanding | Room classification, amenity detection, photo quality; hosts upload unstructured photos | "Categorizing Listing Photos at Airbnb" (2018); "Amenity Detection and Beyond: New Frontiers of Computer Vision at Airbnb" (2019); "WIDeText: A Multimodal Deep Learning Framework" (2020) |
 | Categories | Browsing by category ("Amazing pools") requires ML plus human review | "Building Airbnb Categories with ML and Human-in-the-Loop" (2022) |
 
 ## 3. The stack as publicly described
@@ -58,9 +58,9 @@ flowchart LR
 
 **The approach.** The paper walks through the sequence: a simple single-hidden-layer NN on the same features (neutral online), then a LambdaRank NN using pairwise booked-vs-not-booked loss (gains), then a "decision tree / factorisation machine NN" combining GBDT and FM outputs as features, and finally a deep NN trained on much more data with expanded features, which delivered the improvements. Failed ideas, reported explicitly: using listing IDs as features (overfit, because listings can only be booked so many times), multi-task learning of bookings and long views (views did not transfer), and others. Feature engineering lessons: normalise features to well-behaved distributions (log transforms; the paper's "spread" discussion), position-bias handling in training data, and the importance of feature *distribution* checks. The evaluation discussion contrasts NDCG offline against booking gains online and emphasises hyperparameter and initialisation details.
 
-**Math link.** Pairwise loss for booked $b$ vs not-booked $n$: $\ell = \log(1 + e^{-(s_b - s_n)})$ — logistic on the score difference; see [search ranking design](../part17-ml-system-design/02-search-ranking.md) and [trees & ensembles](../part02-classical/03-trees-and-ensembles.md) for the GBDT baseline.
+**Math link.** Pairwise loss for booked $b$ vs not-booked $n$: $\ell = \log(1 + e^{-(s_b - s_n)})$, logistic on the score difference; see [search ranking design](../part17-ml-system-design/02-search-ranking.md) and [trees & ensembles](../part02-classical/03-trees-and-ensembles.md) for the GBDT baseline.
 
-**The trade-off.** The team chose incremental replacement with strict online validation over a big-bang rewrite; the alternative — a deep model from day one — would have produced the same failures without the diagnosis.
+**The trade-off.** The team chose incremental replacement with strict online validation over a big-bang rewrite; the alternative (a deep model from day one) would have produced the same failures without the diagnosis.
 
 **Outcome.** The paper reports the deep NN beating GBDT on bookings; the value for an interview is the *diagnostic method* (distribution checks, ID overfitting, why multi-task failed then).
 
@@ -87,13 +87,13 @@ flowchart LR
 **Math link.** Skip-gram with negative sampling plus the booked-listing global-context term $\log \sigma(v_b^\top v_l)$; see [tokenization](../part05-sequence-transformers/06-tokenization.md) for the sequence-of-tokens framing and [retrieval](../part13-retrieval-eval-reliability/01-retrieval-and-rag.md).
 
 !!! tip "How to say it in the interview"
-    "For in-session personalisation I would train listing embeddings on click sessions with the two modifications from Airbnb's KDD 2018 paper: treat the booked listing as global context so the whole session is pulled toward the booking, and sample negatives within the same market so distances mean something locally. Then I would compute similarity between the listings the guest just clicked and each candidate as a real-time ranking feature. I would reject collaborative filtering on listing IDs — every listing is unique and bookings are sparse — which is why the paper also builds user-type and listing-type embeddings for the long-term signal. The trade-off is that embeddings drift with the market, so retrain on a schedule. Evaluation: offline ranking of the eventual booking among clicked listings, then A/B on bookings, which is how the paper validated it."
+ "For in-session personalisation I would train listing embeddings on click sessions with the two modifications from Airbnb's KDD 2018 paper: treat the booked listing as global context so the whole session is pulled toward the booking, and sample negatives within the same market so distances mean something locally. Then I would compute similarity between the listings the guest just clicked and each candidate as a real-time ranking feature. I would reject collaborative filtering on listing IDs (every listing is unique and bookings are sparse) which is why the paper also builds user-type and listing-type embeddings for the long-term signal. The trade-off is that embeddings drift with the market, so retrain on a schedule. Evaluation: offline ranking of the eventual booking among clicked listings, then A/B on bookings, which is how the paper validated it."
 
 ### 4.4 Diversity as a ranking objective (KDD 2020, CIKM 2023)
 
 **The problem.** A pointwise ranker returns the top-N similar listings, but a guest comparing options wants a spread; Airbnb's whole-page perspective says the value of a listing depends on what is around it.
 
-**The approach.** The 2020 paper describes re-ranking with a model that scores a listing conditioned on the listings above it (a listwise, context-aware second stage). The 2023 CIKM paper "Learning To Rank Diversely" derives diversity from the objective itself — it formalises the booking probability of a *set* and trains the ranker so that its top results cover distinct guest preferences — and reports booking gains and a change in the price distribution of top results.
+**The approach.** The 2020 paper describes re-ranking with a model that scores a listing conditioned on the listings above it (a listwise, context-aware second stage). The 2023 CIKM paper "Learning To Rank Diversely" derives diversity from the objective itself (it formalises the booking probability of a *set* and trains the ranker so that its top results cover distinct guest preferences) and reports booking gains and a change in the price distribution of top results.
 
 **Math link.** Listwise context: $s_i = f(x_i, \{x_j\}_{j<i})$; see [feed ranking](../part17-ml-system-design/01-recommendation-feed-ranking.md) for slate-aware ranking.
 
@@ -111,7 +111,7 @@ flowchart LR
 
 ### 4.6 Trust: risk models and targeted friction; listing photos
 
-**What is public.** The 2014 post describes a risk architecture with real-time scoring and model training pipelines for fraud; the 2018 post argues for *targeted friction* — adding verification steps (e.g., micro-deposits, additional checks) only for high-risk transactions, tuned by expected loss — instead of blanket blocking, and describes the evaluation as a trade-off between fraud losses and good-user friction. Airbnb's 2022 anti-party technology post describes ML that considers signals like booking lead time and trip length to block high-risk reservations in some markets. On photos: the 2018 post trains a room-type classifier on listing photos to organise galleries; the 2019 amenity-detection post trains object detectors for amenities using a mix of in-house and open data (with detail on annotation strategy and using Detectron-style tooling); WIDeText (2020) fuses wide, deep, text and image inputs for listing classification tasks; the 2022 categories post combines ML candidate generation with human review to build browse categories.
+**What is public.** The 2014 post describes a risk architecture with real-time scoring and model training pipelines for fraud; the 2018 post argues for *targeted friction* (adding verification steps (e.g., micro-deposits, additional checks) only for high-risk transactions, tuned by expected loss) instead of blanket blocking, and describes the evaluation as a trade-off between fraud losses and good-user friction. Airbnb's 2022 anti-party technology post describes ML that considers signals like booking lead time and trip length to block high-risk reservations in some markets. On photos: the 2018 post trains a room-type classifier on listing photos to organise galleries; the 2019 amenity-detection post trains object detectors for amenities using a mix of in-house and open data (with detail on annotation strategy and using Detectron-style tooling); WIDeText (2020) fuses wide, deep, text and image inputs for listing classification tasks; the 2022 categories post combines ML candidate generation with human review to build browse categories.
 
 !!! tip "How to say it in the interview"
     "For trust I would follow the principle in Airbnb's 2018 post on targeted friction: rather than block or allow, add verification steps proportional to risk, tuned by the expected fraud loss against the cost of friction to good users. For listing understanding I would build the pipeline Airbnb has described across 2018 to 2022: a room-type classifier to organise photos, amenity detectors trained with a deliberate annotation strategy, a multimodal model combining text, image and structured fields, and categories built from ML candidates with human review. The decision I would defend is human review on anything guest-facing that claims a fact about a home, because a wrong 'has pool' label is a trust failure. I would reject fully automated categorisation. Evaluation: precision of amenity labels on audits, plus booking and cancellation rates for listings whose labels changed."
@@ -140,7 +140,7 @@ flowchart LR
     **Sketch.** Score both, logistic loss on the difference, shapes $(P,)$; batch construction per search; test that swapping the pair flips the gradient.
 
     !!! tip "How to say it in the interview"
-        "For each search I would pair the booked listing with each non-booked impressed listing, score both with the shared network, and apply logistic loss on the score difference — the pairwise formulation Airbnb's 2019 paper used with its LambdaRank-style network. I would test symmetry and check the gradient with finite differences."
+ "For each search I would pair the booked listing with each non-booked impressed listing, score both with the shared network, and apply logistic loss on the score difference, the pairwise formulation Airbnb's 2019 paper used with its LambdaRank-style network. I would test symmetry and check the gradient with finite differences."
 
 !!! interview "5. Classify and organise a host's 40 uploaded photos."
     **Sketch.** Room-type classifier, quality scoring, duplicate detection, cover-photo selection; human override. Cross-link: [CNN architectures](../part04-vision/03-cnn-architectures.md).
@@ -164,7 +164,7 @@ flowchart LR
     **Sketch.** ML candidate generation from photos, text and amenities, human review, quality thresholds; 2022 categories post.
 
     !!! tip "How to say it in the interview"
-        "I would generate candidates with multimodal listing models — photos, descriptions, amenities — and route them to human review with quality thresholds, which is the human-in-the-loop process Airbnb's 2022 categories post describes. I would reject fully automated inclusion. Evaluation: reviewer precision and category engagement."
+ "I would generate candidates with multimodal listing models (photos, descriptions, amenities) and route them to human review with quality thresholds, which is the human-in-the-loop process Airbnb's 2022 categories post describes. I would reject fully automated inclusion. Evaluation: reviewer precision and category engagement."
 
 !!! interview "9. How do you keep training features point-in-time correct?"
     **Sketch.** Chronon-style joins with event-time semantics, backfills, lineage; testing for leakage.
@@ -201,4 +201,4 @@ flowchart LR
 * Airbnb, "Zipline: Airbnb's Machine Learning Data Management Platform", Strata Data Conference 2018; Airbnb Tech Blog, "Chronon, Airbnb's ML Feature Platform, Is Now Open Source", 2024.
 * Airbnb Tech Blog, "Experiments at Airbnb", 2014; posts on the Experimentation Reporting Framework (2017) and experimentation guardrails (2021).
 * Airbnb Tech Blog, "Architecting a Machine Learning System for Risk", 2014; "Fighting Financial Fraud with Targeted Friction", 2018; Airbnb Newsroom on anti-party technology, 2022.
-* Airbnb Tech Blog, "Categorizing Listing Photos at Airbnb", 2018; "Amenity Detection and Beyond — New Frontiers of Computer Vision at Airbnb", 2019; "WIDeText: A Multimodal Deep Learning Framework", 2020; "Building Airbnb Categories with ML and Human-in-the-Loop", 2022.
+* Airbnb Tech Blog, "Categorizing Listing Photos at Airbnb", 2018; "Amenity Detection and Beyond, New Frontiers of Computer Vision at Airbnb", 2019; "WIDeText: A Multimodal Deep Learning Framework", 2020; "Building Airbnb Categories with ML and Human-in-the-Loop", 2022.

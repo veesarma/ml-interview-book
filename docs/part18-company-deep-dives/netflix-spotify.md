@@ -74,7 +74,7 @@ flowchart LR
 
 ### 4.2 Netflix: contextual bandits for artwork
 
-**The problem.** Each title has several candidate images; the best one differs by member (genre affinity, favourite actors) and there is no offline label — a member sees one image, and you learn only whether they played.
+**The problem.** Each title has several candidate images; the best one differs by member (genre affinity, favourite actors) and there is no offline label, a member sees one image, and you learn only whether they played.
 
 **The approach.** The 2017 post frames artwork selection as a contextual bandit: context is member features, arms are the images, reward is play after impression. Exploration is needed to learn each image's value; the post explains offline evaluation via *replay* (score only logged rounds where the logged action matches the policy's choice) and the danger of *attribution* (does the play belong to the artwork or to the ranking?), plus incrementality concerns (playing anyway vs. because of the image).
 
@@ -83,7 +83,7 @@ flowchart LR
 **The trade-off.** Exploration costs plays in the short term; the alternative, picking the globally best image, forgoes personalisation. Netflix's post accepts exploration and controls its cost with a small explore fraction and offline replay before online tests.
 
 !!! tip "How to say it in the interview"
-    "I would model artwork selection as a contextual bandit, exactly as Netflix's 2017 Tech Blog post does: context is the member's affinities, arms are the candidate images, reward is a play following the impression. The decision is to accept explicit exploration, because the alternative of a single best image per title leaves personalisation on the table and gives no counterfactual data. I would evaluate offline with replay on uniformly logged exploration traffic, since replay is unbiased only when logging is randomised — a point the post makes — and then online with a randomised control. The trade-off is that exploration costs plays and that attribution is ambiguous when the ranker also changed, so I would freeze the ranking during the artwork test. My inference beyond the post is the choice of a Thompson-sampling policy; Netflix describes the framing, not the exact algorithm."
+ "I would model artwork selection as a contextual bandit, exactly as Netflix's 2017 Tech Blog post does: context is the member's affinities, arms are the candidate images, reward is a play following the impression. The decision is to accept explicit exploration, because the alternative of a single best image per title leaves personalisation on the table and gives no counterfactual data. I would evaluate offline with replay on uniformly logged exploration traffic, since replay is unbiased only when logging is randomised (a point the post makes) and then online with a randomised control. The trade-off is that exploration costs plays and that attribution is ambiguous when the ranker also changed, so I would freeze the ranking during the artwork test. My inference beyond the post is the choice of a Thompson-sampling policy; Netflix describes the framing, not the exact algorithm."
 
 ### 4.3 Netflix: from rankers to a personalisation foundation model
 
@@ -105,7 +105,7 @@ flowchart LR
 
 **The problem.** Home recommends shelves and items; exploration is needed, but Spotify wanted every recommendation to carry an explanation ("because you listened to X"), and the explanation itself affects the response.
 
-**The approach.** BaRT (RecSys 2018) is a contextual bandit whose action is a *(item, explanation)* pair; the reward model is trained with counterfactual data collected under a logging policy and evaluated offline with inverse-propensity scoring. CoSeRNN (RecSys 2020) learns contextual, sequential user embeddings — an RNN over a member's session sequence conditioned on context (time, device) — to predict the next session's preference, feeding retrieval and ranking. The 2021 Home posts describe the evolution to multi-stage models and lessons about offline/online metric gaps.
+**The approach.** BaRT (RecSys 2018) is a contextual bandit whose action is a *(item, explanation)* pair; the reward model is trained with counterfactual data collected under a logging policy and evaluated offline with inverse-propensity scoring. CoSeRNN (RecSys 2020) learns contextual, sequential user embeddings (an RNN over a member's session sequence conditioned on context (time, device)) to predict the next session's preference, feeding retrieval and ranking. The 2021 Home posts describe the evolution to multi-stage models and lessons about offline/online metric gaps.
 
 **Math link.** IPS estimator $\hat V = \frac{1}{n}\sum_i \frac{\pi(a_i \mid x_i)}{\pi_0(a_i \mid x_i)} r_i$; see [policy gradients](../part12-rl/04-policy-gradients-ppo.md) for the same importance-weighting idea.
 
@@ -117,7 +117,7 @@ flowchart LR
 **What is public.** The 2022 post describes natural-language search for podcast episodes using a dense retrieval model (a multilingual sentence encoder fine-tuned on query-episode pairs, with synthetic queries to bootstrap) and ANN over episode vectors, layered on top of lexical search. Annoy (2013) is Spotify's tree-based ANN with memory-mapped indexes; Voyager (2023) is its HNSW-based successor. 
 
 !!! tip "How to say it in the interview"
-    "For podcast search I would add dense retrieval next to lexical search, as Spotify's 2022 engineering post on natural-language episode search describes: a multilingual encoder fine-tuned on query-episode pairs, bootstrapped with synthetic queries because spoken-word interaction data is sparse, and served with an ANN index. I would reject replacing lexical search — exact titles and names still need it — and merge the two lists. For the index I would use an HNSW library like Spotify's Voyager rather than tree-based Annoy, because graph indexes give better recall at the same latency, while noting Annoy's memory-mapped design was the right choice when the constraint was RAM. Evaluation: recall@k against exact search, and click-through and 'no result' rate by query type online."
+ "For podcast search I would add dense retrieval next to lexical search, as Spotify's 2022 engineering post on natural-language episode search describes: a multilingual encoder fine-tuned on query-episode pairs, bootstrapped with synthetic queries because spoken-word interaction data is sparse, and served with an ANN index. I would reject replacing lexical search (exact titles and names still need it) and merge the two lists. For the index I would use an HNSW library like Spotify's Voyager rather than tree-based Annoy, because graph indexes give better recall at the same latency, while noting Annoy's memory-mapped design was the right choice when the constraint was RAM. Evaluation: recall@k against exact search, and click-through and 'no result' rate by query type online."
 
 ## 5. Likely interview questions
 
@@ -137,7 +137,7 @@ flowchart LR
     **Sketch.** Given logs $(x_t, a_t, r_t)$ under uniform random logging, average $r_t$ over rounds where $\pi(x_t) = a_t$; discuss bias under non-uniform logging and IPS.
 
     !!! tip "How to say it in the interview"
-        "I would filter the logged rounds to those where my policy chooses the same arm as the logged action and average their rewards; under uniform logging this replay estimator is unbiased, which Netflix's artwork post relies on for offline evaluation. If logging was not uniform I would weight by inverse propensity as in Spotify's RecSys 2018 bandit paper. I would reject evaluating on the greedy logged policy alone — no counterfactuals. The trade-off is data efficiency: replay discards most rounds, so I would size the exploration slice accordingly."
+ "I would filter the logged rounds to those where my policy chooses the same arm as the logged action and average their rewards; under uniform logging this replay estimator is unbiased, which Netflix's artwork post relies on for offline evaluation. If logging was not uniform I would weight by inverse propensity as in Spotify's RecSys 2018 bandit paper. I would reject evaluating on the greedy logged policy alone, no counterfactuals. The trade-off is data efficiency: replay discards most rounds, so I would size the exploration slice accordingly."
 
 !!! interview "4. Choose a bitrate ladder for a new film."
     **Sketch.** Encode at several resolutions and QPs, measure VMAF, take the convex hull, per-shot optimisation; compute vs delivery savings. Cross-link: [image representation & signal processing](../part04-vision/01-image-representation.md).
@@ -149,7 +149,7 @@ flowchart LR
     **Sketch.** Content and audio embeddings for cold items, collaborative signals from global users, exploration via bandits, artist-fairness guardrails. Cross-link: [CLIP & contrastive learning](../part08-multimodal/03-clip-contrastive.md) for audio-text embeddings.
 
     !!! tip "How to say it in the interview"
-        "With sparse local data I would lean on content embeddings — audio and text — to place new-market tracks near global ones, use a bandit to explore locally, and constrain for artist exposure. Spotify's WWW 2020 diversity paper shows recommendation can narrow consumption, so I would set diversity as a guardrail from day one. I would reject pure collaborative filtering because the interaction matrix is nearly empty. Evaluation: saves and repeat listens, with diversity tracked."
+ "With sparse local data I would lean on content embeddings (audio and text) to place new-market tracks near global ones, use a bandit to explore locally, and constrain for artist exposure. Spotify's WWW 2020 diversity paper shows recommendation can narrow consumption, so I would set diversity as a guardrail from day one. I would reject pure collaborative filtering because the interaction matrix is nearly empty. Evaluation: saves and repeat listens, with diversity tracked."
 
 !!! interview "6. Design search that handles 'that podcast about the guy who faked his death'."
     **Sketch.** Dense retrieval over episode descriptions and transcripts, synthetic query generation, hybrid with lexical, re-ranker. Cross-link: [search ranking](../part17-ml-system-design/02-search-ranking.md).
@@ -173,13 +173,13 @@ flowchart LR
     **Sketch.** Shot detection, scene understanding, match cutting, character recognition; embeddings feeding artwork and search; Netflix's media understanding platform posts. Cross-link: [video models](../part08-multimodal/06-video-models.md).
 
     !!! tip "How to say it in the interview"
-        "I would build a media-understanding platform that runs shot and scene detection, character and face grouping, and clip embeddings once per title and serves them to many consumers — Netflix has described such a platform and specific applications like match cutting in its Tech Blog. I would reject per-application video models because they duplicate expensive decoding. Evaluation is per-task accuracy plus reuse across teams."
+ "I would build a media-understanding platform that runs shot and scene detection, character and face grouping, and clip embeddings once per title and serves them to many consumers, Netflix has described such a platform and specific applications like match cutting in its Tech Blog. I would reject per-application video models because they duplicate expensive decoding. Evaluation is per-task accuracy plus reuse across teams."
 
 !!! interview "10. What surrogate metric would you optimise, and how would you validate it?"
     **Sketch.** Choose a metric predictive of retention (e.g., meaningful plays), validate by correlating experiment-level lifts with long-term holdout effects.
 
     !!! tip "How to say it in the interview"
-        "I would pick a surrogate — a play of meaningful duration — and validate it by checking that experiment-level lifts in the surrogate predict long-term retention lifts in holdouts, which is the discipline Netflix's experimentation blog series describes. I would reject optimising raw clicks. The trade-off is that surrogates decay as the ranker learns to game them, so I would re-validate periodically."
+ "I would pick a surrogate (a play of meaningful duration) and validate it by checking that experiment-level lifts in the surrogate predict long-term retention lifts in holdouts, which is the discipline Netflix's experimentation blog series describes. I would reject optimising raw clicks. The trade-off is that surrogates decay as the ranker learns to game them, so I would re-validate periodically."
 
 ## 6. What to bring from your background
 
@@ -197,7 +197,7 @@ flowchart LR
 * Steck et al., "Deep Learning for Recommender Systems: A Netflix Case Study", AI Magazine, 2021.
 * Steck, "Calibrated Recommendations", RecSys 2018.
 * Netflix Tech Blog, "Netflix's Foundation Model for Personalized Recommendation", 2025.
-* Netflix Tech Blog, "Per-Title Encode Optimization", December 2015; "Dynamic optimizer — a perceptual video encoding optimization framework", 2018; "Toward A Practical Perceptual Video Quality Metric" (VMAF), 2016.
+* Netflix Tech Blog, "Per-Title Encode Optimization", December 2015; "Dynamic optimizer, a perceptual video encoding optimization framework", 2018; "Toward A Practical Perceptual Video Quality Metric" (VMAF), 2016.
 * Netflix Tech Blog, "Open-Sourcing Metaflow, a Human-Centric Framework for Data Science", 2019.
 * Netflix Tech Blog experimentation series ("Decision Making at Netflix", 2021); "Match Cutting at Netflix", 2022; posts on the media understanding platform, 2023.
 
