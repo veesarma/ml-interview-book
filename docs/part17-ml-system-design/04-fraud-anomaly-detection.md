@@ -445,7 +445,7 @@ overrides layered on top. *Serve*: in the charge path, with a rules engine and
 allow/block lists. *Evaluate*: precision/recall at merchant-facing operating points,
 plus merchant-visible metrics.
 
-**What the sources say.** Stripe's Radar documentation and engineering posts
+**What the sources say.** Stripe's [Radar documentation](https://docs.stripe.com/radar) and [engineering posts](https://stripe.com/blog/how-we-built-it-stripe-radar)
 describe Radar as trained on signals from the businesses across the Stripe network
 (so a card seen at one business informs risk at another), scoring every charge with a
 risk score in the payment path, with configurable rules, allow/block lists and
@@ -456,7 +456,7 @@ around them.
 !!! tip "How to say it in the interview: network signals beat per-merchant models"
     "I would train one network-wide model rather than a model per merchant, and give
     merchants control through thresholds and rules instead of separate models.
-    Stripe's Radar documentation describes it this way: each payment is scored in real
+    Stripe's [Radar documentation](https://docs.stripe.com/radar/risk-evaluation) describes it this way: each payment is scored in real
     time from hundreds of signals plus data from across the network of businesses on
     Stripe, and the output is a 0 to 99 risk score with documented risk bands that
     merchants act on. A card that just committed fraud at another business is already
@@ -523,16 +523,16 @@ embeddings, per-vertical heads and thresholds; a rules engine shared across all.
 *Serve*: the same real-time feature platform that serves the rest of the company's
 ML. *Evaluate*: per-vertical, with a shared experimentation framework.
 
-**What the sources say.** Uber's engineering blog describes Michelangelo, their
+**What the sources say.** Uber's engineering blog describes [Michelangelo](https://www.uber.com/us/en/blog/michelangelo-machine-learning-platform/), their
 end-to-end ML platform, as serving real-time predictive use cases across the company
-including fraud detection, with a shared feature store (Palette) providing consistent
+including fraud detection, with a shared feature store ([Palette](https://www.uber.com/us/en/blog/palette-meta-store-journey/)) providing consistent
 offline and online features and low-latency online serving; Uber has also published
 on real-time streaming aggregation for such features.
 
 !!! tip "How to say it in the interview: one platform, many heads"
     "I'd build one risk platform with shared entity features and a graph, then
     per-vertical models and policies on top, rather than three vertical stacks.
-    Uber's Michelangelo posts describe this shape: one feature platform with
+    Uber's [Michelangelo posts](https://www.uber.com/us/en/blog/michelangelo-machine-learning-platform/) describe this shape: one feature platform with
     consistent offline and online definitions serving many real-time use cases,
     fraud among them. The entities overlap here. A
     device that farms promo codes today is the device that runs a stolen card
@@ -559,13 +559,13 @@ fraud), feeding a review queue with rich case context instead of auto-blocking.
 *Serve*: mostly near-line, listings can be scored at creation, bookings at
 authorisation. *Evaluate*: precision at the review capacity, plus overturn rate.
 
-**What the sources say.** Airbnb's engineering blog describes "Architecting a Machine
-Learning System for Risk", a framework combining fast real-time scoring with an agile
+**What the sources say.** Airbnb's engineering blog describes ["Architecting a Machine
+Learning System for Risk"](https://medium.com/airbnb-engineering/architecting-a-machine-learning-system-for-risk-941abbba5a60), a framework combining fast real-time scoring with an agile
 model-building pipeline, motivated by the observation that fraud vectors morph
-constantly so new models and features must reach production quickly. "Fighting
-Financial Fraud with Targeted Friction" describes models trained on confirmed good and
+constantly so new models and features must reach production quickly. ["Fighting
+Financial Fraud with Targeted Friction"](https://medium.com/airbnb-engineering/fighting-financial-fraud-with-targeted-friction-82d950d8900e) describes models trained on confirmed good and
 fraudulent behaviour, with an added verification step (a "friction") that blocks
-fraudsters while staying easy for good users. "Graph Machine Learning at Airbnb"
+fraudsters while staying easy for good users. ["Graph Machine Learning at Airbnb"](https://medium.com/airbnb-engineering/graph-machine-learning-at-airbnb-f868d65f36ee)
 describes using graph neural networks to improve their models, with protecting the
 community from harm as the motivating use case.
 
@@ -575,10 +575,10 @@ community from harm as the motivating use case.
     can block at the cost-optimal threshold. Removing a host's listing is not
     reversible in any meaningful sense, because the income and the trust are gone
     before the appeal is heard, so that action needs a human in the loop and the
-    model's job is to rank the review queue. Airbnb's post 'Fighting Financial Fraud
-    with Targeted Friction' makes the middle move explicit: instead of blocking, add a
+    model's job is to rank the review queue. Airbnb's post ['Fighting Financial Fraud
+    with Targeted Friction'](https://medium.com/airbnb-engineering/fighting-financial-fraud-with-targeted-friction-82d950d8900e) makes the middle move explicit: instead of blocking, add a
     verification step that a fraudster fails and a good user passes easily, and their
-    'Architecting a Machine Learning System for Risk' post describes the scoring and
+    ['Architecting a Machine Learning System for Risk'](https://medium.com/airbnb-engineering/architecting-a-machine-learning-system-for-risk-941abbba5a60) post describes the scoring and
     decision framework around it. The trade-off is
     latency and cost (review capacity becomes the binding constraint on recall) so
     I'd measure precision at the capacity point and treat appeal overturn rate as a
@@ -597,7 +597,7 @@ history with signals learned from the provider's wider data, produces a calibrat
 score and reason codes, and exposes rules. *Serve*: a hosted real-time endpoint.
 *Evaluate*: AUC/AUPRC on a held-out time-forward split, then a shadow period.
 
-**What the sources say.** Amazon Fraud Detector's documentation describes a managed
+**What the sources say.** Amazon Fraud Detector's [documentation](https://docs.aws.amazon.com/frauddetector/latest/ug/how-frauddetector-works.html) describes a managed
 service that trains models on the customer's historical fraud data combined with
 patterns learned from Amazon's own fraud-detection experience, producing scores with
 explanations and supporting rules, for use cases such as new-account fraud and
@@ -605,7 +605,7 @@ online payment fraud.
 
 !!! tip "How to say it in the interview: build vs buy, honestly"
     "If the company has no ML team and no labelled history, a managed detector is
-    the right first move: Amazon Fraud Detector's docs describe combining the
+    the right first move: Amazon Fraud Detector's [docs](https://docs.aws.amazon.com/frauddetector/latest/ug/how-frauddetector-works.html) describe combining the
     customer's own fraud labels with patterns learned from Amazon's experience,
     which is the transfer-learning argument for buying rather than building at the
     start. What I would still build myself on day one is the *decision layer* and
@@ -791,14 +791,14 @@ for why PR curves, not ROC, belong in imbalanced evaluation.
 
 ## References
 
-- Stripe. "Radar" product documentation and Stripe engineering blog posts on Radar's machine learning (network-wide signals, risk scores in the payment path, rules and review queues).
+- Stripe. Radar documentation ([docs.stripe.com](https://docs.stripe.com/radar), [risk evaluation](https://docs.stripe.com/radar/risk-evaluation)) and the Stripe engineering post "How we built it: Stripe Radar" ([stripe.com](https://stripe.com/blog/how-we-built-it-stripe-radar)).
 - Dal Pozzolo, A. et al. "Credit Card Fraud Detection: A Realistic Modeling and a Novel Learning Strategy." IEEE Transactions on Neural Networks and Learning Systems, 2018.
 - Saito, T., Rehmsmeier, M. "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets." PLoS ONE, 2015.
 - Liu, F. T., Ting, K. M., Zhou, Z.-H. "Isolation Forest." ICDM 2008.
 - Chen, T., Guestrin, C. "XGBoost: A Scalable Tree Boosting System." KDD 2016 ([arXiv:1603.02754](https://arxiv.org/abs/1603.02754)).
 - Hamilton, W. L., Ying, R., Leskovec, J. "Inductive Representation Learning on Large Graphs" (GraphSAGE). NeurIPS 2017 ([arXiv:1706.02216](https://arxiv.org/abs/1706.02216)).
-- Uber Engineering. "Meet Michelangelo: Uber's Machine Learning Platform" and subsequent posts on real-time features and risk use cases.
-- Airbnb Engineering. "Architecting a Machine Learning System for Risk"; "Fighting Financial Fraud with Targeted Friction"; "Graph Machine Learning at Airbnb".
-- Amazon Web Services. "Amazon Fraud Detector" developer documentation.
+- Uber Engineering. "Meet Michelangelo: Uber's Machine Learning Platform" ([uber.com](https://www.uber.com/us/en/blog/michelangelo-machine-learning-platform/)) and "Palette Meta Store Journey" on the feature store ([uber.com](https://www.uber.com/us/en/blog/palette-meta-store-journey/)).
+- Airbnb Engineering. "Architecting a Machine Learning System for Risk" ([medium.com/airbnb-engineering](https://medium.com/airbnb-engineering/architecting-a-machine-learning-system-for-risk-941abbba5a60)); "Fighting Financial Fraud with Targeted Friction" ([medium.com/airbnb-engineering](https://medium.com/airbnb-engineering/fighting-financial-fraud-with-targeted-friction-82d950d8900e)); "Graph Machine Learning at Airbnb" ([medium.com/airbnb-engineering](https://medium.com/airbnb-engineering/graph-machine-learning-at-airbnb-f868d65f36ee)).
+- Amazon Web Services. "Amazon Fraud Detector" developer documentation ([docs.aws.amazon.com](https://docs.aws.amazon.com/frauddetector/latest/ug/how-frauddetector-works.html)).
 - Lundberg, S., Lee, S.-I. "A Unified Approach to Interpreting Model Predictions" (SHAP). NeurIPS 2017 ([arXiv:1705.07874](https://arxiv.org/abs/1705.07874)).
 - Book cross-references: [ads calibration and down-sampling](03-ads-ctr-prediction.md), [uncertainty & reliability](../part13-retrieval-eval-reliability/03-uncertainty-reliability.md), [ML platform & point-in-time features](12-ml-platform-feature-store-monitoring.md).

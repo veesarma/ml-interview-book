@@ -41,13 +41,32 @@ def test_temporal_fusion_memory_follows_ego_motion():
     assert torch.isclose(out[0, 0, 10, 8], torch.tensor(1.0), atol=1e-4)  # moved 2 cells closer
 
 
-def test_voxelize_points_and_iou():
+def _toy_target():
+    """Two labelled points voxelised into a (Z=2, X=16, Y=16) grid over +-8 m and +-1 m."""
     pts = torch.tensor([[0.5, 0.5, 0.5], [-7.5, 7.5, -0.5]])
     labels = torch.tensor([2, 1])
-    target = occ.voxelize_points(pts, labels, (-8.0, 8.0, -8.0, 8.0, -1.0, 1.0), grid=(2, 16, 16))
+    return occ.voxelize_points(pts, labels, (-8.0, 8.0, -8.0, 8.0, -1.0, 1.0), grid=(2, 16, 16))
+
+
+def test_voxelize_points_puts_points_in_hand_computed_voxels():
+    target = _toy_target()
     assert target.shape == (2, 16, 16)
-    assert target[1, 8, 8] == 2 and target[0, 0, 15] == 1
-    assert (target == 0).sum() == 2 * 16 * 16 - 2
+    assert target[1, 8, 8] == 2       # (0.5, 0.5, 0.5) → z slice 1, x cell 8, y cell 8
+    assert target[0, 0, 15] == 1      # (-7.5, 7.5, -0.5) → z slice 0, x cell 0, y cell 15
+    assert (target == 0).sum() == 2 * 16 * 16 - 2  # everything else is free
+    outside = occ.voxelize_points(torch.tensor([[100.0, 0.0, 0.0]]), torch.tensor([1]),
+                                  (-8.0, 8.0, -8.0, 8.0, -1.0, 1.0), grid=(2, 16, 16))
+    assert (outside == 0).all()       # points beyond the extent are dropped, not wrapped
+
+
+def test_occupancy_iou_perfect_and_empty_predictions():
+    target = _toy_target()
     logits = torch.nn.functional.one_hot(target, 3).permute(3, 0, 1, 2).unsqueeze(0).float()  # (1, 3, Z, X, Y)
     binary, per_class = occ.occupancy_iou(logits, target.unsqueeze(0))
     assert binary == 1.0 and torch.allclose(per_class, torch.ones(3))
+    # Predicting free everywhere: high voxel accuracy, zero occupied IoU.
+    all_free = torch.zeros(1, 3, 2, 16, 16)
+    all_free[:, 0] = 1.0
+    binary_free, per_class_free = occ.occupancy_iou(all_free, target.unsqueeze(0))
+    assert binary_free == 0.0
+    assert per_class_free[1] == 0.0 and per_class_free[2] == 0.0

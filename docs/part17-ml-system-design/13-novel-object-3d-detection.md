@@ -663,7 +663,7 @@ in monitoring rather than in the release gate.
 
 Report both, and know why they differ.
 
-**Waymo Open Dataset** uses 3D IoU-based matching with thresholds of 0.7 for vehicles
+**[Waymo Open Dataset](https://waymo.com/open/data/perception/)** uses 3D IoU-based matching with thresholds of 0.7 for vehicles
 and 0.5 for pedestrians and cyclists, and extends AP into **APH**, which weights
 average precision by heading accuracy so that a detection with a reversed heading is
 penalised. Metrics are broken into difficulty levels (L1 and L2), where L2 includes
@@ -871,7 +871,7 @@ features and improves robustness to domain gaps.
     hide a five-point drop on cyclists.
 
 !!! interview "Your crosswalk detector was trained in the US. Now we launch in Europe."
-    The marking standards differ. The US MUTCD recognises several patterns, including
+    The marking standards differ. The US [MUTCD](https://mutcd.fhwa.dot.gov/) recognises several patterns, including
     transverse (two parallel lines perpendicular to traffic), continental (longitudinal
     bars only), ladder (transverse boundary lines plus longitudinal bars), dashed and
     bar pairs. The European zebra is longitudinal bars with no transverse boundary,
@@ -1053,7 +1053,7 @@ What the interviewer is marking, and what each level typically does.
 - Puy, G. et al. "Three Pillars improving Vision Foundation Model Distillation for Lidar" (ScaLR). CVPR 2024 ([arXiv:2310.17504](https://arxiv.org/abs/2310.17504)).
 - Liu, S. et al. "Grounding DINO: Marrying DINO with Grounded Pre-Training for Open-Set Object Detection." 2023 ([arXiv:2303.05499](https://arxiv.org/abs/2303.05499)).
 - Liang, M. et al. "AIDE: An Automatic Data Engine for Object Detection in Autonomous Driving." CVPR 2024.
-- Sun, P. et al. "Scalability in Perception for Autonomous Driving: Waymo Open Dataset." CVPR 2020 ([arXiv:1912.04838](https://arxiv.org/abs/1912.04838)). Waymo Open Dataset metrics: 3D IoU matching, AP and APH, difficulty levels L1 and L2.
+- Sun, P. et al. "Scalability in Perception for Autonomous Driving: Waymo Open Dataset." CVPR 2020 ([arXiv:1912.04838](https://arxiv.org/abs/1912.04838)); dataset and metric definitions at [waymo.com/open](https://waymo.com/open/data/perception/). Waymo Open Dataset metrics: 3D IoU matching, AP and APH, difficulty levels L1 and L2.
 - Caesar, H. et al. "nuScenes: A Multimodal Dataset for Autonomous Driving." CVPR 2020 ([arXiv:1903.11027](https://arxiv.org/abs/1903.11027)). nuScenes metrics: centre-distance matching, mAP, TP error metrics and NDS.
-- US Department of Transportation, Federal Highway Administration. "Manual on Uniform Traffic Control Devices" (MUTCD), crosswalk marking patterns.
+- US Department of Transportation, Federal Highway Administration. "Manual on Uniform Traffic Control Devices" (MUTCD), crosswalk marking patterns ([mutcd.fhwa.dot.gov](https://mutcd.fhwa.dot.gov/)).
 - Book cross-references: [multi-camera & BEV](../part11-perception-autonomy/02-multi-camera-bev.md), [sensor fusion](../part11-perception-autonomy/03-sensor-fusion.md), [tracking](../part11-perception-autonomy/04-tracking.md), [occupancy & temporal perception](../part11-perception-autonomy/05-occupancy-temporal.md), [perception foundation models](../part11-perception-autonomy/01-perception-foundation-models.md), [self-supervised learning](../part10-self-supervised/01-self-supervised-learning.md), [weak supervision & auto-labeling](../part10-self-supervised/03-weak-supervision-and-auto-labeling.md), [quantization](../part06-llm-training/05-quantization.md), [AV perception system design](05-perception-system-av.md).

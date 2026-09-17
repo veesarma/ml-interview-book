@@ -462,9 +462,9 @@ both interactive and bulk workloads. *Evaluate*: per-field accuracy with confide
 scores exposed so customers can set their own review thresholds, plus a human-review
 integration.
 
-**What the sources say.** AWS documentation for Amazon Textract describes extraction
+**What the sources say.** AWS documentation for [Amazon Textract](https://docs.aws.amazon.com/textract/latest/dg/what-is.html) describes [extraction
 of printed text, handwriting, forms (key-value pairs), tables and structured data
-from documents, with confidence scores for extracted items, specialised APIs for
+from documents](https://docs.aws.amazon.com/textract/latest/dg/how-it-works-analyzing.html), with confidence scores for extracted items, specialised APIs for
 analysing identity documents, invoices and receipts, synchronous and asynchronous
 operations, and integration with Amazon Augmented AI (A2I) for human review of
 low-confidence results.
@@ -472,7 +472,7 @@ low-confidence results.
 !!! tip "How to say it in the interview: return structure and confidence, not text"
     "The output contract is the design decision I'd make first. I'd return key-value
     pairs, table cells and field values with a confidence and a bounding box for
-    each, instead of a text blob. Amazon Textract's API is built this way: forms,
+    each, instead of a text blob. [Amazon Textract's API](https://docs.aws.amazon.com/textract/latest/dg/how-it-works-analyzing.html) is built this way: forms,
     tables, and specialised extraction for invoices and identity documents, each with
     confidence scores, plus a documented path to route low-confidence results to
     human review through Augmented AI. The alternative, returning text and letting
@@ -499,8 +499,8 @@ pretrained enough to fine-tune from few examples. *Serve*: a processor abstracti
 each document type is a versioned endpoint. *Evaluate*: per-processor field accuracy,
 with human review for low confidence.
 
-**What the sources say.** Google Cloud's Document AI documentation describes
-processors for document parsing including specialised processors for document types
+**What the sources say.** Google Cloud's [Document AI documentation](https://docs.cloud.google.com/document-ai/docs/overview) describes
+[processors for document parsing](https://docs.cloud.google.com/document-ai/docs/processors-list) including specialised processors for document types
 such as invoices, receipts and identity documents, a general form parser, custom
 extractor training on customer-labelled documents, confidence scores on extracted
 entities, and a human-in-the-loop review capability.
@@ -510,7 +510,7 @@ entities, and a human-in-the-loop review capability.
     constantly, invoices, receipts, IDs, and each gets a specialised extractor tuned
     for its schema. The tail is every customer's own form, and that gets a general
     parser plus a path to fine-tune a custom extractor from a modest number of
-    labelled examples. Google's Document AI is organised exactly this way, with
+    labelled examples. Google's [Document AI](https://docs.cloud.google.com/document-ai/docs/overview) is organised exactly this way, with
     specialised processors, a general form parser and custom extractor training. The
     alternative is one universal model, which is a cleaner story and loses to a
     specialist on the high-volume types where the schema is known and the accuracy
@@ -602,15 +602,15 @@ frames at a reduced rate and recognition only on regions the user interacts with
 model updates ship with OS releases. *Evaluate*: per-language accuracy and battery and
 thermal behaviour during extended use.
 
-**What the sources say.** Apple's platform documentation describes Live Text as
+**What the sources say.** Apple's platform documentation describes [Live Text](https://support.apple.com/guide/iphone/live-text-interact-content-a-photo-video-iph37fdd714b/16.0/ios/16.0) as
 recognising text in images and the camera view on device, supporting selection, copy,
 translation and lookup, with a documented list of supported languages, and Apple's
-developer frameworks (the Vision framework's text recognition) expose on-device text
+developer frameworks (the Vision framework's [text recognition](https://developer.apple.com/documentation/vision/vnrecognizetextrequest)) expose on-device text
 recognition with fast and accurate recognition levels.
 
 !!! tip "How to say it in the interview: on-device changes the metric, not just the model"
     "For a camera-overlay feature I'd run everything on device, which Apple does for
-    Live Text: recognition happens locally, so it works offline and the image never
+    [Live Text](https://support.apple.com/guide/iphone/live-text-interact-content-a-photo-video-iph37fdd714b/16.0/ios/16.0): recognition happens locally, so it works offline and the image never
     leaves the phone. That changes what I optimise. The metric stops being field
     accuracy and becomes perceived latency and stability of the overlay, because text
     boxes that jitter between frames feel broken even when every character is right.
@@ -639,7 +639,7 @@ app (the single largest accuracy lever), server-side extraction, human review fo
 mismatches. *Evaluate*: audit sample of auto-accepted documents, per-country and
 per-document-type breakdowns.
 
-**What the sources say.** The ICAO 9303 standard specifies the machine-readable zone
+**What the sources say.** The [ICAO 9303 standard](https://www.icao.int/publications/doc-series/doc-9303) specifies the machine-readable zone
 format and its check-digit scheme for travel documents, which gives an independent
 verification path for the same fields printed in the visual zone; cloud providers'
 identity-document APIs (including Amazon Textract's identity document analysis and
@@ -648,7 +648,7 @@ Google Document AI's identity processors) expose these fields with confidence sc
 !!! tip "How to say it in the interview: two independent reads beat one better model"
     "For identity documents, the accuracy lever I'd reach for before any model change
     is redundancy: read the same fields twice by independent means and compare. The
-    machine-readable zone under ICAO 9303 encodes name, document number, date of
+    machine-readable zone under [ICAO 9303](https://www.icao.int/publications/doc-series/doc-9303) encodes name, document number, date of
     birth and expiry with check digits, so I can parse the MRZ, parse the visual
     zone, verify the check digits, and only auto-accept when all three agree. That
     turns a confidence estimate into something much closer to a proof. The
@@ -806,9 +806,9 @@ Google Document AI's identity processors) expose these fields with confidence sc
 - Kim, G. et al. "OCR-free Document Understanding Transformer" (Donut). ECCV 2022 ([arXiv:2111.15664](https://arxiv.org/abs/2111.15664)).
 - Huang, Y. et al. "LayoutLMv3: Pre-training for Document AI with Unified Text and Image Masking." ACM Multimedia 2022 ([arXiv:2204.08387](https://arxiv.org/abs/2204.08387)).
 - Xu, Y. et al. "LayoutLM: Pre-training of Text and Layout for Document Image Understanding." KDD 2020 ([arXiv:1912.13318](https://arxiv.org/abs/1912.13318)).
-- Amazon Web Services. "Amazon Textract" developer documentation (forms, tables, identity documents, invoices and receipts, confidence scores, Augmented A2I human review).
-- Google Cloud. "Document AI" documentation (specialised processors, form parser, custom extractor training, human-in-the-loop review).
-- Microsoft. "Azure AI Document Intelligence" documentation (prebuilt and custom models, confidence scores).
-- Apple. Live Text platform documentation and the Vision framework's text-recognition APIs.
-- ICAO. "Doc 9303, Machine Readable Travel Documents" (MRZ format and check digits).
+- Amazon Web Services. "Amazon Textract" developer documentation (forms, tables, identity documents, invoices and receipts, confidence scores, Augmented A2I human review) ([docs.aws.amazon.com](https://docs.aws.amazon.com/textract/latest/dg/what-is.html), [analysing documents](https://docs.aws.amazon.com/textract/latest/dg/how-it-works-analyzing.html)).
+- Google Cloud. "Document AI" documentation (specialised processors, form parser, custom extractor training, human-in-the-loop review) ([overview](https://docs.cloud.google.com/document-ai/docs/overview), [processor list](https://docs.cloud.google.com/document-ai/docs/processors-list)).
+- Microsoft. "Azure AI Document Intelligence" documentation, including the page on interpreting model accuracy and confidence scores ([learn.microsoft.com](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/concept/accuracy-confidence?view=doc-intel-4.0.0)).
+- Apple. Live Text user-guide documentation ([support.apple.com](https://support.apple.com/guide/iphone/live-text-interact-content-a-photo-video-iph37fdd714b/16.0/ios/16.0)) and the Vision framework's `VNRecognizeTextRequest` ([developer.apple.com](https://developer.apple.com/documentation/vision/vnrecognizetextrequest)).
+- ICAO. "Doc 9303, Machine Readable Travel Documents" (MRZ format and check digits) ([icao.int](https://www.icao.int/publications/doc-series/doc-9303)).
 - Book cross-references: [detection](../part04-vision/04-detection.md), [VLM architecture](../part08-multimodal/04-vlm-architecture.md), [quantization](../part06-llm-training/05-quantization.md), [uncertainty & reliability](../part13-retrieval-eval-reliability/03-uncertainty-reliability.md), [weak supervision & auto-labeling](../part10-self-supervised/03-weak-supervision-and-auto-labeling.md), [AV perception (teacher-student)](05-perception-system-av.md), [LLM assistant with RAG (document ingestion)](08-llm-product-rag-assistant.md).

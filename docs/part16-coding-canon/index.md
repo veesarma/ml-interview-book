@@ -263,10 +263,10 @@ to please a proxy.
 ![Accuracy after each stage of the capstone pipeline and the wall time each stage costs](../assets/figures/part16_capstone_stages.png){ width="860" }
 
 The left panel is the reason the capstone is worth three hours. Each stage moves a
-number you measured the same way, and the largest single jump comes from the agent
-loop rather than from any of the training stages. The right panel is the cost:
-under twenty seconds for the whole pipeline on one CPU thread, which is what makes
-it possible to change one thing and rerun.
+number you measured the same way, and among the post-training stages the biggest
+single jump comes from the agent loop, not from any of the three that touch the
+weights. The right panel is the cost: under twenty seconds for the whole pipeline
+on one CPU thread, which is what makes it possible to change one thing and rerun.
 
 ```python
 from mlbook.capstone.pipeline import run_pipeline, format_report

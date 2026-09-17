@@ -71,8 +71,31 @@ def test_cem_planning_reaches_goal_better_than_random_shooting_with_few_samples(
     z0 = model.encode(torch.tensor(start, dtype=torch.float32))
     plan = wm.cem_plan(model, z0, cost_fn, horizon=8, action_dim=2, n_samples=128, n_elite=16, n_iters=4)
     assert plan.shape == (8, 2)
+    assert (plan.abs() <= 1.0).all()  # the action limit is enforced inside the search
     real = env.rollout(start, plan.numpy()[None])[0, -1, :2]
     assert np.linalg.norm(real - goal.numpy()) < 0.6
     rs = wm.random_shooting_plan(model, z0, cost_fn, horizon=8, action_dim=2, n_samples=16)
     real_rs = env.rollout(start, rs.numpy()[None])[0, -1, :2]
     assert np.linalg.norm(real - goal.numpy()) <= np.linalg.norm(real_rs - goal.numpy()) + 0.2
+
+
+def test_random_shooting_improves_with_more_samples(trained):
+    """More samples can only lower the best imagined cost, since the search is a minimum."""
+    env, model = trained
+    goal = torch.tensor([1.0, 1.0])
+    start = np.array([[0.0, 0.0, 0.0, 0.0]])
+
+    def cost_fn(decoded):
+        return (decoded[:, -1, :2] - goal).norm(dim=-1)
+
+    z0 = model.encode(torch.tensor(start, dtype=torch.float32))
+    torch.manual_seed(0)
+    few = wm.random_shooting_plan(model, z0, cost_fn, horizon=8, action_dim=2, n_samples=8)
+    torch.manual_seed(0)
+    many = wm.random_shooting_plan(model, z0, cost_fn, horizon=8, action_dim=2, n_samples=512)
+    assert few.shape == (8, 2) and many.shape == (8, 2)
+    assert (many.abs() <= 1.0).all()
+    with torch.no_grad():
+        cost_few = cost_fn(model.decode(model.rollout(z0, few.unsqueeze(0))))
+        cost_many = cost_fn(model.decode(model.rollout(z0, many.unsqueeze(0))))
+    assert cost_many.item() <= cost_few.item()

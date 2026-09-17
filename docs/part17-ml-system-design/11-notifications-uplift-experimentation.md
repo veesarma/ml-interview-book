@@ -35,7 +35,7 @@ flowchart LR
   (do not bother), and sleeping dogs (sending actively hurts, so never send).
 - **Budget per user, then allocate.** A weekly volume budget per user, filled by
   choosing the highest-uplift notifications, which is a knapsack rather than a
-  threshold. Pinterest's published system does exactly this.
+  threshold. Pinterest's [published system](https://dl.acm.org/doi/10.1145/3219819.3219906) does exactly this.
 - **The cost of a notification is not zero and not constant.** Fatigue is cumulative,
   and the worst outcome (disabling notifications or uninstalling) removes the channel
   forever, so it must be in the objective with a large negative weight.
@@ -220,7 +220,7 @@ budget. Two coupled problems:
 
 **The budget itself.** How many notifications should this user receive this week? This
 is a per-user quantity: a heavy user tolerates and benefits from more than a dormant
-one, and the optimal number depends on their state. Pinterest's published system treats
+one, and the optimal number depends on their state. Pinterest's [published system](https://medium.com/pinterest-engineering/user-state-based-notification-volume-optimization-7764118f73ff) treats
 notification budgeting as computing an optimal weekly volume per user with a model,
 then filling that budget.
 
@@ -431,9 +431,9 @@ then fill that budget with the highest-value candidates. *Serve*: batch decision
 user per week with real-time adjustment. *Evaluate*: online experiments comparing the
 budgeting system to the previous ML approach.
 
-**What the source says.** Gupta et al., "Notification Volume Control and Optimization
-System at Pinterest" (KDD 2018) describes their deployed system for controlling
-notification volume per user; the associated Pinterest engineering writing describes
+**What the source says.** Zhao, Narita, Orten & Egan, ["Notification Volume Control and Optimization
+System at Pinterest"](https://dl.acm.org/doi/10.1145/3219819.3219906) (KDD 2018) describes their deployed system for controlling
+notification volume per user; the associated [Pinterest engineering writing](https://medium.com/pinterest-engineering/user-state-based-notification-volume-optimization-7764118f73ff) describes
 notification budgeting as computing an optimal number of weekly notifications per
 person with a trained model, and reports that the system deployed in mid-2017 reduced
 notification volume while improving notification click-through and site engagement
@@ -441,7 +441,7 @@ compared with their previous machine learning approach.
 
 !!! tip "How to say it in the interview: budget per user, then fill it"
     "I'd make the primary decision a weekly volume budget per user, and only then
-    decide what fills it. Pinterest published this design at KDD 2018 as their
+    decide what fills it. Pinterest published this design at [KDD 2018](https://dl.acm.org/doi/10.1145/3219819.3219906) as their
     notification volume control and optimisation system, and their engineering posts
     describe training a model to pick the optimal number of weekly notifications per
     person. They report that the deployed system reduced volume and improved both
@@ -466,15 +466,15 @@ treatment by construction. *Evaluate*: verify unbiasedness on A/A tests and meas
 realised variance reduction, which is determined by the correlation between the
 pre-period and in-period metric.
 
-**What the source says.** Deng, Xu, Kohavi & Walker, "Improving the Sensitivity of
-Online Controlled Experiments by Utilizing Pre-Experiment Data" (WSDM 2013) introduces
+**What the source says.** Deng, Xu, Kohavi & Walker, ["Improving the Sensitivity of
+Online Controlled Experiments by Utilizing Pre-Experiment Data"](https://dl.acm.org/doi/10.1145/2433396.2433413) (WSDM 2013) introduces
 CUPED, which uses pre-experiment data to reduce metric variability and improve
 sensitivity, and describes it as applicable to a wide variety of key business metrics
 and practical to implement.
 
 !!! tip "How to say it in the interview: CUPED before more traffic"
-    "Before asking for more traffic I'd apply CUPED, from the Microsoft WSDM 2013
-    paper: subtract theta times the centred pre-experiment covariate from the metric,
+    "Before asking for more traffic I'd apply CUPED, from the Microsoft [WSDM 2013
+    paper](https://dl.acm.org/doi/10.1145/2433396.2433413): subtract theta times the centred pre-experiment covariate from the metric,
     where theta is the covariance over the variance. It stays unbiased because the
     covariate is pre-treatment, and the variance drops by one minus rho squared, so a
     correlation of 0.7 between the pre-period and in-period metric halves the variance
@@ -500,7 +500,7 @@ the number of windows, and the variance estimate must account for temporal corre
 *Evaluate*: the measured effect is the total market effect including the equilibrium
 response, which is the quantity the business wants for a dispatch change.
 
-**What the sources say.** DoorDash's engineering writing on switchback testing
+**What the sources say.** DoorDash's [engineering writing on switchback testing](https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/)
 describes using time-based randomisation within regions to handle network effects in
 their marketplace, including the treatment of carry-over between windows; the general
 statistical treatment of experiments under interference is covered in the
@@ -509,7 +509,7 @@ causal-inference literature.
 !!! tip "How to say it in the interview: switchbacks buy validity and cost power"
     "For a dispatch or pricing change I'd run a switchback: randomise time windows
     within each region so the whole market runs one policy at a time, with a burn-in
-    after each switch that I throw away. DoorDash has written about using exactly this
+    after each switch that I throw away. DoorDash has [written about using exactly this](https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/)
     design for marketplace changes where couriers are shared and a user-level or
     order-level split would contaminate both arms. The alternative, order-level
     randomisation, gives me huge sample size and measures the wrong estimand: the
@@ -717,9 +717,9 @@ have written about measuring long-term member value rather than short-term engag
 
 ## References
 
-- Gupta, B. et al. "Notification Volume Control and Optimization System at Pinterest." KDD 2018.
-- Pinterest Engineering. "User state-based notification volume optimization" and subsequent posts on their notification system and relevance.
-- Deng, A., Xu, Y., Kohavi, R., Walker, T. "Improving the Sensitivity of Online Controlled Experiments by Utilizing Pre-Experiment Data" (CUPED). WSDM 2013.
+- Zhao, B., Narita, K., Orten, B., Egan, J. "Notification Volume Control and Optimization System at Pinterest." KDD 2018 ([dl.acm.org](https://dl.acm.org/doi/10.1145/3219819.3219906)).
+- Pinterest Engineering. "User state-based notification volume optimization," 2020 ([medium.com/pinterest-engineering](https://medium.com/pinterest-engineering/user-state-based-notification-volume-optimization-7764118f73ff)); "NEP: Notification System and Relevance" ([medium.com/pinterest-engineering](https://medium.com/pinterest-engineering/nep-notification-system-and-relevance-a7fff21986c7)).
+- Deng, A., Xu, Y., Kohavi, R., Walker, T. "Improving the Sensitivity of Online Controlled Experiments by Utilizing Pre-Experiment Data" (CUPED). WSDM 2013 ([dl.acm.org](https://dl.acm.org/doi/10.1145/2433396.2433413)).
 - Kohavi, R., Tang, D., Xu, Y. "Trustworthy Online Controlled Experiments: A Practical Guide to A/B Testing." Cambridge University Press, 2020.
 - Künzel, S. R. et al. "Metalearners for estimating heterogeneous treatment effects using machine learning." PNAS 2019 ([arXiv:1706.03461](https://arxiv.org/abs/1706.03461)).
 - Wager, S., Athey, S. "Estimation and Inference of Heterogeneous Treatment Effects using Random Forests." JASA 2018 ([arXiv:1510.04342](https://arxiv.org/abs/1510.04342)).
@@ -727,6 +727,6 @@ have written about measuring long-term member value rather than short-term engag
 - Radcliffe, N. J., Surry, P. D. "Real-World Uplift Modelling with Significance-Based Uplift Trees." Stochastic Solutions white paper, 2011.
 - Johari, R., Pekelis, L., Walsh, D. J. "Always Valid Inference: Bringing Sequential Analysis to A/B Testing." 2015 ([arXiv:1512.04922](https://arxiv.org/abs/1512.04922)).
 - Lan, K. K. G., DeMets, D. L. "Discrete Sequential Boundaries for Clinical Trials." Biometrika 1983.
-- DoorDash Engineering. Posts on switchback testing for marketplace experiments.
+- DoorDash Engineering. "Switchback Tests and Randomized Experimentation Under Network Effects at DoorDash" ([careersatdoordash.com](https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/)).
 - Ugander, J. et al. "Graph Cluster Randomization: Network Exposure to Multiple Universes." KDD 2013.
 - Book cross-references: [forecasting & ETA (switchbacks in marketplaces)](10-forecasting-eta.md), [feed ranking (long-term holdouts)](01-recommendation-feed-ranking.md), [evaluation](../part13-retrieval-eval-reliability/02-evaluation.md).

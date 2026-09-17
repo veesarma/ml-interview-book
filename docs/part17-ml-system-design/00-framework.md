@@ -128,8 +128,8 @@ Always in this order, and say so: **baseline → candidates → chosen design �
 math → how the pieces combine.**
 
 - **Baseline**: a heuristic or a linear/GBDT model on a handful of features. It is
-  your fallback, your A/B control and your sanity check. Google's *Rules of Machine
-  Learning* (Zinkevich, 2017) opens with "don't be afraid to launch a product without
+  your fallback, your A/B control and your sanity check. Google's [*Rules of Machine
+  Learning*](https://developers.google.com/machine-learning/guides/rules-of-ml) (Zinkevich, 2017) opens with "don't be afraid to launch a product without
   machine learning" and advises starting with a simple, interpretable model; quoting
   that in the room is fine and shows you know why.
 - **Candidates**: two or three architectures with the trade-off for each in one
@@ -331,7 +331,7 @@ matters.
 | Ignoring the incumbent | Most rounds are "replace a rules system", not greenfield | Ask what exists; make it your baseline and your fallback. |
 | Reciting a paper as if it were your design | Interviewers can tell | Use the paper as *evidence for* your decision, not as the decision. |
 
-Sculley et al., "Hidden Technical Debt in Machine Learning Systems" (NeurIPS 2015)
+Sculley et al., ["Hidden Technical Debt in Machine Learning Systems"](https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems) (NeurIPS 2015)
 is the canonical catalogue of what goes wrong after launch, entanglement ("changing
 anything changes everything"), undeclared consumers, feedback loops, pipeline jungles,
 configuration debt. Mentioning one of its named debts when discussing failure modes is
@@ -534,10 +534,10 @@ Prepare four evolutions and run them for each chapter:
 
 ## References
 
-- Zinkevich, M. "Rules of Machine Learning: Best Practices for ML Engineering." Google Developers guide (2017).
-- Sculley, D. et al. "Hidden Technical Debt in Machine Learning Systems." NeurIPS 2015.
-- Breck, E. et al. "The ML Test Score: A Rubric for ML Production Readiness and Technical Debt Reduction." IEEE Big Data 2017.
-- Covington, P., Adams, J., Sargin, E. "Deep Neural Networks for YouTube Recommendations." RecSys 2016 (offline metrics used for triage, live A/B as the final arbiter).
+- Zinkevich, M. "Rules of Machine Learning: Best Practices for ML Engineering." Google Developers guide (2017) ([developers.google.com](https://developers.google.com/machine-learning/guides/rules-of-ml)).
+- Sculley, D. et al. "Hidden Technical Debt in Machine Learning Systems." NeurIPS 2015 ([papers.nips.cc](https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems)).
+- Breck, E. et al. "The ML Test Score: A Rubric for ML Production Readiness and Technical Debt Reduction." IEEE Big Data 2017 ([research.google](https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/)).
+- Covington, P., Adams, J., Sargin, E. "Deep Neural Networks for YouTube Recommendations." RecSys 2016, on offline metrics used for triage with live A/B as the final arbiter ([research.google](https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/)).
 - Huang, J.-T. et al. "Embedding-based Retrieval in Facebook Search." KDD 2020 ([arXiv:2006.11632](https://arxiv.org/abs/2006.11632)).
 - Joachims, T., Swaminathan, A., Schnabel, T. "Unbiased Learning-to-Rank with Biased Feedback." WSDM 2017 ([arXiv:1608.04468](https://arxiv.org/abs/1608.04468)).
 - Hello Interview, "ML System Design" interview guides (the structure this part extends).

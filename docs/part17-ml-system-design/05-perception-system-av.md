@@ -166,7 +166,7 @@ the *offline* problem is far easier than the online one:
 Humans then do three things: audit a sample to measure auto-label quality, label the
 residual cases the auto-labeller flags as uncertain, and adjudicate the definition
 of ambiguous categories (is a person on a scooter a pedestrian or a cyclist?). Tesla
-described this pipeline at AI Day 2021 and 2022, offline auto-labelling that
+described this pipeline at AI Day [2021](https://www.youtube.com/watch?v=j0z4FweCy4M) and [2022](https://www.youtube.com/watch?v=ODSJsviD_SU), offline auto-labelling that
 reconstructs both the static world and object trajectories from fleet clips, with
 humans reviewing rather than drawing, and the same pattern, with different
 sensors, is standard across the industry.
@@ -202,7 +202,7 @@ binding constraint, so the vehicle must decide *onboard* what is worth uploading
 | Targeted campaign | "Upload anything with a school bus with its stop sign extended" | Directed data collection for a known gap |
 
 The last row is the operationally important one: engineers must be able to deploy a
-new trigger to the fleet in days and get a curated dataset back. Tesla's AI Day
+new trigger to the fleet in days and get a curated dataset back. Tesla's [AI Day](https://www.youtube.com/watch?v=ODSJsviD_SU)
 description of the data engine is essentially this, define the failure mode, query
 the fleet for it, label, retrain, verify, and it is the answer to "how do you fix a
 specific rare failure?"
@@ -267,7 +267,7 @@ calibration monitoring (detecting reprojection drift against static structure) i
 production subsystem, not a one-time factory step.
 
 The multi-task structure on top, one backbone, a shared BEV representation, and
-many heads (Tesla's "HydraNets" framing from AI Day 2021), is driven by compute:
+many heads (Tesla's "HydraNets" framing from [AI Day 2021](https://www.youtube.com/watch?v=j0z4FweCy4M)), is driven by compute:
 you cannot afford one network per task, and the tasks share geometry, so sharing
 the trunk is both cheaper and better. The cost is training complexity: tasks have
 different data volumes and loss scales, heads interfere, and a change to the trunk
@@ -284,7 +284,7 @@ drivable**, which is a geometric question rather than a semantic one.
 Occupancy prediction outputs a voxel grid (or a continuous occupancy field) with
 occupied/free/unobserved per voxel, optionally with semantics and with **occupancy
 flow** (per-voxel velocity) so the planner can reason about moving unlabelled mass.
-Tesla presented occupancy networks at AI Day 2022 as exactly this: a general
+Tesla presented occupancy networks at [AI Day 2022](https://www.youtube.com/watch?v=ODSJsviD_SU) as exactly this: a general
 geometric representation that does not require the object to be a known class, run
 at high rate with a lower-resolution semantic head. The academic lineage runs
 through Occupancy Networks (Mescheder et al., CVPR 2019) for the representation and
@@ -309,7 +309,7 @@ and cost:
   and it is what most production BEV stacks do.
 - **Recurrent or attention-based video modules** over a window of several seconds,
   which give explicit motion features and let the network remember objects through
-  occlusion. Tesla's AI Day presentations describe a video module with spatial and
+  occlusion. Tesla's [AI Day](https://www.youtube.com/watch?v=ODSJsviD_SU) presentations describe a video module with spatial and
   temporal queueing so that the network can remember, for example, a sign it has
   passed or a car that is momentarily occluded.
 - **Full spatio-temporal transformers**, which is where the research is going, at
@@ -554,7 +554,7 @@ class-agnostic geometry. *Serve*: distilled and quantised onto the vehicle compu
 multi-rate head scheduling. *Evaluate*: shadow mode on the fleet, a growing bank of
 mined cases, staged OTA.
 
-**What the sources say.** Tesla's AI Day 2021 and AI Day 2022 presentations describe:
+**What the sources say.** Tesla's [AI Day 2021](https://www.youtube.com/watch?v=j0z4FweCy4M) and [AI Day 2022](https://www.youtube.com/watch?v=ODSJsviD_SU) presentations describe:
 the multi-camera fusion into a shared representation with a transformer-based
 mapping from image space to a vector space; the video/temporal module for memory; the
 HydraNet multi-task structure with a shared backbone and many heads; occupancy
@@ -566,7 +566,7 @@ trigger → collect → label → retrain → verify via shadow mode.
 !!! tip "How to say it in the interview: design the data engine first"
     "Before I design a network I'd design the loop that feeds it, because on a fleet
     this size labelling is the binding constraint, not modelling. Tesla described
-    this at AI Day: fleet triggers select clips, an offline auto-labeller
+    this at [AI Day](https://www.youtube.com/watch?v=ODSJsviD_SU): fleet triggers select clips, an offline auto-labeller
     reconstructs the scene using the full future of the clip and aggregation across
     multiple passes and vehicles, humans audit rather than draw, and the retrained
     model is verified in shadow mode on the fleet before an OTA. The alternative is
@@ -581,7 +581,7 @@ trigger → collect → label → retrain → verify via shadow mode.
 
 !!! tip "How to say it in the interview: BEV fusion over per-camera outputs"
     "I'd fuse camera features into a shared bird's-eye-view representation rather
-    than run per-camera detectors and fuse their outputs. Tesla's AI Day
+    than run per-camera detectors and fuse their outputs. Tesla's [AI Day](https://www.youtube.com/watch?v=j0z4FweCy4M)
     presentations describe exactly this transition, a transformer that maps image
     features into a vector space shared across cameras. The motivation they gave is
     the one I'd give: an object spanning two cameras gets one consistent
@@ -597,7 +597,7 @@ trigger → collect → label → retrain → verify via shadow mode.
 
 !!! tip "How to say it in the interview: occupancy alongside boxes"
     "I'd ship a class-agnostic occupancy output next to the object detector, not
-    instead of it. Tesla presented occupancy networks at AI Day 2022 for precisely
+    instead of it. Tesla presented occupancy networks at [AI Day 2022](https://www.youtube.com/watch?v=ODSJsviD_SU) for precisely
     the reason I'd give: a box detector can only report categories it was trained
     on, and the road contains debris, fallen cargo and articulated things that no
     taxonomy covers, while the planner mostly needs to know what space is not
@@ -619,7 +619,7 @@ your design and, especially, your evaluation?"
 the degraded-mode behaviour become primary; the sensor suite is chosen for the
 safety case, not the BOM. *Metrics*: closed-loop safety metrics plus per-component
 guarantees; the release gate is a documented safety case. *Data*: a rich multi-sensor
-fleet including lidar, published in part as the Waymo Open Dataset; simulation as a
+fleet including lidar, published in part as the [Waymo Open Dataset](https://waymo.com/open/data/perception/); simulation as a
 first-class data source. *Model*: multi-sensor fusion with lidar as a primary
 geometric sensor and cameras for semantics, with heavy emphasis on long-range
 detection and on behaviour prediction. *Serve*: redundant compute with a fallback
@@ -627,9 +627,9 @@ path that can achieve a minimal risk condition. *Evaluate*: extensive closed-loo
 simulation (including reactive-agent simulation) scenario libraries, and structured
 on-road testing before any ODD expansion.
 
-**What the sources say.** Waymo has published the Waymo Open Dataset ("Scalability in
+**What the sources say.** Waymo has published the [Waymo Open Dataset](https://waymo.com/open/data/perception/) ("Scalability in
 Perception for Autonomous Driving: Waymo Open Dataset", CVPR 2020, [arXiv:1912.04838](https://arxiv.org/abs/1912.04838))
-with multi-sensor data and 3D labels, the Waymo Open Motion Dataset for behaviour
+with multi-sensor data and 3D labels, the [Waymo Open Motion Dataset](https://waymo.com/open/data/motion/) for behaviour
 prediction, and Waymax ("Waymax: An Accelerated, Data-Driven Simulator for
 Large-Scale Autonomous Driving Research", NeurIPS 2023 Datasets and Benchmarks), a
 closed-loop simulator for planning research; their safety blog and safety-framework
@@ -644,7 +644,7 @@ simulation, closed-course and on-road testing.
     and other agents react; shadow mode on the fleet for real-world coverage with no
     risk; and staged on-road rollout. Waymo's published work supports the middle
     layer directly, they released Waymax, a closed-loop data-driven simulator, at
-    NeurIPS 2023, and the Waymo Open Dataset papers describe the multi-sensor
+    NeurIPS 2023, and the [Waymo Open Dataset](https://waymo.com/open/data/perception/) papers describe the multi-sensor
     labelled data underpinning perception evaluation. The alternative, shipping on
     open-loop metrics alone, is the classic trap: a perception change alters the
     trajectory, which alters what the car sees next, and open-loop evaluation is
@@ -658,7 +658,7 @@ simulation, closed-course and on-road testing.
     is a technical one, and I'd say so. For a robotaxi, the sensor cost amortises
     over service revenue and the driverless safety case wants independent,
     physically different measurement paths, which is the suite Waymo built and
-    published data from in the Waymo Open Dataset. For a consumer vehicle at
+    published data from in the [Waymo Open Dataset](https://waymo.com/open/data/perception/). For a consumer vehicle at
     consumer margins with a human driver as the fallback, a camera-centric suite
     with radar is the defensible choice and lidar lives on the data-collection
     fleet as an auto-labelling sensor. The trade-off is direct: cameras give
@@ -683,8 +683,8 @@ them. *Serve*: an inference runtime tuned for the target SoC with deterministic
 timing. *Evaluate*: per-network benchmarks plus system integration testing and
 safety certification artefacts.
 
-**What the sources say.** NVIDIA's DRIVE developer documentation and technical blog
-posts describe the DRIVE platform's perception components (DNNs for obstacle
+**What the sources say.** NVIDIA's [DRIVE developer documentation](https://developer.nvidia.com/drive/documentation) and technical blog
+posts describe the [DRIVE platform's perception components](https://developer.nvidia.com/drive/perception) (DNNs for obstacle
 detection, free space, lane and sign perception), the use of TensorRT for optimised,
 quantised inference on DRIVE SoCs, and their safety-oriented development process and
 documentation (including their published safety report), aimed at automotive
@@ -958,12 +958,12 @@ simulation-based scenario generation for rare events in their technical material
 
 ## References
 
-- Tesla. AI Day 2021 and AI Day 2022 presentations (multi-camera BEV fusion, HydraNet multi-task architecture, video/temporal module, occupancy networks, auto-labelling, the data engine, shadow mode).
+- Tesla. AI Day 2021 ([recorded presentation](https://www.youtube.com/watch?v=j0z4FweCy4M)) and AI Day 2022 ([recorded presentation](https://www.youtube.com/watch?v=ODSJsviD_SU)): multi-camera BEV fusion, HydraNet multi-task architecture, video/temporal module, occupancy networks, auto-labelling, the data engine, shadow mode.
 - Sun, P. et al. "Scalability in Perception for Autonomous Driving: Waymo Open Dataset." CVPR 2020 ([arXiv:1912.04838](https://arxiv.org/abs/1912.04838)).
 - Ettinger, S. et al. "Large Scale Interactive Motion Forecasting for Autonomous Driving: The Waymo Open Motion Dataset." ICCV 2021 ([arXiv:2104.10133](https://arxiv.org/abs/2104.10133)).
 - Gulino, C. et al. "Waymax: An Accelerated, Data-Driven Simulator for Large-Scale Autonomous Driving Research." NeurIPS 2023 Datasets and Benchmarks ([arXiv:2310.08710](https://arxiv.org/abs/2310.08710)).
-- Waymo. Safety report and safety-framework publications; Waymo blog posts on simulation and on driverless operation.
-- NVIDIA. DRIVE platform developer documentation and technical blog posts on DRIVE perception DNNs, TensorRT inference optimisation, and automotive functional safety.
+- Waymo. Safety report and safety-framework publications ([waymo.com/safety](https://waymo.com/safety/), "Sharing our safety framework for fully autonomous operations", October 2020, [waymo.com/blog](https://waymo.com/blog/2020/10/sharing-our-safety-framework/)); the Waymo Open Dataset site ([waymo.com/open](https://waymo.com/open/data/perception/)).
+- NVIDIA. DRIVE platform developer documentation ([developer.nvidia.com](https://developer.nvidia.com/drive/documentation)) and the DRIVE perception pages on obstacle, path and wait-condition DNNs ([developer.nvidia.com](https://developer.nvidia.com/drive/perception)).
 - Philion, J., Fidler, S. "Lift, Splat, Shoot: Encoding Images from Arbitrary Camera Rigs by Implicitly Unprojecting to 3D." ECCV 2020 ([arXiv:2008.05711](https://arxiv.org/abs/2008.05711)).
 - Li, Z. et al. "BEVFormer: Learning Bird's-Eye-View Representation from Multi-Camera Images via Spatiotemporal Transformers." ECCV 2022 ([arXiv:2203.17270](https://arxiv.org/abs/2203.17270)).
 - Liu, Z. et al. "BEVFusion: Multi-Task Multi-Sensor Fusion with Unified Bird's-Eye View Representation." ICRA 2023 ([arXiv:2205.13542](https://arxiv.org/abs/2205.13542)).
