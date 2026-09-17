@@ -26,14 +26,14 @@
    a week"); the cross-chapter patterns are what you'll draw on.
 
 !!! note "On citations in this part"
-    Every case study and every "how to say it" script cites a specific public paper
-    or engineering-blog post by company, exact title, venue and year (and arXiv
-    identifier where one exists). The build environment used to author this part
-    could not verify live URLs, so, per the book's authoring contract, sources are
-    given as searchable titles rather than hyperlinks. Searching the exact title
-    returns the primary source as the first result. Nothing here attributes a design
-    choice to a company without such a source; where the text infers a reason the
-    source does not state, it says "the paper implies".
+    Every case study and every "how to say it" script cites a specific public paper or
+    engineering-blog post by company, exact title, venue and year, with the arXiv
+    identifier where one exists. Sources are given as searchable titles rather than as
+    hyperlinks, because the environment this part was written in could not fetch pages
+    directly to confirm that a given URL still resolves; searching the exact title
+    returns the primary source. Nothing here attributes a design choice to a company
+    without such a source, and where the text infers a reason the source does not
+    state, it says so.
 
 ## From "the question the interviewer asks" to the chapter
 

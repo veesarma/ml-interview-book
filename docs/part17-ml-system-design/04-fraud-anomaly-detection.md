@@ -455,10 +455,13 @@ around them.
 
 !!! tip "How to say it in the interview: network signals beat per-merchant models"
     "I would train one network-wide model rather than a model per merchant, and give
-    merchants control through thresholds and rules instead of separate models. Stripe describes Radar exactly this way: signals from across the network
-    of businesses feed a single risk model, so a card that just committed fraud at
-    another business is already risky at yours, which is the only way a brand-new
-    merchant with no history gets protection on day one. The alternative is a model
+    merchants control through thresholds and rules instead of separate models.
+    Stripe's Radar documentation describes it this way: each payment is scored in real
+    time from hundreds of signals plus data from across the network of businesses on
+    Stripe, and the output is a 0 to 99 risk score with documented risk bands that
+    merchants act on. A card that just committed fraud at another business is already
+    risky at yours, which is the only way a brand-new merchant with no history gets
+    protection on day one. The alternative is a model
     per large merchant. That fits merchant-specific patterns better, and I would add
     it as a second model for the largest accounts, but it cannot see the network and
     it starves on data for the long tail. The trade-off is that one global model
@@ -556,12 +559,15 @@ fraud), feeding a review queue with rich case context instead of auto-blocking.
 *Serve*: mostly near-line, listings can be scored at creation, bookings at
 authorisation. *Evaluate*: precision at the review capacity, plus overturn rate.
 
-**What the sources say.** Airbnb's engineering blog has described their trust and
-safety infrastructure, including a rules/decision framework for risk decisions and
-the use of ML models within it, and their work on fraud detection using graph-based
-approaches to link related accounts and listings. Their posts emphasise combining
-model scores with a configurable decision layer and human review for high-impact,
-irreversible actions.
+**What the sources say.** Airbnb's engineering blog describes "Architecting a Machine
+Learning System for Risk", a framework combining fast real-time scoring with an agile
+model-building pipeline, motivated by the observation that fraud vectors morph
+constantly so new models and features must reach production quickly. "Fighting
+Financial Fraud with Targeted Friction" describes models trained on confirmed good and
+fraudulent behaviour, with an added verification step (a "friction") that blocks
+fraudsters while staying easy for good users. "Graph Machine Learning at Airbnb"
+describes using graph neural networks to improve their models, with protecting the
+community from harm as the motivating use case.
 
 !!! tip "How to say it in the interview: irreversibility decides autonomy"
     "My rule is that reversibility decides whether a model may act alone. A declined
@@ -569,9 +575,11 @@ irreversible actions.
     can block at the cost-optimal threshold. Removing a host's listing is not
     reversible in any meaningful sense, because the income and the trust are gone
     before the appeal is heard, so that action needs a human in the loop and the
-    model's job is to rank the review queue. Airbnb's trust-and-safety engineering
-    posts describe exactly this split: a decision framework where model scores feed
-    configurable rules and high-impact actions route to review. The trade-off is
+    model's job is to rank the review queue. Airbnb's post 'Fighting Financial Fraud
+    with Targeted Friction' makes the middle move explicit: instead of blocking, add a
+    verification step that a fraudster fails and a good user passes easily, and their
+    'Architecting a Machine Learning System for Risk' post describes the scoring and
+    decision framework around it. The trade-off is
     latency and cost (review capacity becomes the binding constraint on recall) so
     I'd measure precision at the capacity point and treat appeal overturn rate as a
     launch guardrail, because a rising overturn rate means the model is buying
@@ -790,7 +798,7 @@ for why PR curves, not ROC, belong in imbalanced evaluation.
 - Chen, T., Guestrin, C. "XGBoost: A Scalable Tree Boosting System." KDD 2016 ([arXiv:1603.02754](https://arxiv.org/abs/1603.02754)).
 - Hamilton, W. L., Ying, R., Leskovec, J. "Inductive Representation Learning on Large Graphs" (GraphSAGE). NeurIPS 2017 ([arXiv:1706.02216](https://arxiv.org/abs/1706.02216)).
 - Uber Engineering. "Meet Michelangelo: Uber's Machine Learning Platform" and subsequent posts on real-time features and risk use cases.
-- Airbnb Engineering. Trust-and-safety posts on their risk decision framework and graph-based fraud detection.
+- Airbnb Engineering. "Architecting a Machine Learning System for Risk"; "Fighting Financial Fraud with Targeted Friction"; "Graph Machine Learning at Airbnb".
 - Amazon Web Services. "Amazon Fraud Detector" developer documentation.
 - Lundberg, S., Lee, S.-I. "A Unified Approach to Interpreting Model Predictions" (SHAP). NeurIPS 2017 ([arXiv:1705.07874](https://arxiv.org/abs/1705.07874)).
 - Book cross-references: [ads calibration and down-sampling](03-ads-ctr-prediction.md), [uncertainty & reliability](../part13-retrieval-eval-reliability/03-uncertainty-reliability.md), [ML platform & point-in-time features](12-ml-platform-feature-store-monitoring.md).
