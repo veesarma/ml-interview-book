@@ -42,13 +42,13 @@ def test_minhash_estimates_jaccard():
 
 def test_lsh_index_finds_near_duplicates_only():
     mh = MinHash(num_perm=128)
-    idx = LSHIndex(num_perm=128, bands=32)
+    idx = LSHIndex(num_perm=128, bands=16)  # rows = 8
     sig_a, sig_b = mh.signature(shingles(DOC_A, 3)), mh.signature(shingles(DOC_B, 3))
     idx.add(0, sig_a)
     idx.add(1, sig_b)
     assert 0 in idx.query(mh.signature(shingles(DOC_A_EDIT, 3)))
     assert idx.query(mh.signature(shingles("completely unrelated text about cooking pasta al dente", 3))) == set()
-    assert 0.5 < idx.threshold() < 0.9
+    assert abs(idx.threshold() - (1 / 16) ** (1 / 8)) < 1e-9  # ≈ 0.71
 
 
 def test_near_dedup_pipeline():

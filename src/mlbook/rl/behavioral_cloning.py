@@ -3,9 +3,9 @@
 Two learners share the ``fit`` / ``act`` interface:
 
 * :class:`TabularPolicy` -- bins the observation and stores an action histogram per
-  bin; unseen bins act uniformly at random. This is a *pessimistic* function class
-  (no generalisation) that makes the covariate-shift failure of BC visible on a
-  1-D toy in a few hundred steps.
+  bin; unseen bins fall back to the most frequent action overall. This is a
+  *pessimistic* function class (no generalisation) that makes the covariate-shift
+  failure of BC visible on a 2-D toy in a few hundred steps.
 * :class:`MLPPolicy` -- a PyTorch classifier trained with cross-entropy, i.e.
   ``max_theta sum_i log pi_theta(a_i | s_i)`` -- the same objective as SFT of a language model.
 """
@@ -31,14 +31,20 @@ def collect_expert_data(env, expert_fn, n_episodes: int, rng: np.random.Generato
 
 
 class TabularPolicy:
-    """Histogram classifier over bins of width ``bin_width`` on the first observation coordinate."""
+    """Histogram classifier over a grid of ``bin_width`` cells in observation space.
+
+    A bin never seen in training returns the *class prior* (the most frequent expert action
+    overall) -- what a classifier with uninformative features falls back to. This is the
+    pessimistic "no generalisation" learner that makes the covariate-shift argument concrete.
+    """
 
     def __init__(self, n_actions: int, bin_width: float, rng: np.random.Generator) -> None:
         self.n_actions, self.bin_width, self.rng = n_actions, bin_width, rng
-        self.counts: dict[int, np.ndarray] = {}
+        self.counts: dict[tuple[int, ...], np.ndarray] = {}
+        self.prior = np.zeros(n_actions)  # (A,) global action counts
 
-    def _bin(self, obs: np.ndarray) -> int:
-        return int(np.floor(float(obs[0]) / self.bin_width))
+    def _bin(self, obs: np.ndarray) -> tuple[int, ...]:
+        return tuple(int(np.floor(float(x) / self.bin_width)) for x in obs)
 
     def fit(self, obs: np.ndarray, actions: np.ndarray) -> None:
         """Accumulate action counts per bin from ``obs (N, obs_dim)`` and ``actions (N,)``."""
@@ -47,15 +53,16 @@ class TabularPolicy:
             if b not in self.counts:
                 self.counts[b] = np.zeros(self.n_actions)  # (A,)
             self.counts[b][a] += 1
+            self.prior[a] += 1
 
     def act(self, obs: np.ndarray) -> int:
         b = self._bin(obs)
         if b not in self.counts:
-            return int(self.rng.integers(self.n_actions))  # never seen: no idea
+            return int(np.argmax(self.prior))  # never seen: fall back to the marginal mode
         return int(np.argmax(self.counts[b]))
 
-    def coverage(self) -> list[int]:
-        return sorted(self.counts)
+    def n_bins(self) -> int:
+        return len(self.counts)
 
 
 class MLPPolicy(nn.Module):
@@ -88,4 +95,4 @@ def fit_bc_mlp(policy: MLPPolicy, obs: np.ndarray, actions: np.ndarray, n_epochs
         opt.zero_grad()
         loss.backward()
         opt.step()
-    return float(loss)
+    return float(loss.detach())

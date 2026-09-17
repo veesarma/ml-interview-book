@@ -1,5 +1,7 @@
 import torch
 
+torch.set_num_threads(1)  # the sandbox oversubscribes cores; 1 thread is fastest for these tiny nets
+
 from mlbook.vision.unet import (TinyUNet, boundary_weight_map, dice_loss, mean_iou, panoptic_quality,
                                 segmentation_loss, synthetic_segmentation)
 

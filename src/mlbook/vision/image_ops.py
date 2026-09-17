@@ -123,13 +123,15 @@ def gaussian_blur(img: np.ndarray, sigma: float, pad_mode: str = "reflect") -> n
 
 
 def sobel(img: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Sobel gradients by *convolution* (so ``gx > 0`` where intensity rises to the right).
+    """Sobel gradients by *correlation* (as OpenCV's ``filter2D``/``Sobel`` do), so ``gx > 0``
+    where intensity rises to the right.  Under true convolution the sign would flip —
+    the classic gotcha with antisymmetric kernels.
 
     Returns:
         (gx, gy, magnitude), each the same shape as ``img``.
     """
-    gx = convolve2d(img, SOBEL_X)  # (..., H, W)  ∂I/∂x  (times 8)
-    gy = convolve2d(img, SOBEL_Y)  # (..., H, W)  ∂I/∂y
+    gx = correlate2d(img, SOBEL_X)  # (..., H, W)  ∂I/∂x  (times 8 on a unit ramp)
+    gy = correlate2d(img, SOBEL_Y)  # (..., H, W)  ∂I/∂y
     mag = np.sqrt(gx**2 + gy**2)  # (..., H, W)
     return gx, gy, mag
 

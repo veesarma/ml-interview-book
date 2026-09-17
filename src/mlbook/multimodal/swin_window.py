@@ -35,21 +35,18 @@ def window_reverse(windows: torch.Tensor, M: int, h: int, w: int) -> torch.Tenso
     return x.reshape(B, h, w, d)  # (B, h, w, d)
 
 
-def region_ids(h: int, w: int, M: int, shift: int) -> torch.Tensor:
-    """Label each grid cell by the region it came from BEFORE the cyclic shift, (h, w) ints.
+def region_ids(h: int, w: int, shift: int) -> torch.Tensor:
+    """Label each cell of the UN-shifted grid by whether it will wrap around under the cyclic shift. (h, w) ints.
 
-    Rows split into [0, h-M), [h-M, h-shift), [h-shift, h) and likewise columns
-    (3 x 3 = 9 ids). After ``torch.roll(-shift)`` every window is a union of
-    cells with at most 4 distinct ids; cells with different ids must not attend.
+    ``torch.roll(x, -shift)`` moves rows ``[0, shift)`` to the bottom and columns ``[0, shift)``
+    to the right edge. A wrapped cell is not a spatial neighbour of the cells it lands next
+    to, so the id is ``2 * row_wrapped + col_wrapped`` (four regions). The official Swin code
+    labels 3 x 3 = 9 regions in rolled coordinates; inside any window the two labellings
+    induce the same partition because the extra boundary sits exactly on a window edge.
     """
     ids = torch.zeros(h, w, dtype=torch.long)  # (h, w)
-    row_slices = (slice(0, h - M), slice(h - M, h - shift), slice(h - shift, h))
-    col_slices = (slice(0, w - M), slice(w - M, w - shift), slice(w - shift, w))
-    cnt = 0
-    for rs in row_slices:
-        for cs in col_slices:
-            ids[rs, cs] = cnt
-            cnt += 1
+    ids[:shift, :] += 2  # rows that wrap to the bottom
+    ids[:, :shift] += 1  # columns that wrap to the right
     return ids
 
 
@@ -58,10 +55,11 @@ def shifted_window_mask(h: int, w: int, M: int, shift: int) -> torch.Tensor:
 
     Build region ids on the un-shifted grid, roll them exactly as the tokens
     are rolled, partition into windows, and mark pairs (q, k) whose ids differ.
+    Requires h, w >= 2M so a wrapped cell is never a true neighbour of an unwrapped one.
     """
     if shift == 0:
         return torch.zeros((h // M) * (w // M), M * M, M * M)  # (nW, M*M, M*M)
-    ids = region_ids(h, w, M, shift)  # (h, w)
+    ids = region_ids(h, w, shift)  # (h, w)
     ids = torch.roll(ids, shifts=(-shift, -shift), dims=(0, 1))  # (h, w), same roll as tokens
     win = window_partition(ids[None, :, :, None].float(), M).squeeze(-1)  # (nW, M*M)
     diff = win[:, :, None] - win[:, None, :]  # (nW, M*M, M*M)

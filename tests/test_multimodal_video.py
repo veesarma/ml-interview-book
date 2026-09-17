@@ -8,6 +8,8 @@ from mlbook.multimodal.video_attention import (
     tubelet_embed,
 )
 
+torch.set_num_threads(1)  # multi-threaded CPU kernels are pathologically slow on tiny tensors in CI containers
+
 
 def test_tubelet_shapes_and_content():
     v = torch.randn(2, 3, 4, 8, 8)  # (B, C, T, H, W)

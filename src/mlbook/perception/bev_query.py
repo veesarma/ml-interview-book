@@ -109,7 +109,8 @@ class BEVQueryCrossAttention(nn.Module):
         attn = torch.softmax(scores, dim=-1)  # (B, Nq, S)  NaN where no hits
         attn = torch.where(any_hit.view(1, -1, 1), attn, torch.zeros_like(attn))  # (B, Nq, S)
         out = (attn.unsqueeze(-1) * v).sum(2)  # (B, Nq, d)
-        return queries + self.out_proj(out)  # (B, Nq, d)
+        delta = self.out_proj(out) * any_hit.view(1, -1, 1).to(out.dtype)  # (B, Nq, d) zero update for unseen pillars
+        return queries + delta  # (B, Nq, d)
 
 
 class PETRPositionEncoder(nn.Module):

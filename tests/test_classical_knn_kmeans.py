@@ -1,3 +1,4 @@
+"""Tests for knn.py and kmeans.py — one focused test per retype target."""
 import numpy as np
 
 from mlbook.classical.kmeans import kmeans, kmeans_objective, kmeans_plusplus_init, minibatch_kmeans, squared_distances
@@ -14,15 +15,21 @@ def test_pairwise_distances_match_naive():
     np.testing.assert_allclose(pairwise_distances(Q, X, "cosine"), cos, atol=1e-10)
 
 
-def test_knn_indices_sorted_and_kdtree_agrees_with_brute_force():
+def test_knn_indices_sorted_and_correct():
     rng = np.random.default_rng(0)
-    X = rng.standard_normal((500, 3))
-    Q = rng.standard_normal((20, 3))
+    X, Q = rng.standard_normal((500, 3)), rng.standard_normal((20, 3))
     idx = knn_indices(Q, X, k=5)
     D = pairwise_distances(Q, X)
     for m in range(20):
         assert np.all(np.diff(D[m, idx[m]]) >= 0)
         assert set(idx[m]) == set(np.argsort(D[m])[:5])
+
+
+def test_kdtree_agrees_with_brute_force():
+    rng = np.random.default_rng(0)
+    X, Q = rng.standard_normal((500, 3)), rng.standard_normal((20, 3))
+    idx = knn_indices(Q, X, k=5)
+    D = pairwise_distances(Q, X)
     tree = KDTree(X, leaf_size=8)
     for m in range(20):
         d_t, i_t = tree.query(Q[m], k=5)
@@ -30,14 +37,15 @@ def test_knn_indices_sorted_and_kdtree_agrees_with_brute_force():
         np.testing.assert_allclose(d_t, D[m, idx[m]])
 
 
-def test_knn_classifier_and_regressor():
+def test_knn_classifier_blobs():
     rng = np.random.default_rng(0)
     y = rng.integers(0, 3, 300)
     X = np.array([[0, 0], [4, 0], [0, 4.0]])[y] + 0.5 * rng.standard_normal((300, 2))
-    clf = KNNClassifier(k=7).fit(X, y)
-    assert (clf.predict(X) == y).mean() > 0.97
-    clf_w = KNNClassifier(k=7, weighted=True).fit(X, y)
-    assert (clf_w.predict(X) == y).mean() > 0.97
+    assert (KNNClassifier(k=7).fit(X, y).predict(X) == y).mean() > 0.97
+    assert (KNNClassifier(k=7, weighted=True).fit(X, y).predict(X) == y).mean() > 0.97
+
+
+def test_knn_regressor_smooth_function():
     Xr = np.linspace(0, 1, 200)[:, None]
     yr = Xr[:, 0] ** 2
     reg = KNNRegressor(k=3).fit(Xr, yr)
@@ -51,21 +59,32 @@ def _blobs(seed=0):
     return C[lab] + 0.7 * rng.standard_normal((400, 2)), C
 
 
+def test_squared_distances_and_kmeans_objective():
+    rng = np.random.default_rng(0)
+    X, C = rng.standard_normal((5, 2)), rng.standard_normal((3, 2))
+    naive = ((X[:, None, :] - C[None, :, :]) ** 2).sum(axis=2)
+    np.testing.assert_allclose(squared_distances(X, C), naive, atol=1e-10)
+    labels = naive.argmin(axis=1)
+    np.testing.assert_allclose(kmeans_objective(X, C, labels), naive.min(axis=1).sum())
+
+
+def test_kmeans_plusplus_init_one_seed_per_blob():
+    X, C_true = _blobs(1)
+    seeds = kmeans_plusplus_init(X, 4, np.random.default_rng(0))
+    assert seeds.shape == (4, 2)
+    assert np.all(squared_distances(C_true, seeds).min(axis=1) < 4.0)
+
+
 def test_kmeans_objective_monotone_and_recovers_centres():
     X, C_true = _blobs()
     C, labels, hist = kmeans(X, 4, seed=0)
     assert np.all(np.diff(hist) <= 1e-9), hist
     np.testing.assert_allclose(kmeans_objective(X, C, labels), hist[-1])
-    d = squared_distances(C, C_true).min(axis=1)  # each found centre near a true centre
-    assert np.all(d < 0.2)
+    assert np.all(squared_distances(C, C_true).min(axis=1) < 0.2)
     assert labels.shape == (400,)
 
 
-def test_kmeans_plusplus_spreads_seeds_and_minibatch_close():
+def test_minibatch_kmeans_close_to_true_centres():
     X, C_true = _blobs(1)
-    rng = np.random.default_rng(0)
-    seeds = kmeans_plusplus_init(X, 4, rng)
-    assert seeds.shape == (4, 2)
-    assert np.all(squared_distances(C_true, seeds).min(axis=1) < 4.0)  # one seed per true blob
     Cm = minibatch_kmeans(X, 4, batch_size=64, n_steps=100, seed=0)
     assert np.all(squared_distances(C_true, Cm).min(axis=1) < 1.0)

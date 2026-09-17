@@ -1,4 +1,6 @@
 import torch
+
+torch.set_num_threads(1)  # the sandbox oversubscribes cores; 1 thread is fastest for these tiny nets
 import torch.nn.functional as F
 
 from mlbook.vision.resnet_block import BasicBlock, Bottleneck, MBConv, PreActBlock, SEBlock, TinyResNet

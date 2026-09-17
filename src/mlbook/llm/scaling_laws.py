@@ -29,8 +29,16 @@ class ChinchillaParams:
     beta: float
 
 
-# Fitted values reported in Hoffmann et al. (2022), "approach 3".
-CHINCHILLA_FIT = ChinchillaParams(E=1.69, A=406.4, B=410.7, alpha=0.34, beta=0.28)
+# Fitted values as printed in Hoffmann et al. (2022), "approach 3" (their eq. 10).
+# NOTE: with these exponents the closed-form optimum gives N* ∝ C^0.46 and ~50+
+# tokens/parameter at 1e21 FLOPs, *not* the "20 tokens per parameter" rule that
+# came from approaches 1 and 2 of the same paper.  Besiroglu et al. (2024,
+# "Chinchilla Scaling: A replication attempt") re-fit the same data and obtained
+# the second parameter set below, which is consistent with all three approaches
+# and with the actual Chinchilla configuration (70B params, 1.4T tokens).
+CHINCHILLA_PAPER_FIT = ChinchillaParams(E=1.69, A=406.4, B=410.7, alpha=0.34, beta=0.28)
+CHINCHILLA_REFIT = ChinchillaParams(E=1.8172, A=482.01, B=2085.43, alpha=0.3478, beta=0.3658)
+CHINCHILLA_FIT = CHINCHILLA_REFIT  # default used throughout the chapter
 
 
 def chinchilla_loss(N: np.ndarray, D: np.ndarray, p: ChinchillaParams = CHINCHILLA_FIT) -> np.ndarray:

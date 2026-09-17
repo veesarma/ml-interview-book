@@ -4,6 +4,7 @@ import numpy as np
 
 from mlbook.llm.scaling_laws import (
     CHINCHILLA_FIT,
+    CHINCHILLA_PAPER_FIT,
     ChinchillaParams,
     chinchilla_loss,
     compute_optimal,
@@ -29,6 +30,16 @@ def test_compute_optimal_is_the_argmin_on_the_isoflop_curve():
 def test_tokens_per_parameter_is_about_twenty():
     assert 15 < tokens_per_parameter(1e21) < 30
     assert 15 < tokens_per_parameter(1e24) < 30
+    # The printed approach-3 exponents give a different answer: a well-known discrepancy.
+    assert tokens_per_parameter(1e21, CHINCHILLA_PAPER_FIT) > 30
+
+
+def test_paper_fit_optimum_is_still_the_isoflop_argmin():
+    C = 5.76e23
+    N_star, D_star = compute_optimal(C, CHINCHILLA_PAPER_FIT)
+    N_grid = np.logspace(np.log10(N_star) - 1, np.log10(N_star) + 1, 2001)
+    losses = loss_at_fixed_compute(C, N_grid, CHINCHILLA_PAPER_FIT)
+    assert abs(np.log(N_grid[np.argmin(losses)]) - np.log(N_star)) < 0.01
 
 
 def test_chinchilla_point_estimate():

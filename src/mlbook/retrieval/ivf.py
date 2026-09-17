@@ -12,17 +12,31 @@ import numpy as np
 from mlbook.retrieval.similarity import squared_euclidean
 
 
+def kmeans_pp_init(X: np.ndarray, k: int, rng: np.random.Generator) -> np.ndarray:
+    """k-means++ seeding: each new centre is drawn with probability proportional
+    to its squared distance from the nearest centre chosen so far. X (N, d) -> (k, d)."""
+    N = X.shape[0]
+    centroids = np.empty((k, X.shape[1]))  # (k, d)
+    centroids[0] = X[rng.integers(N)]
+    d2 = squared_euclidean(X, centroids[:1])[:, 0]  # (N,)
+    for j in range(1, k):
+        probs = d2 / d2.sum() if d2.sum() > 0 else np.full(N, 1.0 / N)  # (N,)
+        centroids[j] = X[rng.choice(N, p=probs)]
+        d2 = np.minimum(d2, squared_euclidean(X, centroids[j : j + 1])[:, 0])  # (N,)
+    return centroids
+
+
 def kmeans(
     X: np.ndarray, k: int, n_iters: int = 20, seed: int = 0
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Lloyd's k-means with random-row initialisation.
+    """Lloyd's k-means with k-means++ initialisation.
 
     X (N, d) -> centroids (k, d), assignments (N,). Empty clusters are re-seeded
     with a random row so every centroid stays live.
     """
     rng = np.random.default_rng(seed)
     N = X.shape[0]
-    centroids = X[rng.choice(N, size=k, replace=False)].copy()  # (k, d)
+    centroids = kmeans_pp_init(X, k, rng)  # (k, d)
     assign = np.zeros(N, dtype=int)  # (N,)
     for _ in range(n_iters):
         d2 = squared_euclidean(X, centroids)  # (N, k)

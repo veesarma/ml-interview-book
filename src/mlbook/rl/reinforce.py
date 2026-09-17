@@ -52,14 +52,26 @@ def reinforce_loss(logp: torch.Tensor, returns: torch.Tensor, baseline: torch.Te
     return -(logp * weights.detach()).mean()
 
 
+def sample_action(policy: nn.Module, obs: np.ndarray, rng: np.random.Generator) -> tuple[int, float]:
+    """Draw ``a ~ pi(.|obs)`` for one observation (obs_dim,); return ``(a, log pi(a|obs))``.
+
+    Sampling is done in NumPy from the softmax of the logits: cheaper than building a
+    ``torch.distributions.Categorical`` per environment step, and identical in distribution.
+    """
+    with torch.no_grad():
+        logits = policy(torch.from_numpy(obs).unsqueeze(0)).squeeze(0).numpy()  # (A,)
+    logits = logits - logits.max()
+    probs = np.exp(logits) / np.exp(logits).sum()  # (A,) softmax
+    a = int(rng.choice(probs.shape[0], p=probs))
+    return a, float(np.log(probs[a]))
+
+
 def rollout(env, policy: PolicyNetwork, rng: np.random.Generator) -> tuple[torch.Tensor, np.ndarray, torch.Tensor]:
     """One episode. Returns ``(obs (T, obs_dim), rewards (T,), actions (T,))``."""
     obs_list, rewards, actions = [], [], []
     obs, done = env.reset(rng), False
     while not done:
-        with torch.no_grad():
-            logits = policy(torch.from_numpy(obs).unsqueeze(0))  # (1, A)
-        a = int(Categorical(logits=logits).sample().item())
+        a, _ = sample_action(policy, obs, rng)
         next_obs, r, done = env.step(a, rng)
         obs_list.append(obs)
         rewards.append(r)

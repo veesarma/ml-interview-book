@@ -66,7 +66,7 @@ class TemperatureScaling(nn.Module):
 
     @property
     def temperature(self) -> float:
-        return float(self.log_t.exp())
+        return float(self.log_t.detach().exp())
 
     def forward(self, logits: torch.Tensor) -> torch.Tensor:
         return logits / self.log_t.exp()  # (N, K)

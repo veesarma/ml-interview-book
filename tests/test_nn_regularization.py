@@ -62,21 +62,41 @@ def test_label_smoothing_optimum_is_finite_logit_gap():
     np.testing.assert_allclose(loss.backward(), 0.0, atol=1e-12)
 
 
-def test_mixup_and_cutmix_shapes_and_label_mass():
+def test_mixup_is_convex_combination():
     rng = np.random.default_rng(0)
     x = rng.random((8, 3, 6, 6))
     y = one_hot(rng.integers(0, 4, 8), 4)
     xm, ym = mixup(x, y, 0.4, rng)
     assert xm.shape == x.shape and ym.shape == y.shape
     np.testing.assert_allclose(ym.sum(1), 1.0)
+    assert xm.min() >= x.min() - 1e-12 and xm.max() <= x.max() + 1e-12
+
+
+def test_cutmix_pastes_box_and_weights_label_by_area():
+    rng = np.random.default_rng(0)
+    x = rng.random((8, 3, 6, 6))
+    y = one_hot(rng.integers(0, 4, 8), 4)
     xc, yc = cutmix(x, y, 1.0, rng)
     assert xc.shape == x.shape
     np.testing.assert_allclose(yc.sum(1), 1.0)
+    changed = (xc != x).any(axis=(0, 1))  # (H, W) mask of pasted pixels
+    frac = changed.mean()
+    lam = yc[0][y[0] == 1].max() if (y[0] == 1).sum() == 1 else None
+    # every pasted pixel column/row set forms one rectangle
+    rows, cols = np.where(changed)
+    if rows.size:
+        assert changed[rows.min():rows.max() + 1, cols.min():cols.max() + 1].all()
+        assert abs(frac - (rows.max() - rows.min() + 1) * (cols.max() - cols.min() + 1) / 36) < 1e-12
 
 
-def test_early_stopping_and_weight_decay_forms():
+def test_early_stopping_patience():
     es = EarlyStopping(patience=2)
     assert not es.step(1.0) and not es.step(0.9) and not es.step(0.95)
     assert es.step(0.96)
+    assert es.best == 0.9
+
+
+def test_weight_decay_forms_coincide_for_sgd():
     w, g = np.ones(3), np.full(3, 0.5)
     np.testing.assert_allclose(sgd_step_weight_decay(w, g, 0.1, 0.01, decoupled=True), sgd_step_weight_decay(w, g, 0.1, 0.01, decoupled=False))
+    np.testing.assert_allclose(sgd_step_weight_decay(w, g, 0.1, 0.01), 1 - 0.05 - 0.001)

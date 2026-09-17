@@ -36,8 +36,12 @@ def fake_quantize(x: torch.Tensor, bits: int, dim: int | None = None) -> torch.T
         scale = x.detach().abs().max().clamp(min=1e-12) / q_max
     else:
         scale = x.detach().abs().amax(dim=dim, keepdim=True).clamp(min=1e-12) / q_max
-    q = torch.clamp(RoundSTE.apply(x / scale), -q_max - 1, q_max)  # clamp's grad is 0 outside range
-    return q * scale
+    z = x / scale  # real-valued codes
+    q = torch.clamp(RoundSTE.apply(z), -q_max - 1, q_max)  # integer codes (forward value)
+    # STE gradient mask: pass the gradient only where rounding (not clipping) chose the code.
+    in_range = (z.detach().abs() <= q_max + 0.5).to(x.dtype)
+    q_ste = q.detach() + in_range * (z - z.detach())  # forward: q;  backward: grad * in_range
+    return q_ste * scale
 
 
 class QATLinear(nn.Module):

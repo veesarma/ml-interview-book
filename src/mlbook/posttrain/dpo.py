@@ -118,4 +118,4 @@ def dpo_train_step(
     opt.zero_grad()
     loss.backward()
     opt.step()
-    return float(loss), float((r_c - r_r).mean())
+    return float(loss.detach()), float((r_c - r_r).mean())

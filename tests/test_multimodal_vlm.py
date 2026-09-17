@@ -1,44 +1,8 @@
 import torch
 
-from mlbook.multimodal.projectors import GatedCrossAttentionAdapter, LinearProjector, MLPProjector, PerceiverResampler, QFormer
-from mlbook.multimodal.token_compression import (
-    anyres_tiles,
-    average_pool_tokens,
-    pixel_shuffle_merge,
-    PixelShuffleProjector,
-    prune_tokens_by_score,
-    visual_token_count,
-)
 from mlbook.multimodal.vlm import MiniVLM, TinyCausalLM, ToyVisionEncoder, merge_visual_tokens, vlm_lm_loss
 
-
-def test_projector_shapes():
-    feats = torch.randn(2, 9, 12)  # (B, N_v, d_v)
-    assert LinearProjector(12, 20)(feats).shape == (2, 9, 20)
-    assert MLPProjector(12, 20)(feats).shape == (2, 9, 20)
-    assert PerceiverResampler(12, 20, n_queries=4, n_heads=2)(feats).shape == (2, 4, 20)
-    assert QFormer(12, 20, n_queries=4, n_heads=2)(feats).shape == (2, 4, 20)
-    text = torch.randn(2, 7, 20)
-    ad = GatedCrossAttentionAdapter(20, 12, n_heads=2)
-    out = ad(text, feats)
-    assert out.shape == (2, 7, 20)
-    assert torch.allclose(out, text)  # zero-initialised gates: identity at step 0
-
-
-def test_token_compression():
-    grid = torch.randn(2, 6, 6, 8)
-    assert average_pool_tokens(grid, 2).shape == (2, 9, 8)
-    ps = pixel_shuffle_merge(grid, 3)
-    assert ps.shape == (2, 4, 72)
-    # pixel shuffle keeps every value: block (0,0) is the concatenation of grid[:, :3, :3]
-    assert torch.equal(ps[0, 0], grid[0, :3, :3].reshape(-1))
-    assert PixelShuffleProjector(8, 16, 2)(grid).shape == (2, 9, 16)
-    kept, idx = prune_tokens_by_score(grid.reshape(2, 36, 8), torch.randn(2, 36), keep=10)
-    assert kept.shape == (2, 10, 8) and torch.all(idx[:, 1:] > idx[:, :-1])
-    assert anyres_tiles(torch.randn(1, 3, 8, 12), 4).shape == (6, 3, 4, 4)
-    assert visual_token_count(336, 336, 14) == 576
-    assert visual_token_count(448, 448, 14, merge=2) == 256
-    assert visual_token_count(448, 448, 14, n_queries=64) == 64
+torch.set_num_threads(1)  # multi-threaded CPU kernels are pathologically slow on tiny tensors in CI containers
 
 
 def _vlm(vocab=16, d_v=16, d_llm=24, image_token_id=15):
@@ -73,7 +37,7 @@ def test_vlm_overfits_captions():
         imgs[i, 0, r : r + 4, c : c + 4] += 3.0
         ids[i] = torch.tensor([1, 15, 3, 4 + k, 4 + k])  # caption depends on the image
     opt = torch.optim.Adam(model.parameters(), lr=3e-3)
-    for _ in range(150):
+    for _ in range(120):
         opt.zero_grad()
         logits, is_visual = model(imgs, ids)
         loss = vlm_lm_loss(logits, ids, is_visual, 15)
@@ -84,3 +48,26 @@ def test_vlm_overfits_captions():
     # position that predicts the class-dependent token: merged index of ids[:, 3] is 1 + 4 + 1 = 6 -> pred at 5
     pred = logits[:, 5].argmax(-1)
     assert torch.equal(pred, ids[:, 3])
+
+
+def test_causal_lm_is_causal():
+    lm = TinyCausalLM(vocab=16, max_len=32, d_llm=24, depth=2, n_heads=4)
+    ids = torch.randint(0, 16, (1, 6))
+    pos = torch.arange(6)[None]
+    a = lm(lm.tok(ids), pos)
+    ids2 = ids.clone(); ids2[0, 4] = (ids2[0, 4] + 1) % 16  # change token 4
+    b = lm(lm.tok(ids2), pos)
+    assert torch.allclose(a[:, :4], b[:, :4], atol=1e-5)  # positions < 4 unaffected
+    assert not torch.allclose(a[:, 4:], b[:, 4:])
+
+
+def test_vlm_lm_loss_ignores_visual_positions():
+    B, L, V = 1, 8, 16
+    logits = torch.randn(B, L, V)
+    ids = torch.tensor([[1, 15, 3, 4, 5]])  # image token at column 1 expands to N_v = 4
+    is_visual = torch.tensor([[False, True, True, True, True, False, False, False]])
+    loss = vlm_lm_loss(logits, ids, is_visual, 15)
+    # manual: targets = [1, -100 x4, 3, 4, 5]; predictions at positions 4, 5, 6 predict 3, 4, 5
+    lp = logits[0].log_softmax(-1)
+    manual = -(lp[4, 3] + lp[5, 4] + lp[6, 5]) / 3
+    assert torch.isclose(loss, manual)

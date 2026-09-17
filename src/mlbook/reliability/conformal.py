@@ -14,10 +14,10 @@ import numpy as np
 def conformal_quantile(scores: np.ndarray, alpha: float) -> float:
     """Finite-sample-corrected quantile of calibration scores (n,)."""
     n = len(scores)
-    level = np.ceil((n + 1) * (1.0 - alpha)) / n
-    if level > 1.0:
+    k = int(np.ceil((n + 1) * (1.0 - alpha)))  # rank of the score we need
+    if k > n:
         return float(np.inf)  # not enough calibration points for this alpha
-    return float(np.quantile(scores, level, method="higher"))
+    return float(np.sort(scores)[k - 1])  # k-th smallest score
 
 
 class SplitConformalClassifier:

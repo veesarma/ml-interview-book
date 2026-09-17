@@ -66,8 +66,9 @@ def apply_merges(symbols: tuple[str, ...], ranks: dict[Pair, int]) -> tuple[str,
 class BPETokenizer:
     """Word-level BPE with an end-of-word marker. ``train`` then ``encode``/``decode``."""
 
-    def __init__(self, end_of_word: str = "</w>") -> None:
+    def __init__(self, end_of_word: str = "</w>", unk_token: str = "<unk>") -> None:
         self.eow = end_of_word
+        self.unk = unk_token
         self.merges: list[Pair] = []
         self.ranks: dict[Pair, int] = {}
         self.vocab: dict[str, int] = {}
@@ -79,7 +80,8 @@ class BPETokenizer:
     def train(self, corpus: str, vocab_size: int) -> None:
         words = Counter(corpus.split())
         word_freqs = {self._word_to_symbols(w): f for w, f in words.items()}
-        alphabet = sorted({s for w in word_freqs for s in w})
+        chars = {c for w in words for c in w}
+        alphabet = [self.unk] + sorted(chars) + sorted(c + self.eow for c in chars)  # every char, with and without the marker
         self.merges = learn_merges(word_freqs, max(0, vocab_size - len(alphabet)))
         self.ranks = {pair: i for i, pair in enumerate(self.merges)}
         tokens = alphabet + [a + b for a, b in self.merges]
@@ -93,7 +95,8 @@ class BPETokenizer:
         return out
 
     def encode(self, text: str) -> list[int]:
-        return [self.vocab[t] for t in self.tokenize(text)]
+        unk = self.vocab[self.unk]
+        return [self.vocab.get(t, unk) for t in self.tokenize(text)]  # characters never seen in training -> <unk>
 
     def decode(self, ids: list[int]) -> str:
         return "".join(self.inv_vocab[i] for i in ids).replace(self.eow, " ").strip()

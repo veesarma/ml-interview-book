@@ -190,7 +190,7 @@ def ppo_update(
         loss.backward()
         torch.nn.utils.clip_grad_norm_(list(policy.parameters()) + list(critic.parameters()), 1.0)
         opt.step()
-    return clip_frac, float(v_loss), float(ent)
+    return clip_frac, float(v_loss.detach()), float(ent.detach())
 
 
 def train_ppo(

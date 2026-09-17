@@ -92,3 +92,65 @@ def test_diamond_graph_topological_order():
     z = x * 3.0
     (y * z).sum().backward()  # 6 x^2 -> 12 x = 18
     np.testing.assert_allclose(x.grad, [18.0])
+
+
+def _grad_vs_torch(build_np, build_t, shape=(3, 4)):
+    a_n, a_t = _pair(shape)
+    r = np.random.randn(*build_np(a_n).shape)
+    (build_np(a_n) * Tensor(r)).sum().backward()
+    (build_t(a_t) * torch.tensor(r)).sum().backward()
+    np.testing.assert_allclose(a_n.grad, a_t.grad.numpy(), atol=1e-9)
+
+
+def test_op_add_and_mul_broadcast():
+    _grad_vs_torch(lambda a: a + a * 3.0 + Tensor(np.ones(4)), lambda a: a + a * 3.0 + torch.ones(4, dtype=torch.float64))
+
+
+def test_op_pow_and_div():
+    _grad_vs_torch(lambda a: (a ** 3) / (a ** 2 + 1.0), lambda a: (a ** 3) / (a ** 2 + 1.0))
+
+
+def test_op_exp_log():
+    _grad_vs_torch(lambda a: (a.exp() + 1.0).log(), lambda a: (a.exp() + 1.0).log())
+
+
+def test_op_relu():
+    _grad_vs_torch(lambda a: a.relu(), lambda a: torch.relu(a))
+
+
+def test_op_sigmoid_tanh():
+    _grad_vs_torch(lambda a: a.sigmoid() * a.tanh(), lambda a: torch.sigmoid(a) * torch.tanh(a))
+
+
+def test_op_sum_mean_axes():
+    _grad_vs_torch(lambda a: a.sum(axis=1, keepdims=True) * a.mean(axis=0), lambda a: a.sum(dim=1, keepdim=True) * a.mean(dim=0))
+
+
+def test_op_softmax():
+    _grad_vs_torch(lambda a: a.softmax(axis=-1), lambda a: torch.softmax(a, dim=-1))
+
+
+def test_op_log_softmax():
+    _grad_vs_torch(lambda a: a.log_softmax(axis=0), lambda a: torch.log_softmax(a, dim=0))
+
+
+def test_op_reshape_transpose():
+    _grad_vs_torch(lambda a: a.reshape(2, 6).transpose(1, 0) * Tensor(np.arange(12.0).reshape(6, 2)),
+                   lambda a: a.reshape(2, 6).permute(1, 0) * torch.arange(12.0, dtype=torch.float64).reshape(6, 2))
+
+
+def test_op_matmul_2d():
+    a_n, a_t = _pair((3, 4))
+    b_n, b_t = _pair((4, 2))
+    (a_n @ b_n).sum().backward()
+    (a_t @ b_t).sum().backward()
+    np.testing.assert_allclose(a_n.grad, a_t.grad.numpy(), atol=1e-10)
+    np.testing.assert_allclose(b_n.grad, b_t.grad.numpy(), atol=1e-10)
+
+
+def test_cross_entropy_helper_matches_torch():
+    z_n, z_t = _pair((6, 3))
+    y = np.array([0, 2, 1, 1, 0, 2])
+    cross_entropy(z_n, y).backward()
+    torch.nn.functional.cross_entropy(z_t, torch.tensor(y)).backward()
+    np.testing.assert_allclose(z_n.grad, z_t.grad.numpy(), atol=1e-10)

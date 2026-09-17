@@ -14,6 +14,8 @@ import torch
 from torch import nn
 from torch.distributions import Categorical
 
+from mlbook.rl.reinforce import sample_action
+
 
 class Actor(nn.Module):
     """``obs (B, obs_dim) -> logits (B, A)``."""
@@ -78,8 +80,7 @@ def train_actor_critic(
         obs_l, act_l, rew_l, next_l, done_l = [], [], [], [], []
         obs, done = env.reset(rng), False
         while not done:
-            with torch.no_grad():
-                a = int(Categorical(logits=actor(torch.from_numpy(obs).unsqueeze(0))).sample().item())
+            a, _ = sample_action(actor, obs, rng)
             next_obs, r, done = env.step(a, rng)
             obs_l.append(obs), act_l.append(a), rew_l.append(r), next_l.append(next_obs), done_l.append(float(done))
             obs = next_obs

@@ -52,9 +52,9 @@ def test_hidden_jacobian_norms_shrink_for_small_weights():
 
 
 def test_clip_grad_norm_scales_to_max_norm():
-    grads = {"a": np.full(4, 3.0), "b": np.full(4, 4.0)}  # global norm = sqrt(16*9 + 16*16) = 20
+    grads = {"a": np.full(4, 3.0), "b": np.full(4, 4.0)}  # global norm = sqrt(4*9 + 4*16) = 10
     clipped, norm = clip_grad_norm(grads, max_norm=5.0)
-    assert np.isclose(norm, 20.0)
+    assert np.isclose(norm, 10.0)
     total = np.sqrt(sum((g ** 2).sum() for g in clipped.values()))
     assert np.isclose(total, 5.0)
     same, _ = clip_grad_norm(grads, max_norm=100.0)

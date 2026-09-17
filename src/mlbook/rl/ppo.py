@@ -21,6 +21,7 @@ from torch.distributions import Categorical
 
 from mlbook.rl.actor_critic import Actor, Critic
 from mlbook.rl.gae import compute_gae
+from mlbook.rl.reinforce import sample_action
 
 
 @dataclass
@@ -78,14 +79,11 @@ def collect_rollout(env, actor: Actor, critic: Critic, buf: RolloutBuffer, rng: 
     """
     obs = state["obs"]
     for _ in range(buf.obs.shape[0]):
+        a, logp = sample_action(actor, obs, rng)  # a ~ pi_old, logp = log pi_old(a|s)
         with torch.no_grad():
-            obs_t = torch.from_numpy(obs).unsqueeze(0)  # (1, obs_dim)
-            dist = Categorical(logits=actor(obs_t))
-            a = dist.sample()  # (1,)
-            logp = float(dist.log_prob(a).item())
-            v = float(critic(obs_t).item())
-        next_obs, r, done = env.step(int(a.item()), rng)
-        buf.add(obs, int(a.item()), logp, r, v, done)
+            v = float(critic(torch.from_numpy(obs).unsqueeze(0)).item())  # V_old(s)
+        next_obs, r, done = env.step(a, rng)
+        buf.add(obs, a, logp, r, v, done)
         state["ep_return"] += r
         if done:
             state["returns"].append(state["ep_return"])

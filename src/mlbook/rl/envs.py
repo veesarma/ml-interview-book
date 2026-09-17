@@ -161,43 +161,59 @@ class PointMass1D:
 
 @dataclass
 class CorridorEnv:
-    """Lane keeping with wind gusts; the expert is a scripted bang-bang controller.
+    """Lane keeping with momentum, wind gusts and a noisy sensor; the expert is a scripted PD controller.
 
-    State is the lateral offset ``y``. Each step, with probability ``gust_prob``
-    a gust adds ``+-gust`` to ``y``. Actions ``{0: left, 1: stay, 2: right}`` move
-    ``y`` by ``-0.1, 0, +0.1``. Reward ``+1`` per step while ``|y| <= 0.5``; the
-    episode ends early (crash) when ``|y| > 1``. Observation is ``(y,)``.
+    True state ``(y, v)``: lateral offset and lateral velocity. Actions ``{0, 1, 2}`` apply
+    accelerations ``-accel, 0, +accel``; with probability ``gust_prob`` a gust adds ``+-gust`` to
+    ``v``; then ``y <- y + v``. Reward ``+1`` per step while ``|y| <= 0.3``; the episode ends
+    early (crash) when ``|y| > 1``.
+
+    The *learner* observes ``(y, v) + N(0, obs_noise^2)`` -- a perception stack is never exact --
+    while :meth:`expert_action` reads the true state (a privileged expert, as a human driver or
+    an offline planner is). That gap is the on-distribution error source epsilon in the
+    behavioural-cloning analysis; momentum is what makes off-distribution states require an
+    action (brake against ``v``) that the expert's own trajectories never demonstrate.
     """
 
-    horizon: int = 30
-    gust_prob: float = 0.2
-    gust: float = 0.25
-    obs_dim: int = 1
+    horizon: int = 40
+    gust_prob: float = 0.15
+    gust: float = 0.1
+    accel: float = 0.05
+    obs_noise: float = 0.04
+    kp: float = 2.0
+    kd: float = 6.0
+    deadband: float = 0.05
+    obs_dim: int = 2
     n_actions: int = 3
 
     def reset(self, rng: np.random.Generator | None = None) -> np.ndarray:
-        self.y = 0.0
-        self.t = 0
+        self.rng = np.random.default_rng() if rng is None else rng
+        self.y, self.v, self.t = 0.0, 0.0, 0
         return self.observe()
 
     def observe(self) -> np.ndarray:
-        return np.array([self.y], dtype=np.float32)  # (1,)
+        noise = self.rng.normal(size=2) * self.obs_noise  # (2,) sensor noise
+        return np.array([self.y + noise[0], self.v + noise[1]], dtype=np.float32)  # (2,)
 
-    def expert_action(self, obs: np.ndarray) -> int:
-        """Scripted expert: steer toward the centre once ``|y| > 0.1``."""
-        y = float(obs[0])
-        if abs(y) <= 0.1:
+    @property
+    def true_state(self) -> np.ndarray:
+        return np.array([self.y, self.v], dtype=np.float32)  # (2,)
+
+    def expert_action(self, obs: np.ndarray | None = None) -> int:
+        """PD controller on the TRUE state: ``u = -(kp y + kd v)``, thresholded to three actions."""
+        u = -(self.kp * self.y + self.kd * self.v)
+        if abs(u) <= self.deadband:
             return 1
-        return 0 if y > 0 else 2
+        return 2 if u > 0 else 0
 
     def step(self, a: int, rng: np.random.Generator | None = None) -> tuple[np.ndarray, float, bool]:
-        rng = np.random.default_rng() if rng is None else rng
-        self.y += (a - 1) * 0.1
-        if rng.random() < self.gust_prob:
-            self.y += self.gust * (1.0 if rng.random() < 0.5 else -1.0)
-        self.y = round(self.y, 6)
+        self.v += (a - 1) * self.accel
+        if self.rng.random() < self.gust_prob:
+            self.v += self.gust * (1.0 if self.rng.random() < 0.5 else -1.0)
+        self.v = float(np.clip(self.v, -0.3, 0.3))
+        self.y += self.v
         self.t += 1
-        reward = 1.0 if abs(self.y) <= 0.5 else 0.0
+        reward = 1.0 if abs(self.y) <= 0.3 else 0.0
         crashed = abs(self.y) > 1.0
         return self.observe(), reward, crashed or self.t >= self.horizon
 

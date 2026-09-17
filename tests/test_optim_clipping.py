@@ -1,10 +1,17 @@
+"""One focused test per function in mlbook.optim.clipping (select with -k <name>)."""
+
 import numpy as np
 import torch
 
 from mlbook.optim import clipping as cl
 
 
-def test_clip_grad_norm_matches_torch():
+def test_global_grad_norm():
+    grads = [np.array([3.0, 0.0]), np.array([[0.0, 4.0]])]
+    assert np.isclose(cl.global_grad_norm(grads), 5.0)
+
+
+def test_clip_grad_norm():
     grads = [np.random.randn(3, 4) * 5, np.random.randn(7) * 5]
     tg = [torch.tensor(g, requires_grad=True) for g in grads]
     for t, g in zip(tg, grads):
@@ -15,9 +22,7 @@ def test_clip_grad_norm_matches_torch():
     assert np.isclose(cl.global_grad_norm(grads), 1.0)
     for t, g in zip(tg, grads):
         assert np.allclose(t.grad.numpy(), g, atol=1e-6)
-
-
-def test_clip_preserves_direction_and_noop_below_threshold():
+    # direction preserved; no-op below the threshold
     g0 = np.array([3.0, 4.0])
     g = [g0.copy()]
     cl.clip_grad_norm(g, max_norm=1.0)

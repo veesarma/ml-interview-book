@@ -43,3 +43,24 @@ def test_shapes_and_relu_variant_gradient():
     logits = model.forward(x)
     assert logits.shape == (7, 3)
     assert model.backward(np.ones((7, 3))).shape == (7, 4)
+
+
+def test_sgd_step_moves_against_gradient():
+    model = MLP([2, 3, 2], seed=0)
+    x = np.random.randn(4, 2)
+    y = np.array([0, 1, 0, 1])
+    loss_fn = CrossEntropyLoss()
+    before = loss_fn.forward(model.forward(x), y)
+    model.backward(loss_fn.backward())
+    w_old = [p.copy() for p in model.params()]
+    g_old = [g.copy() for g in model.grads()]
+    model.sgd_step(0.01)
+    for p, w0, g in zip(model.params(), w_old, g_old):
+        np.testing.assert_allclose(p, w0 - 0.01 * g)
+    assert CrossEntropyLoss().forward(model.forward(x), y) < before
+
+
+def test_make_two_moons_is_balanced_and_shaped():
+    x, y = make_two_moons(n=101, noise=0.0, seed=0)
+    assert x.shape == (101, 2) and y.shape == (101,)
+    assert set(np.unique(y)) == {0, 1} and abs(y.mean() - 0.5) < 0.02

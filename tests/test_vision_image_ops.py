@@ -9,7 +9,7 @@ from mlbook.vision import image_ops as ops
 def test_gaussian_blur_matches_scipy():
     img = np.random.rand(20, 24)
     ours = ops.gaussian_blur(img, sigma=1.5)  # (20, 24)
-    ref = ndi.gaussian_filter(img, sigma=1.5, mode="reflect", truncate=3.0)  # scipy truncates at 3σ too
+    ref = ndi.gaussian_filter(img, sigma=1.5, mode="mirror", truncate=3.0)  # np.pad "reflect" == scipy "mirror"
     assert np.allclose(ours, ref, atol=1e-6)
 
 

@@ -1,5 +1,7 @@
 """Seq2seq with attention learns to reverse sequences; attention modules have the right shapes."""
 import torch
+
+torch.set_num_threads(1)  # tiny CPU models: one thread is faster than oversubscribed BLAS threads
 from torch.nn import functional as F
 
 from mlbook.sequence.seq2seq_attention import AdditiveAttention, DotProductAttention, Seq2SeqAttention, beam_search
@@ -44,7 +46,7 @@ def test_seq2seq_attention_learns_to_reverse():
     model = Seq2SeqAttention(vocab_size=V, d_model=32, attention="additive")
     opt = torch.optim.Adam(model.parameters(), lr=3e-3)
     T = 6
-    for _ in range(250):
+    for _ in range(150):
         src, tgt_in, tgt_out = _batch(64, T, g)
         logits, _ = model(src, tgt_in)
         loss = F.cross_entropy(logits.reshape(-1, V), tgt_out.reshape(-1))

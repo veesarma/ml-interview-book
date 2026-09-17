@@ -31,7 +31,7 @@ def test_lstm_forward_matches_torch_lstmcell():
     c = torch.zeros(1, d_h)
     for t in range(T):
         h, c = cell(torch.tensor(X[t : t + 1], dtype=torch.float32), (h, c))
-        np.testing.assert_allclose(H[t], h[0].numpy(), atol=1e-5)
+        np.testing.assert_allclose(H[t], h[0].detach().numpy(), atol=1e-5)
 
 
 def test_lstm_bptt_matches_finite_differences():

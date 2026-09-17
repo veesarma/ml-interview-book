@@ -1,5 +1,7 @@
 import numpy as np
 import torch
+
+torch.set_num_threads(1)  # the sandbox oversubscribes cores; 1 thread is fastest for these tiny nets
 import torch.nn.functional as F
 
 from mlbook.vision import depth as D
@@ -35,7 +37,7 @@ def test_disparity_depth_roundtrip_and_error_growth():
     assert np.allclose(z, [5.4, 54.0, 108.0])
     assert np.allclose(D.depth_to_disparity(z, f, b), d)
     err = D.depth_error_from_disparity_error(z, f, b, disp_err_px=0.5)
-    assert err[1] / err[0] == 100.0  # 10× range → 100× depth error
+    assert abs(err[1] / err[0] - 100.0) < 1e-9  # 10× range → 100× depth error
 
 
 def test_block_matching_recovers_constant_shift():

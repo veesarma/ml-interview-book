@@ -4,6 +4,8 @@ import torch
 
 from mlbook.multimodal.clip import MiniCLIP, TinyImageEncoder, TinyTextEncoder, clip_loss, siglip_loss, zero_shot_classify
 
+torch.set_num_threads(1)  # multi-threaded CPU kernels are pathologically slow on tiny tensors in CI containers
+
 
 def _toy_data(n_classes: int = 4, per_class: int = 4, seed: int = 0):
     """Class k image: a bright k-th 4x4 quadrant; class k caption: token ids [1, k+2, 0(pad)]."""
@@ -51,7 +53,7 @@ def test_mini_clip_learns_alignment_and_zero_shot():
     model = _model()
     opt = torch.optim.Adam(model.parameters(), lr=3e-3)
     # batch = one image per class (unique captions) so the diagonal is the only positive
-    for step in range(120):
+    for step in range(80):
         sel = torch.tensor([k * 4 + (step % 4) for k in range(4)])
         opt.zero_grad()
         loss = clip_loss(model(imgs[sel], ids[sel]))
@@ -69,7 +71,7 @@ def test_siglip_training_also_aligns():
     log_t = torch.nn.Parameter(torch.tensor(math.log(10.0)))
     bias = torch.nn.Parameter(torch.tensor(-10.0))
     opt = torch.optim.Adam(list(model.parameters()) + [log_t, bias], lr=3e-3)
-    for step in range(120):
+    for step in range(80):
         sel = torch.tensor([k * 4 + (step % 4) for k in range(4)])
         opt.zero_grad()
         loss = siglip_loss(model.encode_image(imgs[sel]), model.encode_text(ids[sel]), log_t, bias)
@@ -78,3 +80,18 @@ def test_siglip_training_also_aligns():
     prompts = torch.stack([torch.tensor([1, k + 2, 0]) for k in range(4)])
     acc = (zero_shot_classify(model, imgs, prompts).argmax(-1) == ys).float().mean().item()
     assert acc > 0.9, acc
+
+
+def test_text_encoder_ignores_padding():
+    enc = TinyTextEncoder(vocab=8, max_len=4, d=16, depth=1, n_heads=2)
+    a = enc(torch.tensor([[1, 2, 0, 0]]))
+    b = enc(torch.tensor([[1, 2, 0, 5]]))  # token after a pad is itself masked only if it is pad
+    c = enc(torch.tensor([[1, 2, 3, 0]]))
+    assert a.shape == (1, 16)
+    assert not torch.allclose(a, b)  # token 5 is real and changes the output
+    assert not torch.allclose(a, c)
+
+
+def test_image_encoder_shape():
+    enc = TinyImageEncoder(image_size=8, patch=4, in_channels=1, d=16, depth=1, n_heads=2)
+    assert enc(torch.randn(3, 1, 8, 8)).shape == (3, 16)

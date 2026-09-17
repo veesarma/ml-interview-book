@@ -5,6 +5,8 @@ from scipy.optimize import linear_sum_assignment
 from mlbook.multimodal.detr_loss import detr_loss, hungarian_match, matching_as_permutation, pairwise_giou
 from mlbook.multimodal.hungarian import assignment_cost, hungarian
 
+torch.set_num_threads(1)  # multi-threaded CPU kernels are pathologically slow on tiny tensors in CI containers
+
 
 def test_hungarian_matches_scipy_square_and_rectangular():
     rng = np.random.default_rng(0)

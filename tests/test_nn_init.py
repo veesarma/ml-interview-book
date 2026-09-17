@@ -1,5 +1,6 @@
 """Initialisers: empirical variances match the derivations."""
 import numpy as np
+import pytest
 
 from mlbook.nn.init import (
     activation_std_by_depth,
@@ -13,15 +14,31 @@ from mlbook.nn.init import (
 )
 
 
-def test_variances_match_formulas():
+FAN_IN, FAN_OUT = 400, 300
+
+
+@pytest.mark.parametrize(
+    "init, expected_var",
+    [
+        (xavier_uniform, 2 / (FAN_IN + FAN_OUT)),
+        (xavier_normal, 2 / (FAN_IN + FAN_OUT)),
+        (kaiming_normal, 2 / FAN_IN),
+        (kaiming_uniform, 2 / FAN_IN),
+        (lecun_normal, 1 / FAN_IN),
+    ],
+    ids=["xavier_uniform", "xavier_normal", "kaiming_normal", "kaiming_uniform", "lecun_normal"],
+)
+def test_variance_matches_formula(init, expected_var):
     rng = np.random.default_rng(0)
-    fan_in, fan_out = 400, 300
-    assert abs(xavier_uniform(fan_in, fan_out, rng).var() - 2 / (fan_in + fan_out)) < 2e-4
-    assert abs(xavier_normal(fan_in, fan_out, rng).var() - 2 / (fan_in + fan_out)) < 2e-4
-    assert abs(kaiming_normal(fan_in, fan_out, rng).var() - 2 / fan_in) < 3e-4
-    assert abs(kaiming_uniform(fan_in, fan_out, rng).var() - 2 / fan_in) < 3e-4
-    assert abs(lecun_normal(fan_in, fan_out, rng).var() - 1 / fan_in) < 2e-4
-    w = gpt2_residual_normal(fan_in, fan_out, rng, n_layers=12)
+    w = init(FAN_IN, FAN_OUT, rng)
+    assert w.shape == (FAN_IN, FAN_OUT)
+    assert abs(w.mean()) < 5e-3
+    assert abs(w.var() - expected_var) < 3e-4
+
+
+def test_gpt2_residual_scaling():
+    rng = np.random.default_rng(0)
+    w = gpt2_residual_normal(FAN_IN, FAN_OUT, rng, n_layers=12)
     assert abs(w.std() - 0.02 / np.sqrt(24)) < 2e-4
 
 

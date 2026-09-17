@@ -48,7 +48,8 @@ for x, label in grads:
     ax.text(x, y_bwd, label, ha="center", va="center", fontsize=6.8, family="monospace")
 for (x1, _), (x0, _) in zip(grads[:-1], grads[1:]):
     ax.add_patch(FancyArrowPatch((x1 - 0.88, y_bwd), (x0 + 0.88, y_bwd), arrowstyle="-|>", mutation_scale=12, color="#991b1b"))
-ax.text(0.15, y_fwd + 0.9, "forward (cache what backward needs)", fontsize=9, color="#1f2937", va="center")
+ax.text(0.15, y_fwd + 0.75, "forward", fontsize=9, color="#1f2937", va="center")
+ax.text(10.55, 3.72, "cache X, Z1, H, P\nfor backward", fontsize=7.5, color="#374151", va="center", ha="right")
 ax.text(0.15, y_bwd + 0.7, "backward: reverse topological order, one vector-Jacobian product per node",
         fontsize=9, color="#991b1b", va="center")
 fig.savefig("docs/assets/figures/part03_computational_graph.png", dpi=150, bbox_inches="tight", facecolor="white")

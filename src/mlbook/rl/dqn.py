@@ -123,15 +123,15 @@ def epsilon_schedule(step: int, eps_start: float, eps_end: float, decay_steps: i
 @dataclass
 class DQNConfig:
     gamma: float = 0.98
-    lr: float = 1e-3
-    batch_size: int = 64
+    lr: float = 2e-3
+    batch_size: int = 32
     buffer_size: int = 20_000
-    warmup: int = 500
+    warmup: int = 200
     target_update_every: int = 200
-    train_every: int = 1
+    train_every: int = 3
     eps_start: float = 1.0
     eps_end: float = 0.05
-    eps_decay_steps: int = 3000
+    eps_decay_steps: int = 1500
     double: bool = False
     hidden: int = 64
 
@@ -167,7 +167,6 @@ def train_dqn(env, n_episodes: int, cfg: DQNConfig, seed: int = 0, dueling: bool
                 loss = dqn_loss(q_net, target_net, buffer.sample(cfg.batch_size, rng), cfg.gamma, cfg.double)
                 opt.zero_grad()
                 loss.backward()
-                nn.utils.clip_grad_norm_(q_net.parameters(), 10.0)
                 opt.step()
             if step % cfg.target_update_every == 0:
                 target_net.load_state_dict(q_net.state_dict())

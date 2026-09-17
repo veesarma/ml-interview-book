@@ -1,6 +1,8 @@
 """GRU: our explicit gates must match torch.nn.GRU with copied weights; bidirectional shapes."""
 import torch
 
+torch.set_num_threads(1)  # tiny CPU models: one thread is faster than oversubscribed BLAS threads
+
 from mlbook.sequence.gru import GRU, BidirectionalGRU, GRUCell
 
 
