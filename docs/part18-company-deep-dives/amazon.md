@@ -220,33 +220,33 @@ flowchart LR
 
 **Search and recommendations**
 
-* Nigam et al., "Semantic Product Search", KDD 2019 ([arXiv 1907.00937](https://arxiv.org/abs/1907.00937)).
-* Sorokina & Cantu-Paz, "Amazon Search: The Joy of Ranking Products", SIGIR 2016 (industry track).
-* Linden, Smith & York, "Amazon.com Recommendations: Item-to-Item Collaborative Filtering", IEEE Internet Computing, 2003.
-* Smith & Linden, "Two Decades of Recommender Systems at Amazon.com", IEEE Internet Computing, 2017.
-* Yu et al., "COSMO: A Large-Scale E-commerce Common Sense Knowledge Generation and Serving System at Amazon", SIGMOD 2024.
+* Nigam et al., "Semantic Product Search", KDD 2019. [arXiv:1907.00937](https://arxiv.org/abs/1907.00937)
+* Sorokina & Cantu-Paz, "Amazon Search: The Joy of Ranking Products", SIGIR 2016 (industry track). [ACM DL](https://dl.acm.org/doi/10.1145/2911451.2926725) · [Amazon Science](https://www.amazon.science/publications/amazon-search-the-joy-of-ranking-products)
+* Linden, Smith & York, "Amazon.com Recommendations: Item-to-Item Collaborative Filtering", IEEE Internet Computing 7(1), 2003. [doi:10.1109/MIC.2003.1167344](https://dl.acm.org/doi/10.1109/MIC.2003.1167344)
+* Smith & Linden, "Two Decades of Recommender Systems at Amazon.com", IEEE Internet Computing 21(3), 2017. [doi:10.1109/MIC.2017.72](https://dl.acm.org/doi/abs/10.1109/MIC.2017.72) · [Amazon Science](https://www.amazon.science/publications/two-decades-of-recommender-systems-at-amazon-com)
+* Yu et al., "COSMO: A Large-Scale E-commerce Common Sense Knowledge Generation and Serving System at Amazon", SIGMOD Companion 2024. [ACM DL](https://dl.acm.org/doi/10.1145/3626246.3653398) · [Amazon Science](https://www.amazon.science/publications/cosmo-a-large-scale-e-commerce-common-sense-knowledge-generation-and-serving-system-at-amazon)
 
 **Forecasting**
 
 * Salinas, Flunkert, Gasthaus & Januschowski, "DeepAR: Probabilistic Forecasting with Autoregressive Recurrent Networks", International Journal of Forecasting, 2020. [arXiv:1704.04110](https://arxiv.org/abs/1704.04110)
-* Wen et al., "A Multi-Horizon Quantile Recurrent Forecaster", 2017 ([arXiv 1711.11053](https://arxiv.org/abs/1711.11053)).
-* Alexandrov et al., "GluonTS: Probabilistic and Neural Time Series Modeling in Python", JMLR, 2020.
+* Wen et al., "A Multi-Horizon Quantile Recurrent Forecaster", NIPS 2017 Time Series Workshop. [arXiv:1711.11053](https://arxiv.org/abs/1711.11053)
+* Alexandrov et al., "GluonTS: Probabilistic and Neural Time Series Modeling in Python", JMLR 21(116), 2020. [jmlr.org](https://jmlr.org/papers/v21/19-820.html) · library at [ts.gluon.ai](https://ts.gluon.ai/stable/)
 
 **Speech, assistants and foundation models**
 
-* Soltau et al. / Alexa Science publications on wake-word detection and on-device ASR (Amazon Science).
-* Soltan et al., "AlexaTM 20B: Few-Shot Learning Using a Large-Scale Multilingual Seq2Seq Model", 2022 ([arXiv 2208.01448](https://arxiv.org/abs/2208.01448)).
-* Amazon, Rufus shopping assistant announcements and Amazon Science posts, 2024.
-* Amazon Nova family of foundation models, announced at AWS re:Invent 2024; Amazon Bedrock documentation.
+* Amazon Science publications on wake-word detection and on-device ASR, for example "Monophone-based Background Modeling for Two-stage On-device Wake Word Detection" ([amazon.science](https://www.amazon.science/publications/monophone-based-background-modeling-for-two-stage-on-device-wake-word-detection)), "Building a robust word-level wakeword verification network" ([amazon.science](https://www.amazon.science/publications/building-a-robust-word-level-wakeword-verification-network)) and "Accurate detection of wake word start and end using a CNN" ([amazon.science](https://www.amazon.science/publications/accurate-detection-of-wake-word-start-and-end-using-a-cnn)).
+* Soltan et al., "AlexaTM 20B: Few-Shot Learning Using a Large-Scale Multilingual Seq2Seq Model", 2022. [arXiv:2208.01448](https://arxiv.org/abs/2208.01448) · [Amazon Science](https://www.amazon.science/publications/alexatm-20b-few-shot-learning-using-a-large-scale-multilingual-seq2seq-model)
+* Amazon Science, "The technology behind Amazon's GenAI-powered shopping assistant, Rufus", 2024 ([amazon.science](https://www.amazon.science/blog/the-technology-behind-amazons-genai-powered-shopping-assistant-rufus)); AWS, "Scaling Rufus with over 80,000 AWS Inferentia and AWS Trainium chips for Prime Day" ([aws.amazon.com](https://aws.amazon.com/blogs/machine-learning/scaling-rufus-the-amazon-generative-ai-powered-conversational-shopping-assistant-with-over-80000-aws-inferentia-and-aws-trainium-chips-for-prime-day/)).
+* Amazon Nova family of foundation models, announced at AWS re:Invent 2024 ([aboutamazon.com](https://www.aboutamazon.com/news/aws/amazon-nova-ai-canvas-reel-aws-reinvent)); Amazon Bedrock documentation (cited by name; the docs root URL was not confirmed in search results).
 
 **Perception products**
 
-* Amazon Textract documentation (text and geometry, forms, tables, Queries, signatures, Analyze Expense, Analyze ID, Analyze Lending).
-* Amazon Rekognition documentation.
-* Amazon, "Just Walk Out" technology; Amazon Science posts on Amazon Go computer vision and sensor fusion.
+* Amazon Textract documentation: [analyzing document text](https://docs.aws.amazon.com/textract/latest/dg/analyzing-document-text.html) (text and geometry, forms, tables, Queries, signatures), [AnalyzeExpense](https://docs.aws.amazon.com/textract/latest/dg/API_AnalyzeExpense.html) and [Analyze Lending](https://docs.aws.amazon.com/textract/latest/dg/lending-response-objects.html).
+* Amazon Rekognition documentation. [docs.aws.amazon.com](https://docs.aws.amazon.com/rekognition/latest/dg/)
+* Amazon, Just Walk Out technology ([justwalkout.com](https://www.justwalkout.com/)); Amazon, "An inside look at the AI tech behind Just Walk Out" ([aboutamazon.com](https://www.aboutamazon.com/news/retail/how-does-amazon-just-walk-out-work)).
 
 **Platform and silicon**
 
-* Liberty et al., "Elastic Machine Learning Algorithms in Amazon SageMaker", SIGMOD 2020.
-* Amazon SageMaker documentation (training, endpoints, pipelines, Feature Store, built-in DeepAR algorithm).
-* AWS Trainium and Inferentia documentation; AWS Neuron SDK documentation.
+* Liberty et al., "Elastic Machine Learning Algorithms in Amazon SageMaker", SIGMOD 2020. [ACM DL](https://dl.acm.org/doi/10.1145/3318464.3386126) · [Amazon Science](https://www.amazon.science/publications/elastic-machine-learning-algorithms-in-amazon-sagemaker)
+* Amazon SageMaker documentation, including the [built-in time-series algorithms](https://docs.aws.amazon.com/sagemaker/latest/dg/algorithms-time-series.html) (DeepAR).
+* AWS Trainium and Inferentia ([aws.amazon.com/ai/machine-learning/inferentia](https://aws.amazon.com/ai/machine-learning/inferentia/)); AWS Neuron SDK documentation ([awsdocs-neuron.readthedocs-hosted.com](https://awsdocs-neuron.readthedocs-hosted.com/)).

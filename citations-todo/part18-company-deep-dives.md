@@ -54,38 +54,38 @@ verify each one, add the link to the chapter, and tick the box.
 - [x] docs/part18-company-deep-dives/airbnb.md | Airbnb Tech Blog, "Experiments at Airbnb", 2014; posts on the Experimentation Reporting Framework (2017) and experimentation guardrails (2021)
 - [x] docs/part18-company-deep-dives/airbnb.md | Airbnb Tech Blog, "Architecting a Machine Learning System for Risk", 2014; "Fighting Financial Fraud with Targeted Friction", 2018; Airbnb Newsroom on anti-party technology, 2022
 - [x] PARTIAL docs/part18-company-deep-dives/airbnb.md | Airbnb Tech Blog, "Categorizing Listing Photos at Airbnb", 2018; "Amenity Detection and Beyond, New Frontiers of Computer Vision at Airbnb", 2019; "WIDeText: A Multimodal Deep Learning Framework", 2020; "Building Airbnb Categories with ML and Human-in-the-Loop", 2022 | all linked except "Categorizing Listing Photos at Airbnb" (2018), whose URL was not confirmed; chapter keeps it as title-and-year
-- [ ] docs/part18-company-deep-dives/amazon.md | Nigam et al., "Semantic Product Search", KDD 2019 (arXiv 1907.00937)
-- [ ] docs/part18-company-deep-dives/amazon.md | Sorokina & Cantu-Paz, "Amazon Search: The Joy of Ranking Products", SIGIR 2016 (industry track)
-- [ ] docs/part18-company-deep-dives/amazon.md | Linden, Smith & York, "Amazon.com Recommendations: Item-to-Item Collaborative Filtering", IEEE Internet Computing, 2003
-- [ ] docs/part18-company-deep-dives/amazon.md | Smith & Linden, "Two Decades of Recommender Systems at Amazon.com", IEEE Internet Computing, 2017
-- [ ] docs/part18-company-deep-dives/amazon.md | Yu et al., "COSMO: A Large-Scale E-commerce Common Sense Knowledge Generation and Serving System at Amazon", SIGMOD 2024
-- [ ] docs/part18-company-deep-dives/amazon.md | Wen et al., "A Multi-Horizon Quantile Recurrent Forecaster", 2017 (arXiv 1711.11053)
-- [ ] docs/part18-company-deep-dives/amazon.md | Alexandrov et al., "GluonTS: Probabilistic and Neural Time Series Modeling in Python", JMLR, 2020
-- [ ] docs/part18-company-deep-dives/amazon.md | Soltau et al. / Alexa Science publications on wake-word detection and on-device ASR (Amazon Science)
-- [ ] docs/part18-company-deep-dives/amazon.md | Soltan et al., "AlexaTM 20B: Few-Shot Learning Using a Large-Scale Multilingual Seq2Seq Model", 2022 (arXiv 2208.01448)
-- [ ] docs/part18-company-deep-dives/amazon.md | Amazon, Rufus shopping assistant announcements and Amazon Science posts, 2024
-- [ ] docs/part18-company-deep-dives/amazon.md | Amazon Nova family of foundation models, announced at AWS re:Invent 2024; Amazon Bedrock documentation
-- [ ] docs/part18-company-deep-dives/amazon.md | Amazon Textract documentation (text and geometry, forms, tables, Queries, signatures, Analyze Expense, Analyze ID, Analyze Lending)
-- [ ] docs/part18-company-deep-dives/amazon.md | Amazon Rekognition documentation
-- [ ] docs/part18-company-deep-dives/amazon.md | Amazon, "Just Walk Out" technology; Amazon Science posts on Amazon Go computer vision and sensor fusion
-- [ ] docs/part18-company-deep-dives/amazon.md | Liberty et al., "Elastic Machine Learning Algorithms in Amazon SageMaker", SIGMOD 2020
-- [ ] docs/part18-company-deep-dives/amazon.md | Amazon SageMaker documentation (training, endpoints, pipelines, Feature Store, built-in DeepAR algorithm)
-- [ ] docs/part18-company-deep-dives/amazon.md | AWS Trainium and Inferentia documentation; AWS Neuron SDK documentation
-- [ ] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "An On-device Deep Neural Network for Face Detection", Apple ML Journal, 2017
-- [ ] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "Recognizing People in Photos Through Private On-Device Machine Learning", 2021
-- [ ] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "On-device Panoptic Segmentation for Camera Using Transformers", 2021
-- [ ] docs/part18-company-deep-dives/apple.md | Apple developer documentation: the Vision framework (text recognition requests and recognition levels, document and rectangle detection, subject lifting, animal and object recognition); Live Text and Visual Look Up feature documentation and supported languages/categories
-- [ ] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "Deploying Transformers on the Apple Neural Engine", 2022 (with reference implementation)
-- [ ] docs/part18-company-deep-dives/apple.md | Apple developer documentation: Core ML, Core ML Tools, and WWDC sessions on Core ML performance and model conversion
-- [ ] docs/part18-company-deep-dives/apple.md | Apple Security Research, "Private Cloud Compute: A new frontier for AI privacy in the cloud", 2024
-- [ ] docs/part18-company-deep-dives/apple.md | McKinzie et al., "MM1: Methods, Analysis & Insights from Multimodal LLM Pre-training", 2024 (arXiv 2403.09611)
-- [ ] docs/part18-company-deep-dives/apple.md | You et al., "Ferret-UI: Grounded Mobile UI Understanding with Multimodal LLMs", 2024
-- [ ] docs/part18-company-deep-dives/apple.md | Mehta et al., "OpenELM: An Efficient Language Model Family with Open Training and Inference Framework", 2024
-- [ ] docs/part18-company-deep-dives/apple.md | Apple Platform Security guide (Face ID and Touch ID security; Secure Enclave)
-- [ ] docs/part18-company-deep-dives/apple.md | Apple Support, "About Face ID advanced technology"
-- [ ] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "Hey Siri: An On-device DNN-powered Voice Trigger for Apple's Personal Assistant", 2017; "Personalized Hey Siri", 2018; "Deep Learning for Siri's Voice: On-device Deep Mixture Density Networks for Hybrid Unit Selection Synthesis", 2017
-- [ ] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "Learning with Privacy at Scale", Apple ML Journal, 2017
-- [ ] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "Understanding Aggregate Trends for Apple Intelligence Using Differential Privacy", 2025
+- [x] docs/part18-company-deep-dives/amazon.md | Nigam et al., "Semantic Product Search", KDD 2019 (arXiv 1907.00937)
+- [x] docs/part18-company-deep-dives/amazon.md | Sorokina & Cantu-Paz, "Amazon Search: The Joy of Ranking Products", SIGIR 2016 (industry track)
+- [x] docs/part18-company-deep-dives/amazon.md | Linden, Smith & York, "Amazon.com Recommendations: Item-to-Item Collaborative Filtering", IEEE Internet Computing, 2003
+- [x] docs/part18-company-deep-dives/amazon.md | Smith & Linden, "Two Decades of Recommender Systems at Amazon.com", IEEE Internet Computing, 2017
+- [x] docs/part18-company-deep-dives/amazon.md | Yu et al., "COSMO: A Large-Scale E-commerce Common Sense Knowledge Generation and Serving System at Amazon", SIGMOD 2024
+- [x] docs/part18-company-deep-dives/amazon.md | Wen et al., "A Multi-Horizon Quantile Recurrent Forecaster", 2017 (arXiv 1711.11053)
+- [x] docs/part18-company-deep-dives/amazon.md | Alexandrov et al., "GluonTS: Probabilistic and Neural Time Series Modeling in Python", JMLR, 2020
+- [x] docs/part18-company-deep-dives/amazon.md | Soltau et al. / Alexa Science publications on wake-word detection and on-device ASR (Amazon Science) | linked to Amazon Science wake-word publications; the "Soltau et al." attribution was dropped as unconfirmed
+- [x] docs/part18-company-deep-dives/amazon.md | Soltan et al., "AlexaTM 20B: Few-Shot Learning Using a Large-Scale Multilingual Seq2Seq Model", 2022 (arXiv 2208.01448)
+- [x] docs/part18-company-deep-dives/amazon.md | Amazon, Rufus shopping assistant announcements and Amazon Science posts, 2024
+- [x] PARTIAL docs/part18-company-deep-dives/amazon.md | Amazon Nova family of foundation models, announced at AWS re:Invent 2024; Amazon Bedrock documentation | Nova announcement linked; Bedrock docs root URL not confirmed
+- [x] docs/part18-company-deep-dives/amazon.md | Amazon Textract documentation (text and geometry, forms, tables, Queries, signatures, Analyze Expense, Analyze ID, Analyze Lending)
+- [x] docs/part18-company-deep-dives/amazon.md | Amazon Rekognition documentation
+- [x] docs/part18-company-deep-dives/amazon.md | Amazon, "Just Walk Out" technology; Amazon Science posts on Amazon Go computer vision and sensor fusion
+- [x] docs/part18-company-deep-dives/amazon.md | Liberty et al., "Elastic Machine Learning Algorithms in Amazon SageMaker", SIGMOD 2020
+- [x] docs/part18-company-deep-dives/amazon.md | Amazon SageMaker documentation (training, endpoints, pipelines, Feature Store, built-in DeepAR algorithm)
+- [x] docs/part18-company-deep-dives/amazon.md | AWS Trainium and Inferentia documentation; AWS Neuron SDK documentation
+- [x] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "An On-device Deep Neural Network for Face Detection", Apple ML Journal, 2017
+- [x] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "Recognizing People in Photos Through Private On-Device Machine Learning", 2021
+- [x] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "On-device Panoptic Segmentation for Camera Using Transformers", 2021
+- [x] PARTIAL docs/part18-company-deep-dives/apple.md | Apple developer documentation: the Vision framework (text recognition requests and recognition levels, document and rectangle detection, subject lifting, animal and object recognition); Live Text and Visual Look Up feature documentation and supported languages/categories | Vision framework and text-recognition docs linked; no single Apple developer page for Live Text / Visual Look Up supported languages and categories was found
+- [x] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "Deploying Transformers on the Apple Neural Engine", 2022 (with reference implementation)
+- [x] docs/part18-company-deep-dives/apple.md | Apple developer documentation: Core ML, Core ML Tools, and WWDC sessions on Core ML performance and model conversion
+- [x] docs/part18-company-deep-dives/apple.md | Apple Security Research, "Private Cloud Compute: A new frontier for AI privacy in the cloud", 2024
+- [x] docs/part18-company-deep-dives/apple.md | McKinzie et al., "MM1: Methods, Analysis & Insights from Multimodal LLM Pre-training", 2024 (arXiv 2403.09611)
+- [x] docs/part18-company-deep-dives/apple.md | You et al., "Ferret-UI: Grounded Mobile UI Understanding with Multimodal LLMs", 2024
+- [x] docs/part18-company-deep-dives/apple.md | Mehta et al., "OpenELM: An Efficient Language Model Family with Open Training and Inference Framework", 2024
+- [x] docs/part18-company-deep-dives/apple.md | Apple Platform Security guide (Face ID and Touch ID security; Secure Enclave)
+- [x] docs/part18-company-deep-dives/apple.md | Apple Support, "About Face ID advanced technology"
+- [x] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "Hey Siri: An On-device DNN-powered Voice Trigger for Apple's Personal Assistant", 2017; "Personalized Hey Siri", 2018; "Deep Learning for Siri's Voice: On-device Deep Mixture Density Networks for Hybrid Unit Selection Synthesis", 2017
+- [x] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "Learning with Privacy at Scale", Apple ML Journal, 2017
+- [x] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "Understanding Aggregate Trends for Apple Intelligence Using Differential Privacy", 2025
 - [x] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, Radar documentation: risk scores and risk levels, risk insights, rules (allow, block, review, 3D Secure), and the manual review queue
 - [x] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, documentation and engineering writing on how Radar's machine learning is built and on the use of signals from across the Stripe network
 - [x] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, engineering writing on identifying linked fraudulent accounts through similarity and clustering

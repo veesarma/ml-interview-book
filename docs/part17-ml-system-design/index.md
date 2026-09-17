@@ -44,6 +44,7 @@
 | "Predict click-through / conversion for ads." | [03 Ads CTR / conversion](03-ads-ctr-prediction.md) | The auction makes calibration a hard requirement; delayed conversions; feature crosses; sparse embeddings at scale; online learning; negative down-sampling and its correction. |
 | "Detect fraudulent payments / fake accounts / promo abuse." | [04 Fraud & anomaly detection](04-fraud-anomaly-detection.md) | Extreme imbalance, adversarial drift, label delay and censoring (declined transactions never get labels), graph features, cost-matrix thresholds, rules + ML, human review. |
 | "Design the perception stack for a self-driving car / delivery robot." | [05 AV perception](05-perception-system-av.md) | Sensors and fusion, multi-camera BEV/occupancy, tracking, a hard onboard latency budget, the data engine (triggers, auto-labelling, active learning), evaluation by range and by scenario, OTA safety. |
+| "Design a detector for crosswalks (or any novel class) given petabytes of unlabeled fleet data." | [13 Novel-object 3D detection](13-novel-object-3d-detection.md) | Reframing the estimand for a static planar class, the offboard auto-labelling teacher, tri-modal weak supervision with zero labels, and why you cannot evaluate against your own generated labels. |
 | "Design visual search / 'shop the look' / duplicate detection." | [06 Visual search & image retrieval](06-visual-search-image-retrieval.md) | Metric learning vs CLIP-style embeddings, billion-scale ANN and its memory, multi-modal queries, near-duplicate hashing, index refresh. |
 | "Design content moderation for uploads / comments / livestreams." | [07 Content moderation](07-content-moderation.md) | Policy taxonomies, multimodal classifiers, hash matching, review-queue economics, prevalence as the true metric, adversarial evasion, appeals. |
 | "Design an enterprise assistant / support bot / coding assistant." | [08 LLM assistant with RAG](08-llm-product-rag-assistant.md) | Retrieval design, context budget, guardrails and prompt injection, evaluation with validated LLM judges, routing/caching/streaming for cost and latency, RAG vs fine-tuning vs long context. |
@@ -70,10 +71,10 @@ means the TL;DR and follow-ups.
 | [Airbnb](../part18-company-deep-dives/airbnb.md) | 02 Search, 04 Fraud, 12 Platform | 11 Experimentation, 01 Feed |
 | [Amazon](../part18-company-deep-dives/amazon.md) | 02 Search, 10 Forecasting, 09 OCR (Textract) | 03 Ads, 06 Visual search, 04 Fraud |
 | [Apple](../part18-company-deep-dives/apple.md) | 09 OCR (Live Text), 06 Visual search | 05 Perception, 08 LLM assistant |
-| [Tesla](../part18-company-deep-dives/tesla.md), [Waymo](../part18-company-deep-dives/waymo.md), [Zoox/Nuro/Aurora](../part18-company-deep-dives/zoox-nuro-aurora.md), [NVIDIA](../part18-company-deep-dives/nvidia.md) | 05 AV perception, 12 Platform (data engine) | 09 OCR (signs/text), 10 Forecasting (prediction as forecasting) |
+| [Tesla](../part18-company-deep-dives/tesla.md), [Waymo](../part18-company-deep-dives/waymo.md), [Zoox/Nuro/Aurora](../part18-company-deep-dives/zoox-nuro-aurora.md), [NVIDIA](../part18-company-deep-dives/nvidia.md) | 05 AV perception, 13 Novel-object 3D detection, 12 Platform (data engine) | 09 OCR (signs/text), 10 Forecasting (prediction as forecasting) |
 | [Stripe & fintech](../part18-company-deep-dives/stripe-fintech.md) | 04 Fraud, 12 Platform | 09 OCR (KYC documents), 11 Experimentation |
 | [OpenAI, Anthropic & DeepMind](../part18-company-deep-dives/frontier-labs.md) | 08 LLM assistant, 07 Moderation (safety classifiers) | 12 Platform (LLMOps), 02 Search |
-| [Scale AI & data engines](../part18-company-deep-dives/scale-ai-data-engines.md) | 05 AV perception (data engine), 12 Platform | 09 OCR, 07 Moderation |
+| [Scale AI & data engines](../part18-company-deep-dives/scale-ai-data-engines.md) | 05 AV perception (data engine), 13 Novel-object 3D detection, 12 Platform | 09 OCR, 07 Moderation |
 
 ## A mock-interview practice plan (three weeks)
 
@@ -85,7 +86,7 @@ chapter.
 | Week | Sessions | What to practise |
 |---|---|---|
 | 1 | Framework ×2, then Feed, Search, Ads | Run the seven phases with a timer. Say every decision as "I choose X over Y because Z; the cost is W." Do the back-of-envelope numbers out loud. |
-| 2 | Fraud, Perception (or OCR if that is your domain), Visual search, LLM assistant | Practise the pivots: "make it real-time", "labels arrive a week late", "traffic spikes 5×", "the model is better offline but flat online". Use the follow-up sections as the interviewer. |
+| 2 | Fraud, Perception, Novel-object 3D detection, Visual search or OCR, LLM assistant | Practise the pivots: "make it real-time", "labels arrive a week late", "traffic spikes 5×", "the model is better offline but flat online". Use the follow-up sections as the interviewer. |
 | 3 | Moderation, Forecasting, Notifications, Platform, then two full mocks with a partner | Bring your own production stories as evidence (framework §7). Have your partner interrupt with follow-ups from a *different* chapter. |
 
 Grade yourself with the rubric in [the framework](00-framework.md#8-the-rubric): a
@@ -107,3 +108,4 @@ on evaluation, and never leaves a stage without a latency and a cost.
 - [10 Forecasting & ETA](10-forecasting-eta.md)
 - [11 Notifications, uplift & experimentation](11-notifications-uplift-experimentation.md)
 - [12 ML platform, feature store & monitoring](12-ml-platform-feature-store-monitoring.md)
+- [13 Novel-object 3D detection from unlabeled fleet data](13-novel-object-3d-detection.md)

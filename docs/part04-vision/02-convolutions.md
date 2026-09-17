@@ -314,14 +314,12 @@ Choosing between the variants:
 
 ## References
 
-Links could not be verified from this build environment, so titles, venues and arXiv IDs are given for you to search.
-
 - V. Dumoulin and F. Visin, "A guide to convolution arithmetic for deep learning", 2016, [arXiv:1603.07285](https://arxiv.org/abs/1603.07285).
 - W. Luo et al., "Understanding the Effective Receptive Field in Deep Convolutional Neural Networks", NeurIPS 2016, [arXiv:1701.04128](https://arxiv.org/abs/1701.04128).
 - A. Howard et al., "MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications", 2017, [arXiv:1704.04861](https://arxiv.org/abs/1704.04861).
 - A. Lavin and S. Gray, "Fast Algorithms for Convolutional Neural Networks", CVPR 2016, [arXiv:1509.09308](https://arxiv.org/abs/1509.09308).
-- A. Odena, V. Dumoulin, C. Olah, "Deconvolution and Checkerboard Artifacts", Distill, 2016.
+- A. Odena, V. Dumoulin, C. Olah, "Deconvolution and Checkerboard Artifacts", Distill, 2016. [distill.pub](https://distill.pub/2016/deconv-checkerboard/)
 - F. Yu and V. Koltun, "Multi-Scale Context Aggregation by Dilated Convolutions", ICLR 2016, [arXiv:1511.07122](https://arxiv.org/abs/1511.07122).
 - Z. Liu et al., "A ConvNet for the 2020s", CVPR 2022, [arXiv:2201.03545](https://arxiv.org/abs/2201.03545).
 - K. Chellapilla, S. Puri, P. Simard, "High Performance Convolutional Neural Networks for Document Processing", 2006, the original im2col-as-GEMM formulation.
-- NVIDIA, *TensorRT Developer Guide*, on builder tactics and layer fusion.
+- NVIDIA, *TensorRT Developer Guide*, on builder tactics and layer fusion. [docs.nvidia.com](https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html)

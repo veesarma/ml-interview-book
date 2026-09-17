@@ -515,8 +515,6 @@ When to use which estimator:
 
 ## References
 
-Links could not be verified from this build environment, so titles, venues and arXiv IDs are given for you to search.
-
 - R. Hartley and A. Zisserman, *Multiple View Geometry in Computer Vision*, 2nd ed., Cambridge, 2004. The standard reference for every derivation in this chapter.
 - R. Hartley, "In Defense of the Eight-Point Algorithm", IEEE TPAMI 19(6), 1997.
 - D. Nistér, "An Efficient Solution to the Five-Point Relative Pose Problem", IEEE TPAMI 26(6), 2004.
@@ -526,9 +524,9 @@ Links could not be verified from this build environment, so titles, venues and a
 - J. Shi and C. Tomasi, "Good Features to Track", CVPR 1994.
 - Z. Teed and J. Deng, "RAFT: Recurrent All-Pairs Field Transforms for Optical Flow", ECCV 2020, [arXiv:2003.12039](https://arxiv.org/abs/2003.12039).
 - B. Triggs et al., "Bundle Adjustment: A Modern Synthesis", Vision Algorithms workshop, 1999.
-- S. Agarwal et al., "Bundle Adjustment in the Large", ECCV 2010, and the Ceres Solver documentation.
+- S. Agarwal et al., "Bundle Adjustment in the Large", ECCV 2010, and the Ceres Solver documentation on bundle adjustment and the Schur-complement solvers. [ceres-solver.org](http://ceres-solver.org/nnls_tutorial.html)
 - N. Snavely, S. Seitz, R. Szeliski, "Photo Tourism: Exploring Photo Collections in 3D", SIGGRAPH 2006.
 - P. Sun et al., "Scalability in Perception for Autonomous Driving: Waymo Open Dataset", CVPR 2020, [arXiv:1912.04838](https://arxiv.org/abs/1912.04838).
 - Z. Zhang, "A Flexible New Technique for Camera Calibration", IEEE TPAMI 22(11), 2000.
-- Apple, *ARKit developer documentation*, on world tracking and its quality states.
-- NVIDIA, *VPI (Vision Programming Interface) documentation*, on hardware-accelerated optical flow and lens distortion correction.
+- Apple, *ARKit developer documentation*, on world tracking and its quality states. [developer.apple.com/augmented-reality/arkit](https://developer.apple.com/augmented-reality/arkit/) · [`ARWorldTrackingConfiguration`](https://developer.apple.com/documentation/arkit/arworldtrackingconfiguration)
+- NVIDIA, *VPI (Vision Programming Interface) documentation*, on hardware-accelerated optical flow and lens distortion correction. [docs.nvidia.com/vpi](https://docs.nvidia.com/vpi/) · [dense optical flow](https://docs.nvidia.com/vpi/sample_optflow_dense.html) · [pyramidal LK optical flow](https://docs.nvidia.com/vpi/sample_optflow_lk.html)

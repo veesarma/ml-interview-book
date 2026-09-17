@@ -134,3 +134,25 @@ def test_samplers_produce_points_near_manifold():
     guided = D.sample_ddim(m, s, n=300, d=2, n_steps=20, y=y0, guidance_scale=2.0)
     frac_mode0 = ((guided - torch.tensor([2.0, 0.0])).norm(dim=1) < 0.6).float().mean()
     assert frac_mode0 > 0.7
+
+
+def test_clip_x0_bounds_the_implied_clean_estimate():
+    """At large t, x̂_0 divides by sqrt(ᾱ_t) ≈ 0, so an unclipped sampler can leave the data range."""
+    s = D.NoiseSchedule(D.cosine_alpha_bar_schedule(50))
+    m = D.EpsMLP(d_x=2, n_classes=0, d_hidden=32)
+    torch.manual_seed(0)
+    free = D.sample_ddim(m, s, n=64, d=2, n_steps=10)
+    torch.manual_seed(0)
+    clipped = D.sample_ddim(m, s, n=64, d=2, n_steps=10, clip_x0=2.0)
+    assert free.abs().max() > clipped.abs().max()
+    assert clipped.abs().max() <= 2.0 + 1e-5      # the last step returns sqrt(1)·x̂_0
+    assert torch.isfinite(clipped).all()
+
+
+def test_sample_ddim_can_return_its_trajectory():
+    s = D.NoiseSchedule(D.cosine_alpha_bar_schedule(20))
+    m = D.EpsMLP(d_x=2, n_classes=0, d_hidden=16)
+    traj = D.sample_ddim(m, s, n=5, d=2, n_steps=4, return_trajectory=True)
+    assert traj.shape == (5, 5, 2)                 # (S+1, N, d)
+    final = D.sample_ddim(m, s, n=5, d=2, n_steps=4, return_trajectory=False)
+    assert final.shape == (5, 2)

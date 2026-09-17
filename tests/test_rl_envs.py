@@ -44,4 +44,4 @@ def test_corridor_expert_keeps_lane_and_random_does_not():
     env = CorridorEnv()
     expert = np.mean([run_episode(env, env.expert_action, rng) for _ in range(50)])
     rand = np.mean([run_episode(env, lambda o: int(rng.integers(3)), rng) for _ in range(50)])
-    assert expert > 34 and rand < 20
+    assert expert > 38 and rand < 15  # the expert scores about 40 of 40, random about 8

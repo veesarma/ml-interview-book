@@ -39,7 +39,7 @@ def draw(ax, env, V, pi, title):
     ax.text(env.start[1], env.start[0] - 0.38, "start", ha="center", va="center", color="white", fontsize=7.5)
     ax.set_xticks([])
     ax.set_yticks([])
-    ax.set_title(title, fontsize=9.5, loc="left")
+    ax.set_title(title, fontsize=9, loc="left")
     return im
 
 
@@ -48,9 +48,11 @@ def main() -> None:
     gamma = 0.95
     V_star, pi_star, n_iters = value_iteration(env.P, env.R, gamma)
     V_rand = policy_evaluation(env.P, env.R, np.full((16, 4), 0.25), gamma)
-    fig, axes = plt.subplots(1, 2, figsize=(9, 4.2), facecolor="white")
-    draw(axes[0], env, V_rand, np.argmax(env.R + gamma * env.P @ V_rand, axis=1), "V^π of the uniform random policy (arrows: one greedy step)")
-    im = draw(axes[1], env, V_star, pi_star, f"V* and π* from value iteration ({n_iters} sweeps, γ=0.95, slip=0.1)")
+    fig, axes = plt.subplots(1, 2, figsize=(9.6, 4.6), facecolor="white")
+    draw(axes[0], env, V_rand, np.argmax(env.R + gamma * env.P @ V_rand, axis=1),
+         "V^π, uniform random policy\n(arrows: one greedy step)")
+    im = draw(axes[1], env, V_star, pi_star,
+              f"V* and π*, value iteration\n({n_iters} sweeps, γ=0.95, slip=0.1)")
     fig.colorbar(im, ax=axes, fraction=0.025, pad=0.02, label="value")
     OUT.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT, dpi=150, bbox_inches="tight", facecolor="white")

@@ -406,8 +406,6 @@ When to use what:
 
 ## References
 
-Links could not be verified from this build environment, so titles, venues and arXiv IDs are given for you to search.
-
 - C. Qi et al., "PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation", CVPR 2017, [arXiv:1612.00593](https://arxiv.org/abs/1612.00593).
 - C. Qi et al., "PointNet++: Deep Hierarchical Feature Learning on Point Sets in a Metric Space", NeurIPS 2017, [arXiv:1706.02413](https://arxiv.org/abs/1706.02413).
 - M. Zaheer et al., "Deep Sets", NeurIPS 2017, [arXiv:1703.06114](https://arxiv.org/abs/1703.06114).
@@ -423,5 +421,5 @@ Links could not be verified from this build environment, so titles, venues and a
 - C. Godard et al., "Digging Into Self-Supervised Monocular Depth Estimation", ICCV 2019, [arXiv:1806.01260](https://arxiv.org/abs/1806.01260) (Monodepth2).
 - J.-R. Chang and Y.-S. Chen, "Pyramid Stereo Matching Network", CVPR 2018, [arXiv:1803.08669](https://arxiv.org/abs/1803.08669) (PSMNet).
 - A. Kendall et al., "End-to-End Learning of Geometry and Context for Deep Stereo Regression", ICCV 2017, [arXiv:1703.04309](https://arxiv.org/abs/1703.04309) (GC-Net, soft-argmin).
-- Apple, *AVFoundation* and *ARKit* developer documentation, on depth data and scene depth.
-- NVIDIA, *CUDA-PointPillars* sample and *TensorRT Developer Guide*, on deploying 3-D detectors.
+- Apple, *AVFoundation* and *ARKit* developer documentation, on depth data and scene depth. [`AVDepthData`](https://developer.apple.com/documentation/avfoundation/avdepthdata/depthdatamap) · [`ARDepthData`](https://developer.apple.com/documentation/arkit/ardepthdata) · WWDC 2022, ["Discover advancements in iOS camera capture: Depth, focus, and multitasking"](https://developer.apple.com/videos/play/wwdc2022/110429/)
+- NVIDIA, *CUDA-PointPillars* sample ([github.com/NVIDIA-AI-IOT/CUDA-PointPillars](https://github.com/NVIDIA-AI-IOT/CUDA-PointPillars)) and *TensorRT Developer Guide* ([docs.nvidia.com](https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html)), on deploying 3-D detectors.

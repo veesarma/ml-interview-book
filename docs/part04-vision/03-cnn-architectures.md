@@ -272,7 +272,7 @@ Backbone selection:
     Goyal et al. (Meta, 2017, [arXiv:1706.02677](https://arxiv.org/abs/1706.02677)) showed ResNet-50 training at batch 8192 in one hour on 256 GPUs with no accuracy loss, using three ingredients that are now standard: linear LR scaling with batch size, a gradual warm-up over the first five epochs or so, and zero-initialising the last BN $\gamma$ of each residual block. NVIDIA's MLPerf ResNet-50 submissions industrialised this with mixed precision, channels-last, fused BN and ReLU, DALI data loading, and LARS at extreme batch sizes, driving time-to-train from hours to under a minute on large clusters. See [distributed training](../part14-systems/01-distributed-training.md).
 
 !!! production "Apple: CNNs on the Neural Engine"
-    Apple's Core ML tooling and its ML research write-ups on deploying vision models on-device emphasise the constraints this chapter's systems section lists: prefer operations the Neural Engine executes natively, keep activations in a layout the compiler can fuse, and quantise weights per channel. Apple's published guidance on deploying Transformers on the Neural Engine (a 2022 Apple Machine Learning Research article) makes the general point directly: the fastest model is the one whose primitive ops map to the accelerator, which is why mobile CNN families, and mobile-friendly ViT hybrids, keep their block vocabulary small. Search "Apple Machine Learning Research deploying Transformers on the Apple Neural Engine".
+    Apple's Core ML tooling and its ML research write-ups on deploying vision models on-device emphasise the constraints this chapter's systems section lists: prefer operations the Neural Engine executes natively, keep activations in a layout the compiler can fuse, and quantise weights per channel. Apple's published guidance on deploying Transformers on the Neural Engine (a 2022 Apple Machine Learning Research article) makes the general point directly: the fastest model is the one whose primitive ops map to the accelerator, which is why mobile CNN families, and mobile-friendly ViT hybrids, keep their block vocabulary small. See [Deploying Transformers on the Apple Neural Engine](https://machinelearning.apple.com/research/neural-engine-transformers) and the [Core ML Tools guide](https://apple.github.io/coremltools/docs-guides/).
 
 ## 6. Interview questions and strong answers
 
@@ -339,10 +339,9 @@ Backbone selection:
 
 ## References
 
-Links could not be verified from this build environment, so titles, venues and arXiv IDs are given for you to search.
-
-- Y. LeCun et al., "Gradient-Based Learning Applied to Document Recognition", Proc. IEEE, 1998 (LeNet-5).
-- A. Krizhevsky, I. Sutskever, G. Hinton, "ImageNet Classification with Deep Convolutional Neural Networks", NeurIPS 2012 (AlexNet).
+- Y. LeCun et al., "Gradient-Based Learning Applied to Document Recognition", Proc. IEEE 86(11), 1998 (LeNet-5). [leon.bottou.org](https://leon.bottou.org/papers/lecun-98h)
+- A. Krizhevsky, I. Sutskever, G. Hinton, "ImageNet Classification with Deep Convolutional Neural Networks", NeurIPS 2012 (AlexNet). [papers.nips.cc](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks)
+- Apple Machine Learning Research, "Deploying Transformers on the Apple Neural Engine", 2022, and Apple's Core ML Tools guide, for the on-device constraints in the production note above. [machinelearning.apple.com](https://machinelearning.apple.com/research/neural-engine-transformers) · [apple.github.io/coremltools](https://apple.github.io/coremltools/docs-guides/)
 - K. Simonyan and A. Zisserman, "Very Deep Convolutional Networks for Large-Scale Image Recognition", ICLR 2015, [arXiv:1409.1556](https://arxiv.org/abs/1409.1556) (VGG).
 - C. Szegedy et al., "Going Deeper with Convolutions", CVPR 2015, [arXiv:1409.4842](https://arxiv.org/abs/1409.4842), and "Rethinking the Inception Architecture", CVPR 2016, [arXiv:1512.00567](https://arxiv.org/abs/1512.00567).
 - K. He et al., "Deep Residual Learning for Image Recognition", CVPR 2016, [arXiv:1512.03385](https://arxiv.org/abs/1512.03385).

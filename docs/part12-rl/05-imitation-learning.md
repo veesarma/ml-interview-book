@@ -283,8 +283,10 @@ reasons:
 * **A privileged expert.** `expert_action` reads the true state and applies a PD law
   $u = -(k_p y + k_d v)$. The learner sees $(y,v)$ plus Gaussian noise, so even a perfect
   fit has irreducible error, which is $\epsilon > 0$ in §2.2.
-* **Gusts.** A random impulse to $v$ with probability 0.15, so the expert's own trajectories
-  have some spread and the task is not degenerate.
+* **Rare, large gusts.** An impulse to $v$ with probability 0.02 per step. The expert
+  corrects one within a step or two, so its trajectories contain almost no off-centre
+  states. Make gusts frequent instead and the expert's own data starts covering the
+  recovery states, which is the fastest way to make this demonstration stop working.
 
 ```python title="src/mlbook/rl/envs.py (excerpt)"
 def expert_action(self, obs: np.ndarray | None = None) -> int:
@@ -398,12 +400,12 @@ the theory.
 wide enough not to flake:
 
 ```python
-expert_ret = _mean_return(env, env.expert_action, rng)            # about 37
-bc_ret     = _mean_return(env, bc.act, rng)                       # about 23
-dagger_ret = _mean_return(env, learner.act, rng)                  # about 34
-assert expert_ret > 35
+expert_ret = _mean_return(env, env.expert_action, rng)            # 40.0
+bc_ret     = _mean_return(env, bc.act, rng)                       # 28.5
+dagger_ret = _mean_return(env, learner.act, rng)                  # 38.1
+assert expert_ret > 38
 assert bc_ret < expert_ret - 8
-assert dagger_ret > bc_ret + 6 and dagger_ret > expert_ret - 6
+assert dagger_ret > bc_ret + 6 and dagger_ret > expert_ret - 4
 ```
 
 `tests/test_rl_behavioral_cloning.py` separately checks that BC itself is correct, by
@@ -669,7 +671,7 @@ pytest tests/test_rl_dagger.py -k relabel -q    # just rollout_and_relabel
         self-training, and it is worth having felt it once.
 
 3. **★★ Sweep the observation noise.** Run the BC-versus-DAgger comparison for
-   `obs_noise` in $\{0, 0.02, 0.04, 0.08\}$ and plot both returns.
+   `obs_noise` in $\{0, 0.03, 0.06, 0.12\}$ and plot both returns (the default is 0.06).
 
     ??? success "Solution"
         ```python
@@ -677,7 +679,7 @@ pytest tests/test_rl_dagger.py -k relabel -q    # just rollout_and_relabel
         from mlbook.rl.envs import CorridorEnv, run_episode
         from mlbook.rl.behavioral_cloning import TabularPolicy, collect_expert_data
         from mlbook.rl.dagger import dagger, make_tabular_learner
-        for noise in (0.0, 0.02, 0.04, 0.08):
+        for noise in (0.0, 0.03, 0.06, 0.12):
             rng = np.random.default_rng(0)
             env = CorridorEnv(obs_noise=noise)
             obs, acts = collect_expert_data(env, env.expert_action, 20, rng)

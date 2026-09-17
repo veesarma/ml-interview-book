@@ -166,7 +166,9 @@ class CorridorEnv:
     True state ``(y, v)``: lateral offset and lateral velocity. Actions ``{0, 1, 2}`` apply
     accelerations ``-accel, 0, +accel``; with probability ``gust_prob`` a gust adds ``+-gust`` to
     ``v``; then ``y <- y + v``. Reward ``+1`` per step while ``|y| <= 0.3``; the episode ends
-    early (crash) when ``|y| > 1``.
+    early (crash) when ``|y| > 1``. Gusts are rare and large on purpose: the expert corrects
+    one within a step or two, so expert trajectories contain almost no off-centre states,
+    which is exactly the coverage gap that breaks behavioural cloning.
 
     The *learner* observes ``(y, v) + N(0, obs_noise^2)`` -- a perception stack is never exact --
     while :meth:`expert_action` reads the true state (a privileged expert, as a human driver or
@@ -176,10 +178,10 @@ class CorridorEnv:
     """
 
     horizon: int = 40
-    gust_prob: float = 0.15
+    gust_prob: float = 0.02
     gust: float = 0.1
     accel: float = 0.05
-    obs_noise: float = 0.04
+    obs_noise: float = 0.06
     kp: float = 2.0
     kd: float = 6.0
     deadband: float = 0.05

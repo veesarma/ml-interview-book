@@ -308,13 +308,11 @@ When to use which resampler:
 
 ## References
 
-Links could not be verified from this build environment, so titles, venues and arXiv IDs are given for you to search.
-
 - R. Zhang, "Making Convolutional Networks Shift-Invariant Again", ICML 2019, [arXiv:1904.11486](https://arxiv.org/abs/1904.11486).
 - T.-Y. Lin et al., "Feature Pyramid Networks for Object Detection", CVPR 2017, [arXiv:1612.03144](https://arxiv.org/abs/1612.03144).
 - K. He et al., "Mask R-CNN", ICCV 2017, [arXiv:1703.06870](https://arxiv.org/abs/1703.06870) (ROIAlign is §3).
-- P. Burt and E. Adelson, "The Laplacian Pyramid as a Compact Image Code", IEEE Trans. Communications, 1983.
+- P. Burt and E. Adelson, "The Laplacian Pyramid as a Compact Image Code", IEEE Trans. Communications 31(4), 1983.
 - A. Oppenheim and R. Schafer, *Discrete-Time Signal Processing*, for the sampling theorem and the DFT convolution theorem.
 - R. Szeliski, *Computer Vision: Algorithms and Applications*, 2nd ed., chapters on image processing and pyramids.
-- Tesla AI Day 2021 (recorded presentation), on the vision stack, raw photon counts and multi-camera fusion.
-- NVIDIA DeepStream SDK documentation, on NV12 input and preprocessing plugins.
+- Tesla AI Day 2021 (recorded presentation), on the vision stack, raw photon counts and multi-camera fusion. No canonical URL for the recording could be confirmed; the claims above are reported from the talk, not from a published paper.
+- NVIDIA DeepStream SDK documentation, on NV12 input and preprocessing plugins. [docs.nvidia.com](https://docs.nvidia.com/metropolis/deepstream/dev-guide/)

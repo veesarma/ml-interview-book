@@ -867,8 +867,8 @@ fitting in a table, you are in chapter 3.
         Exploration pulls a uniform arm $10\%$ of the time, giving expected regret per step
         $\varepsilon \cdot \frac{1}{4}\sum_k \Delta_k = 0.1 \times \frac{0.8+0.4+0.3+0}{4} = 0.0375$,
         plus whatever the greedy part loses before it identifies the best arm. Over 5000
-        steps that is about 190, which is what `run_bandit` produces. The test
-        `test_epsilon_greedy_regret_grows_linearly` checks exactly this slope.
+        steps that predicts about 190, and the measured mean over 20 seeds is $208 \pm 14$.
+        The test `test_epsilon_greedy_regret_grows_linearly` checks this slope.
 
 2. **★ Beta posterior by hand.** An arm has 3 successes and 7 failures under a
    $\mathrm{Beta}(1,1)$ prior. Give the posterior, its mean, and the probability that a

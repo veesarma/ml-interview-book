@@ -546,8 +546,6 @@ Choosing a detector family:
 
 ## References
 
-Links could not be verified from this build environment, so titles, venues and arXiv IDs are given for you to search.
-
 - S. Ren, K. He, R. Girshick, J. Sun, "Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks", NeurIPS 2015, [arXiv:1506.01497](https://arxiv.org/abs/1506.01497).
 - K. He, G. Gkioxari, P. Dollár, R. Girshick, "Mask R-CNN", ICCV 2017, [arXiv:1703.06870](https://arxiv.org/abs/1703.06870), where ROIAlign is introduced.
 - T.-Y. Lin et al., "Feature Pyramid Networks for Object Detection", CVPR 2017, [arXiv:1612.03144](https://arxiv.org/abs/1612.03144).
@@ -564,6 +562,6 @@ Links could not be verified from this build environment, so titles, venues and a
 - M. Tan, R. Pang, Q. Le, "EfficientDet: Scalable and Efficient Object Detection", CVPR 2020, [arXiv:1911.09070](https://arxiv.org/abs/1911.09070).
 - B. Singh and L. Davis, "An Analysis of Scale Invariance in Object Detection: SNIP", CVPR 2018, [arXiv:1711.08189](https://arxiv.org/abs/1711.08189).
 - P. Sun et al., "RSN: Range Sparse Net for Efficient, Accurate LiDAR 3D Object Detection", CVPR 2021, [arXiv:2106.13365](https://arxiv.org/abs/2106.13365) (Waymo).
-- Meta AI, *Detectron2*, open-source detection platform, 2019.
-- NVIDIA, *TensorRT Developer Guide*, on the EfficientNMS and batched NMS plugins.
-- Tesla AI Day 2021 recorded presentation, on HydraNets and multi-camera perception.
+- Meta AI, *Detectron2*, open-source detection platform, 2019. [ai.meta.com](https://ai.meta.com/tools/detectron2/) · [github.com/facebookresearch/detectron2](https://github.com/facebookresearch/detectron2)
+- NVIDIA, *TensorRT Developer Guide*, on the EfficientNMS and batched NMS plugins. [docs.nvidia.com](https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html)
+- Tesla AI Day 2021 recorded presentation, on HydraNets and multi-camera perception. No canonical URL for the recording could be confirmed; treat the HydraNet description as reported from the talk rather than published.

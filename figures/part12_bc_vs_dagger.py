@@ -1,4 +1,9 @@
-"""Behavioural cloning vs DAgger on the corridor toy, plus the T vs T^2 error-growth argument.
+"""Behavioural cloning against DAgger at a matched label budget, plus the T vs T^2 bound.
+
+Left panel: for each budget of expert-labelled episodes, train BC on that many expert
+demonstrations and run DAgger with the same total number of labelled episodes, then
+evaluate BOTH learned policies the same way (100 fresh episodes, learner driving). Right
+panel: the theoretical error growth from Ross & Bagnell.
 
 Writes docs/assets/figures/part12_bc_vs_dagger.png. Run from the repository root.
 """
@@ -17,37 +22,43 @@ from mlbook.rl.dagger import dagger, make_tabular_learner  # noqa: E402
 from mlbook.rl.envs import CorridorEnv, run_episode  # noqa: E402
 
 OUT = Path(__file__).resolve().parents[1] / "docs" / "assets" / "figures" / "part12_bc_vs_dagger.png"
-SEEDS, EPISODES_PER_ITER, N_ITERS = 8, 20, 8
+SEEDS, PER_ITER, BUDGETS, BIN_WIDTH = 5, 20, [20, 40, 60, 80, 120, 160], 0.05
 
 
-def mean_return(env, act, rng, n=100):
-    return float(np.mean([run_episode(env, act, rng) for _ in range(n)]))
+def evaluate(env, policy_fn, rng, n: int = 100) -> float:
+    return float(np.mean([run_episode(env, policy_fn, rng) for _ in range(n)]))
 
 
 def main() -> None:
     env = CorridorEnv()
-    bc_curve = np.zeros((SEEDS, N_ITERS))  # BC with the same total data budget as DAgger at each iteration
-    dg_curve = np.zeros((SEEDS, N_ITERS))
-    expert = np.zeros(SEEDS)
+    bc_curve = np.zeros((SEEDS, len(BUDGETS)))  # (seeds, budgets)
+    dg_curve = np.zeros((SEEDS, len(BUDGETS)))  # (seeds, budgets)
+    expert = np.zeros(SEEDS)  # (seeds,)
+
     for s in range(SEEDS):
         rng = np.random.default_rng(s)
-        expert[s] = mean_return(env, env.expert_action, rng)
-        for i in range(N_ITERS):
-            obs, acts = collect_expert_data(env, env.expert_action, EPISODES_PER_ITER * (i + 1), rng)
-            bc = TabularPolicy(3, 0.05, rng)
+        expert[s] = evaluate(env, env.expert_action, rng)
+        for j, budget in enumerate(BUDGETS):
+            obs, acts = collect_expert_data(env, env.expert_action, budget, rng)
+            bc = TabularPolicy(3, BIN_WIDTH, rng)
             bc.fit(obs, acts)
-            bc_curve[s, i] = mean_return(env, bc.act, rng)
-        _, hist = dagger(env, env.expert_action, make_tabular_learner(3, 0.05, rng), N_ITERS, EPISODES_PER_ITER, rng, beta0=0.5)
-        dg_curve[s] = hist
+            bc_curve[s, j] = evaluate(env, bc.act, rng)
+            # DAgger with the same number of labelled episodes: one initial batch of
+            # PER_ITER plus (budget/PER_ITER - 1) relabelled batches.
+            n_iter = max(1, budget // PER_ITER - 1)
+            learner, _ = dagger(env, env.expert_action, make_tabular_learner(3, BIN_WIDTH, rng),
+                                n_iter, PER_ITER, rng, beta0=0.5)
+            dg_curve[s, j] = evaluate(env, learner.act, rng)
+
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.7), facecolor="white")
-    x = np.arange(1, N_ITERS + 1) * EPISODES_PER_ITER
-    for curve, name in ((bc_curve, "Behavioural cloning (more expert demos)"), (dg_curve, "DAgger (learner rollouts, expert labels)")):
-        axes[0].plot(x, curve.mean(0), marker="o", ms=3, label=name)
-        axes[0].fill_between(x, curve.mean(0) - curve.std(0), curve.mean(0) + curve.std(0), alpha=0.15)
+    for curve, name in ((bc_curve, "Behavioural cloning (more expert demos)"),
+                        (dg_curve, "DAgger (learner rollouts, expert labels)")):
+        axes[0].plot(BUDGETS, curve.mean(0), marker="o", ms=3, label=name)
+        axes[0].fill_between(BUDGETS, curve.mean(0) - curve.std(0), curve.mean(0) + curve.std(0), alpha=0.15)
     axes[0].axhline(expert.mean(), color="black", ls="--", lw=1, label=f"expert ({expert.mean():.1f})")
     axes[0].set_xlabel("labelled episodes in the dataset")
     axes[0].set_ylabel("return of the learned policy (max 40)")
-    axes[0].set_title("Corridor toy: same label budget, different state distribution", fontsize=9.5, loc="left")
+    axes[0].set_title("Corridor toy: equal label budget, different state distribution", fontsize=9.5, loc="left")
     axes[0].legend(fontsize=8, frameon=False, loc="lower right")
 
     T = np.arange(1, 101)
@@ -66,6 +77,8 @@ def main() -> None:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT, dpi=150, bbox_inches="tight", facecolor="white")
     print(f"wrote {OUT}")
+    for j, b in enumerate(BUDGETS):
+        print(f"  budget {b:4d}  BC {bc_curve[:, j].mean():5.1f}  DAgger {dg_curve[:, j].mean():5.1f}")
 
 
 if __name__ == "__main__":

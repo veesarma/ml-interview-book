@@ -214,34 +214,34 @@ flowchart TB
 
 **On-device vision and perception**
 
-* Apple Machine Learning Research, "An On-device Deep Neural Network for Face Detection", Apple ML Journal, 2017.
-* Apple Machine Learning Research, "Recognizing People in Photos Through Private On-Device Machine Learning", 2021.
-* Apple Machine Learning Research, "On-device Panoptic Segmentation for Camera Using Transformers", 2021.
-* Apple developer documentation: the Vision framework (text recognition requests and recognition levels, document and rectangle detection, subject lifting, animal and object recognition); Live Text and Visual Look Up feature documentation and supported languages/categories.
+* Apple Machine Learning Research, "An On-device Deep Neural Network for Face Detection", Apple ML Journal, 2017. [machinelearning.apple.com](https://machinelearning.apple.com/research/face-detection)
+* Apple Machine Learning Research, "Recognizing People in Photos Through Private On-Device Machine Learning", 2021. [machinelearning.apple.com](https://machinelearning.apple.com/research/recognizing-people-photos)
+* Apple Machine Learning Research, "On-device Panoptic Segmentation for Camera Using Transformers", 2021. [machinelearning.apple.com](https://machinelearning.apple.com/research/panoptic-segmentation)
+* Apple developer documentation: the [Vision framework](https://developer.apple.com/documentation/vision), [recognizing text in images](https://developer.apple.com/documentation/vision/recognizing-text-in-images) and [`VNRecognizeTextRequest`](https://developer.apple.com/documentation/vision/vnrecognizetextrequest) (recognition levels), plus the WWDC 2019 session ["Text Recognition in Vision Framework"](https://developer.apple.com/videos/play/wwdc2019/234/). Live Text and Visual Look Up are product features built on this framework; Apple publishes their supported languages and categories in its user-facing documentation rather than a single developer page.
 
 **Hardware and deployment**
 
-* Apple Machine Learning Research, "Deploying Transformers on the Apple Neural Engine", 2022 (with reference implementation).
-* Apple developer documentation: Core ML, Core ML Tools, and WWDC sessions on Core ML performance and model conversion.
+* Apple Machine Learning Research, "Deploying Transformers on the Apple Neural Engine", 2022 (with reference implementation). [machinelearning.apple.com](https://machinelearning.apple.com/research/neural-engine-transformers) · follow-up, "Deploying Attention-Based Vision Transformers to Apple Neural Engine" ([machinelearning.apple.com](https://machinelearning.apple.com/research/vision-transformers))
+* Apple developer documentation: [Core ML](https://developer.apple.com/documentation/coreml), [getting a Core ML model](https://developer.apple.com/documentation/coreml/getting-a-core-ml-model) and [Core ML Tools](https://apple.github.io/coremltools/docs-guides/) for conversion and optimisation.
 
 **Foundation models and private serving**
 
 * Apple, "Apple Intelligence Foundation Language Models", 2024. [arXiv:2407.21075](https://arxiv.org/abs/2407.21075) · and the 2025 technical report update.
-* Apple Security Research, "Private Cloud Compute: A new frontier for AI privacy in the cloud", 2024.
-* McKinzie et al., "MM1: Methods, Analysis & Insights from Multimodal LLM Pre-training", 2024 ([arXiv 2403.09611](https://arxiv.org/abs/2403.09611)).
-* You et al., "Ferret-UI: Grounded Mobile UI Understanding with Multimodal LLMs", 2024.
-* Mehta et al., "OpenELM: An Efficient Language Model Family with Open Training and Inference Framework", 2024.
+* Apple Security Research, "Private Cloud Compute: A new frontier for AI privacy in the cloud", 2024. [security.apple.com](https://security.apple.com/blog/private-cloud-compute/)
+* McKinzie et al., "MM1: Methods, Analysis & Insights from Multimodal LLM Pre-training", 2024. [arXiv:2403.09611](https://arxiv.org/abs/2403.09611)
+* You et al., "Ferret-UI: Grounded Mobile UI Understanding with Multimodal LLMs", 2024. [arXiv:2404.05719](https://arxiv.org/abs/2404.05719) · Li et al., "Ferret-UI 2: Mastering Universal User Interface Understanding Across Platforms", 2024 ([arXiv:2410.18967](https://arxiv.org/abs/2410.18967))
+* Mehta et al., "OpenELM: An Efficient Language Model Family with Open Training and Inference Framework", 2024. [arXiv:2404.14619](https://arxiv.org/abs/2404.14619) · [machinelearning.apple.com](https://machinelearning.apple.com/research/openelm) · weights at [huggingface.co/apple/OpenELM](https://huggingface.co/apple/OpenELM)
 
 **Biometrics and security**
 
-* Apple Platform Security guide (Face ID and Touch ID security; Secure Enclave).
-* Apple Support, "About Face ID advanced technology".
+* Apple Platform Security guide: [biometric security](https://support.apple.com/guide/security/biometric-security-sec067eb0c9e/web), [facial matching security](https://support.apple.com/guide/security/facial-matching-security-sece151358d1/web) and [the Secure Enclave](https://support.apple.com/guide/security/the-secure-enclave-sec59b0b31ff/web).
+* Apple Support, "About Face ID advanced technology". [support.apple.com](https://support.apple.com/en-us/102381)
 
 **Speech**
 
-* Apple Machine Learning Research, "Hey Siri: An On-device DNN-powered Voice Trigger for Apple's Personal Assistant", 2017; "Personalized Hey Siri", 2018; "Deep Learning for Siri's Voice: On-device Deep Mixture Density Networks for Hybrid Unit Selection Synthesis", 2017.
+* Apple Machine Learning Research, "Hey Siri: An On-device DNN-powered Voice Trigger for Apple's Personal Assistant", 2017 ([machinelearning.apple.com](https://machinelearning.apple.com/research/hey-siri)); "Personalized Hey Siri", 2018 ([machinelearning.apple.com](https://machinelearning.apple.com/research/personalized-hey-siri)); "Deep Learning for Siri's Voice: On-device Deep Mixture Density Networks for Hybrid Unit Selection Synthesis", 2017 ([machinelearning.apple.com](https://machinelearning.apple.com/research/siri-voices)).
 
 **Privacy-preserving learning**
 
-* Apple Machine Learning Research, "Learning with Privacy at Scale", Apple ML Journal, 2017.
-* Apple Machine Learning Research, "Understanding Aggregate Trends for Apple Intelligence Using Differential Privacy", 2025.
+* Apple Machine Learning Research, "Learning with Privacy at Scale", Apple ML Journal, 2017. [machinelearning.apple.com](https://machinelearning.apple.com/research/learning-with-privacy-at-scale)
+* Apple Machine Learning Research, "Understanding Aggregate Trends for Apple Intelligence Using Differential Privacy", 2025. [machinelearning.apple.com](https://machinelearning.apple.com/research/differential-privacy-aggregate-trends)
