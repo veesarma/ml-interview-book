@@ -61,9 +61,9 @@ runs past 100 seconds, cut the stakeholder list, never the numbers.
     European regression by construction and a head-only backfill.
 
     Every text-discriminated North American cluster gained between 17 and 30 points of
-    recall, the pictogram-strong ones moved a little, Europe
-    held within seed variance, marginal latency was 1.8 milliseconds of P95, and the backfill
-    over 6 petabytes finished in 4.2 weeks inside a 6-week window. It also introduced two
+    recall, the pictogram-strong classes moved slightly, and Europe held within seed
+    variance. Marginal latency was 1.8 milliseconds of P95, and the backfill over 6
+    petabytes finished in 4.2 weeks inside a 6-week window. It also introduced two
     regressions that I can walk you through, both caused by trusting OCR more than it
     deserved."
 
@@ -435,7 +435,9 @@ The five rules, stated so that they apply to a system the interviewer owns:
 
 The impact numbers, delivered in this order:
 
-* Cleared the 96% customer recall floor on every NA regulatory cluster.
+* Cleared the 96% customer recall floor on every NA regulatory cluster. (Probe 11 below is
+  the reconciliation you owe between this claim and the per-cluster table rows that read
+  under 96%. Settle it before you present either slide.)
 * +1.8 ms marginal P95, with the OCR feature already paid for.
 * Zero EU regulatory regression beyond seed variance.
 * 4.2 weeks of backfill over 6 PB, inside the 6-week window.

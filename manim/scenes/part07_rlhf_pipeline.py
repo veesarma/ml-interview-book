@@ -71,16 +71,18 @@ class RLHFPipeline(Scene):
                        font_size=15, color=PURPLE)
         kl_note.next_to(ref, DOWN, buff=0.34, aligned_edge=LEFT)
 
-        # Feedback routed along a clear lane above the top row: up, left, then down.
-        lane_y = 2.62
-        up_stub = Line(update.get_top(), [update.get_center()[0], lane_y, 0],
-                       color=RED, stroke_width=3)
-        across = Line([update.get_center()[0], lane_y, 0], [policy.get_center()[0], lane_y, 0],
-                      color=RED, stroke_width=3)
-        down_arrow = Arrow([policy.get_center()[0], lane_y, 0], policy.get_top(),
-                           buff=0.02, color=RED, stroke_width=3,
-                           max_tip_length_to_length_ratio=0.35)
-        back = VGroup(up_stub, across, down_arrow)
+        # Feedback routed out to the right of every box, up to a clear lane, then back left.
+        lane_y, lane_x = 2.62, 5.55
+        update_y = update.get_center()[1]
+        policy_x = policy.get_center()[0]
+        back = VGroup(
+            Line(update.get_right(), [lane_x, update_y, 0], color=RED, stroke_width=3),
+            Line([lane_x, update_y, 0], [lane_x, lane_y, 0], color=RED, stroke_width=3),
+            Line([lane_x, lane_y, 0], [policy_x, lane_y, 0], color=RED, stroke_width=3),
+            Arrow([policy_x, lane_y, 0], policy.get_top(), buff=0.02, color=RED,
+                  stroke_width=3, max_tip_length_to_length_ratio=0.35),
+        )
+        across = back[2]
         back_label = Text("new theta (per-token ratio clipped to 1 +/- eps)",
                           font_size=15, color=RED)
         back_label.next_to(across, UP, buff=0.10)

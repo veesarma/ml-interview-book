@@ -630,3 +630,7 @@ global batch sizes are large.
 * Sergeev, A., Del Balso, M. *Horovod: fast and easy distributed deep learning in TensorFlow.*
   2018. [arXiv:1802.05799](https://arxiv.org/abs/1802.05799) (ring all-reduce for deep learning; the derivation follows Patarasuk &
   Yuan, *Bandwidth optimal all-reduce algorithms for clusters of workstations*, JPDC 2009).
+* NVIDIA. [H100 datasheet](https://resources.nvidia.com/en-us-tensor-core/nvidia-tensor-core-gpu-datasheet),
+  [H100 architecture whitepaper](https://resources.nvidia.com/en-us-hopper-architecture/nvidia-h100-tensor-c) and
+  [A100 80 GB datasheet](https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/a100-80gb-datasheet-update-nvidia-us-1521051-r2-web.pdf)
+  (NVLink, PCIe and HBM bandwidths quoted in §2.9).

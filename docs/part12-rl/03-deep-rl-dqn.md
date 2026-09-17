@@ -66,11 +66,18 @@ it, and refresh it every few hundred steps.
 **The max over a noisy network is optimistic.** Chapter 2's maximisation bias, now amplified
 because the network's errors are correlated across similar states. The fix is Double DQN.
 
-![Learning curves on PointMass1D for DQN, Double plus dueling DQN, and DQN with the target network refreshed every step, three seeds each, against the random-policy and hand-tuned-controller reference lines.](../assets/figures/part12_dqn_curve.png){ width="760" }
+![Learning curves on PointMass1D for three target-network refresh periods (200 steps, 1 step, 2000 steps), four seeds each, against the random-policy and hand-tuned-controller reference lines.](../assets/figures/part12_dqn_curve.png){ width="760" }
 
-The third curve is the ablation worth internalising: refreshing the target network every
-step (equivalent to having no target network) learns more slowly and less stably on a task
-this small. On Atari, the same ablation is the difference between working and not working.
+The measured result on this task is worth reporting exactly, including the part that
+disagrees with the story. Refreshing the target every 200 steps and refreshing it every step
+(which is the same as having no target network) are indistinguishable here: both reach the
+PD controller's return by episode 60, and over four seeds their final returns differ by less
+than the seed spread. Only the very stale target at 2000 steps is clearly worse, and it is
+unstable late in training. A two-dimensional state with a 64-unit MLP generalises so little
+between $s$ and $s'$ that the feedback loop in §2.5 barely exists. The Nature DQN ablations
+on Atari, where the network is a convolutional trunk over 84x84 pixels and neighbouring
+frames are nearly identical, show large drops from removing the target network. Take the
+mechanism seriously and the toy-scale evidence for it lightly.
 
 ## 2. The math
 
@@ -729,10 +736,13 @@ compensate.
                 finals.append(np.mean(returns[-20:]))
             print(C, round(float(np.mean(finals)), 2), round(float(np.std(finals)), 2))
         ```
-        $C = 1$ (no target network) is slowest and highest-variance; $C$ around 200 is best
-        here; $C = 2000$ is stable and slow because the targets are stale for a large
-        fraction of a short run. The optimum scales with how long the run is, which is why
-        Atari uses $C = 10^4$ for $10^7$-step runs.
+        Measured over four seeds with 100 episodes each: $C = 1$ gives $-3.04 \pm 0.48$,
+        $C = 20$ gives $-2.99 \pm 0.48$, $C = 200$ gives $-2.88 \pm 0.27$ and $C = 2000$
+        gives $-7.20 \pm 3.22$ (mean return over the last 20 episodes). The first three are
+        within noise of each other, so on this task the target network buys stability rather
+        than final performance, and only the badly stale setting hurts. Report the spread,
+        because a single seed at $C=1$ can look better than $C=200$. The useful $C$ scales
+        with run length, which is why Atari uses $C = 10^4$ over $10^7$ steps.
 
 4. **★★ Measure the over-estimation.** Train DQN and Double DQN, then compare the predicted
    $Q(s_0, a_0)$ against the actual discounted return obtained from $s_0$ over 50

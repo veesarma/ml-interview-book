@@ -574,3 +574,7 @@ together.
   (the arithmetic-intensity analysis of prefill vs decode on TPUs).
 * NVIDIA. *TensorRT-LLM* [documentation](https://nvidia.github.io/TensorRT-LLM/) and
   [repository](https://github.com/NVIDIA/TensorRT-LLM).
+* NVIDIA. [H100 datasheet](https://resources.nvidia.com/en-us-tensor-core/nvidia-tensor-core-gpu-datasheet),
+  [H100 architecture whitepaper](https://resources.nvidia.com/en-us-hopper-architecture/nvidia-h100-tensor-c) and
+  [A100 80 GB datasheet](https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/a100-80gb-datasheet-update-nvidia-us-1521051-r2-web.pdf)
+  (the 989 TFLOP/s dense BF16 and 3.35 TB/s HBM3 figures behind the $B^\star$ arithmetic).
