@@ -82,7 +82,7 @@ go into a public transparency report.
 **Success metrics.**
 
 - *North star*: prevalence, the fraction of views (not posts) that are of violating
-  content, per policy area. Meta's Community Standards Enforcement Reports define and
+  content, per policy area. Meta's [Community Standards Enforcement Reports](https://transparency.meta.com/reports/community-standards-enforcement/) define and
   publish prevalence this way, alongside content actioned and the share found
   proactively.
 - *Guardrails*: wrongful-removal rate (estimated by appeal overturns plus audited
@@ -164,7 +164,7 @@ because it is exact, cheap and legally defensible.
 
 For known violating media, the question is "have we seen this before", and a
 perceptual hash answers it without a model. PDQ (images) and TMK+PDQF (video) were
-open-sourced by Meta in 2019 for exactly this purpose; PhotoDNA is the long-standing
+[open-sourced by Meta in 2019](https://about.fb.com/news/2019/08/open-source-photo-video-matching/) for exactly this purpose; [PhotoDNA](https://www.microsoft.com/en-us/photodna/documentation) is the long-standing
 industry mechanism for known child sexual abuse material, used with hash lists
 maintained by organisations such as NCMEC and IWF. Properties to state: matching is
 robust to re-compression, resizing and small crops; it is not robust to substantial
@@ -185,7 +185,7 @@ video and lets each head be trained and thresholded on its own data.
 
 **The input is a whole post.** An image that is fine alone becomes a violation under
 a particular caption, and a benign caption becomes harassment when attached to a
-particular photo. Meta's integrity work on Whole Post Integrity Embeddings (WPIE)
+particular photo. Meta's [integrity work on Whole Post Integrity Embeddings (WPIE)](https://ai.meta.com/blog/the-shift-to-generalized-ai-to-better-identify-violating-content/)
 describes learning representations over the whole post, across modalities, instead of
 scoring each modality separately. The alternative is to score each modality and
 combine with a rule, which is simpler and misses exactly the cases that matter.
@@ -207,13 +207,13 @@ reviewer time from a well-calibrated violence head.
 New policies appear faster than labelled datasets can be built. Two mechanisms
 address that:
 
-- **Few-shot learners.** Meta described a "Few-Shot Learner" system in 2021 that
+- **Few-shot learners.** Meta described a ["Few-Shot Learner" system in 2021](https://ai.meta.com/blog/harmful-content-can-evolve-quickly-our-new-ai-system-adapts-to-tackle-it/) that
   works across modalities and languages and can act on new or evolving policy areas
   with far fewer labelled examples than a conventional classifier, by combining a
   large pretrained model with descriptions of the policy and a handful of examples.
 - **LLM classification with a written policy in the prompt.** A capable model reads
   the policy text and the content and returns a judgment with a rationale. OpenAI has
-  described using GPT-4 for content policy development and classification, where
+  [described using GPT-4](https://openai.com/index/using-gpt-4-for-content-moderation/) for content policy development and classification, where
   policy experts iterate on the written policy and the model applies it, shortening
   the loop from months to hours. Meta's Llama Guard ([arXiv:2312.06674](https://arxiv.org/abs/2312.06674)) is an
   openly available safeguard model that classifies prompts and responses against a
@@ -377,7 +377,7 @@ a user reported it). *Data*: a random audit stream sampled by view. *Model*: the
 classifiers do not change; what changes is the measurement system next to them.
 *Evaluate*: publish prevalence with its methodology, per policy area, per quarter.
 
-**What the source says.** Meta's Community Standards Enforcement Report defines and
+**What the source says.** Meta's [Community Standards Enforcement Report](https://transparency.meta.com/reports/community-standards-enforcement/) defines and
 publishes prevalence (the estimated percentage of views that were of violating
 content), content actioned, proactive rate and appeals/restorations, with published
 methodology describing sampling and reviewer adjudication.
@@ -412,7 +412,7 @@ post, shared across policies, which also cuts cost compared to running several
 single-modality models. *Evaluate*: precision and recall on the combination cases
 specifically, since aggregate metrics will barely move.
 
-**What the source says.** Meta's integrity engineering posts describe Whole Post
+**What the source says.** Meta's [integrity engineering posts](https://ai.meta.com/blog/the-shift-to-generalized-ai-to-better-identify-violating-content/) describe Whole Post
 Integrity Embeddings, a multimodal approach that learns a representation of the entire
 post across modalities for integrity classification, motivated by cases where the
 meaning emerges from the combination.
@@ -445,7 +445,7 @@ which takes over as volume allows. *Serve*: run the few-shot model on a sampled 
 targeted slice, since it is expensive, and expand coverage as the fast classifier
 matures. *Evaluate*: audited precision before any automated action.
 
-**What the source says.** Meta described a Few-Shot Learner system (2021) that works
+**What the source says.** Meta described a [Few-Shot Learner system (2021)](https://ai.meta.com/blog/harmful-content-can-evolve-quickly-our-new-ai-system-adapts-to-tackle-it/) that works
 across modalities and languages and can act on new or evolving policy areas with far
 fewer labelled examples than traditional classifiers, by learning from policy
 descriptions and small numbers of examples.
@@ -453,7 +453,7 @@ descriptions and small numbers of examples.
 !!! tip "How to say it in the interview: bootstrap with few-shot, hand off to a fast model"
     "On day one I'd run a few-shot model that takes the written policy and a handful
     of examples, use it to rank a review queue, and auto-action only the band where
-    audited precision is high enough. Meta published a Few-Shot Learner for this in
+    audited precision is high enough. Meta published a [Few-Shot Learner](https://ai.meta.com/blog/harmful-content-can-evolve-quickly-our-new-ai-system-adapts-to-tackle-it/) for this in
     2021, working across modalities and languages on new or evolving policies with
     far fewer labels than a conventional classifier needs. The alternative is to
     wait for a labelled dataset, which is the honest three-month answer and leaves
@@ -476,14 +476,14 @@ with industry bodies, so no content crosses organisational boundaries. *Evaluate
 match precision (a false match removes innocent content) and robustness to common
 transformations.
 
-**What the source says.** Meta open-sourced PDQ (image hashing) and TMK+PDQF (video
-hashing) in 2019 for sharing signals about violating content, and the industry uses
+**What the source says.** Meta [open-sourced PDQ (image hashing) and TMK+PDQF (video
+hashing) in 2019](https://about.fb.com/news/2019/08/open-source-photo-video-matching/) for sharing signals about violating content, and the industry uses
 hash-sharing mechanisms such as PhotoDNA with lists maintained by child-safety
 organisations.
 
 !!! tip "How to say it in the interview: hashing before classification"
     "Before any classifier runs, I'd match against a hash list of known violating
-    media. Meta open-sourced PDQ for images and TMK+PDQF for video in 2019 for
+    media. Meta [open-sourced PDQ for images and TMK+PDQF for video in 2019](https://about.fb.com/news/2019/08/open-source-photo-video-matching/) for
     exactly this, and the mechanism lets organisations share hashes without sharing
     the content. The alternative is to rely on the classifier to catch re-uploads,
     which works and costs a model call per upload and produces a probabilistic
@@ -508,14 +508,14 @@ model. Iterate until agreement is high, then use the model to label at scale.
 *Serve*: distil into a cheap classifier for volume. *Evaluate*: agreement with expert
 labels, and the time from policy change to deployed enforcement.
 
-**What the source says.** OpenAI described using GPT-4 for content policy development
-and content moderation (2023), where policy experts iterate with the model on policy
+**What the source says.** OpenAI described [using GPT-4 for content policy development
+and content moderation](https://openai.com/index/using-gpt-4-for-content-moderation/) (2023), where policy experts iterate with the model on policy
 text and labelled examples, reducing the time to develop and deploy a new content
 policy from months to hours, and they have published a moderation endpoint and model.
 
 !!! tip "How to say it in the interview: the policy is the prompt"
     "I'd treat the written policy as the model's input instead of as instructions to
-    labellers. OpenAI published this workflow in 2023: give GPT-4 the policy text and
+    labellers. OpenAI [published this workflow in 2023](https://openai.com/index/using-gpt-4-for-content-moderation/): give GPT-4 the policy text and
     content, compare its judgments against expert labels, and when they disagree,
     fix the ambiguity in the policy instead of the model. They report cutting policy
     development and deployment from months to hours. The alternative is the classic
@@ -685,12 +685,12 @@ taxonomy, with reported performance on existing benchmarks.
 
 ## References
 
-- Meta. "Community Standards Enforcement Report" and its published methodology (prevalence, content actioned, proactive rate, appeals and restorations).
-- Meta AI. "Here's how we're using AI to help detect misinformation" and related integrity engineering posts describing Whole Post Integrity Embeddings (WPIE).
-- Meta AI. "Harmful content can evolve quickly. Our new AI system adapts to tackle it" (Few-Shot Learner), December 2021.
-- Meta Engineering. "Open-sourcing photo- and video-matching technology to make the internet safer" (PDQ and TMK+PDQF), August 2019.
-- Microsoft. PhotoDNA documentation; NCMEC and IWF hash-list programmes.
-- OpenAI. "Using GPT-4 for content moderation", August 2023; OpenAI moderation endpoint documentation.
+- Meta. "Community Standards Enforcement Report" and its published methodology (prevalence, content actioned, proactive rate, appeals and restorations) ([transparency.meta.com](https://transparency.meta.com/reports/community-standards-enforcement/)).
+- Meta AI. "The shift to generalized AI to better identify violating content," November 2021, which describes Whole Post Integrity Embeddings (WPIE) ([ai.meta.com](https://ai.meta.com/blog/the-shift-to-generalized-ai-to-better-identify-violating-content/)).
+- Meta AI. "Harmful content can evolve quickly. Our new AI system adapts to tackle it" (Few-Shot Learner), December 2021 ([ai.meta.com](https://ai.meta.com/blog/harmful-content-can-evolve-quickly-our-new-ai-system-adapts-to-tackle-it/)).
+- Meta Newsroom. "Open-Sourcing Photo- and Video-Matching Technology to Make the Internet Safer" (PDQ and TMK+PDQF), August 2019 ([about.fb.com](https://about.fb.com/news/2019/08/open-source-photo-video-matching/)).
+- Microsoft. PhotoDNA documentation ([microsoft.com](https://www.microsoft.com/en-us/photodna/documentation)); NCMEC and IWF hash-list programmes.
+- OpenAI. "Using GPT-4 for content moderation", August 2023 ([openai.com](https://openai.com/index/using-gpt-4-for-content-moderation/)); OpenAI moderation endpoint documentation.
 - Inan, H. et al. "Llama Guard: LLM-based Input-Output Safeguard for Human-AI Conversations." 2023 ([arXiv:2312.06674](https://arxiv.org/abs/2312.06674)).
 - Markov, T. et al. "A Holistic Approach to Undesired Content Detection in the Real World." AAAI 2023 ([arXiv:2208.03274](https://arxiv.org/abs/2208.03274)).
 - YouTube. "Community Guidelines enforcement" transparency reports.

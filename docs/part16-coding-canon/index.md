@@ -28,7 +28,7 @@ the PPO clip, the DPO loss. If a topic has never been asked to be typed, it is n
 in the canon no matter how important it is to understand.
 
 The second is **compression**. Each item stands in for a family. Writing
-[scaled dot-product attention](#the-canon) once gives you cross-attention, causal
+[scaled dot-product attention](#2-the-canon) once gives you cross-attention, causal
 attention, GQA and the KV cache for a few extra minutes each, because they are the
 same three matmuls with different shapes. Writing the im2col convolution gives you
 the FLOP count, the backward pass and the receptive-field argument, because they

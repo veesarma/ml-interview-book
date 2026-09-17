@@ -48,6 +48,7 @@ manim/scenes/       Manim scenes for animated/still explanatory figures
 STYLE.md            the authoring contract every chapter follows
 scripts/            style linter and practice-stub generator
 practice/           signature-only stubs for retyping the canon by hand
+snippets/           the generated bibliography included by docs/references.md
 ```
 
 ## Run it locally

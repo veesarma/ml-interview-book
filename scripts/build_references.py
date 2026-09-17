@@ -20,12 +20,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
-OUT = DOCS / "_references_body.md"
+OUT = ROOT / "snippets" / "references_body.md"
 
 REF_HEADING = re.compile(r"^##\s+References\s*$", re.I)
 NEXT_HEADING = re.compile(r"^##\s+")
 LIST_ITEM = re.compile(r"^\s*[-*]\s+(.*)$")
 LINK = re.compile(r"\[([^\]]+)\]\((https?://[^)]+)\)")
+# An entry copied out of a chapter may carry a relative cross-link such as
+# ](../part12-rl/04-...md). This page lives at the docs root, one level up, so
+# that "../" would escape the docs tree. Rewrite it to a root-relative path.
+REL_LINK = re.compile(r"\]\(\.\./(part\d\d[^)]*\.md)\)")
+# A sibling link such as ](06-dimensionality-reduction.md) is relative to the
+# chapter it came from, so it needs that chapter's directory prepended.
+SIBLING_LINK = re.compile(r"\]\((?!https?://|\.\./|/|part\d\d)([0-9a-z][0-9a-z-]*\.md)\)")
 TITLE_QUOTED = re.compile(r'["“]([^"”]{6,200})["”]|\*([^*]{6,200})\*')
 
 KINDS = [
@@ -99,6 +106,8 @@ def main() -> int:
             key = url or ("title:" + norm_title(entry))
             if not key or key == "title:":
                 continue
+            entry = REL_LINK.sub(r"](\1)", entry)
+            entry = SIBLING_LINK.sub(rf"]({path.parent.name}/\1)", entry)
             rec = by_key.setdefault(key, {"entry": entry, "url": url, "cited": set()})
             rec["cited"].add(chapter_label(path))
             # keep the richest phrasing of the entry

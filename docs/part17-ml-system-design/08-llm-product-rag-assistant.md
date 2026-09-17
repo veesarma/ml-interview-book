@@ -42,7 +42,7 @@ flowchart LR
   dense catches paraphrase, a cross-encoder reranker fixes the ordering of the top 50.
 - **Chunking is a design decision with a metric.** Chunk by document structure, keep
   a parent-document pointer, and add context to each chunk so it is interpretable
-  alone. Anthropic's contextual retrieval work reports large reductions in retrieval
+  alone. Anthropic's [contextual retrieval work](https://anthropic.com/news/contextual-retrieval) reports large reductions in retrieval
   failure from exactly this.
 - **Permissions are part of retrieval, not a filter afterwards.** An enterprise
   assistant that leaks one document destroys the product.
@@ -128,8 +128,8 @@ enrich, embed, index, and it runs continuously:
   section, function) preserves meaning. Store a parent pointer so the generator can
   be given the surrounding section when the chunk alone is thin.
 - *Enrichment* adds what the chunk lacks: a short generated summary of the document
-  it came from, the section path, entities, and a timestamp. Anthropic's contextual
-  retrieval approach prepends a generated, chunk-specific context sentence before
+  it came from, the section path, entities, and a timestamp. Anthropic's [contextual
+  retrieval approach](https://anthropic.com/news/contextual-retrieval) prepends a generated, chunk-specific context sentence before
   embedding, and reports a large drop in retrieval failure rates on their
   evaluations when this is combined with BM25, with a further drop once a reranker
   is added.
@@ -429,8 +429,8 @@ that. Keep BM25 alongside for exact terms and fuse. Add a reranker on the shortl
 unchanged; prompt caching makes the one-off generation cheap. *Evaluate*: retrieval
 failure rate at fixed k, before and after each component.
 
-**What the source says.** Anthropic's engineering post "Introducing Contextual
-Retrieval" (September 2024) describes prepending a short generated context to each
+**What the source says.** Anthropic's engineering post ["Introducing Contextual
+Retrieval"](https://anthropic.com/news/contextual-retrieval) (September 2024) describes prepending a short generated context to each
 chunk before embedding (contextual embeddings) and doing the same for the BM25 index
 (contextual BM25), reports a substantial reduction in top-20 retrieval failure rate
 from combining the two, and reports a further reduction when a reranking stage is
@@ -439,7 +439,7 @@ added on top.
 !!! tip "How to say it in the interview: contextualise chunks at ingestion"
     "Before embedding a chunk I'd prepend a sentence or two of generated context
     saying what document and section it came from, and index that. Anthropic
-    published this as contextual retrieval in 2024, and they report a large drop in
+    [published this as contextual retrieval in 2024](https://anthropic.com/news/contextual-retrieval), and they report a large drop in
     top-20 retrieval failure rate when contextual embeddings and contextual BM25 are
     combined, with a further drop from adding a reranker. The alternative is bigger
     chunks, which preserve context and dilute the embedding so that a long chunk
@@ -466,7 +466,8 @@ low latency, cancel on keystroke, cache aggressively. *Evaluate*: acceptance rat
 online, plus offline suites; then measure retention, because accepted code that gets
 deleted was not a good suggestion.
 
-**What the sources say.** GitHub's engineering blog posts on Copilot describe prompt
+**What the sources say.** GitHub's engineering blog posts on Copilot ([how Copilot
+understands your code](https://github.blog/ai-and-ml/github-copilot/how-github-copilot-is-getting-better-at-understanding-your-code/), [working with the LLMs behind Copilot](https://github.blog/ai-and-ml/github-copilot/inside-github-working-with-the-llms-behind-github-copilot/)) describe prompt
 construction from the surrounding code and neighbouring tabs, the latency constraints
 of inline completion, and their evaluation using acceptance rate; their later posts
 on Copilot's retrieval and chat features describe adding repository-level context.
@@ -474,7 +475,7 @@ on Copilot's retrieval and chat features describe adding repository-level contex
 !!! tip "How to say it in the interview: retrieval for code is not retrieval for prose"
     "For a coding assistant I'd start the context with the code around the cursor and
     the files the developer has open, then add retrieved snippets, instead of
-    treating it as a pure retrieval problem. GitHub's engineering posts on Copilot
+    treating it as a pure retrieval problem. GitHub's [engineering posts on Copilot](https://github.blog/ai-and-ml/github-copilot/how-github-copilot-is-getting-better-at-understanding-your-code/)
     describe building the prompt from the surrounding code and neighbouring tabs
     under a hard latency budget. The alternative, embedding the whole repository and
     retrieving by similarity, sounds more principled and performs worse for
@@ -499,8 +500,8 @@ internal content, and per-component evaluation. *Serve*: streaming, with a stric
 end-to-end budget. *Evaluate*: build the evaluation pipeline first, with human
 annotation guidelines, because otherwise every change is a subjective argument.
 
-**What the sources say.** LinkedIn's engineering blog posts on building their
-generative-AI product experiences describe organising the system around intent
+**What the sources say.** LinkedIn's engineering blog post ["Musings on Building a
+Generative AI Product"](https://www.linkedin.com/blog/engineering/generative-ai/musings-on-building-a-generative-ai-product) describes organising the system around intent
 routing and retrieval over internal data, the difficulty of evaluation (including
 building annotation guidelines and scaling human evaluation), and latency work for
 streaming responses.
@@ -508,8 +509,8 @@ streaming responses.
 !!! tip "How to say it in the interview: build the evaluation before the second model"
     "The first thing I'd build after a working prototype is the evaluation pipeline,
     with written annotation guidelines and a few hundred labelled examples, because
-    without it every prompt change is an argument about taste. LinkedIn's posts on
-    taking their generative product to production describe exactly this as one of
+    without it every prompt change is an argument about taste. LinkedIn's [post on
+    taking their generative product to production](https://www.linkedin.com/blog/engineering/generative-ai/musings-on-building-a-generative-ai-product) describes exactly this as one of
     the hardest parts, alongside intent routing and latency for streaming. The
     alternative is to iterate on prompts against a handful of favourite test
     questions, which is fast and drifts: you fix one behaviour and silently break
@@ -535,8 +536,8 @@ that samples conversations. *Serve*: streaming with the guardrail applied before
 display for the high-risk categories. *Evaluate*: automated evaluation of transcripts
 plus human review of a sample.
 
-**What the sources say.** DoorDash's engineering blog describes their LLM-based
-support system, including a RAG setup over their knowledge base, a guardrail
+**What the sources say.** DoorDash's engineering blog post on the [path to high-quality
+LLM-based Dasher support automation](https://careersatdoordash.com/blog/large-language-modules-based-dasher-support-automation/) describes their LLM-based support system, including a RAG setup over their knowledge base, a guardrail
 component that evaluates responses for hallucination and policy compliance before
 they are sent, and an LLM-based evaluation pipeline for reviewing conversation
 quality at scale.
@@ -545,7 +546,7 @@ quality at scale.
     "For customer support I'd put a separate guardrail model between the generated
     answer and the customer, checking the answer against the retrieved policy text
     and against a compliance checklist, and I'd let it block or route to a human.
-    DoorDash described this design for their support assistant, with a guardrail that
+    DoorDash [described this design](https://careersatdoordash.com/blog/large-language-modules-based-dasher-support-automation/) for their support assistant, with a guardrail that
     evaluates responses for hallucination and policy compliance before they are sent,
     plus an LLM-based pipeline for evaluating conversation quality. The alternative
     is to strengthen the generation prompt and trust it, which is cheaper by one
@@ -715,7 +716,7 @@ documents biases including position bias, verbosity bias and self-enhancement bi
 
 ## References
 
-- Anthropic. "Introducing Contextual Retrieval." Anthropic engineering blog, September 2024.
+- Anthropic. "Introducing Contextual Retrieval." Anthropic engineering blog, September 2024 ([anthropic.com](https://anthropic.com/news/contextual-retrieval)).
 - Lewis, P. et al. "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks." NeurIPS 2020 ([arXiv:2005.11401](https://arxiv.org/abs/2005.11401)).
 - Karpukhin, V. et al. "Dense Passage Retrieval for Open-Domain Question Answering." EMNLP 2020 ([arXiv:2004.04906](https://arxiv.org/abs/2004.04906)).
 - Nogueira, R., Cho, K. "Passage Re-ranking with BERT." 2019 ([arXiv:1901.04085](https://arxiv.org/abs/1901.04085)).
@@ -723,8 +724,8 @@ documents biases including position bias, verbosity bias and self-enhancement bi
 - Zheng, L. et al. "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena." NeurIPS 2023 Datasets and Benchmarks ([arXiv:2306.05685](https://arxiv.org/abs/2306.05685)).
 - Liu, N. F. et al. "Lost in the Middle: How Language Models Use Long Contexts." TACL 2024 ([arXiv:2307.03172](https://arxiv.org/abs/2307.03172)).
 - Greshake, K. et al. "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection." AISec 2023 ([arXiv:2302.12173](https://arxiv.org/abs/2302.12173)).
-- GitHub Engineering. Posts on how Copilot builds prompts, its latency constraints and its evaluation.
-- LinkedIn Engineering. Posts on building and productionising their generative-AI product experiences (intent routing, retrieval over internal data, evaluation and streaming latency).
-- DoorDash Engineering. Post on their LLM-based support system, including RAG, a response guardrail and LLM-based conversation-quality evaluation.
+- GitHub Engineering. "How GitHub Copilot is getting better at understanding your code" ([github.blog](https://github.blog/ai-and-ml/github-copilot/how-github-copilot-is-getting-better-at-understanding-your-code/)) and "Inside GitHub: Working with the LLMs behind GitHub Copilot" ([github.blog](https://github.blog/ai-and-ml/github-copilot/inside-github-working-with-the-llms-behind-github-copilot/)), February 2024.
+- LinkedIn Engineering. "Musings on Building a Generative AI Product," 2024, on intent routing, retrieval over internal data, evaluation and streaming latency ([linkedin.com](https://www.linkedin.com/blog/engineering/generative-ai/musings-on-building-a-generative-ai-product)).
+- DoorDash Engineering. "Path to high-quality LLM-based Dasher support automation," on RAG, a response guardrail and LLM-based conversation-quality evaluation ([careersatdoordash.com](https://careersatdoordash.com/blog/large-language-modules-based-dasher-support-automation/)).
 - Inan, H. et al. "Llama Guard: LLM-based Input-Output Safeguard for Human-AI Conversations." 2023 ([arXiv:2312.06674](https://arxiv.org/abs/2312.06674)).
 - Book cross-references: [retrieval & RAG](../part13-retrieval-eval-reliability/01-retrieval-and-rag.md), [evaluation](../part13-retrieval-eval-reliability/02-evaluation.md), [uncertainty & reliability](../part13-retrieval-eval-reliability/03-uncertainty-reliability.md), [inference systems](../part14-systems/03-inference-systems.md), [fine-tuning & LoRA](../part06-llm-training/06-fine-tuning-lora.md), [SFT](../part07-post-training/01-sft.md), [agents & tool use](../part12-rl/06-agents-tool-use.md), [content moderation](07-content-moderation.md).

@@ -113,7 +113,7 @@ interests where policy allows); context (surface, position, device, time, app).
 
 **The online joiner.** Impressions and clicks arrive on different streams; the
 training example is created when a click arrives within the window or when the
-window expires without one. Facebook's 2014 paper describes such an online joiner
+window expires without one. Facebook's [2014 paper](https://ai.meta.com/research/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/) describes such an online joiner
 feeding continuous training, and the failure mode to name: if the joiner's window
 is too short, real clicks become negatives and the model's calibration drifts
 downward.
@@ -165,7 +165,7 @@ shift the label pipeline itself), retention limits.
 
 Hash every sparse feature and every hand-chosen pair into a $2^{28}$-dimensional
 space (Weinberger et al., ICML 2009), train logistic regression with FTRL-Proximal
-online (McMahan et al., KDD 2013), calibrate with isotonic regression. It is fast,
+online (McMahan et al., [KDD 2013](https://research.google/pubs/ad-click-prediction-a-view-from-the-trenches/)), calibrate with isotonic regression. It is fast,
 online, cheap to serve, easy to debug, and it was Google's production system in
 2013. Its limit is that crosses must be enumerated by hand and generalise poorly to
 unseen combinations.
@@ -289,7 +289,7 @@ following $W$ days. Training hourly on the last day's data with "no conversion y
 = negative systematically under-predicts CVR, and the under-prediction is worst for
 the freshest data, which is precisely what continuous training emphasises.
 
-**Survival-model approach** (Chapelle, KDD 2014, Criteo). Model two things:
+**Survival-model approach** (Chapelle, [KDD 2014](https://dl.acm.org/doi/10.1145/2623330.2623634), Criteo). Model two things:
 whether the click will ever convert, $p(x) = P(C = 1 \mid x)$, and the delay $D$
 until conversion, e.g. exponential with rate $\lambda(x)$. At elapsed time $e$ since
 the click, the likelihood of what has been *observed* is
@@ -304,7 +304,7 @@ example contribute "probably not converted *yet*" rather than "negative". Serve
 $p(x)$. *Meaning*: the model learns the delay distribution and discounts recent
 negatives accordingly.
 
-**Fake-negative approach** (Ktena et al., RecSys 2019, Twitter). For continuous
+**Fake-negative approach** (Ktena et al., [RecSys 2019](https://arxiv.org/abs/1907.06558), Twitter). For continuous
 training, ingest every example immediately as a negative; when a conversion arrives,
 ingest a positive for the same example; correct the resulting bias with importance
 weights derived from the model's own predictions (or with a positive-unlabelled
@@ -353,15 +353,15 @@ automatic calibration and NE gate before it reaches serving.
 - *Score*: $\text{eCPM}_a = \text{bid}_a \times \hat p_{\text{CTR},a}$ for CPC; for
   conversion-optimised bidding $\text{bid}_a \times \hat p_{\text{CTR},a} \times
   \hat p_{\text{CVR},a}$ where the bid is a target cost per action; platforms add
-  user-value terms (predicted negative feedback) to the score. Meta's public
-  auction documentation describes the auction as ranking by a "total value" that
+  user-value terms (predicted negative feedback) to the score. Meta's [public
+  auction documentation](https://www.facebook.com/business/help/430291176997542) describes the auction as ranking by a "total value" that
   combines the bid, estimated action rates and ad quality.
 - *Pricing*: generalized second price (Edelman, Ostrovsky & Schwarz, AER 2007) or
   VCG; either way, a calibration error moves prices.
 - *Pacing*: an advertiser's daily budget must be spent smoothly; a feedback
   controller adjusts the bid multiplier or the participation probability through
   the day toward a target spend curve (Agarwal et al., "Budget pacing for targeted
-  online advertisements at LinkedIn", KDD 2014; Xu et al., "Smart Pacing for
+  online advertisements at LinkedIn", [KDD 2014](https://dl.acm.org/doi/10.1145/2623330.2623366); Xu et al., "Smart Pacing for
   Effective Online Ad Campaign Optimization", KDD 2015). The model's miscalibration
   appears here as spend that ends too early or too late.
 
@@ -469,8 +469,8 @@ inclusion and fewer bits per weight, and a separate calibration layer. *Serve*: 
 sparse weight vector; per-prediction confidence estimates. *Evaluate*: online
 metrics on the stream, with careful attention to calibration.
 
-**What the source says.** McMahan et al., "Ad Click Prediction: a View from the
-Trenches" (KDD 2013) describes FTRL-Proximal, per-coordinate learning rates, memory
+**What the source says.** McMahan et al., ["Ad Click Prediction: a View from the
+Trenches"](https://research.google/pubs/ad-click-prediction-a-view-from-the-trenches/) (KDD 2013) describes FTRL-Proximal, per-coordinate learning rates, memory
 savings (probabilistic feature inclusion, reduced-precision weights, sharing across
 similar models), a calibration layer, confidence estimates, and a list of things that
 did *not* help in their setting.
@@ -479,7 +479,7 @@ did *not* help in their setting.
     "I'd put an explicit calibration layer between the model and the auction and
     monitor it per segment, rather than trusting logloss to keep the probabilities
     honest, because Google reported in 'Ad Click Prediction: a View from the
-    Trenches' (KDD 2013) that systematic miscalibration arises from training
+    Trenches' ([KDD 2013](https://research.google/pubs/ad-click-prediction-a-view-from-the-trenches/)) that systematic miscalibration arises from training
     choices and that they added a dedicated calibration stage; the auction
     consumes probabilities, so a 10 % over-prediction on one format silently
     reprices that format. The alternative is to rely on the loss alone. A separate
@@ -500,8 +500,8 @@ logistic regression; the LR trained online. *Serve*: cheap. *Evaluate*: NE, with
 experiments on retraining frequency and on which features (historical vs
 contextual) carry the signal.
 
-**What the source says.** He et al., "Practical Lessons from Predicting Clicks on
-Ads at Facebook" (ADKDD 2014) reports the GBDT-features-plus-LR hybrid, the
+**What the source says.** He et al., ["Practical Lessons from Predicting Clicks on
+Ads at Facebook"](https://ai.meta.com/research/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/) (ADKDD 2014) reports the GBDT-features-plus-LR hybrid, the
 importance of data freshness (a measurable NE gain from daily versus weekly
 retraining), online learning for the LR, the online joiner, negative down-sampling
 with the re-calibration formula $q = p/(p + (1-p)/w)$, and that historical
@@ -510,7 +510,7 @@ with the re-calibration formula $q = p/(p + (1-p)/w)$, and that historical
 !!! tip "How to say it in the interview: down-sampling and freshness"
     "I'd down-sample negatives to about a tenth and correct the output with
     $p = p'/(p' + (1-p')/w)$, which Facebook published in 'Practical Lessons from
-    Predicting Clicks on Ads at Facebook' (2014); the alternative is training on
+    Predicting Clicks on Ads at Facebook' ([2014](https://ai.meta.com/research/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/)); the alternative is training on
     everything, which costs ten times the compute for negligible information. On
     cadence, the same paper showed a measurable normalised-entropy gain from daily
     over weekly retraining, and they moved the linear part online, so I'd design
@@ -561,18 +561,18 @@ examples. *Model*: either a joint model of conversion probability and delay
 scheme that ingests fake negatives and corrects with importance weights. *Evaluate*:
 calibration against matured labels.
 
-**What the sources say.** Chapelle, "Modeling Delayed Feedback in Display
-Advertising" (KDD 2014) introduces the survival-style model with an exponential
+**What the sources say.** Chapelle, ["Modeling Delayed Feedback in Display
+Advertising"](https://dl.acm.org/doi/10.1145/2623330.2623634) (KDD 2014) introduces the survival-style model with an exponential
 delay and shows it improves over treating unmatured examples as negatives on Criteo
-data. Ktena et al., "Addressing Delayed Feedback for Continuous Training with
-Neural Networks in CTR prediction" (RecSys 2019) compares loss functions for
+data. Ktena et al., ["Addressing Delayed Feedback for Continuous Training with
+Neural Networks in CTR prediction"](https://arxiv.org/abs/1907.06558) (RecSys 2019) compares loss functions for
 continuous training under delayed feedback at Twitter, including fake-negative
 schemes with importance weighting.
 
 !!! tip "How to say it in the interview: delayed feedback"
     "I would not treat 'no conversion yet' as a negative. If the trainer can hold
     examples, I'd fit conversion probability and conversion delay jointly, as
-    Chapelle did in 'Modeling Delayed Feedback in Display Advertising' (KDD 2014),
+    Chapelle did in 'Modeling Delayed Feedback in Display Advertising' ([KDD 2014](https://dl.acm.org/doi/10.1145/2623330.2623634)),
     so that a two-hour-old click contributes 'probably not converted yet' rather
     than 'no'. If the trainer is fully streaming, I'd use the fake-negative scheme
     with importance weighting that Twitter evaluated in their RecSys 2019 paper.
@@ -617,14 +617,14 @@ participation rate or bid multiplier toward a target spend curve derived from
 forecast traffic; the click model's calibration errors surface as pacing errors.
 *Evaluate*: spend smoothness, advertiser outcomes, revenue.
 
-**What the source says.** Agarwal et al., "Budget pacing for targeted online
-advertisements at LinkedIn" (KDD 2014) describes a pacing system that controls
+**What the source says.** Agarwal et al., ["Budget pacing for targeted online
+advertisements at LinkedIn"](https://dl.acm.org/doi/10.1145/2623330.2623366) (KDD 2014) describes a pacing system that controls
 participation in auctions to spread spend across the day and reports improved
 advertiser and platform outcomes.
 
 !!! tip "How to say it in the interview: pacing literacy"
     "I'd make sure the interviewer knows I see the model as one input to a control
-    loop: LinkedIn's KDD 2014 pacing paper controls each campaign's auction
+    loop: LinkedIn's [KDD 2014 pacing paper](https://dl.acm.org/doi/10.1145/2623330.2623366) controls each campaign's auction
     participation toward a target spend curve, which means a miscalibrated pCTR
     shows up as a pacing error before anyone looks at a reliability diagram. So my
     monitoring would include pacing error per campaign segment as a model-health
@@ -718,8 +718,8 @@ advertiser and platform outcomes.
 
 ## References
 
-- McMahan, H. B. et al. "Ad Click Prediction: a View from the Trenches." KDD 2013.
-- He, X. et al. "Practical Lessons from Predicting Clicks on Ads at Facebook." ADKDD 2014.
+- McMahan, H. B. et al. "Ad Click Prediction: a View from the Trenches." KDD 2013 ([research.google](https://research.google/pubs/ad-click-prediction-a-view-from-the-trenches/)).
+- He, X. et al. "Practical Lessons from Predicting Clicks on Ads at Facebook." ADKDD 2014 ([ai.meta.com](https://ai.meta.com/research/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/)).
 - Naumov, M. et al. "Deep Learning Recommendation Model for Personalization and Recommendation Systems." 2019 ([arXiv:1906.00091](https://arxiv.org/abs/1906.00091)).
 - Shi, H.-J. M. et al. "Compositional Embeddings Using Complementary Partitions for Memory-Efficient Recommendation Systems." KDD 2020 ([arXiv:1909.02107](https://arxiv.org/abs/1909.02107)).
 - Cheng, H.-T. et al. "Wide & Deep Learning for Recommender Systems." DLRS 2016 ([arXiv:1606.07792](https://arxiv.org/abs/1606.07792)).
@@ -728,11 +728,11 @@ advertiser and platform outcomes.
 - Wang, R. et al. "DCN V2: Improved Deep & Cross Network and Practical Lessons for Web-scale Learning to Rank Systems." WWW 2021 ([arXiv:2008.13535](https://arxiv.org/abs/2008.13535)).
 - Rendle, S. "Factorization Machines." ICDM 2010.
 - Weinberger, K. et al. "Feature Hashing for Large Scale Multitask Learning." ICML 2009.
-- Chapelle, O. "Modeling Delayed Feedback in Display Advertising." KDD 2014.
-- Ktena, S. I. et al. "Addressing Delayed Feedback for Continuous Training with Neural Networks in CTR prediction." RecSys 2019.
+- Chapelle, O. "Modeling Delayed Feedback in Display Advertising." KDD 2014 ([dl.acm.org](https://dl.acm.org/doi/10.1145/2623330.2623634)).
+- Ktena, S. I. et al. "Addressing Delayed Feedback for Continuous Training with Neural Networks in CTR prediction." RecSys 2019 ([arXiv:1907.06558](https://arxiv.org/abs/1907.06558)).
 - Ma, X. et al. "Entire Space Multi-Task Model: An Effective Approach for Estimating Post-Click Conversion Rate." SIGIR 2018 ([arXiv:1804.07931](https://arxiv.org/abs/1804.07931)).
-- Agarwal, D. et al. "Budget pacing for targeted online advertisements at LinkedIn." KDD 2014.
+- Agarwal, D. et al. "Budget pacing for targeted online advertisements at LinkedIn." KDD 2014 ([dl.acm.org](https://dl.acm.org/doi/10.1145/2623330.2623366)).
 - Xu, J. et al. "Smart Pacing for Effective Online Ad Campaign Optimization." KDD 2015.
 - Edelman, B., Ostrovsky, M., Schwarz, M. "Internet Advertising and the Generalized Second-Price Auction." American Economic Review 2007.
-- Meta Business Help Center. "About ad auctions" (the "total value" description of the auction).
+- Meta Business Help Center. "About Ad Auctions" (the "total value" description of the auction) ([facebook.com/business/help](https://www.facebook.com/business/help/430291176997542)).
 - Book cross-references: [feed ranking (multi-task, sequence features)](01-recommendation-feed-ranking.md), [uncertainty & reliability (calibration)](../part13-retrieval-eval-reliability/03-uncertainty-reliability.md).

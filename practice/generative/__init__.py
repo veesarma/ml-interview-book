@@ -4,6 +4,6 @@ All models are tiny MLPs on 2-D toy data so every test runs on CPU in seconds; t
 maths and the training steps are exactly the ones used at scale.
 """
 
-from mlbook.generative import autoencoder, ddpm, flow_matching, gan, toy_data, vae, vqvae
+from . import autoencoder, ddpm, flow_matching, gan, toy_data, vae, vqvae
 
 __all__ = ["autoencoder", "ddpm", "flow_matching", "gan", "toy_data", "vae", "vqvae"]
