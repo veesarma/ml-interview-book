@@ -54,7 +54,7 @@ class VectorQuantizer(nn.Module):
 
 
 def codebook_perplexity(indices: torch.Tensor, n_codes: int) -> torch.Tensor:
-    """``exp(H(usage))`` of the code histogram — how many codes are effectively in use.
+    """``exp(H(usage))`` of the code histogram: how many codes are effectively in use.
 
     Args:
         indices: (B, N) integers in [0, K).

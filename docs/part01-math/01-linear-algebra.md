@@ -568,7 +568,7 @@ takes $O(\kappa)$ iterations ([chapter 06](06-optimization.md)).
 Search terms are given for every source; no URLs are included here because they could not be
 verified in the build environment.
 
-* G. Strang, *Introduction to Linear Algebra*, 5th ed., Wellesley-Cambridge Press, 2016 (and MIT OCW 18.06).
+* G. Strang, *Introduction to Linear Algebra*, 5th ed., Wellesley-Cambridge Press, 2016, and the lectures for [MIT 18.06 Linear Algebra on OpenCourseWare](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/).
 * C. Eckart & G. Young, "The approximation of one matrix by another of lower rank", *Psychometrika*, 1936.
 * N. Halko, P.-G. Martinsson & J. Tropp, "Finding Structure with Randomness: Probabilistic Algorithms for Constructing Approximate Matrix Decompositions", *SIAM Review*, 2011 ([arXiv:0909.4061](https://arxiv.org/abs/0909.4061)).
 * Y. Koren, R. Bell & C. Volinsky, "Matrix Factorization Techniques for Recommender Systems", *IEEE Computer*, 2009.
@@ -578,4 +578,4 @@ verified in the build environment.
 * A. Bewley et al., "Simple Online and Realtime Tracking", ICIP 2016 ([arXiv:1602.00763](https://arxiv.org/abs/1602.00763)).
 * N. Wojke, A. Bewley & D. Paulus, "Simple Online and Realtime Tracking with a Deep Association Metric", ICIP 2017 ([arXiv:1703.07402](https://arxiv.org/abs/1703.07402)).
 * X. Weng et al., "3D Multi-Object Tracking: A Baseline and New Evaluation Metrics", IROS 2020 ([arXiv:1907.03961](https://arxiv.org/abs/1907.03961)).
-* K. Petersen & M. Pedersen, *The Matrix Cookbook*, Technical University of Denmark, 2012.
+* K. Petersen & M. Pedersen, *The Matrix Cookbook*, Technical University of Denmark, November 2012. [DTU publication database](https://www2.imm.dtu.dk/pubdb/pubs/3274-full.html)

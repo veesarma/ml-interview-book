@@ -617,10 +617,10 @@ changed their throughput by 20% with identical outputs. Give two plausible mecha
 
 ## References
 
-* NumPy documentation, "Broadcasting" and "Internal memory layout of an ndarray", NumPy User Guide.
-* PyTorch documentation, "Broadcasting semantics", "Tensor Views", and `torch.nn.functional.scaled_dot_product_attention`.
+* NumPy documentation, ["Broadcasting"](https://numpy.org/doc/stable/user/basics.broadcasting.html) and the ndarray reference on [internal memory layout and strides](https://numpy.org/doc/stable/reference/arrays.ndarray.html).
+* PyTorch documentation, ["Broadcasting semantics"](https://docs.pytorch.org/docs/stable/notes/broadcasting.html), ["Tensor Views"](https://docs.pytorch.org/docs/stable/tensor_view.html) and [`torch.nn.functional.scaled_dot_product_attention`](https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html).
 * A. Paszke et al., "PyTorch: An Imperative Style, High-Performance Deep Learning Library", NeurIPS 2019 ([arXiv:1912.01703](https://arxiv.org/abs/1912.01703)).
-* A. Rogozhnikov, "Einops: Clear and Reliable Tensor Manipulations with Einstein-like Notation", ICLR 2022.
+* A. Rogozhnikov, "Einops: Clear and Reliable Tensor Manipulations with Einstein-like Notation", ICLR 2022. [OpenReview](https://openreview.net/forum?id=oapKSVM2bcj) · [ICLR page](https://iclr.cc/virtual/2022/oral/6603) · [einops.rocks](https://einops.rocks/)
 * T. Dao, D. Fu, S. Ermon, A. Rudra & C. Ré, "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness", NeurIPS 2022 ([arXiv:2205.14135](https://arxiv.org/abs/2205.14135)); T. Dao, "FlashAttention-2", 2023 ([arXiv:2307.08691](https://arxiv.org/abs/2307.08691)).
 * Y. Xu et al., "GSPMD: General and Scalable Parallelization for ML Computation Graphs", 2021 ([arXiv:2105.04663](https://arxiv.org/abs/2105.04663)).
 * A. Chowdhery et al., "PaLM: Scaling Language Modeling with Pathways", 2022 ([arXiv:2204.02311](https://arxiv.org/abs/2204.02311)).

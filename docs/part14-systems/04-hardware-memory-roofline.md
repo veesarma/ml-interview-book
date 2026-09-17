@@ -11,7 +11,8 @@
 - **Roofline:** attainable $= \min(F_\text{peak},\; I \cdot BW)$ where $I$ = FLOPs / bytes moved.
   The **ridge point** $I^\star = F_\text{peak}/BW$ divides memory-bound (left) from compute-bound (right).
 - **H100 SXM:** 989 TFLOP/s dense BF16 (tensor cores), 3.35 TB/s HBM3, 80 GB → ridge ≈ **295 FLOP/byte**.
-  **A100 80 GB:** 312 TFLOP/s BF16, ~2.0 TB/s HBM2e → ridge ≈ **156**.
+  **A100 80 GB SXM:** 312 TFLOP/s BF16, 2.04 TB/s HBM2e (2,039 GB/s on the datasheet, taken as
+  2.0 below) → ridge ≈ **156**.
 - **Memory hierarchy** (per GPU, orders of magnitude): registers ~10s TB/s → SMEM/L1 ~10 TB/s →
   L2 (tens of MB) ~several TB/s → HBM (80 GB) 2–3.4 TB/s → NVLink ~450 GB/s/direction →
   PCIe 5.0 x16 ~64 GB/s → InfiniBand NDR 50 GB/s/port. **Each step down is ~an order of magnitude.**
@@ -397,9 +398,9 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
     The same model, unchanged, is therefore *more* likely to be memory-bound on newer hardware,
     which is the quantitative reason FlashAttention, quantisation and GQA became mandatory rather
     than optional in the H100 generation.
-    *Source: the [NVIDIA H100 datasheet](https://resources.nvidia.com/en-us-tensor-core/nvidia-tensor-core-gpu-datasheet),
+    *Source: the [NVIDIA H100 datasheet](https://resources.nvidia.com/en-us-gpu-resources/h100-datasheet-24306),
     which prints 1,979 TFLOP/s BF16 with sparsity, and the
-    [A100 80 GB datasheet](https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/a100-80gb-datasheet-update-nvidia-us-1521051-r2-web.pdf).*
+    [A100 80 GB datasheet](https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/a100-80gb-datasheet-update-a4-nvidia-1485612-r12-web.pdf).*
 
 ## 6. Interview questions and strong answers
 
@@ -535,8 +536,8 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
   [Triton documentation](https://triton-lang.org/main/index.html).
 * Pope, R. et al. *Efficiently Scaling Transformer Inference.* MLSys 2023. [arXiv:2211.05102](https://arxiv.org/abs/2211.05102).
 * NVIDIA. [*NVIDIA H100 Tensor Core GPU Architecture*](https://resources.nvidia.com/en-us-hopper-architecture/nvidia-h100-tensor-c)
-  whitepaper, the [H100 datasheet](https://resources.nvidia.com/en-us-tensor-core/nvidia-tensor-core-gpu-datasheet) and the
-  [A100 80 GB datasheet](https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/a100-80gb-datasheet-update-nvidia-us-1521051-r2-web.pdf)
+  whitepaper, the [H100 datasheet](https://resources.nvidia.com/en-us-gpu-resources/h100-datasheet-24306) and the
+  [A100 80 GB datasheet](https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/a100-80gb-datasheet-update-a4-nvidia-1485612-r12-web.pdf)
   (peak BF16 throughput, HBM bandwidth, NVLink and PCIe figures).
 * Chowdhery, A. et al. *PaLM: Scaling Language Modeling with Pathways.* 2022. [arXiv:2204.02311](https://arxiv.org/abs/2204.02311)
   (the model-FLOPs-utilisation definition used throughout Part XIV).

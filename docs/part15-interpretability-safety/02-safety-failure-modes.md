@@ -693,7 +693,9 @@ retrain), how to notify, and what goes into the postmortem.
   [arXiv:2307.15043](https://arxiv.org/abs/2307.15043).
 * Anil, C. et al. [*Many-shot Jailbreaking.*](https://www.anthropic.com/research/many-shot-jailbreaking) Anthropic, 2024.
 * Inan, H. et al. *Llama Guard: LLM-based Input-Output Safeguard for Human-AI Conversations.* 2023.
-  [arXiv:2312.06674](https://arxiv.org/abs/2312.06674).
+  [arXiv:2312.06674](https://arxiv.org/abs/2312.06674), with Meta's
+  [Purple Llama repository](https://github.com/meta-llama/PurpleLlama) and the
+  [Llama Guard model cards](https://github.com/meta-llama/PurpleLlama/tree/main/Llama-Guard) it ships.
 * Google. [*Secure AI Framework (SAIF)*](https://saif.google/) and the
   [announcement post](https://blog.google/innovation-and-ai/technology/safety-security/introducing-googles-secure-ai-framework/), 2023.
 * Willison, S. [*Prompt injection* post series](https://simonwillison.net/series/prompt-injection/) and

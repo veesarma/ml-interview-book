@@ -47,12 +47,12 @@ def semi_supervised_loss(logits_l: torch.Tensor, y_l: torch.Tensor, logits_u: to
 
 
 def entropy_minimization_loss(logits_u: torch.Tensor) -> torch.Tensor:
-    """``mean_u H(p_θ(·|x_u))`` — pushes predictions on unlabelled data toward one-hot.  logits_u: (B_u, K)."""
+    """``mean_u H(p_θ(·|x_u))``, which pushes predictions on unlabelled data toward one-hot.  logits_u: (B_u, K)."""
     log_p = F.log_softmax(logits_u, dim=1)                        # (B_u, K)
     return -(log_p.exp() * log_p).sum(dim=1).mean()
 
 
 def class_balance_of_pseudo_labels(pseudo: torch.Tensor, mask: torch.Tensor, n_classes: int) -> torch.Tensor:
-    """Histogram of accepted pseudo-labels (K,) — watch this to catch confirmation bias / imbalance."""
+    """Histogram of accepted pseudo-labels (K,).  Watch it to catch confirmation bias and imbalance."""
     accepted = pseudo[mask > 0.5]                                 # (M,)
     return torch.bincount(accepted, minlength=n_classes).float()  # (K,)

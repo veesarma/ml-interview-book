@@ -112,7 +112,7 @@ def vae_loss(x: torch.Tensor, x_hat: torch.Tensor, mu: torch.Tensor, logvar: tor
 
     ``sigma_dec`` is the fixed standard deviation of the Gaussian decoder and it *is* the
     rate–distortion knob: 1/σ² multiplies the reconstruction term, so a large σ on data of
-    scale ≫ σ makes ignoring z cheaper than encoding it — posterior collapse.  Reporting a
+    scale ≫ σ makes ignoring z cheaper than encoding it, which is posterior collapse.  Reporting a
     β-VAE with β = 1 and σ = 1 on unnormalised data is the classic way to get a blurry mean.
 
     Args:
@@ -132,7 +132,7 @@ def vae_loss(x: torch.Tensor, x_hat: torch.Tensor, mu: torch.Tensor, logvar: tor
 def negative_elbo_estimate(model: VAE, x: torch.Tensor, sigma_dec: float = 1.0) -> torch.Tensor:
     """Single-sample estimate of −ELBO(x) built from ``gaussian_log_density`` (for monitoring).
 
-    Equals ``vae_loss(..., beta=1, sigma_dec=sigma_dec)`` in expectation — a useful cross-check
+    Equals ``vae_loss(..., beta=1, sigma_dec=sigma_dec)`` in expectation, a useful cross-check
     that the closed-form KL and the hand-written Gaussian NLL agree.
 
     Args:

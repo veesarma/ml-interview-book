@@ -50,8 +50,8 @@ def badge_gradient_embeddings(probs: np.ndarray, features: np.ndarray) -> np.nda
     """Gradient of the CE loss w.r.t. the last linear layer, using the argmax as pseudo-label.
 
     For last layer logits = W h, the gradient w.r.t. W is (p − e_ŷ) ⊗ h, flattened to (N, K·d).
-    Its norm is large when the model is uncertain (p far from one-hot) — uncertainty for free —
-    and its direction depends on h — diversity for free.
+    Its norm is large when the model is uncertain (p far from one-hot), which is uncertainty for free,
+    and its direction depends on h, which is diversity for free.
     """
     N, K = probs.shape
     y_hat = probs.argmax(axis=1)                                  # (N,)

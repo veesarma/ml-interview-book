@@ -1,4 +1,4 @@
-"""BYOL: bootstrap your own latent — no negatives, an EMA target network, and a predictor with stop-grad.
+"""BYOL: bootstrap your own latent, with no negatives, an EMA target network, and a predictor with stop-grad.
 
 online:  x_1 → f_θ → g_θ → q_θ  gives  p_1 (B, d)
 target:  x_2 → f_ξ → g_ξ        gives  z_2 (B, d),  with ξ ← τ ξ + (1 − τ) θ  (no gradient)

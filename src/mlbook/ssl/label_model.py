@@ -3,8 +3,8 @@
 The label matrix is ``L ∈ {−1, 0, …, K−1}^{N×M}``: N examples, M labelling functions, −1 = abstain.
 Two combiners:
 
-* ``majority_vote`` — count votes, ignore abstains.
-* ``NaiveLabelModel`` — a Dawid–Skene-style generative model: each LF j has a class prior-independent
+* ``majority_vote``: count votes, ignore abstains.
+* ``NaiveLabelModel``: a Dawid-Skene-style generative model: each LF j has a class prior-independent
   accuracy ``a_j`` and a propensity to vote ``β_j``; conditioned on the true label y the LF votes are
   independent (the *data programming* assumption).  Fit by EM with no ground truth:
       E-step  q(y_i = k) ∝ π_k Π_j P(L_ij | y = k)

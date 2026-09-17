@@ -284,7 +284,7 @@ a confidently wrong teacher cannot dominate the gradient. Use `ema_update` from
 
 ```python
 def entropy_minimization_loss(logits_u: torch.Tensor) -> torch.Tensor:
-    """``mean_u H(p_θ(·|x_u))`` — pushes predictions on unlabelled data toward one-hot."""
+    """``mean_u H(p_θ(·|x_u))``, which pushes predictions toward one-hot."""
     log_p = F.log_softmax(logits_u, dim=1)                        # (B_u, K)
     return -(log_p.exp() * log_p).sum(dim=1).mean()
 ```

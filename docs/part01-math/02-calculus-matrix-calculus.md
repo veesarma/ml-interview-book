@@ -507,7 +507,7 @@ $O(\sqrt{L})$ stored layers ([Part XIV](../part14-systems/02-training-systems.md
 
 ## References
 
-* K. Petersen & M. Pedersen, *The Matrix Cookbook*, Technical University of Denmark, 2012.
+* K. Petersen & M. Pedersen, *The Matrix Cookbook*, Technical University of Denmark, November 2012. [DTU publication database](https://www2.imm.dtu.dk/pubdb/pubs/3274-full.html)
 * D. Rumelhart, G. Hinton & R. Williams, "Learning representations by back-propagating errors", *Nature* 323, 1986.
 * A. G. Baydin, B. Pearlmutter, A. Radul & J. Siskind, "Automatic Differentiation in Machine Learning: a Survey", *JMLR* 18, 2018 ([arXiv:1502.05767](https://arxiv.org/abs/1502.05767)).
 * T. Dao, D. Fu, S. Ermon, A. Rudra & C. Ré, "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness", NeurIPS 2022 ([arXiv:2205.14135](https://arxiv.org/abs/2205.14135)).
@@ -515,5 +515,5 @@ $O(\sqrt{L})$ stored layers ([Part XIV](../part14-systems/02-training-systems.md
 * P. Micikevicius et al., "Mixed Precision Training", ICLR 2018 ([arXiv:1710.03740](https://arxiv.org/abs/1710.03740)).
 * A. Paszke et al., "PyTorch: An Imperative Style, High-Performance Deep Learning Library", NeurIPS 2019 ([arXiv:1912.01703](https://arxiv.org/abs/1912.01703)).
 * J. Cohen et al., "Gradient Descent on Neural Networks Typically Occurs at the Edge of Stability", ICLR 2021 ([arXiv:2103.00065](https://arxiv.org/abs/2103.00065)).
-* Stanford CS231n course notes, "Neural Networks Part 3: Learning and Evaluation" (gradient checks section).
+* Stanford CS231n course notes, "Neural Networks Part 3: Learning and Evaluation" (gradient checks section). [cs231n.github.io](https://cs231n.github.io/neural-networks-3/)
 * S. Boyd & L. Vandenberghe, *Convex Optimization*, Cambridge University Press, 2004 (chapter 5 on duality and KKT).

@@ -525,7 +525,7 @@ are probing when they ask how you would run a two-month job.
 * Daly, J. T. [*A higher order estimate of the optimum checkpoint interval for restart dumps.*](https://www.sciencedirect.com/science/article/abs/pii/S0167739X04002213)
   Future Generation Computer Systems, 2006 (the $\sqrt{2CT}$ result; Young, J. W., CACM 1974).
 * Shoeybi, M. et al. *Megatron-LM.* 2019. [arXiv:1909.08053](https://arxiv.org/abs/1909.08053).
-* NVIDIA. [H100 datasheet](https://resources.nvidia.com/en-us-tensor-core/nvidia-tensor-core-gpu-datasheet),
+* NVIDIA. [H100 datasheet](https://resources.nvidia.com/en-us-gpu-resources/h100-datasheet-24306),
   [H100 architecture whitepaper](https://resources.nvidia.com/en-us-hopper-architecture/nvidia-h100-tensor-c) and
-  [A100 80 GB datasheet](https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/a100-80gb-datasheet-update-nvidia-us-1521051-r2-web.pdf)
+  [A100 80 GB datasheet](https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/a100-80gb-datasheet-update-a4-nvidia-1485612-r12-web.pdf)
   (the 989 TFLOP/s dense BF16 figure used in the MFU worked examples).

@@ -511,8 +511,8 @@ then deployed under shift; treating a Bayesian posterior with a flat prior on a 
 * R. Kohavi, A. Deng, B. Frasca, T. Walker, Y. Xu & N. Pohlmann, "Online Controlled Experiments at Large Scale", KDD 2013.
 * A. Deng, Y. Xu, R. Kohavi & T. Walker, "Improving the Sensitivity of Online Controlled Experiments by Utilizing Pre-Experiment Data", WSDM 2013.
 * R. Kohavi, D. Tang & Y. Xu, *Trustworthy Online Controlled Experiments: A Practical Guide to A/B Testing*, Cambridge University Press, 2020.
-* Netflix Technology Blog, "It's All A/Bout Testing: The Netflix Experimentation Platform", 2016; M. Tingley et al., "Decision Making at Netflix" series, 2021.
-* J. Overgoor, "Experiments at Airbnb", Airbnb Engineering, 2014; M. Shen et al., "Selection Bias in Online Experimentation", Airbnb Engineering, 2018.
+* Netflix Technology Blog, "It's All A/Bout Testing: The Netflix Experimentation Platform", April 2016 ([techblog.netflix.com](http://techblog.netflix.com/2016/04/its-all-about-testing-netflix.html)); "Decision Making at Netflix", 2021, the opening post of the experimentation series ([netflixtechblog.com](https://netflixtechblog.com/decision-making-at-netflix-33065fa06481)).
+* "Experiments at Airbnb", Airbnb Engineering, 2014 ([medium.com/airbnb-engineering](https://medium.com/airbnb-engineering/experiments-at-airbnb-e2db3abf39e7)); M. Shen, "Selection Bias in Online Experimentation", Airbnb Engineering, 2018 ([medium.com/airbnb-engineering](https://medium.com/airbnb-engineering/selection-bias-in-online-experimentation-c3d67795cceb)).
 * C. Guo, G. Pleiss, Y. Sun & K. Weinberger, "On Calibration of Modern Neural Networks", ICML 2017 ([arXiv:1706.04599](https://arxiv.org/abs/1706.04599)).
 * B. Efron & R. Tibshirani, *An Introduction to the Bootstrap*, Chapman & Hall, 1993.
 * L. Wasserman, *All of Statistics*, Springer, 2004.

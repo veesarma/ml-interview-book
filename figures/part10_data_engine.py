@@ -51,8 +51,8 @@ def main() -> None:
         ax.add_patch(FancyArrowPatch((sx, sy), (ex, ey), arrowstyle="-|>", mutation_scale=13,
                                      linewidth=1.2, color="#888888",
                                      connectionstyle="arc3,rad=0.12"))
-    ax.text(0, 0.06, "data engine", ha="center", fontsize=12, fontweight="bold", color="#333333")
-    ax.text(0, -0.06, "each turn makes the next\nround of labels cheaper", ha="center",
+    ax.text(0, -0.12, "data engine", ha="center", fontsize=12, fontweight="bold", color="#333333")
+    ax.text(0, -0.26, "each turn makes the next\nround of labels cheaper", ha="center",
             fontsize=8, color="#666666")
 
     # right: cost per label under three strategies, as a function of volume

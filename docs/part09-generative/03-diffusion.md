@@ -47,8 +47,8 @@ simulates the chain: pick a random $t$, corrupt once, predict.
 ![Forward diffusion and noise schedules](../assets/figures/part09_diffusion_forward.png){ width="900" }
 
 The top row is the forward process on eight Gaussians, with the same noise draw at every panel so
-the panels form one trajectory. At $t=200$ the ring is still visible, at $t=600$ it is a smear, and
-at $t=999$ the structure is gone.
+the panels form one trajectory. At $t=200$ the ring survives as a hole in the middle, by $t=400$ it is one blob, and at
+$t=999$ nothing of the structure is left.
 
 The bottom-left panel plots $\bar\alpha_t$, the fraction of signal that survives, for the linear
 and cosine schedules. The linear schedule destroys structure early, so a large part of the

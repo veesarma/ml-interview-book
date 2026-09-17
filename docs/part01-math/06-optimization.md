@@ -701,7 +701,7 @@ correct place to clip when accumulating $k$ micro-batches.
 * Y. Dauphin et al., "Identifying and attacking the saddle point problem in high-dimensional non-convex optimization", NeurIPS 2014 ([arXiv:1406.2572](https://arxiv.org/abs/1406.2572)).
 * R. Ge, F. Huang, C. Jin & Y. Yuan, "Escaping From Saddle Points, Online Stochastic Gradient for Tensor Decomposition", COLT 2015 ([arXiv:1503.02101](https://arxiv.org/abs/1503.02101)).
 * V. Gupta, T. Koren & Y. Singer, "Shampoo: Preconditioned Stochastic Tensor Optimization", ICML 2018 ([arXiv:1802.09568](https://arxiv.org/abs/1802.09568)).
-* K. Jordan et al., "Muon: An optimizer for hidden layers in neural networks", 2024.
+* K. Jordan et al., "Muon: An optimizer for hidden layers in neural networks", 2024. [kellerjordan.github.io](https://kellerjordan.github.io/posts/muon/) · [github.com/KellerJordan/Muon](https://github.com/KellerJordan/Muon)
 * G. Yang & E. Hu, "Feature Learning in Infinite-Width Neural Networks", ICML 2021 ([arXiv:2011.14522](https://arxiv.org/abs/2011.14522)); G. Yang et al., "Tensor Programs V: Tuning Large Neural Networks via Zero-Shot Hyperparameter Transfer", 2022 ([arXiv:2203.03466](https://arxiv.org/abs/2203.03466)).
 * T. Dettmers, M. Lewis, S. Shleifer & L. Zettlemoyer, "8-bit Optimizers via Block-wise Quantization", ICLR 2022 ([arXiv:2110.02861](https://arxiv.org/abs/2110.02861)).
 * N. Shazeer & M. Stern, "Adafactor: Adaptive Learning Rates with Sublinear Memory Cost", ICML 2018 ([arXiv:1804.04235](https://arxiv.org/abs/1804.04235)).
