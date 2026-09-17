@@ -80,7 +80,7 @@ def main() -> None:
     axes[2].set_xscale("log", base=2); axes[2].set_yscale("log")
     axes[2].set_xlabel("network evaluations per sample")
     axes[2].set_ylabel("median distance to nearest mode")
-    axes[2].set_title("Straight paths tolerate a coarse integrator", fontsize=10)
+    axes[2].set_title("Both are fine past 4 steps here. The gap is at 1 to 2 steps.", fontsize=10)
     axes[2].legend(fontsize=8, frameon=False)
     axes[2].grid(alpha=0.25, linewidth=0.5)
     for side in ("top", "right"):

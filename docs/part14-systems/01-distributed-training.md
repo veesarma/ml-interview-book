@@ -504,7 +504,7 @@ global batch sizes are large.
     activations at $s = 8192$, micro-batch 1, selective recompute, SP: $34 \cdot 8192 \cdot 8192 \cdot 80 / 8 = 21$ GB;
     total $\approx 70$ GB, which fits an 80 GB GPU with little headroom. To create headroom:
     FSDP full sharding instead of ZeRO-1 (weights + grads drop to 4 GB, total $\approx 38$ GB),
- or PP 2. **Staff follow-up:** "what changes at 128K context?" The $34sbh$ term is now
+    or PP 2. **Staff follow-up:** "what changes at 128K context?" The $34sbh$ term is now
     16× larger per layer and exceeds the GPU by itself; you need context parallelism (Llama 3
     used CP for exactly this stage) rather than more recompute.
 
@@ -513,7 +513,7 @@ global batch sizes are large.
     per rank, bandwidth-optimal and independent of $N$ in the limit. The latency term
     $2(N-1)\alpha$ is linear in $N$: for small tensors and large $N$ it dominates and a tree
     (logarithmic depth) or a hierarchical intra-node-then-inter-node scheme wins; NCCL picks by
- message size. **Follow-up:** "how does DDP hide it?" Buckets of ~25 MB all-reduced from
+    message size. **Follow-up:** "how does DDP hide it?" Buckets of ~25 MB all-reduced from
     the last layer backwards during the remaining backward compute; only the final bucket is
     exposed, so the exposed time is roughly one bucket's transfer plus the optimizer step.
 
@@ -522,7 +522,7 @@ global batch sizes are large.
     by output columns and GELU is element-wise, so the second matrix, sharded by input rows,
     consumes each rank's own columns; the only cross-rank operation is summing the partial
     outputs. Attention is the same with heads as the columns: softmax is per head. Backward has
- the mirror-image two. **Follow-up:** "why then add sequence parallelism?" The LayerNorm
+    the mirror-image two. **Follow-up:** "why then add sequence parallelism?" The LayerNorm
     and dropout regions were replicated $t$ times; SP shards them along $s$ by replacing the
     all-reduce with reduce-scatter + all-gather at zero extra traffic.
 
@@ -532,7 +532,7 @@ global batch sizes are large.
     flight to $p$ per stage instead of $m$, which is what makes large $m$ affordable.
     Interleaving with $v$ chunks per stage makes each stage-time $1/v$ as long, so the bubble
     becomes $\frac{p-1}{vm+p-1}$ at $v\times$ the point-to-point messages. **Follow-up:** "why
- not $p = 64$?" Every stage boundary is a synchronisation point and the first/last stages
+    not $p = 64$?" Every stage boundary is a synchronisation point and the first/last stages
     carry the embedding and LM head, so imbalance grows with $p$; and you must find $m \gg p$
     micro-batches, which pushes global batch size up.
 
@@ -542,7 +542,7 @@ global batch sizes are large.
     1.5×, all of it overlappable with layer prefetching. Worth it whenever $16P$ does not fit
     and tensor parallelism would cross the NVLink domain; not worth it when the model fits with
     ZeRO-1 (same traffic as DDP, $12P/N$ saved). **Follow-up:** "why does FSDP offer hybrid
- sharding?" With thousands of ranks the all-gather group's latency term and the smallest
+    sharding?" With thousands of ranks the all-gather group's latency term and the smallest
     shard size make global sharding inefficient; sharding within a node and replicating across
     nodes keeps the gather on NVLink and the cross-node traffic a plain gradient all-reduce.
 
@@ -552,7 +552,7 @@ global batch sizes are large.
     DP 128 with FSDP-sharded state; per-GPU state $16 \times 405.9/(128 \cdot 128) \approx 0.4$ GB
     with ZeRO-3 or $\approx 12$ GB with ZeRO-1, activations $\approx 67$ GB at $s = 8192$ with
     selective recompute and 16 micro-batches in flight (the first stage). This is Llama 3's
- published layout. **Follow-up:** "what dominates step time?" Pipeline bubble at the
+    published layout. **Follow-up:** "what dominates step time?" Pipeline bubble at the
     chosen $m$, then exposed communication when tokens-per-rank is small.
 
 ## 7. Exercises

@@ -193,6 +193,8 @@ RULES: list[tuple[str, str, str, str, float, str]] = [
 
 FENCE = re.compile(r"^(```|~~~)")
 MATH = re.compile(r"^\s*\$\$")
+# a complete one-line display block must not flip the parity
+MATH_ONELINE = re.compile(r"^\s*\$\$.*\$\$\s*$")
 SNIPPET = re.compile(r"^\s*--8<--")
 INLINE_CODE = re.compile(r"`[^`]*`")
 LINK_TARGET = re.compile(r"\]\([^)]*\)")
@@ -215,7 +217,8 @@ def prose_lines(text: str) -> list[tuple[int, str]]:
             in_fence = not in_fence
             continue
         if MATH.match(raw):
-            in_math = not in_math
+            if not MATH_ONELINE.match(raw):
+                in_math = not in_math
             continue
         if in_fence or in_math or SNIPPET.match(raw) or EXEMPT_LINE.match(raw):
             continue

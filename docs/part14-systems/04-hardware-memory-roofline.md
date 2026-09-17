@@ -365,7 +365,7 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
     Problem: attention was memory-bound because the $T\times T$ score matrix round-tripped through
     HBM. Built: tiling plus online softmax so the score tile lives in SRAM, making HBM traffic
     linear in $T$ for the same FLOPs; FlashAttention-2 improved work partitioning and reduced
- non-matmul FLOPs. The framing (count HBM accesses, not FLOPs) is the transferable lesson,
+    non-matmul FLOPs. The framing (count HBM accesses, not FLOPs) is the transferable lesson,
     and it is the same lesson the roofline teaches.
     *Sources: Dao et al., "FlashAttention: Fast and Memory-Efficient Exact Attention with
     IO-Awareness", NeurIPS 2022, arXiv:2205.14135; Dao, "FlashAttention-2", 2023, arXiv:2307.08691.*
@@ -385,7 +385,7 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
     Problem: writing CUDA for every fused kernel is expensive, but PyTorch's op-by-op execution
     leaves memory-bound performance on the table. Built: Triton, a Python-embedded language where
     you write a *tile* program and the compiler handles vectorisation, shared-memory staging and
- scheduling. It is now the backend for many `torch.compile`-generated kernels, i.e. the
+    scheduling. It is now the backend for many `torch.compile`-generated kernels, i.e. the
     fusion argument in §2.6, industrialised.
     *Source: Tillet, Kung & Cox, "Triton: an intermediate language and compiler for tiled neural
     network computations", MAPL 2019, and the OpenAI Triton documentation/repository.*
@@ -393,7 +393,7 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
 !!! production "NVIDIA: Hopper (H100), and why the ridge moved"
     H100 SXM's published dense BF16 tensor-core throughput (989 TFLOP/s with the sparsity feature
     off) against 3.35 TB/s of HBM3 puts its ridge at ~295 FLOP/byte, versus ~156 for the A100.
- The same model, unchanged, is therefore *more* likely to be memory-bound on newer hardware,
+    The same model, unchanged, is therefore *more* likely to be memory-bound on newer hardware,
     which is the quantitative reason FlashAttention, quantisation and GQA became mandatory rather
     than optional in the H100 generation.
     *Source: NVIDIA H100 and A100 datasheets / architecture whitepapers.*
@@ -405,10 +405,10 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
     the ridge $F_\text{peak}/BW$ is ~295 FLOP/byte on an H100. A large prefill GEMM has $I$ in the
     thousands: compute-bound, on the flat roof. FlashAttention is also compute-bound because it
     keeps the $T\times T$ tile in SRAM ($I \approx T/2 \approx 2000$ at $T$=4096), whereas *naive*
- attention writes and re-reads that matrix and lands at $I \approx d/2 \approx 60$: same FLOPs,
+    attention writes and re-reads that matrix and lands at $I \approx d/2 \approx 60$: same FLOPs,
     30× less intensity. LayerNorm is $I\approx2$: pure bandwidth. LLM decode has $I$ equal to the
     batch size, so batch-1 decode sits at $I=1$, 295× left of the ridge. **Staff follow-up:**
- "what does the roofline *not* tell you?" It is an upper bound assuming perfect overlap and
+    "what does the roofline *not* tell you?" It is an upper bound assuming perfect overlap and
     full occupancy; it ignores launch overhead, cache effects between the extremes, tail waves and
     synchronisation, so a kernel can be far below the roof for reasons the model does not express.
 
@@ -418,17 +418,17 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
     fast tensor-core path entirely, and even if not, the final tile is ragged and the last wave of
     thread blocks runs at partial occupancy. Padding to 50,304 = 128 × 393 makes every tile full.
     The extra logits are masked out or never selected, so quality is unchanged. **Follow-up:**
- "where else does this bite?" Head dimension and $d_{ff}$ not multiples of 64, odd batch sizes
+    "where else does this bite?" Head dimension and $d_{ff}$ not multiples of 64, odd batch sizes
     in serving (hence padding to bucketed batch sizes for CUDA graphs), and sequence lengths that
     produce partial tiles in attention.
 
 !!! interview "You have a fused kernel idea that removes 30 % of the FLOPs from a LayerNorm. Worth it?"
- No, LayerNorm sits at $I \approx 2$, roughly 150× left of the H100 ridge, so its runtime is
+    No, LayerNorm sits at $I \approx 2$, roughly 150× left of the H100 ridge, so its runtime is
     $M/BW$ and is unchanged by removing arithmetic. What *would* help is removing memory traffic:
     fuse the norm with the preceding residual add and the following projection so the tensor is
     read once instead of three times, or keep it in registers. This is the general rule: left of
     the ridge, optimise bytes; right of the ridge, optimise FLOPs. **Follow-up:** "how would you
- verify before writing the kernel?" Compute $I$ and `time_lower_bound`, then measure the
+    verify before writing the kernel?" Compute $I$ and `time_lower_bound`, then measure the
     current kernel; if it is already at the bandwidth bound the only win available is fusion.
 
 !!! interview "Walk me through the memory hierarchy and where host↔device transfers fit."
@@ -438,7 +438,7 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
     magnitude per step. Host transfers must be rare, pinned and asynchronous: pinned memory lets
     the DMA engine transfer without a bounce buffer and lets the copy overlap compute on a separate
     stream; a pageable synchronous copy in the training loop is a hard stall that shows up as a gap
- in the profiler. **Follow-up:** "when would you deliberately go to host memory?", KV-cache
+    in the profiler. **Follow-up:** "when would you deliberately go to host memory?", KV-cache
     offload for very long contexts or high concurrency, optimizer-state offload (ZeRO-Offload) when
     memory-bound rather than bandwidth-bound; in both cases you are trading a 50× slower link for
     capacity, so it only wins when the alternative is not running at all.
@@ -449,7 +449,7 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
     input embedding as FLOPs (it is a gather), forgetting the LM head (a real GEMM, and large when
     the vocabulary is 128k), forgetting the attention term entirely (14 % for 7B at $s$=4096,
     much more at long context), and conflating MFU with HFU by counting recomputed forwards.
- **Follow-up:** "what about MoE?" Use *active* parameters per token for FLOPs but *total*
+    **Follow-up:** "what about MoE?" Use *active* parameters per token for FLOPs but *total*
     parameters for memory; that divergence is the entire economic argument for MoE.
 
 !!! interview "What do CUDA graphs buy, and what do they cost?"
@@ -458,7 +458,7 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
     graph records the step's whole kernel DAG once and replays it with a single submission. The
     cost is rigidity: shapes, pointers and control flow must be static, so serving engines pad to
     a fixed set of batch sizes and pre-allocate KV blocks, and any dynamic shape forces a re-capture.
- **Follow-up:** "is it worth it for training?" Much less, because training steps have large
+    **Follow-up:** "is it worth it for training?" Much less, because training steps have large
     kernels where launch overhead is a rounding error; it is a small-batch inference optimisation.
 
 ## 7. Exercises
@@ -468,15 +468,15 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
 
     ??? success "Solution"
         $M=1$: FLOPs $3.36\times10^7$, bytes $2(4096 + 4096^2 + 4096) = 33.6$ MB, $I \approx 1.0$,
- time $= 33.6\text{MB}/3.35\text{TB/s} = 10\,\mu$s, memory-bound.
- $M=512$: FLOPs $1.7\times10^{10}$, bytes $\approx 42$ MB, $I \approx 410$, compute-bound,
+        time $= 33.6\text{MB}/3.35\text{TB/s} = 10\,\mu$s, memory-bound.
+        $M=512$: FLOPs $1.7\times10^{10}$, bytes $\approx 42$ MB, $I \approx 410$, compute-bound,
         time $= 1.7\times10^{10}/9.89\times10^{14} = 17\,\mu$s. **512× the work for 1.7× the time.**
 
 2. ★ A kernel achieves 120 TFLOP/s on an H100 at $I = 40$. Is it well optimised?
 
     ??? success "Solution"
         At $I=40$ the roof is $40 \times 3.35\times10^{12} = 134$ TFLOP/s (memory-bound side). It is
- at 90 % of its attainable roof, so it is well optimised *for its intensity*, the remaining
+        at 90 % of its attainable roof, so it is well optimised *for its intensity*, the remaining
         win is algorithmic (raise $I$), not micro-optimisation.
 
 3. ★★ Using `roofline.py`, find the sequence length at which naive attention's intensity drops
@@ -484,7 +484,7 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
 
     ??? success "Solution"
         $I_\text{naive} \to \frac{4T^2d}{2(4T^2 + 4Td)}$, which decreases toward $d/2 = 64$ as $T$
- grows and stays there, so it never falls below LayerNorm's 2, but it is already ~60 at
+        grows and stays there, so it never falls below LayerNorm's 2, but it is already ~60 at
         $T=4096$, i.e. 5× left of the ridge, which is enough to make it the bottleneck.
         $I_\text{flash} = T/2$ *increases* with $T$. The lesson: naive attention's intensity is
         capped by the head dimension; Flash's grows with sequence length.
@@ -499,7 +499,7 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
         recompute the hardware executes 4/3 as much, so if MFU stays 40 % the wall-clock is the
         same 20.6 days but HFU is 53 %; if instead the *hardware* is saturated at 40 % HFU, the
         wall-clock becomes 27.5 days. Put the MFU-based number in the plan and state the
- recomputation assumption explicitly, this ambiguity is exactly why MFU is the standard.
+        recomputation assumption explicitly, this ambiguity is exactly why MFU is the standard.
 
 5. ★★★ Extend `roofline.py` with a `Machine` for a hypothetical accelerator with 2× the H100's
    compute and the same bandwidth. Recompute the ridge, and determine which of the seven kernels
@@ -511,7 +511,7 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
         B=64 ($I$=62) and naive attention ($I$=63) stay memory-bound; the prefill GEMM ($I$=1638)
         and FlashAttention ($I$=2068) stay compute-bound but now achieve 2×. Prediction: doubling
         FLOPs with flat bandwidth only helps the already-compute-bound kernels, so serving
- throughput at small batch does not improve at all, which is why real generations ship
+        throughput at small batch does not improve at all, which is why real generations ship
         HBM upgrades alongside compute, and why bandwidth-reducing techniques (quantisation, GQA)
         keep their value across generations.
 

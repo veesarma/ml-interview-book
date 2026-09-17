@@ -166,13 +166,13 @@ Li et al., "Generalized Trajectory Scoring for End-to-end Multimodal Planning"
     than regressing a continuous trajectory. NVIDIA's Hydra-MDP paper, which won the
     CVPR 2024 End-to-End Driving at Scale challenge, shows why that pays: once you
     have a vocabulary you can label *every* candidate with a rule-based simulator's
- metrics (collision, drivable area, comfort) and distil those scores into
+    metrics (collision, drivable area, comfort) and distil those scores into
     parallel heads alongside the human-imitation head. That turns a non-differentiable
     evaluation metric into a training signal, which is exactly the gap that pure
     imitation leaves. I'd rule out continuous trajectory
     regression: it's simpler, but it gives one target per scene and no ranking, so
     the model never learns why the alternatives were worse. The trade-off I accept is
- resolution, the vocabulary bounds what I can express, so I'd size it from
+    resolution, the vocabulary bounds what I can express, so I'd size it from
     clustered real trajectories and check the residual error against the human path.
     I like this design for a supplier because the per-criterion scores are inspectable
     and the combination weights can be retuned by the OEM at deployment without
@@ -232,8 +232,8 @@ and the [Waymo World Model](waymo.md#33-simulation-and-closed-loop-evaluation-si
     than build a bespoke simulator, and I'd say so citing NVIDIA's Cosmos platform
     paper, which explicitly positions the WFM as shared infrastructure that developers
     fine-tune into their own domain model. Concretely: take the pre-trained model, and
- post-train it conditioned on the signals I actually control, multi-view camera and
- ego trajectory for driving, or action vectors for manipulation, so I can generate
+    post-train it conditioned on the signals I actually control, multi-view camera and
+    ego trajectory for driving, or action vectors for manipulation, so I can generate
     counterfactual rollouts of a rare scenario instead of waiting to encounter it. On
     the architecture choice, Cosmos ships both a diffusion family and an autoregressive
     family over the same video tokenizer, and I'd pick diffusion when I need
@@ -242,7 +242,7 @@ and the [Waymo World Model](waymo.md#33-simulation-and-closed-loop-evaluation-si
     cost dominates at long horizons. The alternative I'd pass on is a hand-built
     graphics simulator as the primary source: it's controllable but its appearance gap
     shows up precisely in the perception models I'm trying to test. The trade-off to
- name is that a generated world is only as trustworthy as its physics, so
+    name is that a generated world is only as trustworthy as its physics, so
     I'd use it to train policies and to stress-test, and I'd validate any
     conclusion on real logs before it gates a release. My evaluation would be
     downstream: does a policy trained with synthetic rollouts beat the baseline on
@@ -299,7 +299,7 @@ Compare Google DeepMind's Gemini Robotics ([arXiv:2503.20020](https://arxiv.org/
     is the design NVIDIA's GR00T N1 paper describes: a vision-language model that reads
     the scene and the instruction at low rate, and a diffusion-transformer action head
     that takes that latent plus proprioception and emits action chunks at control
- rate. The reason is a compute argument, not an elegance argument, you can't run
+    rate. The reason is a compute argument, not an elegance argument, you can't run
     a multi-billion-parameter VLM in the control loop, and you don't need to, because
     the semantic content of a scene changes far more slowly than the arm does. For
     data I'd copy the same paper's pyramid: internet and human video at the base
@@ -307,11 +307,11 @@ Compare Google DeepMind's Gemini Robotics ([arXiv:2503.20020](https://arxiv.org/
     trajectories in the middle, real teleoperated demonstrations at the apex. The
     alternative I'd reject is training only on real demonstrations; it's the
     highest-quality data and there will never be enough of it. The trade-off I'd
- watch is systematic error from the inferred actions at the base of the pyramid, 
+    watch is systematic error from the inferred actions at the base of the pyramid, 
     it's correlated, so it won't average out, and I'd hold a real-demo
     validation set that the pyramid never touches. On evaluation, I'd report
- success rate under distribution shift, new objects, new lighting, a new
- embodiment, and interventions per hour, and I'd be explicit that a
+    success rate under distribution shift, new objects, new lighting, a new
+    embodiment, and interventions per hour, and I'd be explicit that a
     latency-coupling bug between the two systems shows up as failures on *moving*
     objects specifically, so that gets its own slice."
 
@@ -360,13 +360,13 @@ Generalizable Autonomous Driving in the Long Tail"
     mine the long-tail clips, have the reasoning model produce both a rationale and a
     trajectory, use those as supervision for the onboard model, and keep the rationale
     as an auxiliary target so the student has some pressure to encode *why*. The
- alternative I'd reject is putting the reasoning model in the car, the compute
+    alternative I'd reject is putting the reasoning model in the car, the compute
     isn't there, and a variable-latency component in a control loop is its own safety
     problem. The trade-off I'd name out loud is faithfulness: a distilled student
     can reproduce the conclusion without the reasoning, so the rationale it emits is
     not evidence, and I'd not let a safety argument lean on it. I'd evaluate on
- a curated long-tail scenario set, the kind Waymo's WOD-E2E release defines at
- roughly the 0.03%-frequency level, and measure whether the distilled student
+    a curated long-tail scenario set, the kind Waymo's WOD-E2E release defines at
+    roughly the 0.03%-frequency level, and measure whether the distilled student
     closes the gap to the teacher specifically on those slices, not on average."
 
 ### 3.5 Inference systems: TensorRT-LLM, Dynamo, and where the milliseconds go
@@ -413,12 +413,12 @@ Leviathan et al., speculative decoding ([arXiv:2211.17192](https://arxiv.org/abs
     "I'd start by separating the two phases, because they're bound by different
     resources: prefill is compute-bound and decode is memory-bandwidth-bound, so a
     single batching policy is always leaving one of them idle. My first three moves
- would be in-flight batching, a paged KV cache, and FP8 weights and KV, the paged
+    would be in-flight batching, a paged KV cache, and FP8 weights and KV, the paged
     cache because fragmentation, not raw memory, is usually what caps batch size,
     which is the argument the vLLM PagedAttention paper makes and which TensorRT-LLM
     implements. Only then would I consider disaggregated prefill and decode the way
     NVIDIA's Dynamo does it, because that buys independent scaling of the two pools at
- the cost of moving the KV cache across the network on the critical path, worth it
+    the cost of moving the KV cache across the network on the critical path, worth it
     at scale and with long prompts, not worth it for a small deployment. I'd add
     speculative decoding where the workload has a cheap draft model available, since
     it converts a bandwidth-bound step into a compute-bound one. The trade-off I'd
@@ -478,12 +478,12 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
     where NVLink bandwidth is high; pipeline parallelism communicates only activations
     at stage boundaries, so it crosses nodes; data parallelism wraps the outside; and
     I'd add sequence or context parallelism only when activation memory for long
- contexts is what is actually binding. Doing this backwards, tensor parallel across
- slow links, is the classic way to burn half a cluster. Once training scales, my
+    contexts is what is actually binding. Doing this backwards, tensor parallel across
+    slow links, is the classic way to burn half a cluster. Once training scales, my
     attention shifts to data, and here I'd follow NVIDIA's Nemotron-4 340B report,
     which describes generating the overwhelming majority of its alignment data
- synthetically and releasing the reward model used to filter it. The alternative, 
- buying all alignment data from human annotators, doesn't scale to the volumes
+    synthetically and releasing the reward model used to filter it. The alternative, 
+    buying all alignment data from human annotators, doesn't scale to the volumes
     modern post-training needs. The cost is a closed loop: a model grading its own
     synthetic data amplifies its own biases, so I'd keep a human-labelled gold set
     that the generator never sees and track the divergence between reward-model scores
@@ -534,14 +534,14 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
         hand-building the world each time. I'd condition on ego trajectory and
         multi-view camera so the scenario is controllable. Before I trusted any result
         I'd calibrate the generator: regenerate near-duplicates of real logs and
- check that perception metrics on them match the real ones, if they do not, the
+    check that perception metrics on them match the real ones, if they do not, the
         gap is my error bar. The trade-off is that generated physics is not evidence, so
         this informs triage and training but does not gate a safety claim."
 
 !!! interview "Q3. Why split a robot policy into System 1 and System 2? What breaks if you do not?"
     **Answer sketch.** Frequency mismatch: semantics change slowly, control must be
     fast. A monolith either runs the VLM too often (compute infeasible) or the
- controller too rarely (jerky, unsafe). Splitting introduces staleness coupling, 
+    controller too rarely (jerky, unsafe). Splitting introduces staleness coupling, 
     quantify the maximum age of the System 2 latent given object speed. Failure slice:
     moving objects. Link: [Imitation learning](../part12-rl/05-imitation-learning.md).
 
@@ -586,7 +586,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
 
     !!! tip "How to say it in the interview"
         "With 100k-token prompts and short outputs this is a prefill-bound workload, so
- I would size for prefill and treat decode as an afterthought, the opposite of
+    I would size for prefill and treat decode as an afterthought, the opposite of
         the default chat deployment. Concretely: chunked prefill so a long prompt does
         not block the queue, prefix caching if prompts share a large system preamble,
         a paged KV cache with FP8 KV because cache memory scales linearly with context
@@ -597,9 +597,9 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
 
 !!! interview "Q6. Tensor parallel across nodes or pipeline parallel across nodes? Justify with communication volume."
     **Answer sketch.** Tensor parallelism: two all-reduces per layer per direction, each
- moving activations of size $B \times T \times d$, high frequency, so it needs
+    moving activations of size $B \times T \times d$, high frequency, so it needs
     intra-node NVLink. Pipeline: one point-to-point send of the stage boundary
- activation per micro-batch, low volume, tolerant of slower links, but introduces
+    activation per micro-batch, low volume, tolerant of slower links, but introduces
     bubbles mitigated by interleaved schedules. Answer: tensor inside the node, pipeline
     across nodes, data parallel outermost. Link:
     [Distributed training](../part14-systems/01-distributed-training.md).
@@ -619,7 +619,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
     **Answer sketch.** Wins on appearance realism, diversity and the cost of authoring
     content; loses on exact controllability, ground-truth availability (a renderer knows
     the depth; a generator does not), physical guarantees, and determinism for
- regression testing. Practical answer: hybrid, renderer for geometry-exact
+    regression testing. Practical answer: hybrid, renderer for geometry-exact
     regression, WFM for appearance diversity and rare-event synthesis.
 
     !!! tip "How to say it in the interview"
@@ -649,7 +649,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
         human trajectory; the metric heads are per-candidate binary cross-entropy against
         the simulator's scores, which is the Hydra-MDP formulation. My test would be
         behavioural, not numerical: with the collision weight turned up, a candidate
- labelled colliding must never be selected, that catches sign errors and
+    labelled colliding must never be selected, that catches sign errors and
         broadcasting bugs at once."
 
 !!! interview "Q9. A partner reports that FP8 quantization dropped accuracy on their task. Debug it."
@@ -664,7 +664,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
     !!! tip "How to say it in the interview"
         "First I'd check the eval has the power to see the difference, because a
         one-point drop on a small benchmark is often noise. Then I'd bisect by
- tensor type (weights, activations, KV cache) and by layer, since FP8 failures
+    tensor type (weights, activations, KV cache) and by layer, since FP8 failures
         are usually a handful of activation-outlier channels, not a global problem.
         The fixes in order of cost: per-channel scales in place of per-tensor,
         recalibrate on in-domain data instead of a generic corpus, keep the offending
@@ -684,7 +684,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
         "A platform model is designed to be post-trained by someone whose task I can't
         see, so I optimise for transferability, clean conditioning interfaces and
         documented limits instead of a single benchmark. That is visible in how NVIDIA
- ships Cosmos and GR00T N1, weights, code, datasets and post-training recipes,
+    ships Cosmos and GR00T N1, weights, code, datasets and post-training recipes,
         with guard rails in the platform, because the vendor does not control the
         downstream use. A product model can overfit its distribution and its hardware,
         and should. The trade-off is that platform generality costs peak performance on
@@ -694,7 +694,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
     **Answer sketch.** Split responsibility: platform-level certification (ASIL-D
     capable SoC, safety-certified OS, cybersecurity milestones on Hyperion), reference
     architectures and blueprints (Halos), documented model limitations and evaluation
- harnesses, while the OEM owns the vehicle-level safety case (compare
+    harnesses, while the OEM owns the vehicle-level safety case (compare
     [Aurora's claims-and-evidence structure](zoox-nuro-aurora.md#36-aurora-verifiable-ai-and-the-safety-case-framework)).
     Mark as inference anything about a specific partner's process.
 
@@ -704,7 +704,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
         safety and cybersecurity milestone announcements describe, plus reference
         architectures and open blueprints like Halos, plus models shipped with their
         limitations and an evaluation harness. The vehicle-level safety case belongs to
- the OEM, that division is structural to a supplier business, and I would not
+    the OEM, that division is structural to a supplier business, and I would not
         claim more. The trade-off is that I must make my components *arguable*: if a
         partner cannot attach evidence to my planner's decisions, they cannot certify
         the vehicle, which is a concrete reason to prefer the inspectable trajectory-
@@ -722,7 +722,7 @@ Models Using Model Parallelism" ([arXiv:1909.08053](https://arxiv.org/abs/1909.0
         "I'd compute it from the tokenizer outwards, because the compression ratio
         sets everything: tokens per second of video times hours times epochs gives the
         token budget, and then it's the same scaling arithmetic as an LLM. That is why
- the Cosmos platform paper puts so much weight on the tokenizer, compression is
+    the Cosmos platform paper puts so much weight on the tokenizer, compression is
         the cost lever. I would also budget for the parts people forget: video decoding
         throughput in the data loader, which is frequently the real bottleneck, and
         evaluation rollouts, which are expensive for diffusion models. The trade-off is

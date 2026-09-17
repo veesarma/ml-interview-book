@@ -17,7 +17,7 @@
 
 You have a frozen reference model and one preference pair for a prompt: $y_w$ = "5", $y_l$ = "8" for "2 + 3 =". Under the reference both have log-prob $-2.0$. DPO turns on one quantity: **how much the policy raises the log-odds of $y_w$ relative to $y_l$, measured against the reference.** That quantity is a reward gap in disguise. If we believed the reward gap was $\Delta r = 1$ nat and $\beta = 0.5$, the KL-regularised optimum would have $\log\frac{\pi^\star(y_w)}{\pi_{\mathrm{ref}}(y_w)} - \log\frac{\pi^\star(y_l)}{\pi_{\mathrm{ref}}(y_l)} = \Delta r/\beta = 2$ nats: the policy tilts the reference by $e^{r/\beta}$.
 
-Now flip the logic. We do not know $\Delta r$; we have a *label* saying $y_w \succ y_l$. Bradley–Terry says $P(y_w\succ y_l) = \sigma(\Delta r)$. So we can read the reward gap *off the policy*, $\Delta r = \beta[\log\frac{\pi_\theta}{\pi_{\mathrm{ref}}}(y_w) - \log\frac{\pi_\theta}{\pi_{\mathrm{ref}}}(y_l)]$, and do logistic regression on it. The policy *is* the reward model; the RM stage collapses into the RL stage.
+Now run that backwards. The reward gap $\Delta r$ is unknown. What the data gives instead is a *label* recording that $y_w$ beat $y_l$. Bradley–Terry says $P(y_w\succ y_l) = \sigma(\Delta r)$. So we can read the reward gap *off the policy*, $\Delta r = \beta[\log\frac{\pi_\theta}{\pi_{\mathrm{ref}}}(y_w) - \log\frac{\pi_\theta}{\pi_{\mathrm{ref}}}(y_l)]$, and do logistic regression on it. The policy *is* the reward model; the RM stage collapses into the RL stage.
 
 | step | $\log\pi_\theta(y_w)$ | $\log\pi_\theta(y_l)$ | implicit $\hat r_w$ | implicit $\hat r_l$ | $\sigma(\hat r_w - \hat r_l)$ | loss |
 |---|---|---|---|---|---|---|
@@ -107,7 +107,7 @@ Three readings. (1) It is a weighted SFT step on $y_w$ minus a weighted "un-SFT"
 
 **Length.** $\log\pi_\theta(y|x)$ is a sum over tokens; a longer $y$ has more negative log-prob and more room to move. If chosen responses are systematically longer, the easiest way to widen the gap is to lengthen outputs. Remedies: length-balanced pairs, length normalisation (SimPO, Tülu 3's length-normalised DPO), or a length-controlled eval.
 
-**Off-policy pairs.** The derivation assumes the pairs are informative about $\pi^\star$ near $\pi_{\mathrm{ref}}$. Pairs sampled from a different model (a public dataset) tell the policy about regions it never visits; the implicit reward fitted there does not transfer. Remedies: sample $y_w, y_l$ from $\pi_{\mathrm{ref}}$ itself (on-policy DPO), iterate (train, re-sample from the new policy, re-label, set the new policy as reference), or run *online DPO* where each batch is freshly sampled and judged.
+**Off-policy pairs.** The derivation assumes the pairs are informative about $\pi^\star$ near $\pi_{\mathrm{ref}}$. Pairs sampled from a different model (a public dataset) tell the policy about regions it never visits; the implicit reward fitted there does not transfer. The fix is to draw $y_w$ and $y_l$ from $\pi_{\mathrm{ref}}$ itself, which is on-policy DPO. Iterating goes further: train, re-sample from the new policy, re-label, then make that policy the next round's reference. *Online DPO* pushes it to the limit by sampling and judging every batch fresh.
 
 **Deterministic preferences.** If a pair is always labelled the same way, Bradley–Terry's MLE wants $u\to\infty$; with a finite dataset DPO keeps pushing the gap and over-fits. IPO's squared loss fixes the target gap.
 
@@ -123,7 +123,7 @@ Three readings. (1) It is a weighted SFT step on $y_w$ minus a weighted "un-SFT"
 | **RPO / DPO + NLL** | $L_{\mathrm{DPO}} + \alpha\,\big(-\tfrac{1}{|y_w|}\log\pi_\theta(y_w)\big)$ | yes | pairs | likelihood displacement observed |
 | **Length-normalised DPO** | DPO with $\hat\ell$ divided by $|y|$ | yes | pairs | chosen responses longer on average (Tülu 3) |
 
-Decision rule: DPO with on-policy pairs and a length monitor is the default. Switch to IPO when the training loss goes to zero and win-rate degrades (over-fitting); to SimPO / length-normalised when outputs lengthen; to KTO when you have unpaired feedback; to ORPO when you cannot afford a separate SFT stage. Use PPO/GRPO when you have a verifier or an RM you trust more than the pairs and can pay for sampling.
+Decision rule: start with DPO on on-policy pairs, watching response length. If the training loss collapses to zero while win-rate degrades, that is over-fitting, and IPO's fixed target gap is the fix. Lengthening outputs point to SimPO or length-normalised DPO. Unpaired thumbs-up/down feedback rules out all the pairwise losses and leaves KTO. ORPO is for the case where you cannot afford a separate SFT stage at all. Once you have a verifier, or an RM you trust more than the raw pairs, and the budget for sampling, move to PPO or GRPO.
 
 ## 3. Implementation
 
@@ -138,7 +138,7 @@ def dpo_loss(pi_chosen, pi_rejected, ref_chosen, ref_rejected, beta):
     return loss, chosen_rewards.detach(), rejected_rewards.detach()
 ```
 
-Four numbers per pair in, one scalar out: the boxed loss with the implicit rewards returned for logging (the margin and the individual rewards are the two diagnostics in the figure). At initialisation $\pi_\theta = \pi_{\mathrm{ref}}$ so the margin is 0 and the loss is $\log 2$; the test checks this and the gradient signs.
+The function consumes four numbers per pair and returns the boxed loss, along with the implicit rewards for logging (the margin and the individual rewards are the two diagnostics in the figure). At initialisation $\pi_\theta = \pi_{\mathrm{ref}}$ so the margin is 0 and the loss is $\log 2$; the test checks this and the gradient signs.
 
 ```python
 def ipo_loss(pi_chosen, pi_rejected, ref_chosen, ref_rejected, tau):

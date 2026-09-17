@@ -540,9 +540,9 @@ falsify it.
     Define $g(t) = f(x' + t(x-x'))$. Then $g'(t) = \sum_i \partial_i f(\gamma(t))\,(x_i - x'_i)$,
     and $\int_0^1 g'(t)dt = g(1) - g(0) = f(x) - f(x')$. The left side is exactly
     $\sum_i \text{IG}_i(x)$, so the attributions sum to the change in output between baseline and
-    input. This matters because it makes attributions comparable and auditable: you can say "these
-    five pixels account for 80 % of the logit difference from a black image" and the remaining
-    20 % is accounted for elsewhere, rather than reporting an unnormalised heatmap. It also gives
+    input. Completeness makes attributions comparable and auditable: you can say "these five
+    pixels account for 80 % of the logit difference from a black image" and the remaining 20 % is
+    accounted for elsewhere, instead of reporting an unnormalised heatmap. It also gives
     you a diagnostic, since the residual gap measures the Riemann approximation error.
     **Staff follow-up:** "what does completeness *not* buy you?" It says nothing about whether the
     baseline is meaningful. With a black baseline, genuinely black pixels get zero attribution by

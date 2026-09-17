@@ -146,8 +146,8 @@ around the car and predicts, per voxel, occupancy probability, semantics, and
 built by attention from 3D positional queries over image features, aligned across
 time with ego-motion, and decoded with deconvolutions. The loss is per-voxel
 classification of occupancy plus regression of flow, exactly the formulation in
-[Occupancy & temporal perception](../part11-perception-autonomy/05-occupancy-temporal.md):
-for voxel $v$ with label $y_v \in \{0,1\}$ and prediction $p_v$,
+[Occupancy & temporal perception](../part11-perception-autonomy/05-occupancy-temporal.md).
+Take a voxel $v$ with occupancy label $y_v \in \{0,1\}$ and prediction $p_v$:
 
 $$
 \mathcal{L}_{\text{occ}} = -\sum_v \big[y_v \log p_v + (1-y_v)\log(1-p_v)\big],\qquad

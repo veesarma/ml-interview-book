@@ -22,7 +22,7 @@
   residual-stream view used by the logit lens and activation patching.
 * [Adversarial robustness](../part13-retrieval-eval-reliability/03-uncertainty-reliability.md)
   and [evaluation](../part13-retrieval-eval-reliability/02-evaluation.md): Chapter 2 links to
-  those rather than restating them.
+  those chapters instead of restating their results.
 * [Reward models](../part07-post-training/02-reward-models.md) for the reward-hacking discussion.
 
 ## If you have one day

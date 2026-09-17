@@ -29,6 +29,8 @@ DASH = "—"
 
 FENCE = re.compile(r"^(```|~~~)")
 MATH = re.compile(r"^\s*\$\$")
+# a complete one-line display block must not flip the parity
+MATH_ONELINE = re.compile(r"^\s*\$\$.*\$\$\s*$")
 SNIPPET = re.compile(r"^\s*--8<--")
 HEADING = re.compile(r"^#{1,6}\s")
 TABLE_ROW = re.compile(r"^\s*\|")
@@ -103,7 +105,8 @@ def process(path: Path, dry_run: bool) -> int:
             out.append(raw)
             continue
         if MATH.match(raw):
-            in_math = not in_math
+            if not MATH_ONELINE.match(raw):
+                in_math = not in_math
             out.append(raw)
             continue
         if in_fence or in_math or SNIPPET.match(raw):

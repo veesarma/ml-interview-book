@@ -16,46 +16,57 @@ from mlbook.nn.autograd import Tensor, cross_entropy
 
 rng = np.random.default_rng(0)
 
-# --- panel 1: forward vs backward wall clock for a chain of matmuls -----------
-widths = [32, 64, 128, 256, 512]
-fwd_ms, bwd_ms = [], []
+# --- panel 1: cost of a full step relative to the forward pass ----------------
+def build(x, ws):
+    """Forward through 8 relu(h @ w) layers; returns the scalar loss node."""
+    h = x                                                       # (64, d)
+    for w in ws:
+        h = (h @ w).relu()                                      # (64, d)
+    return h.sum()                                              # scalar
+
+
+def median_ms(fn, repeats=7):
+    fn()                                                        # warm up (BLAS threads, caches)
+    times = []
+    for _ in range(repeats):
+        t0 = time.perf_counter()
+        fn()
+        times.append((time.perf_counter() - t0) * 1e3)
+    return float(np.median(times))
+
+
+widths = [64, 128, 256, 512, 1024]
+ratios, fwd_ms = [], []
 for d in widths:
-    x = Tensor(rng.normal(size=(64, d)) / np.sqrt(d))          # (64, d)
-    ws = [Tensor(rng.normal(size=(d, d)) / np.sqrt(d)) for _ in range(8)]  # 8 x (d, d)
-    t0 = time.perf_counter()
-    for _ in range(5):
-        h = x                                                   # (64, d)
-        for w in ws:
-            h = (h @ w).relu()                                  # (64, d)
-        loss = h.sum()                                          # scalar
-    fwd_ms.append((time.perf_counter() - t0) / 5 * 1e3)
-    t0 = time.perf_counter()
-    for _ in range(5):
+    x = Tensor(rng.normal(size=(64, d)) / np.sqrt(d))           # (64, d)
+    ws = [Tensor(rng.normal(size=(d, d)) / np.sqrt(d)) for _ in range(8)]   # 8 x (d, d)
+
+    def fwd(x=x, ws=ws):
+        build(x, ws)
+
+    def step(x=x, ws=ws):
         for w in ws:
             w.zero_grad()
         x.zero_grad()
-        h = x
-        for w in ws:
-            h = (h @ w).relu()
-        loss = h.sum()
-        loss.backward()
-    bwd_ms.append((time.perf_counter() - t0) / 5 * 1e3)
+        build(x, ws).backward()
 
-ratio = [b / f for f, b in zip(fwd_ms, bwd_ms)]
+    f, s_ = median_ms(fwd), median_ms(step)
+    fwd_ms.append(f)
+    ratios.append(s_ / f)
 
 fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.9), facecolor="white")
 ax = axes[0]
-ax.plot(widths, fwd_ms, "o-", label="forward only")
-ax.plot(widths, bwd_ms, "s-", label="forward + backward")
-ax.set_xscale("log", base=2)
-ax.set_xlabel("layer width d (8 layers, batch 64)")
-ax.set_ylabel("time per step (ms)")
-ax.set_title("A full step costs about {:.1f}x the forward\n(2 extra GEMMs per matmul)".format(np.mean(ratio)), fontsize=9)
-ax.legend(fontsize=8)
-ax.grid(alpha=0.3)
-for x_, r in zip(widths, ratio):
-    ax.annotate(f"{r:.1f}x", (x_, max(fwd_ms[widths.index(x_)], 0)), textcoords="offset points",
-                xytext=(0, -14), ha="center", fontsize=7, color="#374151")
+ax.bar([str(w) for w in widths], ratios, color="C0", width=0.6)
+ax.axhline(3.0, color="k", ls="--", lw=1)
+ax.text(len(widths) - 0.4, 3.05, "3x (2 backward GEMMs\nper forward GEMM)", fontsize=8, ha="right")
+for i, (r, f) in enumerate(zip(ratios, fwd_ms)):
+    ax.text(i, r + 0.06, f"{r:.1f}x", ha="center", fontsize=8)
+    ax.text(i, 0.12, f"fwd {f:.0f} ms", ha="center", fontsize=7, color="white")
+ax.set_ylim(0, max(3.4, max(ratios) + 0.5))
+ax.set_xlabel("layer width d (8 layers, batch 64, median of 7 runs)")
+ax.set_ylabel("(forward + backward) / forward")
+ax.set_title("Cost of a full step relative to the forward pass;\nPython graph overhead dominates at small widths", fontsize=9)
+ax.grid(alpha=0.3, axis="y")
 
 # --- panel 2: agreement with torch.autograd over random graphs ---------------
 errs = []
