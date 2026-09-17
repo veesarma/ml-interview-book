@@ -385,15 +385,16 @@ together.
     per-sequence KV buffers. Reported 2–4× throughput improvements over prior systems at the
     same latency.
     *Source: Kwon et al., "Efficient Memory Management for Large Language Model Serving with
-    PagedAttention", SOSP 2023, arXiv:2309.06180.*
+    PagedAttention", SOSP 2023, [arXiv:2309.06180](https://arxiv.org/abs/2309.06180); the project's own
+    [launch post](https://vllm.ai/blog/2023-06-20-vllm), June 2023.*
 
 !!! production "Seoul National University / FriendliAI: Orca: iteration-level scheduling (2022)"
     Problem: request-level batching wastes slots because sequences finish at different times.
     Built: iteration-level scheduling (what everyone now calls continuous batching) plus
     selective batching for the operators that cannot be batched across different sequence
     lengths. This is the paper to cite for *why* continuous batching works, not just that it does.
-    *Source: Yu et al., "Orca: A Distributed Serving System for Transformer-Based Generative
-    Models", OSDI 2022.*
+    *Source: Yu et al., ["Orca: A Distributed Serving System for Transformer-Based Generative
+    Models", OSDI 2022](https://www.usenix.org/conference/osdi22/presentation/yu).*
 
 !!! production "Google: speculative decoding (2023)"
     Problem: decode latency is bounded by memory bandwidth, not compute, so the accelerator is
@@ -401,8 +402,8 @@ together.
     the target distribution exactly, reporting 2–3× wall-clock speed-ups on T5 and similar
     models without any quality change. DeepMind's concurrent paper gives the same rule.
     *Sources: Leviathan, Kalman & Matias, "Fast Inference from Transformers via Speculative
-    Decoding", ICML 2023, arXiv:2211.17192; Chen et al., "Accelerating Large Language Model
-    Decoding with Speculative Sampling", 2023, arXiv:2302.01318.*
+    Decoding", ICML 2023, [arXiv:2211.17192](https://arxiv.org/abs/2211.17192); Chen et al., "Accelerating Large Language Model
+    Decoding with Speculative Sampling", 2023, [arXiv:2302.01318](https://arxiv.org/abs/2302.01318).*
 
 !!! production "Peking University / UCSD: DistServe, and Microsoft: Splitwise (2024)"
     Problem: prefill and decode have opposite bottlenecks and interfere when colocated, a long
@@ -411,8 +412,8 @@ together.
     independently scaled and parallelised. Reported large gains in goodput under tight
     TTFT/TPOT SLOs. Splitwise additionally exploits the phases' different power/hardware profiles.
     *Sources: Zhong et al., "DistServe: Disaggregating Prefill and Decoding for Goodput-optimized
-    Large Language Model Serving", OSDI 2024, arXiv:2401.09670; Patel et al., "Splitwise:
-    Efficient Generative LLM Inference Using Phase Splitting", ISCA 2024, arXiv:2311.18677.*
+    Large Language Model Serving", OSDI 2024, [arXiv:2401.09670](https://arxiv.org/abs/2401.09670); Patel et al., "Splitwise:
+    Efficient Generative LLM Inference Using Phase Splitting", ISCA 2024, [arXiv:2311.18677](https://arxiv.org/abs/2311.18677).*
 
 !!! production "Stanford / LMSYS: SGLang and RadixAttention (2024)"
     Problem: agentic and structured workloads re-send large shared prefixes (system prompts,
@@ -420,7 +421,7 @@ together.
     radix-tree KV cache that shares prefixes automatically across requests, plus a frontend
     language and a fast constrained-decoding path for JSON/grammar outputs.
     *Source: Zheng et al., "SGLang: Efficient Execution of Structured Language Model Programs",
-    NeurIPS 2024, arXiv:2312.07104.*
+    NeurIPS 2024, [arXiv:2312.07104](https://arxiv.org/abs/2312.07104).*
 
 !!! production "NVIDIA: TensorRT-LLM"
     Problem: squeeze the last factor out of a fixed GPU. Built: fused kernels, in-flight
@@ -428,7 +429,8 @@ together.
     prefill, speculative decoding and multi-LoRA, exposed through a compiled engine per model
     and parallel configuration. The trade-off relative to vLLM is flexibility (an engine must be
     rebuilt per shape/parallelism) for peak performance on NVIDIA hardware.
-    *Source: NVIDIA TensorRT-LLM documentation and GitHub repository.*
+    *Source: NVIDIA [TensorRT-LLM documentation](https://nvidia.github.io/TensorRT-LLM/) and
+    [GitHub repository](https://github.com/NVIDIA/TensorRT-LLM).*
 
 ## 6. Interview questions and strong answers
 
@@ -550,26 +552,25 @@ together.
 
 ## References
 
-Links are omitted where they could not be verified from this environment; search the exact
-title and venue.
-
 * Kwon, W. et al. *Efficient Memory Management for Large Language Model Serving with
-  PagedAttention.* SOSP 2023. arXiv:2309.06180.
-* Yu, G.-I. et al. *Orca: A Distributed Serving System for Transformer-Based Generative Models.*
+  PagedAttention.* SOSP 2023. [arXiv:2309.06180](https://arxiv.org/abs/2309.06180). vLLM project blog,
+  [*Easy, fast, and cheap LLM serving with PagedAttention*](https://vllm.ai/blog/2023-06-20-vllm), June 2023.
+* Yu, G.-I. et al. [*Orca: A Distributed Serving System for Transformer-Based Generative Models.*](https://www.usenix.org/conference/osdi22/presentation/yu)
   OSDI 2022.
 * Leviathan, Y., Kalman, M., Matias, Y. *Fast Inference from Transformers via Speculative
-  Decoding.* ICML 2023. arXiv:2211.17192.
+  Decoding.* ICML 2023. [arXiv:2211.17192](https://arxiv.org/abs/2211.17192).
 * Chen, C. et al. *Accelerating Large Language Model Decoding with Speculative Sampling.* 2023.
-  arXiv:2302.01318.
+  [arXiv:2302.01318](https://arxiv.org/abs/2302.01318).
 * Zhong, Y. et al. *DistServe: Disaggregating Prefill and Decoding for Goodput-optimized Large
-  Language Model Serving.* OSDI 2024. arXiv:2401.09670.
+  Language Model Serving.* OSDI 2024. [arXiv:2401.09670](https://arxiv.org/abs/2401.09670).
 * Patel, P. et al. *Splitwise: Efficient Generative LLM Inference Using Phase Splitting.*
-  ISCA 2024. arXiv:2311.18677.
+  ISCA 2024. [arXiv:2311.18677](https://arxiv.org/abs/2311.18677).
 * Zheng, L. et al. *SGLang: Efficient Execution of Structured Language Model Programs.*
-  NeurIPS 2024. arXiv:2312.07104.
+  NeurIPS 2024. [arXiv:2312.07104](https://arxiv.org/abs/2312.07104).
 * Agrawal, A. et al. *Taming Throughput-Latency Tradeoff in LLM Inference with Sarathi-Serve.*
-  OSDI 2024. arXiv:2403.02310 (chunked prefill).
-* Sheng, Y. et al. *S-LoRA: Serving Thousands of Concurrent LoRA Adapters.* 2023. arXiv:2311.03285.
-* Pope, R. et al. *Efficiently Scaling Transformer Inference.* MLSys 2023. arXiv:2211.05102
+  OSDI 2024. [arXiv:2403.02310](https://arxiv.org/abs/2403.02310) (chunked prefill).
+* Sheng, Y. et al. *S-LoRA: Serving Thousands of Concurrent LoRA Adapters.* 2023. [arXiv:2311.03285](https://arxiv.org/abs/2311.03285).
+* Pope, R. et al. *Efficiently Scaling Transformer Inference.* MLSys 2023. [arXiv:2211.05102](https://arxiv.org/abs/2211.05102)
   (the arithmetic-intensity analysis of prefill vs decode on TPUs).
-* NVIDIA. *TensorRT-LLM* documentation and repository.
+* NVIDIA. *TensorRT-LLM* [documentation](https://nvidia.github.io/TensorRT-LLM/) and
+  [repository](https://github.com/NVIDIA/TensorRT-LLM).

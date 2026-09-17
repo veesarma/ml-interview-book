@@ -327,8 +327,8 @@ top-$k$/top-$p$ filtering first is both a quality and a cost decision. Monte Car
     is not disclosed.
 
 !!! production "Kalman filters in multi-object tracking (SORT / DeepSORT / AB3DMOT)"
-    Bewley et al., ICIP 2016 (arXiv:1602.00763); Wojke et al., ICIP 2017 (arXiv:1703.07402); Weng et al., IROS
-    2020 (arXiv:1907.03961). Each track is a Gaussian over (position, size, velocity); the predict step is the
+    Bewley et al., ICIP 2016 ([arXiv:1602.00763](https://arxiv.org/abs/1602.00763)); Wojke et al., ICIP 2017 ([arXiv:1703.07402](https://arxiv.org/abs/1703.07402)); Weng et al., IROS
+    2020 ([arXiv:1907.03961](https://arxiv.org/abs/1907.03961)). Each track is a Gaussian over (position, size, velocity); the predict step is the
     linear-map rule, the update is §2.5 conditioning, and detection–track association gates on the Mahalanobis
     distance $(z - H\mu)^\top S^{-1}(z - H\mu)$, which is only a valid distance because $S = HPH^\top + R$ is PD.
     *Why a Kalman filter and not a learned tracker:* $O(1)$ per track per frame, interpretable covariances that
@@ -344,7 +344,7 @@ top-$k$/top-$p$ filtering first is both a quality and a cost decision. Monte Car
     a categorical".
 
 !!! production "VAEs: the ELBO as a training objective"
-    D. Kingma & M. Welling, "Auto-Encoding Variational Bayes", ICLR 2014 (arXiv:1312.6114). The encoder outputs
+    D. Kingma & M. Welling, "Auto-Encoding Variational Bayes", ICLR 2014 ([arXiv:1312.6114](https://arxiv.org/abs/1312.6114)). The encoder outputs
     $(\mu, \log\sigma^2)$ of a diagonal Gaussian $q(z\mid x)$; the reparameterisation $z = \mu + \sigma\odot\epsilon$ makes
     the Monte Carlo ELBO estimate differentiable. Its KL to the $\mathcal N(0, I)$ prior has the closed form
     implemented in [chapter 05](05-information-theory.md) (`gaussian_kl`). Stable Diffusion's latent space is a
@@ -466,9 +466,9 @@ top-$k$/top-$p$ filtering first is both a quality and a cost decision. Monte Car
 * K. Murphy, *Probabilistic Machine Learning: An Introduction*, MIT Press, 2022.
 * R. Kalman, "A New Approach to Linear Filtering and Prediction Problems", *Journal of Basic Engineering*, 1960.
 * O. Chapelle & L. Li, "An Empirical Evaluation of Thompson Sampling", NeurIPS 2011.
-* D. Russo, B. Van Roy, A. Kazerouni, I. Osband & Z. Wen, "A Tutorial on Thompson Sampling", *Foundations and Trends in ML*, 2018 (arXiv:1707.02038).
-* Netflix Technology Blog, "Artwork Personalization at Netflix", 2017.
+* D. Russo, B. Van Roy, A. Kazerouni, I. Osband & Z. Wen, "A Tutorial on Thompson Sampling", *Foundations and Trends in ML*, 2018 ([arXiv:1707.02038](https://arxiv.org/abs/1707.02038)).
+* Netflix Technology Blog, "Artwork Personalization at Netflix", 2017 ([netflixtechblog.com](https://netflixtechblog.com/artwork-personalization-c589f074ad76)).
 * D. Blei, A. Ng & M. Jordan, "Latent Dirichlet Allocation", *JMLR* 3, 2003.
-* D. Kingma & M. Welling, "Auto-Encoding Variational Bayes", ICLR 2014 (arXiv:1312.6114).
-* A. Bewley et al., "Simple Online and Realtime Tracking", ICIP 2016 (arXiv:1602.00763); N. Wojke et al., ICIP 2017 (arXiv:1703.07402); X. Weng et al., IROS 2020 (arXiv:1907.03961).
+* D. Kingma & M. Welling, "Auto-Encoding Variational Bayes", ICLR 2014 ([arXiv:1312.6114](https://arxiv.org/abs/1312.6114)).
+* A. Bewley et al., "Simple Online and Realtime Tracking", ICIP 2016 ([arXiv:1602.00763](https://arxiv.org/abs/1602.00763)); N. Wojke et al., ICIP 2017 ([arXiv:1703.07402](https://arxiv.org/abs/1703.07402)); X. Weng et al., IROS 2020 ([arXiv:1907.03961](https://arxiv.org/abs/1907.03961)).
 * C. Rasmussen & C. Williams, *Gaussian Processes for Machine Learning*, MIT Press, 2006 (chapter 2).

@@ -352,9 +352,10 @@ query-balanced curation without a model in the loop for that reason.
     has to learn to render. The same team's interpretability work found multimodal neurons
     that fire for both an object and its written name, which is the mechanism behind
     typographic attacks. Sources: *Learning Transferable Visual Models From Natural Language
-    Supervision*, Radford et al., ICML 2021 (arXiv:2103.00020); *Hierarchical Text-Conditional
-    Image Generation with CLIP Latents*, Ramesh et al., 2022 (arXiv:2204.06125); *Multimodal
-    Neurons in Artificial Neural Networks*, Goh et al., Distill, 2021.
+    Supervision*, Radford et al., ICML 2021 ([arXiv:2103.00020](https://arxiv.org/abs/2103.00020)); *Hierarchical Text-Conditional
+    Image Generation with CLIP Latents*, Ramesh et al., 2022 ([arXiv:2204.06125](https://arxiv.org/abs/2204.06125)); *Multimodal
+    Neurons in Artificial Neural Networks*, Goh et al.,
+    [Distill, 2021](https://distill.pub/2021/multimodal-neurons/).
 
 !!! production "Google: SigLIP as the vision tower for PaliGemma and Gemma-family VLMs"
     Google's SigLIP encoders, trained with the sigmoid loss at up to 32k batch on TPUs, are
@@ -362,7 +363,7 @@ query-balanced curation without a model in the loop for that reason.
     classification-pretrained ViT because contrastive features transfer better to captioning,
     VQA and OCR-heavy tasks at equal size, and chooses a 400M-parameter shape-optimised ViT to
     balance the 2B LLM. Sources: *Sigmoid Loss for Language Image Pre-Training*, Zhai et al.,
-    ICCV 2023 (arXiv:2303.15343); *PaliGemma*, Beyer et al., 2024 (arXiv:2407.07726).
+    ICCV 2023 ([arXiv:2303.15343](https://arxiv.org/abs/2303.15343)); *PaliGemma*, Beyer et al., 2024 ([arXiv:2407.07726](https://arxiv.org/abs/2407.07726)).
 
 !!! production "Stability AI, CompVis and LAION: open CLIP as text conditioning for Stable Diffusion"
     Stable Diffusion conditions its latent diffusion U-Net on the token-level outputs of a
@@ -371,9 +372,9 @@ query-balanced curation without a model in the loop for that reason.
     control without training a language model, and the cost is inheriting CLIP's 77-token
     limit and composition weaknesses. LAION-5B itself was built by filtering CommonCrawl pairs
     with a CLIP score. Sources: *High-Resolution Image Synthesis with Latent Diffusion Models*,
-    Rombach et al., CVPR 2022 (arXiv:2112.10752); *LAION-5B*, Schuhmann et al., NeurIPS 2022
-    (arXiv:2210.08402); *Reproducible scaling laws for contrastive language-image learning*,
-    Cherti et al., CVPR 2023 (arXiv:2212.07143).
+    Rombach et al., CVPR 2022 ([arXiv:2112.10752](https://arxiv.org/abs/2112.10752)); *LAION-5B*, Schuhmann et al., NeurIPS 2022
+    ([arXiv:2210.08402](https://arxiv.org/abs/2210.08402)); *Reproducible scaling laws for contrastive language-image learning*,
+    Cherti et al., CVPR 2023 ([arXiv:2212.07143](https://arxiv.org/abs/2212.07143)).
 
 !!! production "Pinterest: unified visual embeddings and multimodal search retrieval"
     Pinterest's visual search stack is built on a single image embedding trained multi-task
@@ -384,8 +385,11 @@ query-balanced curation without a model in the loop for that reason.
     with engagement pairs in place of captions. The documented trade-off is that one shared
     embedding is cheaper to serve and keeps surfaces consistent, at the cost of per-surface
     tuning. Sources: *Learning a Unified Embedding for Visual Search at Pinterest*, Zhai et
-    al., KDD 2019 (arXiv:1908.01707); *OmniSearchSage: Multi-Task Multi-Entity Embeddings for
-    Pinterest Search*, Agarwal et al., 2024 (arXiv:2404.16260). See the
+    al., KDD 2019 ([arXiv:1908.01707](https://arxiv.org/abs/1908.01707)); *OmniSearchSage: Multi-Task Multi-Entity Embeddings for
+    Pinterest Search*, Agarwal et al., 2024 ([arXiv:2404.16260](https://arxiv.org/abs/2404.16260)); Pinterest Engineering's
+    own write-up,
+    [*Unifying visual embeddings for visual search at Pinterest*](https://medium.com/pinterest-engineering/unifying-visual-embeddings-for-visual-search-at-pinterest-74ea7ea103f0),
+    2019. See the
     [visual search system design](../part17-ml-system-design/06-visual-search-image-retrieval.md)
     and the [Pinterest deep dive](../part18-company-deep-dives/pinterest.md).
 
@@ -395,7 +399,7 @@ query-balanced curation without a model in the loop for that reason.
     text transitively. Image-paired data exists for every modality while text-paired data does
     not, which is the reason for the design. The cost is that cross-modal alignment quality is
     bounded by the image bridge. Source: *ImageBind: One Embedding Space To Bind Them All*,
-    Girdhar et al., CVPR 2023 (arXiv:2305.05665). More in
+    Girdhar et al., CVPR 2023 ([arXiv:2305.05665](https://arxiv.org/abs/2305.05665)). More in
     [chapter 5](05-multimodal-foundation.md).
 
 ## 6. Interview questions and strong answers
@@ -528,23 +532,21 @@ query-balanced curation without a model in the loop for that reason.
 
 ## References
 
-Sources are listed by title, venue and arXiv identifier. External links could not be
-verified from this build environment, so search the title or the identifier.
-
-* Radford et al., *Learning Transferable Visual Models From Natural Language Supervision* (CLIP), ICML 2021. arXiv:2103.00020.
-* Jia et al., *Scaling Up Visual and Vision-Language Representation Learning With Noisy Text Supervision* (ALIGN), ICML 2021. arXiv:2102.05918.
-* Zhai et al., *Sigmoid Loss for Language Image Pre-Training* (SigLIP), ICCV 2023. arXiv:2303.15343.
-* van den Oord, Li, Vinyals, *Representation Learning with Contrastive Predictive Coding* (InfoNCE and the MI bound), 2018. arXiv:1807.03748.
-* Schuhmann et al., *LAION-5B: An open large-scale dataset for training next generation image-text models*, NeurIPS 2022. arXiv:2210.08402.
-* Gadre et al., *DataComp: In search of the next generation of multimodal datasets*, NeurIPS 2023. arXiv:2304.14108.
-* Xu et al., *Demystifying CLIP Data* (MetaCLIP), ICLR 2024. arXiv:2309.16671.
-* Cherti et al., *Reproducible scaling laws for contrastive language-image learning* (OpenCLIP), CVPR 2023. arXiv:2212.07143.
-* Yuksekgonul et al., *When and why vision-language models behave like bags-of-words, and what to do about it?* (ARO), ICLR 2023. arXiv:2210.01936.
-* Liang et al., *Mind the Gap: Understanding the Modality Gap in Multi-modal Contrastive Representation Learning*, NeurIPS 2022. arXiv:2203.02053.
-* Goh et al., *Multimodal Neurons in Artificial Neural Networks*, Distill, 2021.
-* Ramesh et al., *Hierarchical Text-Conditional Image Generation with CLIP Latents* (unCLIP, DALL-E 2), 2022. arXiv:2204.06125.
-* Rombach et al., *High-Resolution Image Synthesis with Latent Diffusion Models*, CVPR 2022. arXiv:2112.10752.
-* Girdhar et al., *ImageBind: One Embedding Space To Bind Them All*, CVPR 2023. arXiv:2305.05665.
-* Zhai et al., *Learning a Unified Embedding for Visual Search at Pinterest*, KDD 2019. arXiv:1908.01707.
-* Agarwal et al., *OmniSearchSage: Multi-Task Multi-Entity Embeddings for Pinterest Search*, WWW 2024 companion. arXiv:2404.16260.
-* Beyer et al., *PaliGemma: A versatile 3B VLM for transfer*, 2024. arXiv:2407.07726.
+* Radford et al., *Learning Transferable Visual Models From Natural Language Supervision* (CLIP), ICML 2021. [arXiv:2103.00020](https://arxiv.org/abs/2103.00020).
+* Jia et al., *Scaling Up Visual and Vision-Language Representation Learning With Noisy Text Supervision* (ALIGN), ICML 2021. [arXiv:2102.05918](https://arxiv.org/abs/2102.05918).
+* Zhai et al., *Sigmoid Loss for Language Image Pre-Training* (SigLIP), ICCV 2023. [arXiv:2303.15343](https://arxiv.org/abs/2303.15343).
+* van den Oord, Li, Vinyals, *Representation Learning with Contrastive Predictive Coding* (InfoNCE and the MI bound), 2018. [arXiv:1807.03748](https://arxiv.org/abs/1807.03748).
+* Schuhmann et al., *LAION-5B: An open large-scale dataset for training next generation image-text models*, NeurIPS 2022. [arXiv:2210.08402](https://arxiv.org/abs/2210.08402).
+* Gadre et al., *DataComp: In search of the next generation of multimodal datasets*, NeurIPS 2023. [arXiv:2304.14108](https://arxiv.org/abs/2304.14108).
+* Xu et al., *Demystifying CLIP Data* (MetaCLIP), ICLR 2024. [arXiv:2309.16671](https://arxiv.org/abs/2309.16671).
+* Cherti et al., *Reproducible scaling laws for contrastive language-image learning* (OpenCLIP), CVPR 2023. [arXiv:2212.07143](https://arxiv.org/abs/2212.07143).
+* Yuksekgonul et al., *When and why vision-language models behave like bags-of-words, and what to do about it?* (ARO), ICLR 2023. [arXiv:2210.01936](https://arxiv.org/abs/2210.01936).
+* Liang et al., *Mind the Gap: Understanding the Modality Gap in Multi-modal Contrastive Representation Learning*, NeurIPS 2022. [arXiv:2203.02053](https://arxiv.org/abs/2203.02053).
+* Goh et al., *Multimodal Neurons in Artificial Neural Networks*, [Distill, 2021](https://distill.pub/2021/multimodal-neurons/).
+* Ramesh et al., *Hierarchical Text-Conditional Image Generation with CLIP Latents* (unCLIP, DALL-E 2), 2022. [arXiv:2204.06125](https://arxiv.org/abs/2204.06125).
+* Rombach et al., *High-Resolution Image Synthesis with Latent Diffusion Models*, CVPR 2022. [arXiv:2112.10752](https://arxiv.org/abs/2112.10752).
+* Girdhar et al., *ImageBind: One Embedding Space To Bind Them All*, CVPR 2023. [arXiv:2305.05665](https://arxiv.org/abs/2305.05665).
+* Zhai et al., *Learning a Unified Embedding for Visual Search at Pinterest*, KDD 2019. [arXiv:1908.01707](https://arxiv.org/abs/1908.01707).
+* Agarwal et al., *OmniSearchSage: Multi-Task Multi-Entity Embeddings for Pinterest Search*, WWW 2024 companion. [arXiv:2404.16260](https://arxiv.org/abs/2404.16260).
+* Pinterest Engineering, *Unifying visual embeddings for visual search at Pinterest*, [engineering blog, 2019](https://medium.com/pinterest-engineering/unifying-visual-embeddings-for-visual-search-at-pinterest-74ea7ea103f0).
+* Beyer et al., *PaliGemma: A versatile 3B VLM for transfer*, 2024. [arXiv:2407.07726](https://arxiv.org/abs/2407.07726).

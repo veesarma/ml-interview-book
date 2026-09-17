@@ -387,14 +387,11 @@ accuracy, so they could predict downstream scores of the 405B model from small r
 
 ## References
 
-Hyperlinked entries were verified at build time; entries without a link are given by title
-and arXiv id.
-
 - Kaplan et al. *Scaling Laws for Neural Language Models*. 2020. [arXiv:2001.08361](https://arxiv.org/abs/2001.08361)
 - Hoffmann et al. *Training Compute-Optimal Large Language Models*. NeurIPS 2022. [arXiv:2203.15556](https://arxiv.org/abs/2203.15556)
 - Muennighoff et al. *Scaling Data-Constrained Language Models*. NeurIPS 2023. [arXiv:2305.16264](https://arxiv.org/abs/2305.16264)
 - Meta AI. *The Llama 3 Herd of Models*. 2024. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783)
 - DeepSeek-AI. *DeepSeek-V3 Technical Report*. 2024. [arXiv:2412.19437](https://arxiv.org/abs/2412.19437)
-- Besiroglu et al. *Chinchilla Scaling: A replication attempt*. 2024. arXiv:2404.10102
-- Sardana et al. *Beyond Chinchilla-Optimal: Accounting for Inference in Language Model Scaling Laws*. ICML 2024. arXiv:2401.00448
-- Hu et al. *MiniCPM: Unveiling the Potential of Small Language Models with Scalable Training Strategies*. 2024. arXiv:2404.06395 (WSD schedule and scaling with it)
+- Besiroglu et al. *Chinchilla Scaling: A replication attempt*. 2024. [arXiv:2404.10102](https://arxiv.org/abs/2404.10102)
+- Sardana et al. *Beyond Chinchilla-Optimal: Accounting for Inference in Language Model Scaling Laws*. ICML 2024. [arXiv:2401.00448](https://arxiv.org/abs/2401.00448)
+- Hu et al. *MiniCPM: Unveiling the Potential of Small Language Models with Scalable Training Strategies*. 2024. [arXiv:2404.06395](https://arxiv.org/abs/2404.06395) (WSD schedule and scaling with it)

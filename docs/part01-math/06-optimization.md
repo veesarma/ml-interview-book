@@ -482,17 +482,17 @@ step, negligible FLOPs but non-trivial time at scale (a few percent), which is w
 ## 5. In production
 
 !!! production "Meta: Llama 2's optimizer block"
-    H. Touvron et al., "Llama 2: Open Foundation and Fine-Tuned Chat Models", 2023 (arXiv:2307.09288). The
+    H. Touvron et al., "Llama 2: Open Foundation and Fine-Tuned Chat Models", 2023 ([arXiv:2307.09288](https://arxiv.org/abs/2307.09288)). The
     pretraining recipe is AdamW with $\beta_1 = 0.9$, $\beta_2 = 0.95$, $\epsilon = 10^{-5}$, a cosine schedule
     decaying to $10\%$ of the peak LR, $2000$ warmup steps, weight decay $0.1$ and gradient clipping at $1.0$.
     Every choice in that sentence is §2.5–§2.8: $\beta_2 = 0.95$ for responsiveness to variance shifts,
     $\epsilon = 10^{-5}$ to damp updates on near-zero-curvature coordinates, decoupled decay $0.1$ on the matrices,
     global-norm clip as a seatbelt against bad batches. *Why not SGD:* embedding and attention gradients differ in
-    scale by orders of magnitude across layers; a single global LR cannot serve both. Llama 1 (arXiv:2302.13971)
-    uses the same block, which is itself inherited from GPT-3 (arXiv:2005.14165).
+    scale by orders of magnitude across layers; a single global LR cannot serve both. Llama 1 ([arXiv:2302.13971](https://arxiv.org/abs/2302.13971))
+    uses the same block, which is itself inherited from GPT-3 ([arXiv:2005.14165](https://arxiv.org/abs/2005.14165)).
 
 !!! production "Allen Institute for AI: OLMo 2's stability engineering"
-    Team OLMo, "2 OLMo 2 Furious", 2024 (arXiv:2501.00656), and the original OLMo (arXiv:2402.00838). OLMo 2 is
+    Team OLMo, "2 OLMo 2 Furious", 2024 ([arXiv:2501.00656](https://arxiv.org/abs/2501.00656)), and the original OLMo ([arXiv:2402.00838](https://arxiv.org/abs/2402.00838)). OLMo 2 is
     unusually valuable for interviews because it documents *instabilities and their fixes* rather than only the final
     recipe: loss spikes traced to specific data, growth of attention logits addressed with QK-norm, output-logit growth
     addressed with a z-loss regulariser, plus initialisation and epsilon changes, all with released intermediate
@@ -501,16 +501,16 @@ step, negligible FLOPs but non-trivial time at scale (a few percent), which is w
     not a single knob. See [training systems](../part14-systems/02-training-systems.md).
 
 !!! production "DeepSeek: V3's multi-stage learning-rate schedule"
-    DeepSeek-AI, "DeepSeek-V3 Technical Report", 2024 (arXiv:2412.19437). Trained with AdamW
+    DeepSeek-AI, "DeepSeek-V3 Technical Report", 2024 ([arXiv:2412.19437](https://arxiv.org/abs/2412.19437)). Trained with AdamW
     ($\beta_1 = 0.9$, $\beta_2 = 0.95$, weight decay $0.1$), the schedule is explicitly *not* a single cosine: a
     warmup, then a constant-LR phase over the bulk of the $14.8$T tokens, then staged decay, with long-context
     extension phases afterwards. This is the WSD philosophy of §2.7 at frontier scale: the plateau lets the token
     budget and data mix change without invalidating the schedule. *Why not cosine:* a cosine commits to $T$ on day
     one; at 14.8T tokens with curriculum changes, that commitment is expensive. Related: MiniCPM
-    (Hu et al., 2024, arXiv:2404.06395) is the clearest published ablation of WSD versus cosine.
+    (Hu et al., 2024, [arXiv:2404.06395](https://arxiv.org/abs/2404.06395)) is the clearest published ablation of WSD versus cosine.
 
 !!! production "Meta / Facebook AI Research: the linear scaling rule and gradual warmup"
-    P. Goyal et al., "Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour", 2017 (arXiv:1706.02677).
+    P. Goyal et al., "Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour", 2017 ([arXiv:1706.02677](https://arxiv.org/abs/1706.02677)).
     Scaling ResNet-50 to batch size 8192 across 256 GPUs, the authors show the LR must scale linearly with batch size
     and that a *gradual* (5-epoch) warmup is required; a constant warmup or no warmup loses accuracy or diverges.
     They also document the subtle bugs that bite at scale (weight decay on BN parameters, the difference between
@@ -519,9 +519,9 @@ step, negligible FLOPs but non-trivial time at scale (a few percent), which is w
     happens to the LR?".
 
 !!! production "Adam and AdamW: the primary sources"
-    D. Kingma & J. Ba, "Adam: A Method for Stochastic Optimization", ICLR 2015 (arXiv:1412.6980) introduces the
+    D. Kingma & J. Ba, "Adam: A Method for Stochastic Optimization", ICLR 2015 ([arXiv:1412.6980](https://arxiv.org/abs/1412.6980)) introduces the
     moments, the bias correction of §2.5, and the default $(\beta_1, \beta_2, \epsilon) = (0.9, 0.999, 10^{-8})$.
-    I. Loshchilov & F. Hutter, "Decoupled Weight Decay Regularization", ICLR 2019 (arXiv:1711.05101) shows that
+    I. Loshchilov & F. Hutter, "Decoupled Weight Decay Regularization", ICLR 2019 ([arXiv:1711.05101](https://arxiv.org/abs/1711.05101)) shows that
     Adam's poor generalisation relative to SGD was substantially an artefact of coupling L2 into the adaptive
     denominator, and that decoupling restores it. That is the change of §2.6 that made AdamW the default for Transformers.
     Read together, they are the cleanest example in ML of "a one-line change to an update rule, justified by an
@@ -688,26 +688,26 @@ correct place to clip when accumulating $k$ micro-batches.
 
 ## References
 
-* D. Kingma & J. Ba, "Adam: A Method for Stochastic Optimization", ICLR 2015 (arXiv:1412.6980).
-* I. Loshchilov & F. Hutter, "Decoupled Weight Decay Regularization", ICLR 2019 (arXiv:1711.05101).
-* I. Loshchilov & F. Hutter, "SGDR: Stochastic Gradient Descent with Warm Restarts", ICLR 2017 (arXiv:1608.03983).
+* D. Kingma & J. Ba, "Adam: A Method for Stochastic Optimization", ICLR 2015 ([arXiv:1412.6980](https://arxiv.org/abs/1412.6980)).
+* I. Loshchilov & F. Hutter, "Decoupled Weight Decay Regularization", ICLR 2019 ([arXiv:1711.05101](https://arxiv.org/abs/1711.05101)).
+* I. Loshchilov & F. Hutter, "SGDR: Stochastic Gradient Descent with Warm Restarts", ICLR 2017 ([arXiv:1608.03983](https://arxiv.org/abs/1608.03983)).
 * J. Duchi, E. Hazan & Y. Singer, "Adaptive Subgradient Methods for Online Learning and Stochastic Optimization", *JMLR* 12, 2011 (AdaGrad).
 * T. Tieleman & G. Hinton, "Lecture 6.5, RMSProp", Coursera: Neural Networks for Machine Learning, 2012.
 * Y. Nesterov, "A method for solving the convex programming problem with convergence rate $O(1/k^2)$", *Soviet Mathematics Doklady*, 1983.
-* R. Pascanu, T. Mikolov & Y. Bengio, "On the difficulty of training Recurrent Neural Networks", ICML 2013 (arXiv:1211.5063).
-* P. Goyal et al., "Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour", 2017 (arXiv:1706.02677).
-* L. Liu et al., "On the Variance of the Adaptive Learning Rate and Beyond", ICLR 2020 (arXiv:1908.03265) (RAdam).
-* S. McCandlish, J. Kaplan, S. Amodei et al., "An Empirical Model of Large-Batch Training", 2018 (arXiv:1812.06162).
-* Y. Dauphin et al., "Identifying and attacking the saddle point problem in high-dimensional non-convex optimization", NeurIPS 2014 (arXiv:1406.2572).
-* R. Ge, F. Huang, C. Jin & Y. Yuan, "Escaping From Saddle Points, Online Stochastic Gradient for Tensor Decomposition", COLT 2015 (arXiv:1503.02101).
-* V. Gupta, T. Koren & Y. Singer, "Shampoo: Preconditioned Stochastic Tensor Optimization", ICML 2018 (arXiv:1802.09568).
+* R. Pascanu, T. Mikolov & Y. Bengio, "On the difficulty of training Recurrent Neural Networks", ICML 2013 ([arXiv:1211.5063](https://arxiv.org/abs/1211.5063)).
+* P. Goyal et al., "Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour", 2017 ([arXiv:1706.02677](https://arxiv.org/abs/1706.02677)).
+* L. Liu et al., "On the Variance of the Adaptive Learning Rate and Beyond", ICLR 2020 ([arXiv:1908.03265](https://arxiv.org/abs/1908.03265)) (RAdam).
+* S. McCandlish, J. Kaplan, S. Amodei et al., "An Empirical Model of Large-Batch Training", 2018 ([arXiv:1812.06162](https://arxiv.org/abs/1812.06162)).
+* Y. Dauphin et al., "Identifying and attacking the saddle point problem in high-dimensional non-convex optimization", NeurIPS 2014 ([arXiv:1406.2572](https://arxiv.org/abs/1406.2572)).
+* R. Ge, F. Huang, C. Jin & Y. Yuan, "Escaping From Saddle Points, Online Stochastic Gradient for Tensor Decomposition", COLT 2015 ([arXiv:1503.02101](https://arxiv.org/abs/1503.02101)).
+* V. Gupta, T. Koren & Y. Singer, "Shampoo: Preconditioned Stochastic Tensor Optimization", ICML 2018 ([arXiv:1802.09568](https://arxiv.org/abs/1802.09568)).
 * K. Jordan et al., "Muon: An optimizer for hidden layers in neural networks", 2024.
-* G. Yang & E. Hu, "Feature Learning in Infinite-Width Neural Networks", ICML 2021 (arXiv:2011.14522); G. Yang et al., "Tensor Programs V: Tuning Large Neural Networks via Zero-Shot Hyperparameter Transfer", 2022 (arXiv:2203.03466).
-* T. Dettmers, M. Lewis, S. Shleifer & L. Zettlemoyer, "8-bit Optimizers via Block-wise Quantization", ICLR 2022 (arXiv:2110.02861).
-* N. Shazeer & M. Stern, "Adafactor: Adaptive Learning Rates with Sublinear Memory Cost", ICML 2018 (arXiv:1804.04235).
-* H. Touvron et al., "Llama 2: Open Foundation and Fine-Tuned Chat Models", 2023 (arXiv:2307.09288); "LLaMA: Open and Efficient Foundation Language Models", 2023 (arXiv:2302.13971).
-* Team OLMo, "2 OLMo 2 Furious", 2024 (arXiv:2501.00656).
-* DeepSeek-AI, "DeepSeek-V3 Technical Report", 2024 (arXiv:2412.19437).
-* S. Hu et al., "MiniCPM: Unveiling the Potential of Small Language Models with Scalable Training Strategies", 2024 (arXiv:2404.06395).
-* T. Brown et al., "Language Models are Few-Shot Learners", NeurIPS 2020 (arXiv:2005.14165).
+* G. Yang & E. Hu, "Feature Learning in Infinite-Width Neural Networks", ICML 2021 ([arXiv:2011.14522](https://arxiv.org/abs/2011.14522)); G. Yang et al., "Tensor Programs V: Tuning Large Neural Networks via Zero-Shot Hyperparameter Transfer", 2022 ([arXiv:2203.03466](https://arxiv.org/abs/2203.03466)).
+* T. Dettmers, M. Lewis, S. Shleifer & L. Zettlemoyer, "8-bit Optimizers via Block-wise Quantization", ICLR 2022 ([arXiv:2110.02861](https://arxiv.org/abs/2110.02861)).
+* N. Shazeer & M. Stern, "Adafactor: Adaptive Learning Rates with Sublinear Memory Cost", ICML 2018 ([arXiv:1804.04235](https://arxiv.org/abs/1804.04235)).
+* H. Touvron et al., "Llama 2: Open Foundation and Fine-Tuned Chat Models", 2023 ([arXiv:2307.09288](https://arxiv.org/abs/2307.09288)); "LLaMA: Open and Efficient Foundation Language Models", 2023 ([arXiv:2302.13971](https://arxiv.org/abs/2302.13971)).
+* Team OLMo, "2 OLMo 2 Furious", 2024 ([arXiv:2501.00656](https://arxiv.org/abs/2501.00656)).
+* DeepSeek-AI, "DeepSeek-V3 Technical Report", 2024 ([arXiv:2412.19437](https://arxiv.org/abs/2412.19437)).
+* S. Hu et al., "MiniCPM: Unveiling the Potential of Small Language Models with Scalable Training Strategies", 2024 ([arXiv:2404.06395](https://arxiv.org/abs/2404.06395)).
+* T. Brown et al., "Language Models are Few-Shot Learners", NeurIPS 2020 ([arXiv:2005.14165](https://arxiv.org/abs/2005.14165)).
 * S. Boyd & L. Vandenberghe, *Convex Optimization*, Cambridge University Press, 2004.

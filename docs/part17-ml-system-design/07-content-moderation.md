@@ -215,7 +215,7 @@ address that:
   the policy text and the content and returns a judgment with a rationale. OpenAI has
   described using GPT-4 for content policy development and classification, where
   policy experts iterate on the written policy and the model applies it, shortening
-  the loop from months to hours. Meta's Llama Guard (arXiv:2312.06674) is an
+  the loop from months to hours. Meta's Llama Guard ([arXiv:2312.06674](https://arxiv.org/abs/2312.06674)) is an
   openly available safeguard model that classifies prompts and responses against a
   configurable taxonomy.
 
@@ -541,7 +541,7 @@ which is affordable because the generative feature is already paying for a model
 red-team data.
 
 **What the source says.** Inan et al., "Llama Guard: LLM-based Input-Output Safeguard
-for Human-AI Conversations" (2023, arXiv:2312.06674) describes an openly available
+for Human-AI Conversations" (2023, [arXiv:2312.06674](https://arxiv.org/abs/2312.06674)) describes an openly available
 safeguard model that classifies prompts and responses against a configurable safety
 taxonomy, with reported performance on existing benchmarks.
 
@@ -691,7 +691,7 @@ taxonomy, with reported performance on existing benchmarks.
 - Meta Engineering. "Open-sourcing photo- and video-matching technology to make the internet safer" (PDQ and TMK+PDQF), August 2019.
 - Microsoft. PhotoDNA documentation; NCMEC and IWF hash-list programmes.
 - OpenAI. "Using GPT-4 for content moderation", August 2023; OpenAI moderation endpoint documentation.
-- Inan, H. et al. "Llama Guard: LLM-based Input-Output Safeguard for Human-AI Conversations." 2023 (arXiv:2312.06674).
-- Markov, T. et al. "A Holistic Approach to Undesired Content Detection in the Real World." AAAI 2023 (arXiv:2208.03274).
+- Inan, H. et al. "Llama Guard: LLM-based Input-Output Safeguard for Human-AI Conversations." 2023 ([arXiv:2312.06674](https://arxiv.org/abs/2312.06674)).
+- Markov, T. et al. "A Holistic Approach to Undesired Content Detection in the Real World." AAAI 2023 ([arXiv:2208.03274](https://arxiv.org/abs/2208.03274)).
 - YouTube. "Community Guidelines enforcement" transparency reports.
 - Book cross-references: [fraud & anomaly detection](04-fraud-anomaly-detection.md), [LLM assistant with RAG](08-llm-product-rag-assistant.md), [visual search](06-visual-search-image-retrieval.md), [safety & failure modes](../part15-interpretability-safety/02-safety-failure-modes.md).

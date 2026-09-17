@@ -404,7 +404,7 @@ end-to-end speed.
     whose depth can be cut at inference. They report beating YOLO-family detectors at matched
     speed on a T4 GPU on COCO, and they ship it in PaddleDetection. What they rejected was
     Deformable DETR's full multi-scale encoder, which was too slow for real time. Source:
-    *DETRs Beat YOLOs on Real-time Object Detection*, Zhao et al., CVPR 2024 (arXiv:2304.08069).
+    *DETRs Beat YOLOs on Real-time Object Detection*, Zhao et al., CVPR 2024 ([arXiv:2304.08069](https://arxiv.org/abs/2304.08069)).
 
 !!! production "Meta (FAIR): Segment Anything's prompt decoder is a DETR-style decoder"
     SAM's mask decoder feeds learned output tokens, one per mask candidate plus an IoU token,
@@ -412,7 +412,7 @@ end-to-end speed.
     embedding, then predicts masks from the output tokens. That is the object-query pattern
     with prompts as extra queries. The trade-off is a decoder small enough to run in tens of
     milliseconds in a browser, so the heavy image encoder runs once per image. Source:
-    *Segment Anything*, Kirillov et al., ICCV 2023 (arXiv:2304.02643).
+    *Segment Anything*, Kirillov et al., ICCV 2023 ([arXiv:2304.02643](https://arxiv.org/abs/2304.02643)).
 
 !!! production "Autonomy stacks: queries as the interface between cameras and 3-D"
     DETR3D and BEVFormer generalise object queries to 3-D reference points that project into
@@ -420,7 +420,7 @@ end-to-end speed.
     companies build on is DETR-shaped. Tesla's AI Day 2021 talk described learned BEV queries
     cross-attending to multi-camera features. The set-prediction loss carries over unchanged
     with 3-D boxes and a 3-D GIoU and L1 cost. Sources: *DETR3D*, Wang et al., CoRL 2021
-    (arXiv:2110.06922); *BEVFormer*, Li et al., ECCV 2022 (arXiv:2203.17270). More in
+    ([arXiv:2110.06922](https://arxiv.org/abs/2110.06922)); *BEVFormer*, Li et al., ECCV 2022 ([arXiv:2203.17270](https://arxiv.org/abs/2203.17270)). More in
     [multi-camera and BEV](../part11-perception-autonomy/02-multi-camera-bev.md).
 
 !!! production "Labelling pipelines: open-vocabulary DETRs as auto-labelers"
@@ -431,7 +431,7 @@ end-to-end speed.
     [Part X](../part10-self-supervised/03-weak-supervision-and-auto-labeling.md). The
     trade-off is precision: the matcher trains for recall across many prompts, so a
     human-verification or high-threshold stage follows. Source: *Grounding DINO*, Liu et al.,
-    ECCV 2024 (arXiv:2303.05499).
+    ECCV 2024 ([arXiv:2303.05499](https://arxiv.org/abs/2303.05499)).
 
 ## 6. Interview questions and strong answers
 
@@ -570,21 +570,18 @@ end-to-end speed.
 
 ## References
 
-Sources are listed by title, venue and arXiv identifier. External links could not be
-verified from this build environment, so search the title or the identifier.
-
-* Carion et al., *End-to-End Object Detection with Transformers*, ECCV 2020. arXiv:2005.12872.
-* Zhu et al., *Deformable DETR: Deformable Transformers for End-to-End Object Detection*, ICLR 2021. arXiv:2010.04159.
-* Meng et al., *Conditional DETR for Fast Training Convergence*, ICCV 2021. arXiv:2108.06152.
-* Liu et al., *DAB-DETR: Dynamic Anchor Boxes are Better Queries for DETR*, ICLR 2022. arXiv:2201.12329.
-* Li et al., *DN-DETR: Accelerate DETR Training by Introducing Query DeNoising*, CVPR 2022. arXiv:2203.01305.
-* Zhang et al., *DINO: DETR with Improved DeNoising Anchor Boxes for End-to-End Object Detection*, ICLR 2023. arXiv:2203.03605.
-* Zhao et al., *DETRs Beat YOLOs on Real-time Object Detection* (RT-DETR), CVPR 2024. arXiv:2304.08069.
-* Rezatofighi et al., *Generalized Intersection over Union: A Metric and A Loss for Bounding Box Regression*, CVPR 2019. arXiv:1902.09630.
+* Carion et al., *End-to-End Object Detection with Transformers*, ECCV 2020. [arXiv:2005.12872](https://arxiv.org/abs/2005.12872).
+* Zhu et al., *Deformable DETR: Deformable Transformers for End-to-End Object Detection*, ICLR 2021. [arXiv:2010.04159](https://arxiv.org/abs/2010.04159).
+* Meng et al., *Conditional DETR for Fast Training Convergence*, ICCV 2021. [arXiv:2108.06152](https://arxiv.org/abs/2108.06152).
+* Liu et al., *DAB-DETR: Dynamic Anchor Boxes are Better Queries for DETR*, ICLR 2022. [arXiv:2201.12329](https://arxiv.org/abs/2201.12329).
+* Li et al., *DN-DETR: Accelerate DETR Training by Introducing Query DeNoising*, CVPR 2022. [arXiv:2203.01305](https://arxiv.org/abs/2203.01305).
+* Zhang et al., *DINO: DETR with Improved DeNoising Anchor Boxes for End-to-End Object Detection*, ICLR 2023. [arXiv:2203.03605](https://arxiv.org/abs/2203.03605).
+* Zhao et al., *DETRs Beat YOLOs on Real-time Object Detection* (RT-DETR), CVPR 2024. [arXiv:2304.08069](https://arxiv.org/abs/2304.08069).
+* Rezatofighi et al., *Generalized Intersection over Union: A Metric and A Loss for Bounding Box Regression*, CVPR 2019. [arXiv:1902.09630](https://arxiv.org/abs/1902.09630).
 * Kuhn, *The Hungarian method for the assignment problem*, Naval Research Logistics Quarterly, 1955. Munkres, *Algorithms for the assignment and transportation problems*, J. SIAM, 1957.
-* Cheng et al., *Masked-attention Mask Transformer for Universal Image Segmentation* (Mask2Former), CVPR 2022. arXiv:2112.01527.
-* Wang et al., *DETR3D: 3D Object Detection from Multi-view Images via 3D-to-2D Queries*, CoRL 2021. arXiv:2110.06922.
-* Li et al., *BEVFormer: Learning Bird's-Eye-View Representation from Multi-Camera Images via Spatiotemporal Transformers*, ECCV 2022. arXiv:2203.17270.
-* Liu et al., *Grounding DINO: Marrying DINO with Grounded Pre-Training for Open-Set Object Detection*, ECCV 2024. arXiv:2303.05499.
-* Minderer et al., *Simple Open-Vocabulary Object Detection with Vision Transformers* (OWL-ViT), ECCV 2022. arXiv:2205.06230.
-* Kirillov et al., *Segment Anything*, ICCV 2023. arXiv:2304.02643.
+* Cheng et al., *Masked-attention Mask Transformer for Universal Image Segmentation* (Mask2Former), CVPR 2022. [arXiv:2112.01527](https://arxiv.org/abs/2112.01527).
+* Wang et al., *DETR3D: 3D Object Detection from Multi-view Images via 3D-to-2D Queries*, CoRL 2021. [arXiv:2110.06922](https://arxiv.org/abs/2110.06922).
+* Li et al., *BEVFormer: Learning Bird's-Eye-View Representation from Multi-Camera Images via Spatiotemporal Transformers*, ECCV 2022. [arXiv:2203.17270](https://arxiv.org/abs/2203.17270).
+* Liu et al., *Grounding DINO: Marrying DINO with Grounded Pre-Training for Open-Set Object Detection*, ECCV 2024. [arXiv:2303.05499](https://arxiv.org/abs/2303.05499).
+* Minderer et al., *Simple Open-Vocabulary Object Detection with Vision Transformers* (OWL-ViT), ECCV 2022. [arXiv:2205.06230](https://arxiv.org/abs/2205.06230).
+* Kirillov et al., *Segment Anything*, ICCV 2023. [arXiv:2304.02643](https://arxiv.org/abs/2304.02643).

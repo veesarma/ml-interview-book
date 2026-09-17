@@ -381,7 +381,7 @@ then deployed under shift; treating a Bayesian posterior with a flat prior on a 
 
 !!! production "Calibration of modern neural networks (Cornell)"
     C. Guo, G. Pleiss, Y. Sun & K. Weinberger, "On Calibration of Modern Neural Networks", ICML 2017
-    (arXiv:1706.04599). Showed that ResNet-era classifiers are markedly more overconfident than earlier nets
+    ([arXiv:1706.04599](https://arxiv.org/abs/1706.04599)). Showed that ResNet-era classifiers are markedly more overconfident than earlier nets
     (depth, width, batch norm and lack of weight decay all worsen ECE), and that a single temperature fitted on
     validation NLL brings ECE down to $\sim 1\%$ on ImageNet without touching accuracy. *Why temperature over
     Platt/isotonic:* one parameter, monotone, cannot reorder predictions, robust to small validation sets.
@@ -513,8 +513,8 @@ then deployed under shift; treating a Bayesian posterior with a flat prior on a 
 * R. Kohavi, D. Tang & Y. Xu, *Trustworthy Online Controlled Experiments: A Practical Guide to A/B Testing*, Cambridge University Press, 2020.
 * Netflix Technology Blog, "It's All A/Bout Testing: The Netflix Experimentation Platform", 2016; M. Tingley et al., "Decision Making at Netflix" series, 2021.
 * J. Overgoor, "Experiments at Airbnb", Airbnb Engineering, 2014; M. Shen et al., "Selection Bias in Online Experimentation", Airbnb Engineering, 2018.
-* C. Guo, G. Pleiss, Y. Sun & K. Weinberger, "On Calibration of Modern Neural Networks", ICML 2017 (arXiv:1706.04599).
+* C. Guo, G. Pleiss, Y. Sun & K. Weinberger, "On Calibration of Modern Neural Networks", ICML 2017 ([arXiv:1706.04599](https://arxiv.org/abs/1706.04599)).
 * B. Efron & R. Tibshirani, *An Introduction to the Bootstrap*, Chapman & Hall, 1993.
 * L. Wasserman, *All of Statistics*, Springer, 2004.
 * T. Hastie, R. Tibshirani & J. Friedman, *The Elements of Statistical Learning*, 2nd ed., Springer, 2009 (chapter 7 on bias–variance and model assessment).
-* Y. Gal & Z. Ghahramani, "Dropout as a Bayesian Approximation", ICML 2016 (arXiv:1506.02142).
+* Y. Gal & Z. Ghahramani, "Dropout as a Bayesian Approximation", ICML 2016 ([arXiv:1506.02142](https://arxiv.org/abs/1506.02142)).

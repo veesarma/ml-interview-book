@@ -391,7 +391,7 @@ product of the classifier-filtering and synthetic-generation work of chapter 1.
     pipeline". Rejected alternative: cosine to a fixed budget, which couples the schedule to
     a token count chosen before you know what you will learn.
     Source: *MiniCPM: Unveiling the Potential of Small Language Models with Scalable Training
-    Strategies*, 2024, arXiv:2404.06395.
+    Strategies*, 2024, [arXiv:2404.06395](https://arxiv.org/abs/2404.06395).
 
 !!! production "DeepSeek: long-context extension and mid-training specialisation"
     DeepSeek-V3 pretrains on 14.8T tokens and then extends context in two stages (32k, then
@@ -409,7 +409,7 @@ product of the classifier-filtering and synthetic-generation work of chapter 1.
     Llama 2, and the many medical/legal continuations of open checkpoints) is the same recipe
     at a different scale, with replay of general data added to control forgetting.
     Sources: *Don't Stop Pretraining: Adapt Language Models to Domains and Tasks* (ACL 2020,
-    arXiv:2004.10964); *Code Llama: Open Foundation Models for Code* (2023, arXiv:2308.12950).
+    [arXiv:2004.10964](https://arxiv.org/abs/2004.10964)); *Code Llama: Open Foundation Models for Code* (2023, [arXiv:2308.12950](https://arxiv.org/abs/2308.12950)).
 
 ## 6. Interview questions and strong answers
 
@@ -570,19 +570,16 @@ product of the classifier-filtering and synthetic-generation work of chapter 1.
 
 ## References
 
-Hyperlinked entries were verified at build time; entries without a link are given by title
-and arXiv id so you can search them.
-
 - Meta AI. *The Llama 3 Herd of Models*. 2024. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783)
 - OLMo Team. *2 OLMo 2 Furious*. 2024. [arXiv:2501.00656](https://arxiv.org/abs/2501.00656)
 - DeepSeek-AI. *DeepSeek-V3 Technical Report*. 2024. [arXiv:2412.19437](https://arxiv.org/abs/2412.19437)
 - Soldaini et al. *Dolma: an Open Corpus of Three Trillion Tokens*. 2024. [arXiv:2402.00159](https://arxiv.org/abs/2402.00159)
 - Muennighoff et al. *Scaling Data-Constrained Language Models*. NeurIPS 2023. [arXiv:2305.16264](https://arxiv.org/abs/2305.16264)
-- Hu et al. *MiniCPM: Unveiling the Potential of Small Language Models with Scalable Training Strategies*. 2024. arXiv:2404.06395 (WSD schedule, decay-phase data)
-- Gururangan et al. *Don't Stop Pretraining: Adapt Language Models to Domains and Tasks*. ACL 2020. arXiv:2004.10964
-- Rozière et al. *Code Llama: Open Foundation Models for Code*. 2023. arXiv:2308.12950
-- Chen et al. *Extending Context Window of Large Language Models via Positional Interpolation*. 2023. arXiv:2306.15595
-- Peng et al. *YaRN: Efficient Context Window Extension of Large Language Models*. ICLR 2024. arXiv:2309.00071
-- Hsieh et al. *RULER: What's the Real Context Size of Your Long-Context Language Models?*. 2024. arXiv:2404.06654
-- Liu et al. *Lost in the Middle: How Language Models Use Long Contexts*. TACL 2024. arXiv:2307.03172
-- Ibrahim et al. *Simple and Scalable Strategies to Continually Pre-train Large Language Models*. TMLR 2024. arXiv:2403.08763 (LR re-warming and replay for CPT)
+- Hu et al. *MiniCPM: Unveiling the Potential of Small Language Models with Scalable Training Strategies*. 2024. [arXiv:2404.06395](https://arxiv.org/abs/2404.06395) (WSD schedule, decay-phase data)
+- Gururangan et al. *Don't Stop Pretraining: Adapt Language Models to Domains and Tasks*. ACL 2020. [arXiv:2004.10964](https://arxiv.org/abs/2004.10964)
+- Rozière et al. *Code Llama: Open Foundation Models for Code*. 2023. [arXiv:2308.12950](https://arxiv.org/abs/2308.12950)
+- Chen et al. *Extending Context Window of Large Language Models via Positional Interpolation*. 2023. [arXiv:2306.15595](https://arxiv.org/abs/2306.15595)
+- Peng et al. *YaRN: Efficient Context Window Extension of Large Language Models*. ICLR 2024. [arXiv:2309.00071](https://arxiv.org/abs/2309.00071)
+- Hsieh et al. *RULER: What's the Real Context Size of Your Long-Context Language Models?*. 2024. [arXiv:2404.06654](https://arxiv.org/abs/2404.06654)
+- Liu et al. *Lost in the Middle: How Language Models Use Long Contexts*. TACL 2024. [arXiv:2307.03172](https://arxiv.org/abs/2307.03172)
+- Ibrahim et al. *Simple and Scalable Strategies to Continually Pre-train Large Language Models*. TMLR 2024. [arXiv:2403.08763](https://arxiv.org/abs/2403.08763) (LR re-warming and replay for CPT)

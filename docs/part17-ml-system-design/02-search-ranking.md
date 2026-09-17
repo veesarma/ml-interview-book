@@ -276,7 +276,7 @@ Stage 2 sees ~200 candidates with full features. Options, in increasing cost:
 Google announced BERT in web search ranking in "Understanding searches better than
 ever before" (Google blog, October 2019), describing it as applied to a subset of
 queries where language understanding mattered; LinkedIn's DeText (CIKM 2020,
-arXiv:2008.02460) describes a BERT-based ranking framework for their search products
+[arXiv:2008.02460](https://arxiv.org/abs/2008.02460)) describes a BERT-based ranking framework for their search products
 with attention to serving cost. The interview line: *cross-encoders at the top of the
 funnel, distilled everywhere else*.
 
@@ -321,7 +321,7 @@ rules, so that A/B tests decide their weight.
 ### 3.9 Diversity and the whole list
 
 A top-10 of ten near-identical listings loses bookings even if each is individually
-relevant. Airbnb's "Learning To Rank Diversely At Airbnb" (CIKM 2023, arXiv:2210.07774)
+relevant. Airbnb's "Learning To Rank Diversely At Airbnb" (CIKM 2023, [arXiv:2210.07774](https://arxiv.org/abs/2210.07774))
 reports moving from scoring listings independently to a formulation that accounts
 for the other listings in the result set, with online booking gains. A cheaper
 version of the same idea is a greedy re-ranker with a similarity penalty (MMR) or
@@ -444,15 +444,15 @@ position as a feature with dropout to debias; a list-aware loss for diversity la
 scoring. *Evaluate*: offline NDCG of the booked listing, online A/B on bookings.
 
 **What the sources say.** Haldar et al., "Applying Deep Learning to Airbnb Search"
-(KDD 2019, arXiv:1810.09591) describes the move from GBDT to neural networks: a
+(KDD 2019, [arXiv:1810.09591](https://arxiv.org/abs/1810.09591)) describes the move from GBDT to neural networks: a
 simple single-hidden-layer NN that matched the GBDT first, then a pairwise
 LambdaRank-style NN trained on booked-vs-unbooked pairs, then a deep NN; and,
 importantly, what failed, listing-id embeddings that overfit, a multi-task model
 on long views that did not improve bookings, plus lessons on feature
 normalisation and distribution smoothness. Haldar et al., "Improving Deep Learning
-for Airbnb Search" (KDD 2020, arXiv:2002.05515) covers cold-start handling for new
+for Airbnb Search" (KDD 2020, [arXiv:2002.05515](https://arxiv.org/abs/2002.05515)) covers cold-start handling for new
 listings and position bias handled with a position feature and dropout. Abdool et
-al., "Learning To Rank Diversely At Airbnb" (CIKM 2023, arXiv:2210.07774) reports
+al., "Learning To Rank Diversely At Airbnb" (CIKM 2023, [arXiv:2210.07774](https://arxiv.org/abs/2210.07774)) reports
 gains from ranking that accounts for the other listings in the result set.
 
 !!! tip "How to say it in the interview: GBDT to neural, in stages"
@@ -486,7 +486,7 @@ quantised embeddings. *Evaluate*: recall@k offline; online A/B; and retraining t
 downstream rankers so they learn to use the new candidates.
 
 **What the source says.** Huang et al., "Embedding-based Retrieval in Facebook
-Search" (KDD 2020, arXiv:2006.11632) describes the unified embedding model, the
+Search" (KDD 2020, [arXiv:2006.11632](https://arxiv.org/abs/2006.11632)) describes the unified embedding model, the
 finding that non-click impressions as negatives performed much worse than random
 negatives, hard negative mining (online in-batch and offline ANN-based), hybrid
 retrieval inside their inverted-index system, embedding quantisation, and
@@ -521,7 +521,7 @@ different negative types differently. *Serve*: ANN over product embeddings, merg
 with lexical. *Evaluate*: offline recall, online A/B.
 
 **What the source says.** Nigam et al., "Semantic Product Search" (KDD 2019,
-arXiv:1907.00937) describes a neural model for matching queries and products in
+[arXiv:1907.00937](https://arxiv.org/abs/1907.00937)) describes a neural model for matching queries and products in
 Amazon's product search, trained on behavioural data with purchases as positives and
 a loss that distinguishes impressed-not-purchased from random negatives, and
 reports improved recall over lexical matching.
@@ -549,11 +549,11 @@ document embeddings; cache query embeddings. *Evaluate*: offline NDCG, online A/
 plus fairness metrics.
 
 **What the sources say.** Guo et al., "DeText: A Deep Text Ranking Framework with
-BERT" (CIKM 2020, arXiv:2008.02460) describes an open-sourced framework used in
+BERT" (CIKM 2020, [arXiv:2008.02460](https://arxiv.org/abs/2008.02460)) describes an open-sourced framework used in
 LinkedIn search products with BERT-based text ranking and attention to online
 serving. Geyik, Ambler & Kenthapadi, "Fairness-Aware Ranking in Search &
 Recommendation Systems with Application to LinkedIn Talent Search" (KDD 2019,
-arXiv:1905.01989) describes a re-ranking approach that enforces representation
+[arXiv:1905.01989](https://arxiv.org/abs/1905.01989)) describes a re-ranking approach that enforces representation
 constraints in recruiter search results, deployed at LinkedIn.
 
 !!! tip "How to say it in the interview: BERT within the budget"
@@ -578,7 +578,7 @@ that includes user features; hard negatives; ANN. *Serve*: ANN over product
 embeddings, hybrid with lexical. *Evaluate*: offline recall, online conversion A/B.
 
 **What the source says.** Jha et al., "Unified Embedding Based Personalized
-Retrieval in Etsy Search" (2023, arXiv:2306.11424) describes a unified two-tower
+Retrieval in Etsy Search" (2023, [arXiv:2306.11424](https://arxiv.org/abs/2306.11424)) describes a unified two-tower
 model with multimodal product representations and personalised query
 representations, and reports online improvements in Etsy search.
 
@@ -693,21 +693,21 @@ representations, and reports online improvements in Etsy search.
 
 ## References
 
-- Haldar, M. et al. "Applying Deep Learning to Airbnb Search." KDD 2019 (arXiv:1810.09591).
-- Haldar, M. et al. "Improving Deep Learning for Airbnb Search." KDD 2020 (arXiv:2002.05515).
-- Abdool, M. et al. "Learning To Rank Diversely At Airbnb." CIKM 2023 (arXiv:2210.07774).
-- Huang, J.-T. et al. "Embedding-based Retrieval in Facebook Search." KDD 2020 (arXiv:2006.11632).
-- Nigam, P. et al. "Semantic Product Search." KDD 2019 (arXiv:1907.00937).
-- Guo, W. et al. "DeText: A Deep Text Ranking Framework with BERT." CIKM 2020 (arXiv:2008.02460).
-- Geyik, S. C., Ambler, S., Kenthapadi, K. "Fairness-Aware Ranking in Search & Recommendation Systems with Application to LinkedIn Talent Search." KDD 2019 (arXiv:1905.01989).
-- Jha, R. et al. "Unified Embedding Based Personalized Retrieval in Etsy Search." 2023 (arXiv:2306.11424).
+- Haldar, M. et al. "Applying Deep Learning to Airbnb Search." KDD 2019 ([arXiv:1810.09591](https://arxiv.org/abs/1810.09591)).
+- Haldar, M. et al. "Improving Deep Learning for Airbnb Search." KDD 2020 ([arXiv:2002.05515](https://arxiv.org/abs/2002.05515)).
+- Abdool, M. et al. "Learning To Rank Diversely At Airbnb." CIKM 2023 ([arXiv:2210.07774](https://arxiv.org/abs/2210.07774)).
+- Huang, J.-T. et al. "Embedding-based Retrieval in Facebook Search." KDD 2020 ([arXiv:2006.11632](https://arxiv.org/abs/2006.11632)).
+- Nigam, P. et al. "Semantic Product Search." KDD 2019 ([arXiv:1907.00937](https://arxiv.org/abs/1907.00937)).
+- Guo, W. et al. "DeText: A Deep Text Ranking Framework with BERT." CIKM 2020 ([arXiv:2008.02460](https://arxiv.org/abs/2008.02460)).
+- Geyik, S. C., Ambler, S., Kenthapadi, K. "Fairness-Aware Ranking in Search & Recommendation Systems with Application to LinkedIn Talent Search." KDD 2019 ([arXiv:1905.01989](https://arxiv.org/abs/1905.01989)).
+- Jha, R. et al. "Unified Embedding Based Personalized Retrieval in Etsy Search." 2023 ([arXiv:2306.11424](https://arxiv.org/abs/2306.11424)).
 - Google (Nayak, P.). "Understanding searches better than ever before." The Keyword blog, October 2019.
 - Burges, C. J. C. et al. "Learning to Rank using Gradient Descent." ICML 2005.
 - Burges, C. J. C., Ragno, R., Le, Q. V. "Learning to Rank with Nonsmooth Cost Functions." NeurIPS 2006.
 - Burges, C. J. C. "From RankNet to LambdaRank to LambdaMART: An Overview." Microsoft Research Technical Report MSR-TR-2010-82, 2010.
 - Järvelin, K., Kekäläinen, J. "Cumulated Gain-Based Evaluation of IR Techniques." ACM TOIS 2002.
-- Joachims, T., Swaminathan, A., Schnabel, T. "Unbiased Learning-to-Rank with Biased Feedback." WSDM 2017 (arXiv:1608.04468).
+- Joachims, T., Swaminathan, A., Schnabel, T. "Unbiased Learning-to-Rank with Biased Feedback." WSDM 2017 ([arXiv:1608.04468](https://arxiv.org/abs/1608.04468)).
 - Wang, X. et al. "Position Bias Estimation for Unbiased Learning to Rank in Personal Search." WSDM 2018.
-- Nogueira, R., Cho, K. "Passage Re-ranking with BERT." 2019 (arXiv:1901.04085).
-- Khattab, O., Zaharia, M. "ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT." SIGIR 2020 (arXiv:2004.12832).
+- Nogueira, R., Cho, K. "Passage Re-ranking with BERT." 2019 ([arXiv:1901.04085](https://arxiv.org/abs/1901.04085)).
+- Khattab, O., Zaharia, M. "ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT." SIGIR 2020 ([arXiv:2004.12832](https://arxiv.org/abs/2004.12832)).
 - Book cross-references: [retrieval & RAG](../part13-retrieval-eval-reliability/01-retrieval-and-rag.md), [evaluation](../part13-retrieval-eval-reliability/02-evaluation.md).

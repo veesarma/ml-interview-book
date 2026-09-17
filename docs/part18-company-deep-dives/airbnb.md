@@ -192,7 +192,7 @@ flowchart LR
 
 ## Sources
 
-* Haldar et al., "Applying Deep Learning to Airbnb Search", KDD 2019 (arXiv 1810.09591).
+* Haldar et al., "Applying Deep Learning To Airbnb Search", KDD 2019. [arXiv:1810.09591](https://arxiv.org/abs/1810.09591) · [ACM DL](https://dl.acm.org/doi/10.1145/3292500.3330658) · [Airbnb Tech Blog version](https://medium.com/airbnb-engineering/applying-deep-learning-to-airbnb-search-7ebd7230891f)
 * Haldar et al., "Improving Deep Learning for Airbnb Search", KDD 2020 (arXiv 2002.05515).
 * Grbovic & Cheng, "Real-time Personalization using Embeddings for Search Ranking at Airbnb", KDD 2018.
 * Abdool et al., "Managing Diversity in Airbnb Search", KDD 2020 (arXiv 2004.02621).

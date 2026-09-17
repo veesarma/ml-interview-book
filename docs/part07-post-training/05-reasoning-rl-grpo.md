@@ -2,7 +2,7 @@
 
 > **Why this matters at staff level.** Between 2024 and 2025 the biggest capability jumps came from RL against *checkable* rewards rather than from more pretraining. Interviewers now expect you to derive GRPO the way they used to expect PPO, to explain why dropping the critic is affordable when you can sample a group, and to have opinions about reward hacking grounded in documented cases. Strong signal is knowing which parts of GRPO are load-bearing and which were later shown to be artefacts.
 
-## TL;DR the interview card
+## TL;DR: the interview card
 
 - RLVR (RL with verifiable rewards) replaces a learned reward model with a program: a math answer checker, a unit-test runner, a proof assistant, a format/schema validator. The reward is often binary, $r \in \{0, 1\}$, sometimes shaped (fraction of tests passed, format bonus).
 - A verifier cannot be over-optimised the way an RM can, because it *is* the objective. It can still be gamed when the check is weaker than the intent (tests that the model can special-case, graders it can talk around).
@@ -36,7 +36,7 @@ Two properties follow from the standardisation, and both show up in practice. If
 
 ![Group-relative advantages for three groups of eight: a mixed group, a rare-success group, and an all-correct group](../assets/figures/part07_grpo_advantages.png){ width="860" }
 
-The three panels show reward bars next to advantage bars. In the left panel the advantages are modest and symmetric. In the middle panel the single success gets an advantage near $+2.6$ while each failure gets about $-0.38$. In the right panel every bar is zero, which is the wasted-group case.
+The three panels show reward bars next to advantage bars. The left panel has 3 of 8 correct, giving $+1.29$ to each success and $-0.77$ to each failure. The middle panel has a single success, which gets $+2.65$ while each of the seven failures gets $-0.38$. The right panel is all-correct and every bar is zero, the wasted-group case.
 
 ```mermaid
 flowchart LR

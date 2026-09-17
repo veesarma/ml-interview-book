@@ -458,7 +458,7 @@ retrain), how to notify, and what goes into the postmortem.
     showing the backdoor survived transfer learning. This is the paper to cite for why dataset
     provenance is a security control.
     *Source: Gu, T., Dolan-Gavitt, B., Garg, S., "BadNets: Identifying Vulnerabilities in the
-    Machine Learning Model Supply Chain", 2017, arXiv:1708.06733.*
+    Machine Learning Model Supply Chain", 2017, [arXiv:1708.06733](https://arxiv.org/abs/1708.06733).*
 
 !!! production "UC Berkeley and others: robust physical-world attacks on sign recognition (2018)"
     Problem: do adversarial examples survive the physical channel. Built: Robust Physical
@@ -468,7 +468,7 @@ retrain), how to notify, and what goes into the postmortem.
     not a sufficient basis for a safety-relevant decision, which is an argument for fusion and
     temporal consistency.
     *Source: Eykholt, K. et al., "Robust Physical-World Attacks on Deep Learning Visual
-    Classification", CVPR 2018, arXiv:1707.08945.*
+    Classification", CVPR 2018, [arXiv:1707.08945](https://arxiv.org/abs/1707.08945).*
 
 !!! production "Google and collaborators: extracting training data from LLMs (2021 onward)"
     Problem: do generative models memorise and emit their training data. Built: an extraction
@@ -478,8 +478,8 @@ retrain), how to notify, and what goes into the postmortem.
     training corpus, which also improves model quality, so it is a rare defence with no accuracy
     cost.
     *Sources: Carlini, N. et al., "Extracting Training Data from Large Language Models",
-    USENIX Security 2021, arXiv:2012.07805; Carlini, N. et al., "Quantifying Memorization Across
-    Neural Language Models", ICLR 2023, arXiv:2202.07646.*
+    USENIX Security 2021, [arXiv:2012.07805](https://arxiv.org/abs/2012.07805); Carlini, N. et al., "Quantifying Memorization Across
+    Neural Language Models", ICLR 2023, [arXiv:2202.07646](https://arxiv.org/abs/2202.07646).*
 
 !!! production "Simon Willison: prompt injection and the lethal trifecta"
     Problem: LLM applications concatenate trusted instructions with untrusted content and then act
@@ -488,7 +488,8 @@ retrain), how to notify, and what goes into the postmortem.
     data, exposure to untrusted content, ability to externally communicate) that turns the
     vulnerability into a design checklist. The recurring conclusion across years of examples is
     that filtering the prompt does not work and the fix has to constrain what the system can do.
-    *Source: Simon Willison's weblog, the `prompt-injection` and `lethal-trifecta` tag archives.*
+    *Source: Simon Willison's weblog, the [`prompt-injection` series](https://simonwillison.net/series/prompt-injection/)
+    and the [June 2025 post naming the three ingredients](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/).*
 
 !!! production "Meta: Llama Guard and Purple Llama (2023 onward)"
     Problem: applications need a policy-configurable classifier for inputs and outputs, separate
@@ -498,7 +499,9 @@ retrain), how to notify, and what goes into the postmortem.
     architectural: the guard is a separate component with its own evaluation, so it can be tuned
     and audited without retraining the assistant.
     *Source: Inan, H. et al., "Llama Guard: LLM-based Input-Output Safeguard for Human-AI
-    Conversations", 2023, arXiv:2312.06674, and Meta's Purple Llama project.*
+    Conversations", 2023, [arXiv:2312.06674](https://arxiv.org/abs/2312.06674), and Meta's
+    [Purple Llama announcement](https://ai.meta.com/blog/purple-llama-open-trust-safety-generative-ai/)
+    and [repository](https://github.com/meta-llama/PurpleLlama).*
 
 !!! production "Google: the Secure AI Framework (SAIF)"
     Problem: organisations lacked a common structure for AI-specific risk alongside existing
@@ -506,8 +509,8 @@ retrain), how to notify, and what goes into the postmortem.
     ML systems, covering supply-chain integrity for data and models, detection and response for
     AI-specific incidents, automated defences, and a risk-assessment process. Useful in interviews
     as the vocabulary for talking about organisational controls rather than per-model defences.
-    *Source: Google, "Secure AI Framework (SAIF)", google.github.io/saif and the SAIF
-    announcement, 2023.*
+    *Source: Google, ["Secure AI Framework (SAIF)"](https://saif.google/) and the
+    [SAIF announcement](https://blog.google/innovation-and-ai/technology/safety-security/introducing-googles-secure-ai-framework/), 2023.*
 
 ## 6. Interview questions and strong answers
 
@@ -661,41 +664,41 @@ retrain), how to notify, and what goes into the postmortem.
 
 ## References
 
-Links are omitted where they could not be verified from this environment; search the exact title
-and venue.
-
 * Gu, T., Dolan-Gavitt, B., Garg, S. *BadNets: Identifying Vulnerabilities in the Machine Learning
-  Model Supply Chain.* 2017. arXiv:1708.06733.
+  Model Supply Chain.* 2017. [arXiv:1708.06733](https://arxiv.org/abs/1708.06733).
 * Tran, B., Li, J., Madry, A. *Spectral Signatures in Backdoor Attacks.* NeurIPS 2018.
-  arXiv:1811.00636.
-* Wang, B. et al. *Neural Cleanse: Identifying and Mitigating Backdoor Attacks in Neural Networks.*
+  [arXiv:1811.00636](https://arxiv.org/abs/1811.00636).
+* Wang, B. et al. [*Neural Cleanse: Identifying and Mitigating Backdoor Attacks in Neural Networks.*](https://ieeexplore.ieee.org/document/8835365/)
   IEEE S&P 2019.
 * Eykholt, K. et al. *Robust Physical-World Attacks on Deep Learning Visual Classification.*
-  CVPR 2018. arXiv:1707.08945.
+  CVPR 2018. [arXiv:1707.08945](https://arxiv.org/abs/1707.08945).
 * Yeom, S. et al. *Privacy Risk in Machine Learning: Analyzing the Connection to Overfitting.*
-  CSF 2018. arXiv:1709.01604.
+  CSF 2018. [arXiv:1709.01604](https://arxiv.org/abs/1709.01604).
 * Shokri, R. et al. *Membership Inference Attacks Against Machine Learning Models.* IEEE S&P 2017.
-  arXiv:1610.05820.
+  [arXiv:1610.05820](https://arxiv.org/abs/1610.05820).
 * Carlini, N. et al. *Membership Inference Attacks From First Principles.* IEEE S&P 2022.
-  arXiv:2112.03570 (LiRA, and the low-FPR reporting argument).
+  [arXiv:2112.03570](https://arxiv.org/abs/2112.03570) (LiRA, and the low-FPR reporting argument).
 * Carlini, N. et al. *Extracting Training Data from Large Language Models.* USENIX Security 2021.
-  arXiv:2012.07805.
+  [arXiv:2012.07805](https://arxiv.org/abs/2012.07805).
 * Carlini, N. et al. *Quantifying Memorization Across Neural Language Models.* ICLR 2023.
-  arXiv:2202.07646.
+  [arXiv:2202.07646](https://arxiv.org/abs/2202.07646).
 * Lee, K. et al. *Deduplicating Training Data Makes Language Models Better.* ACL 2022.
-  arXiv:2107.06499.
-* Abadi, M. et al. *Deep Learning with Differential Privacy.* CCS 2016. arXiv:1607.00133.
+  [arXiv:2107.06499](https://arxiv.org/abs/2107.06499).
+* Abadi, M. et al. *Deep Learning with Differential Privacy.* CCS 2016. [arXiv:1607.00133](https://arxiv.org/abs/1607.00133).
 * Tramèr, F. et al. *Stealing Machine Learning Models via Prediction APIs.* USENIX Security 2016.
-  arXiv:1609.02943.
+  [arXiv:1609.02943](https://arxiv.org/abs/1609.02943).
 * Greshake, K. et al. *Not what you've signed up for: Compromising Real-World LLM-Integrated
-  Applications with Indirect Prompt Injection.* AISec 2023. arXiv:2302.12173.
+  Applications with Indirect Prompt Injection.* AISec 2023. [arXiv:2302.12173](https://arxiv.org/abs/2302.12173).
 * Zou, A. et al. *Universal and Transferable Adversarial Attacks on Aligned Language Models.* 2023.
-  arXiv:2307.15043.
-* Anil, C. et al. *Many-shot Jailbreaking.* Anthropic, 2024.
+  [arXiv:2307.15043](https://arxiv.org/abs/2307.15043).
+* Anil, C. et al. [*Many-shot Jailbreaking.*](https://www.anthropic.com/research/many-shot-jailbreaking) Anthropic, 2024.
 * Inan, H. et al. *Llama Guard: LLM-based Input-Output Safeguard for Human-AI Conversations.* 2023.
-  arXiv:2312.06674.
-* Google. *Secure AI Framework (SAIF).* 2023.
-* Willison, S. *Prompt injection* and *lethal trifecta* post series, simonwillison.net.
-* ISO 26262:2018, *Road vehicles: Functional safety*; ISO 21448:2022, *Road vehicles: Safety of the
-  intended functionality (SOTIF)*.
-* Mitchell, M. et al. *Model Cards for Model Reporting.* FAT* 2019. arXiv:1810.03993.
+  [arXiv:2312.06674](https://arxiv.org/abs/2312.06674).
+* Google. [*Secure AI Framework (SAIF)*](https://saif.google/) and the
+  [announcement post](https://blog.google/innovation-and-ai/technology/safety-security/introducing-googles-secure-ai-framework/), 2023.
+* Willison, S. [*Prompt injection* post series](https://simonwillison.net/series/prompt-injection/) and
+  [the post naming the three ingredients that make an agent exploitable](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/),
+  simonwillison.net.
+* [ISO 26262:2018, *Road vehicles: Functional safety*](https://www.iso.org/publication/PUB200262.html);
+  [ISO 21448:2022, *Road vehicles: Safety of the intended functionality (SOTIF)*](https://www.iso.org/standard/77490.html).
+* Mitchell, M. et al. *Model Cards for Model Reporting.* FAT* 2019. [arXiv:1810.03993](https://arxiv.org/abs/1810.03993).

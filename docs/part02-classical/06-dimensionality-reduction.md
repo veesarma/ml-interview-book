@@ -293,7 +293,7 @@ classifier.
     output is exactly what PQ's per-sub-vector k-means needs. FAISS wiki.
     [The index factory](https://github.com/facebookresearch/faiss/wiki/The-index-factory),
     [Guidelines to choose an index](https://github.com/facebookresearch/faiss/wiki/Guidelines-to-choose-an-index);
-    Johnson, Douze, Jégou 2017, [arXiv:1702.08734](https://arxiv.org/pdf/1702.08734).
+    Johnson, Douze, Jégou 2017, [arXiv:1702.08734](https://arxiv.org/abs/1702.08734).
 
 !!! production "Pinterest: one unified visual embedding, compressed for serving"
     *Problem:* several product-specific visual embeddings were expensive to
@@ -448,8 +448,8 @@ $W_2W_1 = V_rV_r^T$ (the PCA projector), and that there are no other local minim
 - van der Maaten, L., Hinton, G. "Visualizing Data using t-SNE." *JMLR* 9, 2008. [jmlr.org](https://jmlr.org/papers/v9/vandermaaten08a.html)
 - McInnes, L., Healy, J., Melville, J. "UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction." 2018. [arXiv:1802.03426](https://arxiv.org/abs/1802.03426)
 - Wattenberg, M., Viégas, F., Johnson, I. "How to Use t-SNE Effectively." *Distill*, 2016. [distill.pub](https://distill.pub/2016/misread-tsne/)
-- Johnson, J., Douze, M., Jégou, H. "Billion-scale similarity search with GPUs." 2017. [arXiv:1702.08734](https://arxiv.org/pdf/1702.08734); FAISS wiki [The index factory](https://github.com/facebookresearch/faiss/wiki/The-index-factory)
-- Jégou, H., Douze, M., Schmid, C. "Product Quantization for Nearest Neighbor Search." *IEEE TPAMI* 33(1), 2011.
+- Johnson, J., Douze, M., Jégou, H. "Billion-scale similarity search with GPUs." 2017. [arXiv:1702.08734](https://arxiv.org/abs/1702.08734); FAISS wiki [The index factory](https://github.com/facebookresearch/faiss/wiki/The-index-factory)
+- Jégou, H., Douze, M., Schmid, C. "Product Quantization for Nearest Neighbor Search." *IEEE TPAMI* 33(1), 2011. [ACM DL](https://dl.acm.org/doi/10.1109/TPAMI.2010.57)
 - Zhai, A. et al. "Learning a Unified Embedding for Visual Search at Pinterest." KDD 2019. [arXiv:1908.01707](https://arxiv.org/abs/1908.01707)
 - Jing, Y. et al. "Visual Search at Pinterest." KDD 2015. [arXiv:1505.07647](https://arxiv.org/abs/1505.07647)
 - Kingma, D., Welling, M. "Auto-Encoding Variational Bayes." 2013. [arXiv:1312.6114](https://arxiv.org/abs/1312.6114)

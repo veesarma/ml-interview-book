@@ -535,4 +535,4 @@ ridge with a linear kernel gives the same predictions as ridge regression.
 - Reynolds, D., Quatieri, T., Dunn, R. "Speaker Verification Using Adapted Gaussian Mixture Models." *Digital Signal Processing* 10, 2000. [sciencedirect.com](https://www.sciencedirect.com/science/article/pii/S1051200499903615)
 - Bishop, C. *Pattern Recognition and Machine Learning*, ch. 6–7 (kernels, GPs, SVMs). [Free PDF](https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf)
 - Hastie, Tibshirani, Friedman. *The Elements of Statistical Learning*, ch. 6 (kernel smoothing), ch. 12 (SVMs). [Free PDF](https://hastie.su.domains/ElemStatLearn/)
-- Rahimi, A., Recht, B. "Random Features for Large-Scale Kernel Machines." NeurIPS 2007 (random Fourier features; see Exercise 3).
+- Rahimi, A., Recht, B. "Random Features for Large-Scale Kernel Machines." NeurIPS 2007 (random Fourier features; see Exercise 3). [proceedings.neurips.cc](https://proceedings.neurips.cc/paper/2007/hash/013a006f03dbc5392effeb8f18fda755-Abstract.html)

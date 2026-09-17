@@ -37,8 +37,9 @@
 ## 1. Intuition first
 
 You have 20 episodes of an expert keeping a car in a lane, gusts and all. Train a
-classifier from observation to action on those 300 or so $(s,a)$ pairs. Validation accuracy
-is high. Deploy it and it drifts out of the lane within 40 steps.
+classifier from observation to action on those 800 $(s,a)$ pairs. Validation accuracy is
+high. Deploy it and it leaves the lane after 23 steps on average, where the expert lasts 34
+out of the 40-step episode.
 
 Nothing is wrong with the classifier. The problem is what it was never shown. The expert
 is good, so the expert is almost always near the lane centre, so the training set contains

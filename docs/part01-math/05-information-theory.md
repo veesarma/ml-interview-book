@@ -339,7 +339,7 @@ training shards the similarity matrix across devices.
 
 !!! production "OpenAI: the KL penalty in InstructGPT / RLHF"
     L. Ouyang et al., "Training language models to follow instructions with human feedback", NeurIPS 2022
-    (arXiv:2203.02155). The RL objective is $\E[r_\theta(x, y)] - \beta\log\frac{\pi_\theta(y|x)}{\pi_{\text{SFT}}(y|x)}$
+    ([arXiv:2203.02155](https://arxiv.org/abs/2203.02155)). The RL objective is $\E[r_\theta(x, y)] - \beta\log\frac{\pi_\theta(y|x)}{\pi_{\text{SFT}}(y|x)}$
     plus a pretraining-loss term; the log-ratio is the per-sample estimate of the *reverse* KL to the SFT model.
     *Why reverse KL:* it is computable on the policy's own samples and it lets the policy sharpen onto high-reward
     behaviours while forbidding text the SFT model finds implausible. The mode-seeking property is the feature.
@@ -348,34 +348,34 @@ training shards the similarity matrix across devices.
 
 !!! production "OpenAI: CLIP and the InfoNCE bound at scale"
     A. Radford et al., "Learning Transferable Visual Models From Natural Language Supervision", ICML 2021
-    (arXiv:2103.00020), building on A. van den Oord et al., "Representation Learning with Contrastive Predictive
-    Coding", 2018 (arXiv:1807.03748). CLIP trains image and text encoders with the symmetric InfoNCE loss over
+    ([arXiv:2103.00020](https://arxiv.org/abs/2103.00020)), building on A. van den Oord et al., "Representation Learning with Contrastive Predictive
+    Coding", 2018 ([arXiv:1807.03748](https://arxiv.org/abs/1807.03748)). CLIP trains image and text encoders with the symmetric InfoNCE loss over
     batches of 32,768 image–text pairs and a learned temperature initialised at $0.07$. *Why contrastive rather than
     generative captioning:* the paper reports an order-of-magnitude efficiency gain in zero-shot transfer per compute.
     *Why the batch size:* the $\log N$ ceiling of §2.5. More negatives per step means more information the objective can
     measure. The similarity matrix is sharded across accelerators so that the $N\times N$ logits never live on one device.
 
 !!! production "Google DeepMind: distillation as forward KL in Gemma 2; reverse KL in MiniLLM / GKD"
-    Gemma Team, "Gemma 2: Improving Open Language Models at a Practical Size", 2024 (arXiv:2408.00118): the 2B and 9B
+    Gemma Team, "Gemma 2: Improving Open Language Models at a Practical Size", 2024 ([arXiv:2408.00118](https://arxiv.org/abs/2408.00118)): the 2B and 9B
     models are trained by minimising the forward KL to a larger teacher's next-token distribution over the
     pretraining corpus, which the report finds better than training from scratch on the same token budget.
-    Y. Gu et al., "MiniLLM: Knowledge Distillation of Large Language Models", ICLR 2024 (arXiv:2306.08543) and
-    R. Agarwal et al., "On-Policy Distillation of Language Models", ICLR 2024 (arXiv:2306.13649) instead minimise
+    Y. Gu et al., "MiniLLM: Knowledge Distillation of Large Language Models", ICLR 2024 ([arXiv:2306.08543](https://arxiv.org/abs/2306.08543)) and
+    R. Agarwal et al., "On-Policy Distillation of Language Models", ICLR 2024 ([arXiv:2306.13649](https://arxiv.org/abs/2306.13649)) instead minimise
     a reverse (or generalised JS) divergence on *student-generated* sequences, arguing that a low-capacity student
     should not be forced to cover every teacher mode. *Trade-off:* forward KL needs only teacher logits on fixed data
     (cheap, parallel); on-policy methods need student sampling plus teacher scoring each step (2–3× the cost) but
     close the exposure-bias gap.
 
 !!! production "EleutherAI: bits per byte as the comparable LM metric"
-    L. Gao et al., "The Pile: An 800GB Dataset of Diverse Text for Language Modeling", 2020 (arXiv:2101.00027).
+    L. Gao et al., "The Pile: An 800GB Dataset of Diverse Text for Language Modeling", 2020 ([arXiv:2101.00027](https://arxiv.org/abs/2101.00027)).
     The Pile's evaluation protocol reports bits per byte (and per-UTF-8-byte perplexity) precisely because GPT-2,
     GPT-3 and later models use different tokenizers. G. Delétang et al., "Language Modeling Is Compression", ICLR
-    2024 (arXiv:2309.10668) push the same idea to its conclusion: an LM plus arithmetic coding is a general-purpose
+    2024 ([arXiv:2309.10668](https://arxiv.org/abs/2309.10668)) push the same idea to its conclusion: an LM plus arithmetic coding is a general-purpose
     compressor whose compression ratio is its BPB, and Chinchilla-scale models compress ImageNet patches and
     LibriSpeech audio better than PNG and FLAC.
 
 !!! production "OpenAI: the entropy bonus in PPO"
-    J. Schulman et al., "Proximal Policy Optimization Algorithms", 2017 (arXiv:1707.06347). The PPO loss adds
+    J. Schulman et al., "Proximal Policy Optimization Algorithms", 2017 ([arXiv:1707.06347](https://arxiv.org/abs/1707.06347)). The PPO loss adds
     $c_2\,H[\pi_\theta](s_t)$ (coefficient $0.01$ in the Atari experiments, $0$ for continuous control) to
     discourage premature determinism. In RLHF for LLMs the entropy coefficient is typically zero and the reverse-KL
     penalty does the regularising; in RLVR-style reasoning training (GRPO variants) entropy collapse re-emerged as a
@@ -495,16 +495,16 @@ training shards the similarity matrix across devices.
 * C. Shannon, "A Mathematical Theory of Communication", *Bell System Technical Journal*, 1948.
 * T. Cover & J. Thomas, *Elements of Information Theory*, 2nd ed., Wiley, 2006.
 * D. MacKay, *Information Theory, Inference, and Learning Algorithms*, Cambridge University Press, 2003.
-* L. Ouyang et al., "Training language models to follow instructions with human feedback", NeurIPS 2022 (arXiv:2203.02155).
-* J. Schulman et al., "Proximal Policy Optimization Algorithms", 2017 (arXiv:1707.06347).
-* A. van den Oord, Y. Li & O. Vinyals, "Representation Learning with Contrastive Predictive Coding", 2018 (arXiv:1807.03748).
-* B. Poole et al., "On Variational Bounds of Mutual Information", ICML 2019 (arXiv:1905.06922).
-* A. Radford et al., "Learning Transferable Visual Models From Natural Language Supervision", ICML 2021 (arXiv:2103.00020).
-* G. Hinton, O. Vinyals & J. Dean, "Distilling the Knowledge in a Neural Network", 2015 (arXiv:1503.02531).
-* Y. Gu et al., "MiniLLM: Knowledge Distillation of Large Language Models", ICLR 2024 (arXiv:2306.08543); R. Agarwal et al., "On-Policy Distillation of Language Models: Learning from Self-Generated Mistakes", ICLR 2024 (arXiv:2306.13649).
-* Gemma Team, "Gemma 2: Improving Open Language Models at a Practical Size", 2024 (arXiv:2408.00118).
-* L. Gao et al., "The Pile: An 800GB Dataset of Diverse Text for Language Modeling", 2020 (arXiv:2101.00027).
-* G. Delétang et al., "Language Modeling Is Compression", ICLR 2024 (arXiv:2309.10668).
-* Z. Allen-Zhu & Y. Li, "Physics of Language Models: Part 3.3, Knowledge Capacity Scaling Laws", 2024 (arXiv:2404.05405).
-* D. Kingma & M. Welling, "Auto-Encoding Variational Bayes", ICLR 2014 (arXiv:1312.6114).
-* I. Goodfellow et al., "Generative Adversarial Nets", NeurIPS 2014 (arXiv:1406.2661).
+* L. Ouyang et al., "Training language models to follow instructions with human feedback", NeurIPS 2022 ([arXiv:2203.02155](https://arxiv.org/abs/2203.02155)).
+* J. Schulman et al., "Proximal Policy Optimization Algorithms", 2017 ([arXiv:1707.06347](https://arxiv.org/abs/1707.06347)).
+* A. van den Oord, Y. Li & O. Vinyals, "Representation Learning with Contrastive Predictive Coding", 2018 ([arXiv:1807.03748](https://arxiv.org/abs/1807.03748)).
+* B. Poole et al., "On Variational Bounds of Mutual Information", ICML 2019 ([arXiv:1905.06922](https://arxiv.org/abs/1905.06922)).
+* A. Radford et al., "Learning Transferable Visual Models From Natural Language Supervision", ICML 2021 ([arXiv:2103.00020](https://arxiv.org/abs/2103.00020)).
+* G. Hinton, O. Vinyals & J. Dean, "Distilling the Knowledge in a Neural Network", 2015 ([arXiv:1503.02531](https://arxiv.org/abs/1503.02531)).
+* Y. Gu et al., "MiniLLM: Knowledge Distillation of Large Language Models", ICLR 2024 ([arXiv:2306.08543](https://arxiv.org/abs/2306.08543)); R. Agarwal et al., "On-Policy Distillation of Language Models: Learning from Self-Generated Mistakes", ICLR 2024 ([arXiv:2306.13649](https://arxiv.org/abs/2306.13649)).
+* Gemma Team, "Gemma 2: Improving Open Language Models at a Practical Size", 2024 ([arXiv:2408.00118](https://arxiv.org/abs/2408.00118)).
+* L. Gao et al., "The Pile: An 800GB Dataset of Diverse Text for Language Modeling", 2020 ([arXiv:2101.00027](https://arxiv.org/abs/2101.00027)).
+* G. Delétang et al., "Language Modeling Is Compression", ICLR 2024 ([arXiv:2309.10668](https://arxiv.org/abs/2309.10668)).
+* Z. Allen-Zhu & Y. Li, "Physics of Language Models: Part 3.3, Knowledge Capacity Scaling Laws", 2024 ([arXiv:2404.05405](https://arxiv.org/abs/2404.05405)).
+* D. Kingma & M. Welling, "Auto-Encoding Variational Bayes", ICLR 2014 ([arXiv:1312.6114](https://arxiv.org/abs/1312.6114)).
+* I. Goodfellow et al., "Generative Adversarial Nets", NeurIPS 2014 ([arXiv:1406.2661](https://arxiv.org/abs/1406.2661)).

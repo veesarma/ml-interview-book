@@ -532,23 +532,20 @@ in-context retrieval and copying, which hybrids fix by keeping ~1 in 8 layers as
 
 ## References
 
-Hyperlinked entries were verified at build time; entries without a link are given by title
-and arXiv id.
-
 - Jiang et al. *Mixtral of Experts*. 2024. [arXiv:2401.04088](https://arxiv.org/abs/2401.04088); [Mistral blog](https://mistral.ai/news/mixtral-of-experts/)
 - Jiang et al. *Mistral 7B*. 2023. [arXiv:2310.06825](https://arxiv.org/abs/2310.06825)
 - DeepSeek-AI. *DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model*. 2024. [arXiv:2405.04434](https://arxiv.org/abs/2405.04434)
 - DeepSeek-AI. *DeepSeek-V3 Technical Report*. 2024. [arXiv:2412.19437](https://arxiv.org/abs/2412.19437)
 - Meta AI. *The Llama 3 Herd of Models*. 2024. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783)
-- Fedus, Zoph, Shazeer. *Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity*. JMLR 2022. arXiv:2101.03961
-- Lepikhin et al. *GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding*. ICLR 2021. arXiv:2006.16668
-- Dai et al. *DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models*. 2024. arXiv:2401.06066
-- Wang et al. *Auxiliary-Loss-Free Load Balancing Strategy for Mixture-of-Experts*. 2024. arXiv:2408.15664
-- Shazeer. *Fast Transformer Decoding: One Write-Head is All You Need*. 2019. arXiv:1911.02150 (MQA)
-- Ainslie et al. *GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints*. EMNLP 2023. arXiv:2305.13245
-- Beltagy et al. *Longformer: The Long-Document Transformer*. 2020. arXiv:2004.05150
-- Xiao et al. *Efficient Streaming Language Models with Attention Sinks*. ICLR 2024. arXiv:2309.17453
-- Gu, Goel, Ré. *Efficiently Modeling Long Sequences with Structured State Spaces*. ICLR 2022. arXiv:2111.00396 (S4)
-- Gu, Dao. *Mamba: Linear-Time Sequence Modeling with Selective State Spaces*. 2023. arXiv:2312.00752
-- Lieber et al. *Jamba: A Hybrid Transformer-Mamba Language Model*. 2024. arXiv:2403.19887
-- Gemma Team. *Gemma 2: Improving Open Language Models at a Practical Size*. 2024. arXiv:2408.00118 (interleaved local/global attention)
+- Fedus, Zoph, Shazeer. *Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity*. JMLR 2022. [arXiv:2101.03961](https://arxiv.org/abs/2101.03961)
+- Lepikhin et al. *GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding*. ICLR 2021. [arXiv:2006.16668](https://arxiv.org/abs/2006.16668)
+- Dai et al. *DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models*. 2024. [arXiv:2401.06066](https://arxiv.org/abs/2401.06066)
+- Wang et al. *Auxiliary-Loss-Free Load Balancing Strategy for Mixture-of-Experts*. 2024. [arXiv:2408.15664](https://arxiv.org/abs/2408.15664)
+- Shazeer. *Fast Transformer Decoding: One Write-Head is All You Need*. 2019. [arXiv:1911.02150](https://arxiv.org/abs/1911.02150) (MQA)
+- Ainslie et al. *GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints*. EMNLP 2023. [arXiv:2305.13245](https://arxiv.org/abs/2305.13245)
+- Beltagy et al. *Longformer: The Long-Document Transformer*. 2020. [arXiv:2004.05150](https://arxiv.org/abs/2004.05150)
+- Xiao et al. *Efficient Streaming Language Models with Attention Sinks*. ICLR 2024. [arXiv:2309.17453](https://arxiv.org/abs/2309.17453)
+- Gu, Goel, Ré. *Efficiently Modeling Long Sequences with Structured State Spaces*. ICLR 2022. [arXiv:2111.00396](https://arxiv.org/abs/2111.00396) (S4)
+- Gu, Dao. *Mamba: Linear-Time Sequence Modeling with Selective State Spaces*. 2023. [arXiv:2312.00752](https://arxiv.org/abs/2312.00752)
+- Lieber et al. *Jamba: A Hybrid Transformer-Mamba Language Model*. 2024. [arXiv:2403.19887](https://arxiv.org/abs/2403.19887)
+- Gemma Team. *Gemma 2: Improving Open Language Models at a Practical Size*. 2024. [arXiv:2408.00118](https://arxiv.org/abs/2408.00118) (interleaved local/global attention)

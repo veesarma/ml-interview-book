@@ -400,7 +400,7 @@ takes $O(\kappa)$ iterations ([chapter 06](06-optimization.md)).
     two-tower retrieval model ([Part XVII](../part17-ml-system-design/01-recommendation-feed-ranking.md)).
 
 !!! production "Microsoft: LoRA for adapting GPT-3-class models"
-    Hu et al., "LoRA: Low-Rank Adaptation of Large Language Models", ICLR 2022 (arXiv:2106.09685).
+    Hu et al., "LoRA: Low-Rank Adaptation of Large Language Models", ICLR 2022 ([arXiv:2106.09685](https://arxiv.org/abs/2106.09685)).
     Freezes $W_0$ and trains $BA$ with $r$ as small as 1–8 on attention projections. *Why:* full fine-tuning
     of a 175B model needs a separate 350 GB checkpoint per task and optimizer state $\sim 3\times$ the
     weights; LoRA reduces trainable parameters by up to $10^4\times$ and optimizer memory by $\sim 3\times$,
@@ -409,16 +409,16 @@ takes $O(\kappa)$ iterations ([chapter 06](06-optimization.md)).
     analysis of $\Delta W$ shows its top singular directions dominate, which is Eckart-Young in the wild.
 
 !!! production "Spectral normalisation for GAN discriminators (Preferred Networks)"
-    Miyato et al., "Spectral Normalization for Generative Adversarial Networks", ICLR 2018 (arXiv:1802.05957).
+    Miyato et al., "Spectral Normalization for Generative Adversarial Networks", ICLR 2018 ([arXiv:1802.05957](https://arxiv.org/abs/1802.05957)).
     Each weight matrix is divided by $\sigma_1(W)$, estimated with one power-iteration step per update,
     so the discriminator is (approximately) 1-Lipschitz. *Why:* the WGAN theory needs a Lipschitz critic;
     weight clipping destroys capacity and gradient penalty costs an extra backward pass. *Cost:* one extra
     matvec pair per layer per step. It became the default stabiliser in BigGAN-era image generation.
 
 !!! production "Kalman-filter trackers in perception stacks (SORT, DeepSORT, AB3DMOT)"
-    Bewley et al., "Simple Online and Realtime Tracking", ICIP 2016 (arXiv:1602.00763); Wojke et al.,
-    "Simple Online and Realtime Tracking with a Deep Association Metric", ICIP 2017 (arXiv:1703.07402);
-    Weng et al., "3D Multi-Object Tracking: A Baseline and New Evaluation Metrics", IROS 2020 (arXiv:1907.03961).
+    Bewley et al., "Simple Online and Realtime Tracking", ICIP 2016 ([arXiv:1602.00763](https://arxiv.org/abs/1602.00763)); Wojke et al.,
+    "Simple Online and Realtime Tracking with a Deep Association Metric", ICIP 2017 ([arXiv:1703.07402](https://arxiv.org/abs/1703.07402));
+    Weng et al., "3D Multi-Object Tracking: A Baseline and New Evaluation Metrics", IROS 2020 ([arXiv:1907.03961](https://arxiv.org/abs/1907.03961)).
     Each track carries a state mean and a PSD covariance $P$; predict $P \leftarrow FPF^\top + Q$ and
     update with the Kalman gain $K = PH^\top(HPH^\top + R)^{-1}$, which is the Gaussian conditioning formula of
     [chapter 03](03-probability.md). PSD-ness of $P$ is what makes the Mahalanobis gating distance used for
@@ -570,12 +570,12 @@ verified in the build environment.
 
 * G. Strang, *Introduction to Linear Algebra*, 5th ed., Wellesley-Cambridge Press, 2016 (and MIT OCW 18.06).
 * C. Eckart & G. Young, "The approximation of one matrix by another of lower rank", *Psychometrika*, 1936.
-* N. Halko, P.-G. Martinsson & J. Tropp, "Finding Structure with Randomness: Probabilistic Algorithms for Constructing Approximate Matrix Decompositions", *SIAM Review*, 2011 (arXiv:0909.4061).
+* N. Halko, P.-G. Martinsson & J. Tropp, "Finding Structure with Randomness: Probabilistic Algorithms for Constructing Approximate Matrix Decompositions", *SIAM Review*, 2011 ([arXiv:0909.4061](https://arxiv.org/abs/0909.4061)).
 * Y. Koren, R. Bell & C. Volinsky, "Matrix Factorization Techniques for Recommender Systems", *IEEE Computer*, 2009.
-* E. Hu et al., "LoRA: Low-Rank Adaptation of Large Language Models", ICLR 2022 (arXiv:2106.09685).
-* T. Miyato et al., "Spectral Normalization for Generative Adversarial Networks", ICLR 2018 (arXiv:1802.05957).
-* A. Vaswani et al., "Attention Is All You Need", NeurIPS 2017 (arXiv:1706.03762).
-* A. Bewley et al., "Simple Online and Realtime Tracking", ICIP 2016 (arXiv:1602.00763).
-* N. Wojke, A. Bewley & D. Paulus, "Simple Online and Realtime Tracking with a Deep Association Metric", ICIP 2017 (arXiv:1703.07402).
-* X. Weng et al., "3D Multi-Object Tracking: A Baseline and New Evaluation Metrics", IROS 2020 (arXiv:1907.03961).
+* E. Hu et al., "LoRA: Low-Rank Adaptation of Large Language Models", ICLR 2022 ([arXiv:2106.09685](https://arxiv.org/abs/2106.09685)).
+* T. Miyato et al., "Spectral Normalization for Generative Adversarial Networks", ICLR 2018 ([arXiv:1802.05957](https://arxiv.org/abs/1802.05957)).
+* A. Vaswani et al., "Attention Is All You Need", NeurIPS 2017 ([arXiv:1706.03762](https://arxiv.org/abs/1706.03762)).
+* A. Bewley et al., "Simple Online and Realtime Tracking", ICIP 2016 ([arXiv:1602.00763](https://arxiv.org/abs/1602.00763)).
+* N. Wojke, A. Bewley & D. Paulus, "Simple Online and Realtime Tracking with a Deep Association Metric", ICIP 2017 ([arXiv:1703.07402](https://arxiv.org/abs/1703.07402)).
+* X. Weng et al., "3D Multi-Object Tracking: A Baseline and New Evaluation Metrics", IROS 2020 ([arXiv:1907.03961](https://arxiv.org/abs/1907.03961)).
 * K. Petersen & M. Pedersen, *The Matrix Cookbook*, Technical University of Denmark, 2012.

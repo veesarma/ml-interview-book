@@ -487,18 +487,15 @@ cost but makes the output softmax and embedding matrices larger.
 
 ## References
 
-Hyperlinked entries were verified at build time; entries without a link are given by title
-and arXiv id so you can search them.
-
 - Meta AI. *The Llama 3 Herd of Models*. 2024. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783)
 - Penedo et al. *The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale*. 2024.
   [Blog](https://huggingface.co/spaces/HuggingFaceFW/blogpost-fineweb-v1), [paper page](https://huggingface.co/papers/2406.17557)
 - Soldaini et al. *Dolma: an Open Corpus of Three Trillion Tokens*. 2024. [arXiv:2402.00159](https://arxiv.org/abs/2402.00159)
 - OLMo Team. *2 OLMo 2 Furious*. 2024. [arXiv:2501.00656](https://arxiv.org/abs/2501.00656)
 - DeepSeek-AI. *DeepSeek-V3 Technical Report*. 2024. [arXiv:2412.19437](https://arxiv.org/abs/2412.19437)
-- Lee et al. *Deduplicating Training Data Makes Language Models Better*. ACL 2022. arXiv:2107.06499
-- Xie et al. *DoReMi: Optimizing Data Mixtures Speeds Up Language Model Pretraining*. NeurIPS 2023. arXiv:2305.10429
-- Rae et al. *Scaling Language Models: Methods, Analysis & Insights from Training Gopher*. 2021. arXiv:2112.11446 (the "Gopher rules")
-- Brown et al. *Language Models are Few-Shot Learners*. NeurIPS 2020. arXiv:2005.14165 (13-gram decontamination)
-- Gao et al. *The Pile: An 800GB Dataset of Diverse Text for Language Modeling*. 2020. arXiv:2101.00027 (bits-per-byte reporting)
-- Broder. *On the resemblance and containment of documents*. Compression and Complexity of Sequences, 1997 (MinHash)
+- Lee et al. *Deduplicating Training Data Makes Language Models Better*. ACL 2022. [arXiv:2107.06499](https://arxiv.org/abs/2107.06499)
+- Xie et al. *DoReMi: Optimizing Data Mixtures Speeds Up Language Model Pretraining*. NeurIPS 2023. [arXiv:2305.10429](https://arxiv.org/abs/2305.10429)
+- Rae et al. *Scaling Language Models: Methods, Analysis & Insights from Training Gopher*. 2021. [arXiv:2112.11446](https://arxiv.org/abs/2112.11446) (the "Gopher rules")
+- Brown et al. *Language Models are Few-Shot Learners*. NeurIPS 2020. [arXiv:2005.14165](https://arxiv.org/abs/2005.14165) (13-gram decontamination)
+- Gao et al. *The Pile: An 800GB Dataset of Diverse Text for Language Modeling*. 2020. [arXiv:2101.00027](https://arxiv.org/abs/2101.00027) (bits-per-byte reporting)
+- Broder. *On the resemblance and containment of documents*. Compression and Complexity of Sequences, 1997 (MinHash). [ACM DL](https://dl.acm.org/doi/10.5555/829502.830043)

@@ -27,16 +27,16 @@ def smoke_config() -> PipelineConfig:
     """A quarter-size run: same code path, fewer steps."""
     return PipelineConfig(
         seed=0,
-        n_train=320,
-        n_eval=128,
-        sft_steps=220,
+        n_train=480,
+        n_eval=160,
+        sft_steps=300,
         sft_batch_size=32,
-        rm_steps=40,
+        rm_steps=60,
         rm_batch_size=24,
         dpo_steps=40,
         dpo_batch_size=16,
-        grpo_steps=10,
-        grpo_prompts_per_step=6,
+        grpo_steps=20,
+        grpo_prompts_per_step=8,
         grpo_group_size=4,
     )
 
@@ -64,7 +64,7 @@ def test_the_model_is_tiny_and_the_token_budget_is_reported(report):
     assert report["tokens"]["vocab_size"] == task.VOCAB_SIZE
     assert report["tokens"]["patches_per_image"] == 16
     assert report["tokens"]["visual_tokens_per_image"] == 8
-    assert report["tokens"]["supervised_tokens"] == 220 * 32 * 2
+    assert report["tokens"]["supervised_tokens"] == 300 * 32 * 2
 
 
 def test_sft_learns_the_task(report):
@@ -82,8 +82,8 @@ def test_reward_model_ranks_preferences(report):
 
 def test_post_training_does_not_reduce_accuracy(report):
     """DPO and GRPO both push probability mass onto the verified answer, so
-    neither may fall below the SFT policy by more than sampling noise on 128
-    evaluation examples (one example is 0.008)."""
+    neither may fall below the SFT policy by more than the noise of a
+    160-example evaluation, where one example is worth 0.006."""
     acc = report["accuracy"]
     tolerance = 0.03
     assert acc["dpo"] >= acc["sft"] - tolerance

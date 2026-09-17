@@ -20,7 +20,7 @@
   Its journal has technical posts on perception and on **sensor staleness**.
 - **Nuro**: founded 2016 by ex-Google self-driving engineers; R1–R3 delivery vehicles;
   now licenses the **Nuro Driver** (L4, "AI-first") to partners; public engineering
-  posts on **CIMRL** (combining imitation and RL for safe driving, arXiv:2406.08878),
+  posts on **CIMRL** (combining imitation and RL for safe driving, [arXiv:2406.08878](https://arxiv.org/abs/2406.08878)),
   a **unified perception model**, and an in-house model-compiler framework.
 - **Aurora**: the Aurora Driver for long-haul trucking; commercial driverless
   freight in Texas from May 2025, night operations by August 2025; **FirstLight**
@@ -66,7 +66,7 @@ philosophy).
 | **Sensor timing and staleness** (Zoox) | Sensors arrive at different rates and with jitter; a model that assumes fresh inputs fails silently when one stream lags. | Zoox journal post on sensor staleness. |
 | **Remote assistance that is not remote driving** (Zoox, Nuro) | Humans must help with ambiguous scenes without adding network latency to the safety case. | Zoox TeleGuidance (public materials); Nuro remote operations for delivery. |
 | **A vehicle-agnostic learned driver** (Nuro) | Licensing means the stack must port across sensor sets and compute; models must be compiled for partner hardware. | Nuro blog: unified perception model; model-compiler framework. |
-| **Learning to drive safely, not just human-like** (Nuro, Aurora) | Pure imitation compounds error and copies human mistakes; pure RL needs reward engineering and a realistic simulator. | Nuro CIMRL (arXiv:2406.08878); Aurora, "AI Alignment: Ensuring the Aurora Driver is Safe and Human-Like". |
+| **Learning to drive safely, not just human-like** (Nuro, Aurora) | Pure imitation compounds error and copies human mistakes; pure RL needs reward engineering and a realistic simulator. | Nuro CIMRL ([arXiv:2406.08878](https://arxiv.org/abs/2406.08878)); Aurora, "AI Alignment: Ensuring the Aurora Driver is Safe and Human-Like". |
 | **Long-range perception at highway speed** (Aurora) | Stopping distance for a loaded truck requires detection hundreds of metres out, at night and in weather. | Aurora FirstLight FMCW lidar posts; company site (450 m, night pedestrian detection). |
 | **A safety argument for a learned system** (Aurora) | Learned components must be wrapped in a structure whose behaviour can be verified against requirements. | Aurora "Verifiable AI" (2024); Safety Case Framework (2020, public site). |
 
@@ -240,7 +240,7 @@ framing: pure imitation (compounding error, copying mistakes) and pure RL (rewar
 design, sample cost).
 
 **Sources.** Nuro blog, "CIMRL: Combining Imitation and Reinforcement Learning for
-Safe Autonomous Driving" and the paper (arXiv:2406.08878); Nuro blog, "Unified
+Safe Autonomous Driving" and the paper ([arXiv:2406.08878](https://arxiv.org/abs/2406.08878)); Nuro blog, "Unified
 Perception Model"; Nuro blog, "FTL Model Compiler Framework".
 
 !!! tip "How to say it in the interview"

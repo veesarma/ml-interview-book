@@ -2,7 +2,7 @@
 
 > **Why this matters at staff level.** Capability stopped being a function of training compute alone. A model that answers in one pass and the same model allowed to sample 64 times, rerank, and revise are different products with different cost curves, and the second one is often cheaper than training a larger model to match it. Interviews probe whether you can derive the best-of-N KL bound, say when search beats sampling, and then cost the thing out per query at serving time.
 
-## TL;DR the interview card
+## TL;DR: the interview card
 
 - Chain of thought turns one forward pass into many by putting intermediate steps in the context. The extra tokens are extra serial compute the model can condition on.
 - Self-consistency samples $N$ chains at temperature $>0$ and takes the majority answer. It needs an answer that can be compared for equality. Accuracy rises with $N$ and saturates.
@@ -90,7 +90,9 @@ $$
 \E\big[\max_{i\le N} r_i\big] \approx \mu + \sigma\sqrt{2\log N}
 $$
 
-to leading order. Combining with §2.2, the proxy reward gained per nat of KL spent falls off like $1/\sqrt{\log N}$: going from $N=1$ to $N=16$ buys roughly $2.0\sigma$ for $2.7$ nats, while $N=256$ to $N=4096$ buys about $0.7\sigma$ for another $2.8$ nats.
+as an asymptotic leading term; at moderate $N$ it overstates the true expectation by 20 % or so, because the next term in the expansion is negative. Measured by Monte Carlo, $\E[\max]$ is $1.76\sigma$ at $N=16$, $2.83\sigma$ at $N=256$ and $3.63\sigma$ at $N=4096$.
+
+Combining with §2.2, the proxy reward gained per nat of KL spent falls off. Going from $N=1$ to $N=16$ buys $1.76\sigma$ for $1.84$ nats. Going from $N=256$ to $N=4096$, a $16\times$ increase again, buys $0.80\sigma$ for $2.77$ nats: roughly a fifth of the reward for half again as much KL.
 
 This is a statement about the *proxy*. Gao et al.'s measured gold reward for best-of-N follows $d(\alpha - \beta\log d)$ with $d = \sqrt{\KL}$, rising then falling, so past some $N$ the true quality degrades even though the RM score keeps climbing (chapter 2 §2.5).
 

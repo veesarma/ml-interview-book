@@ -457,10 +457,10 @@ stochastic. `tests/test_rl_dqn.py` does both:
   still corresponds to the sampled `obs`.
 * **Dueling identifiability.** Row means of $Q$ equal $V$.
 * **Schedule endpoints.** $\varepsilon$ at step 0, midway and past the end.
-* **End-to-end return threshold.** Train for 80 episodes (about 4 seconds on one CPU
+* **End-to-end return threshold.** Train for 80 episodes (about 2 seconds on one CPU
   thread) and require the greedy policy to average above $-6$ over 20 evaluation episodes,
-  where a uniform random policy scores about $-17$ and a hand-tuned PD controller about
-  $-2$. The assertion has margin, because a test that requires a specific return is a test
+  where a uniform random policy scores about $-16$ and a hand-tuned PD controller about
+  $-3$. The assertion has margin, because a test that requires a specific return is a test
   that will flake.
 
 ```bash

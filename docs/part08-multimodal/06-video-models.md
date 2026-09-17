@@ -384,9 +384,9 @@ data problem: people describe an action before, during or after doing it.
     cheaper with a small accuracy cost, and that initialising from image-pretrained ViT weights
     plus strong regularisation is what makes video Transformers trainable on datasets far
     smaller than image corpora. Source: *ViViT: A Video Vision Transformer*, Arnab et al., ICCV
-    2021 (arXiv:2103.15691). The block-factorised variant was developed concurrently as
+    2021 ([arXiv:2103.15691](https://arxiv.org/abs/2103.15691)). The block-factorised variant was developed concurrently as
     divided space-time attention in *Is Space-Time Attention All You Need for Video
-    Understanding?* (TimeSformer), Bertasius et al., ICML 2021 (arXiv:2102.05095).
+    Understanding?* (TimeSformer), Bertasius et al., ICML 2021 ([arXiv:2102.05095](https://arxiv.org/abs/2102.05095)).
 
 !!! production "Nanjing University and Tencent: VideoMAE's tube masking at 90 to 95%"
     VideoMAE masks 90 to 95% of tubelets with the same spatial pattern across frames, and
@@ -396,7 +396,7 @@ data problem: people describe an action before, during or after doing it.
     which is what makes the pretraining affordable, and the authors report that it trains
     usefully on datasets of a few thousand videos where supervised training fails. Source:
     *VideoMAE: Masked Autoencoders are Data-Efficient Learners for Self-Supervised Video
-    Pre-Training*, Tong et al., NeurIPS 2022 (arXiv:2203.12602).
+    Pre-Training*, Tong et al., NeurIPS 2022 ([arXiv:2203.12602](https://arxiv.org/abs/2203.12602)).
 
 !!! production "Meta: token merging as a training-free speedup"
     ToMe merges the most similar token pairs between blocks using bipartite soft matching,
@@ -404,7 +404,7 @@ data problem: people describe an action before, during or after doing it.
     existing checkpoint, and the paper reports roughly 2x throughput on video models at small
     accuracy cost. For a team with a deployed model and a latency problem, it is the cheapest
     intervention available, because nothing has to be retrained. Source: *Token Merging: Your
-    ViT But Faster*, Bolya et al., ICLR 2023 (arXiv:2210.09461).
+    ViT But Faster*, Bolya et al., ICLR 2023 ([arXiv:2210.09461](https://arxiv.org/abs/2210.09461)).
 
 !!! production "OpenAI: Sora's spacetime latent patches"
     OpenAI's Sora technical report describes compressing video into a lower-dimensional latent
@@ -414,9 +414,10 @@ data problem: people describe an action before, during or after doing it.
     instead of resizing everything to a fixed shape, and because scaling behaviour with
     training compute was observed to be favourable. The report is a technical blog post rather
     than a peer-reviewed paper and does not give architecture sizes or data details. Source:
-    *Video generation models as world simulators*, OpenAI, February 2024. The diffusion
+    [*Video generation models as world simulators*](https://openai.com/index/video-generation-models-as-world-simulators/),
+    OpenAI, February 2024. The diffusion
     Transformer backbone is *Scalable Diffusion Models with Transformers* (DiT), Peebles and
-    Xie, ICCV 2023 (arXiv:2212.09748).
+    Xie, ICCV 2023 ([arXiv:2212.09748](https://arxiv.org/abs/2212.09748)).
 
 !!! production "Alibaba: Qwen2-VL's unified image and video tokenisation"
     Qwen2-VL treats an image as a two-frame video and processes real video with 3-D
@@ -425,7 +426,7 @@ data problem: people describe an action before, during or after doing it.
     modalities, which removes a separate video stack, and the temporal component of the
     position encoding is what lets the model answer questions about ordering and timing.
     Source: *Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any
-    Resolution*, Wang et al., 2024 (arXiv:2409.12191).
+    Resolution*, Wang et al., 2024 ([arXiv:2409.12191](https://arxiv.org/abs/2409.12191)).
 
 ## 6. Interview questions and strong answers
 
@@ -600,19 +601,16 @@ data problem: people describe an action before, during or after doing it.
 
 ## References
 
-Sources are listed by title, venue and arXiv identifier. External links could not be
-verified from this build environment, so search the title or the identifier.
-
-* Arnab et al., *ViViT: A Video Vision Transformer*, ICCV 2021. arXiv:2103.15691.
-* Bertasius, Wang, Torresani, *Is Space-Time Attention All You Need for Video Understanding?* (TimeSformer), ICML 2021. arXiv:2102.05095.
-* Tong et al., *VideoMAE: Masked Autoencoders are Data-Efficient Learners for Self-Supervised Video Pre-Training*, NeurIPS 2022. arXiv:2203.12602.
-* Feichtenhofer et al., *Masked Autoencoders As Spatiotemporal Learners*, NeurIPS 2022. arXiv:2205.09113.
-* Bolya et al., *Token Merging: Your ViT But Faster*, ICLR 2023. arXiv:2210.09461.
-* Xu et al., *VideoCLIP: Contrastive Pre-training for Zero-shot Video-Text Understanding*, EMNLP 2021. arXiv:2109.14084.
-* Miech et al., *HowTo100M: Learning a Text-Video Embedding by Watching Hundred Million Narrated Video Clips*, ICCV 2019. arXiv:1906.03327.
-* Bain et al., *Frozen in Time: A Joint Video and Image Encoder for End-to-End Retrieval* (WebVid), ICCV 2021. arXiv:2104.00650.
-* Luo et al., *CLIP4Clip: An Empirical Study of CLIP for End to End Video Clip Retrieval*, Neurocomputing 2022. arXiv:2104.08860.
-* Peebles and Xie, *Scalable Diffusion Models with Transformers* (DiT), ICCV 2023. arXiv:2212.09748.
-* OpenAI, *Video generation models as world simulators* (Sora technical report), February 2024.
-* Wang et al., *Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution*, 2024. arXiv:2409.12191.
-* Zhang, Li, Bing, *Video-LLaMA: An Instruction-tuned Audio-Visual Language Model for Video Understanding*, EMNLP 2023 demo. arXiv:2306.02858.
+* Arnab et al., *ViViT: A Video Vision Transformer*, ICCV 2021. [arXiv:2103.15691](https://arxiv.org/abs/2103.15691).
+* Bertasius, Wang, Torresani, *Is Space-Time Attention All You Need for Video Understanding?* (TimeSformer), ICML 2021. [arXiv:2102.05095](https://arxiv.org/abs/2102.05095).
+* Tong et al., *VideoMAE: Masked Autoencoders are Data-Efficient Learners for Self-Supervised Video Pre-Training*, NeurIPS 2022. [arXiv:2203.12602](https://arxiv.org/abs/2203.12602).
+* Feichtenhofer et al., *Masked Autoencoders As Spatiotemporal Learners*, NeurIPS 2022. [arXiv:2205.09113](https://arxiv.org/abs/2205.09113).
+* Bolya et al., *Token Merging: Your ViT But Faster*, ICLR 2023. [arXiv:2210.09461](https://arxiv.org/abs/2210.09461).
+* Xu et al., *VideoCLIP: Contrastive Pre-training for Zero-shot Video-Text Understanding*, EMNLP 2021. [arXiv:2109.14084](https://arxiv.org/abs/2109.14084).
+* Miech et al., *HowTo100M: Learning a Text-Video Embedding by Watching Hundred Million Narrated Video Clips*, ICCV 2019. [arXiv:1906.03327](https://arxiv.org/abs/1906.03327).
+* Bain et al., *Frozen in Time: A Joint Video and Image Encoder for End-to-End Retrieval* (WebVid), ICCV 2021. [arXiv:2104.00650](https://arxiv.org/abs/2104.00650).
+* Luo et al., *CLIP4Clip: An Empirical Study of CLIP for End to End Video Clip Retrieval*, Neurocomputing 2022. [arXiv:2104.08860](https://arxiv.org/abs/2104.08860).
+* Peebles and Xie, *Scalable Diffusion Models with Transformers* (DiT), ICCV 2023. [arXiv:2212.09748](https://arxiv.org/abs/2212.09748).
+* OpenAI, [*Video generation models as world simulators*](https://openai.com/index/video-generation-models-as-world-simulators/) (Sora technical report), February 2024.
+* Wang et al., *Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution*, 2024. [arXiv:2409.12191](https://arxiv.org/abs/2409.12191).
+* Zhang, Li, Bing, *Video-LLaMA: An Instruction-tuned Audio-Visual Language Model for Video Understanding*, EMNLP 2023 demo. [arXiv:2306.02858](https://arxiv.org/abs/2306.02858).

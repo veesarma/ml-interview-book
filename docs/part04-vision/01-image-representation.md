@@ -200,6 +200,7 @@ The pyramid functions compose these. `downsample2` blurs and then takes `[::2, :
 | `blur_pool` | Read it, be able to explain it | `test_blur_pool_is_more_shift_invariant_than_strided_subsample` |
 | `sobel`, `laplacian`, `fft_convolve2d` | Read them, know the stencils | `test_sobel_sign_on_ramp`, `test_laplacian_of_quadratic_is_constant`, `test_fft_convolution_theorem` |
 | `rgb_to_gray`, `rgb_to_yuv`, `rgb_to_hsv`, `bayer_mosaic` | Read | `test_colour_roundtrip_and_hsv` |
+| `pad2d`, `gaussian_kernel_2d`, `yuv_to_rgb` | Read. Small helpers the functions above call | `test_gaussian_blur_matches_scipy`, `test_colour_roundtrip_and_hsv` |
 
 Check with `pytest tests/test_vision_image_ops.py -q`. Target time: filtering plus the separable Gaussian, 15 minutes. Bilinear sampling plus resize, 15 minutes. Pyramid, 10 minutes.
 
@@ -231,13 +232,13 @@ When to use which resampler:
     At Tesla AI Day (2021) the Autopilot vision team described moving away from ISP-processed images toward feeding the network photon-count data with minimal ISP processing. Their argument was that the ISP is tuned for human viewing, with tone mapping and noise reduction, and discards dynamic range the network can use, especially at night. The cost is more bandwidth per frame and a network that must learn white balance and tone mapping itself, in exchange for low-light range. Source: Tesla AI Day 2021 presentation (recorded talk, search "Tesla AI Day 2021 vision"). This is a design choice reported in a talk, not a paper.
 
 !!! production "Adobe and UC Berkeley: BlurPool for shift-invariant CNNs"
-    Zhang's "Making Convolutional Networks Shift-Invariant Again" (ICML 2019, arXiv:1904.11486) inserted a binomial low-pass filter before every stride-2 operation in ResNet, DenseNet and MobileNet, and reported both better ImageNet accuracy and much better classification consistency under small input shifts. The alternative it rejects, hoping data augmentation teaches invariance, does not fix the aliasing mechanism and costs training data. BlurPool fixes the mechanism for a few percent extra compute, and `blur_pool` above is the reference implementation.
+    Zhang's "Making Convolutional Networks Shift-Invariant Again" (ICML 2019, [arXiv:1904.11486](https://arxiv.org/abs/1904.11486)) inserted a binomial low-pass filter before every stride-2 operation in ResNet, DenseNet and MobileNet, and reported both better ImageNet accuracy and much better classification consistency under small input shifts. The alternative it rejects, hoping data augmentation teaches invariance, does not fix the aliasing mechanism and costs training data. BlurPool fixes the mechanism for a few percent extra compute, and `blur_pool` above is the reference implementation.
 
 !!! production "NVIDIA: hardware ISP to YUV to network on DRIVE and Jetson"
     NVIDIA's DRIVE and Jetson platforms run camera capture through a hardware ISP and deliver frames in YUV formats (NV12) to the inference pipeline. DeepStream and TensorRT preprocessing plugins convert or feed planar YUV directly. The engineering reason is bandwidth and latency: colour conversion on a 4K multi-camera stream is a memory-bound kernel you would rather not run, and the video encoder used for logging already wants 4:2:0. Source: NVIDIA DeepStream SDK documentation (search "DeepStream NV12 preprocessing"). The exact preprocessing choices are product-specific, so treat the YUV-in pattern as the general lesson.
 
 !!! production "Google: FPN as the pyramid everyone ships"
-    Lin et al.'s Feature Pyramid Networks (CVPR 2017, arXiv:1612.03144) formalised the Laplacian-pyramid idea as a learned top-down path, and it became the default neck in Detectron and Detectron2, in EfficientDet as BiFPN, and in every YOLO after v3. The alternative they rejected, running the backbone at several image scales, costs one backbone pass per scale. FPN gives multi-scale features at roughly the cost of a single-scale detector.
+    Lin et al.'s Feature Pyramid Networks (CVPR 2017, [arXiv:1612.03144](https://arxiv.org/abs/1612.03144)) formalised the Laplacian-pyramid idea as a learned top-down path, and it became the default neck in Detectron and Detectron2, in EfficientDet as BiFPN, and in every YOLO after v3. The alternative they rejected, running the backbone at several image scales, costs one backbone pass per scale. FPN gives multi-scale features at roughly the cost of a single-scale detector.
 
 ## 6. Interview questions and strong answers
 
@@ -309,9 +310,9 @@ When to use which resampler:
 
 Links could not be verified from this build environment, so titles, venues and arXiv IDs are given for you to search.
 
-- R. Zhang, "Making Convolutional Networks Shift-Invariant Again", ICML 2019, arXiv:1904.11486.
-- T.-Y. Lin et al., "Feature Pyramid Networks for Object Detection", CVPR 2017, arXiv:1612.03144.
-- K. He et al., "Mask R-CNN", ICCV 2017, arXiv:1703.06870 (ROIAlign is §3).
+- R. Zhang, "Making Convolutional Networks Shift-Invariant Again", ICML 2019, [arXiv:1904.11486](https://arxiv.org/abs/1904.11486).
+- T.-Y. Lin et al., "Feature Pyramid Networks for Object Detection", CVPR 2017, [arXiv:1612.03144](https://arxiv.org/abs/1612.03144).
+- K. He et al., "Mask R-CNN", ICCV 2017, [arXiv:1703.06870](https://arxiv.org/abs/1703.06870) (ROIAlign is §3).
 - P. Burt and E. Adelson, "The Laplacian Pyramid as a Compact Image Code", IEEE Trans. Communications, 1983.
 - A. Oppenheim and R. Schafer, *Discrete-Time Signal Processing*, for the sampling theorem and the DFT convolution theorem.
 - R. Szeliski, *Computer Vision: Algorithms and Applications*, 2nd ed., chapters on image processing and pyramids.

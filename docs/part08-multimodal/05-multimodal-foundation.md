@@ -418,7 +418,7 @@ serving-side complement.
     $\binom{M}{2}$ paired datasets, most of which do not exist naturally. The cost is that
     every cross-modal capability is bounded by each modality's alignment to images. Source:
     *ImageBind: One Embedding Space To Bind Them All*, Girdhar et al., CVPR 2023
-    (arXiv:2305.05665).
+    ([arXiv:2305.05665](https://arxiv.org/abs/2305.05665)).
 
 !!! production "Meta: Chameleon as an early-fusion, mixed-modal token model"
     Chameleon tokenises images into 1,024 discrete codes with a learned image tokeniser and
@@ -428,7 +428,7 @@ serving-side complement.
     and a revised norm placement, and a tokeniser that limits text-heavy images. What it buys
     is interleaved generation, which two-tower and encoder-plus-LLM designs cannot do. Source:
     *Chameleon: Mixed-Modal Early-Fusion Foundation Models*, Chameleon Team, 2024
-    (arXiv:2405.09818). Compare *Unified-IO 2*, Lu et al., CVPR 2024 (arXiv:2312.17172), which
+    ([arXiv:2405.09818](https://arxiv.org/abs/2405.09818)). Compare *Unified-IO 2*, Lu et al., CVPR 2024 ([arXiv:2312.17172](https://arxiv.org/abs/2312.17172)), which
     tokenises images, text, audio and action into one space.
 
 !!! production "Google: Gemini as a natively multimodal model"
@@ -439,7 +439,7 @@ serving-side complement.
     cross-modal reasoning without an adapter bottleneck, and the rejected alternative is the
     adapter approach that dominates open models. Treat the capability claims as the vendor's
     own evaluation. Source: *Gemini: A Family of Highly Capable Multimodal Models*, Gemini
-    Team, Google, 2023 (arXiv:2312.11805).
+    Team, Google, 2023 ([arXiv:2312.11805](https://arxiv.org/abs/2312.11805)).
 
 !!! production "OpenAI: GPT-4V and the safety surface of a new input modality"
     The GPT-4V system card documents what changes when images become an input to a deployed
@@ -447,7 +447,7 @@ serving-side complement.
     medical diagnosis from images; new jailbreak vectors including instructions written inside
     an image; and the evaluation process used before release. It is the best public
     enumeration of multimodal deployment risk and is worth citing directly in a system design
-    round. Source: *GPT-4V(ision) System Card*, OpenAI, September 2023.
+    round. Source: [*GPT-4V(ision) System Card*, OpenAI, September 2023](https://openai.com/index/gpt-4v-system-card/).
 
 !!! production "Google DeepMind: RT-2, web-scale VLMs as robot policies"
     RT-2 co-fine-tunes a VLM on web vision-language data and robot trajectories, with actions
@@ -456,7 +456,7 @@ serving-side complement.
     transfers when the action is emitted by the same decoder as text. The accepted trade-off
     is inference rate, since a large VLM emits actions at a few Hz. Source: *RT-2:
     Vision-Language-Action Models Transfer Web Knowledge to Robotic Control*, Brohan et al.,
-    CoRL 2023 (arXiv:2307.15818).
+    CoRL 2023 ([arXiv:2307.15818](https://arxiv.org/abs/2307.15818)).
 
 !!! production "Stanford, Berkeley and Physical Intelligence: OpenVLA and pi-zero"
     OpenVLA is a 7B open VLA with SigLIP and DINOv2 vision and a Llama-2 LLM, trained on about
@@ -466,10 +466,10 @@ serving-side complement.
     emit continuous action chunks at up to 50 Hz, enabling dexterous tasks such as laundry
     folding and box assembly that discretised low-rate actions cannot express. Sources:
     *OpenVLA: An Open-Source Vision-Language-Action Model*, Kim et al., CoRL 2024
-    (arXiv:2406.09246); *π₀: A Vision-Language-Action Flow Model for General Robot Control*,
-    Black et al., Physical Intelligence, 2024 (arXiv:2410.24164); *Open X-Embodiment: Robotic
+    ([arXiv:2406.09246](https://arxiv.org/abs/2406.09246)); *π₀: A Vision-Language-Action Flow Model for General Robot Control*,
+    Black et al., Physical Intelligence, 2024 ([arXiv:2410.24164](https://arxiv.org/abs/2410.24164)); *Open X-Embodiment: Robotic
     Learning Datasets and RT-X Models*, Open X-Embodiment Collaboration, ICRA 2024
-    (arXiv:2310.08864).
+    ([arXiv:2310.08864](https://arxiv.org/abs/2310.08864)).
 
 ## 6. Interview questions and strong answers
 
@@ -632,23 +632,20 @@ serving-side complement.
 
 ## References
 
-Sources are listed by title, venue and arXiv identifier. External links could not be
-verified from this build environment, so search the title or the identifier.
-
-* Girdhar et al., *ImageBind: One Embedding Space To Bind Them All*, CVPR 2023. arXiv:2305.05665.
-* Chameleon Team (Meta FAIR), *Chameleon: Mixed-Modal Early-Fusion Foundation Models*, 2024. arXiv:2405.09818.
-* Lu et al., *Unified-IO 2: Scaling Autoregressive Multimodal Models with Vision, Language, Audio, and Action*, CVPR 2024. arXiv:2312.17172.
-* Sun et al., *Generative Pretraining in Multimodality* (Emu), ICLR 2024. arXiv:2307.05222.
-* Gemini Team, Google, *Gemini: A Family of Highly Capable Multimodal Models*, 2023. arXiv:2312.11805.
-* OpenAI, *GPT-4V(ision) System Card*, September 2023.
-* Radford et al., *Robust Speech Recognition via Large-Scale Weak Supervision* (Whisper), ICML 2023. arXiv:2212.04356.
-* Défossez et al., *High Fidelity Neural Audio Compression* (EnCodec), TMLR 2023. arXiv:2210.13438.
-* Zeghidour et al., *SoundStream: An End-to-End Neural Audio Codec*, IEEE/ACM TASLP 2021. arXiv:2107.03312.
-* Borsos et al., *AudioLM: a Language Modeling Approach to Audio Generation*, IEEE/ACM TASLP 2023. arXiv:2209.03143.
-* Copet et al., *Simple and Controllable Music Generation* (MusicGen), NeurIPS 2023. arXiv:2306.05284.
-* Esser, Rombach, Ommer, *Taming Transformers for High-Resolution Image Synthesis* (VQGAN), CVPR 2021. arXiv:2012.09841.
-* van den Oord, Vinyals, Kavukcuoglu, *Neural Discrete Representation Learning* (VQ-VAE), NeurIPS 2017. arXiv:1711.00937.
-* Brohan et al., *RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control*, CoRL 2023. arXiv:2307.15818.
-* Kim et al., *OpenVLA: An Open-Source Vision-Language-Action Model*, CoRL 2024. arXiv:2406.09246.
-* Black et al., *π₀: A Vision-Language-Action Flow Model for General Robot Control*, Physical Intelligence, 2024. arXiv:2410.24164.
-* Open X-Embodiment Collaboration, *Open X-Embodiment: Robotic Learning Datasets and RT-X Models*, ICRA 2024. arXiv:2310.08864.
+* Girdhar et al., *ImageBind: One Embedding Space To Bind Them All*, CVPR 2023. [arXiv:2305.05665](https://arxiv.org/abs/2305.05665).
+* Chameleon Team (Meta FAIR), *Chameleon: Mixed-Modal Early-Fusion Foundation Models*, 2024. [arXiv:2405.09818](https://arxiv.org/abs/2405.09818).
+* Lu et al., *Unified-IO 2: Scaling Autoregressive Multimodal Models with Vision, Language, Audio, and Action*, CVPR 2024. [arXiv:2312.17172](https://arxiv.org/abs/2312.17172).
+* Sun et al., *Generative Pretraining in Multimodality* (Emu), ICLR 2024. [arXiv:2307.05222](https://arxiv.org/abs/2307.05222).
+* Gemini Team, Google, *Gemini: A Family of Highly Capable Multimodal Models*, 2023. [arXiv:2312.11805](https://arxiv.org/abs/2312.11805).
+* OpenAI, [*GPT-4V(ision) System Card*, September 2023](https://openai.com/index/gpt-4v-system-card/).
+* Radford et al., *Robust Speech Recognition via Large-Scale Weak Supervision* (Whisper), ICML 2023. [arXiv:2212.04356](https://arxiv.org/abs/2212.04356).
+* Défossez et al., *High Fidelity Neural Audio Compression* (EnCodec), TMLR 2023. [arXiv:2210.13438](https://arxiv.org/abs/2210.13438).
+* Zeghidour et al., *SoundStream: An End-to-End Neural Audio Codec*, IEEE/ACM TASLP 2021. [arXiv:2107.03312](https://arxiv.org/abs/2107.03312).
+* Borsos et al., *AudioLM: a Language Modeling Approach to Audio Generation*, IEEE/ACM TASLP 2023. [arXiv:2209.03143](https://arxiv.org/abs/2209.03143).
+* Copet et al., *Simple and Controllable Music Generation* (MusicGen), NeurIPS 2023. [arXiv:2306.05284](https://arxiv.org/abs/2306.05284).
+* Esser, Rombach, Ommer, *Taming Transformers for High-Resolution Image Synthesis* (VQGAN), CVPR 2021. [arXiv:2012.09841](https://arxiv.org/abs/2012.09841).
+* van den Oord, Vinyals, Kavukcuoglu, *Neural Discrete Representation Learning* (VQ-VAE), NeurIPS 2017. [arXiv:1711.00937](https://arxiv.org/abs/1711.00937).
+* Brohan et al., *RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control*, CoRL 2023. [arXiv:2307.15818](https://arxiv.org/abs/2307.15818).
+* Kim et al., *OpenVLA: An Open-Source Vision-Language-Action Model*, CoRL 2024. [arXiv:2406.09246](https://arxiv.org/abs/2406.09246).
+* Black et al., *π₀: A Vision-Language-Action Flow Model for General Robot Control*, Physical Intelligence, 2024. [arXiv:2410.24164](https://arxiv.org/abs/2410.24164).
+* Open X-Embodiment Collaboration, *Open X-Embodiment: Robotic Learning Datasets and RT-X Models*, ICRA 2024. [arXiv:2310.08864](https://arxiv.org/abs/2310.08864).

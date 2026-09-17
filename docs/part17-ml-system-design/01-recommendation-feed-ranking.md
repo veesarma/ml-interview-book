@@ -621,7 +621,7 @@ servers; sparse parameters synchronised at minute granularity, dense parameters
 daily. *Evaluate*: online A/B of online vs batch training.
 
 **What the source says.** Liu et al., "Monolith: Real Time Recommendation System
-With Collisionless Embedding Table" (2022, arXiv:2209.07663) describes cuckoo-hash
+With Collisionless Embedding Table" (2022, [arXiv:2209.07663](https://arxiv.org/abs/2209.07663)) describes cuckoo-hash
 collisionless embedding tables with expiry, online training with frequent
 synchronisation of sparse parameters to serving, and reports online training
 outperforming batch training in their experiments.
@@ -653,12 +653,12 @@ precomputed; user embeddings refreshed daily in batch rather than at request tim
 *Evaluate*: offline retrieval metrics and A/B.
 
 **What the sources say.** Ying et al., "Graph Convolutional Neural Networks for
-Web-Scale Recommender Systems" (KDD 2018, arXiv:1806.01973) describes PinSage:
+Web-Scale Recommender Systems" (KDD 2018, [arXiv:1806.01973](https://arxiv.org/abs/1806.01973)) describes PinSage:
 random-walk-based neighbourhood sampling with importance pooling, a
 producer–consumer minibatch pipeline, a hard-negative curriculum, and deployment on
 a graph of billions of nodes and edges with reported engagement gains. Pancha et
 al., "PinnerFormer: Sequence Modeling for User Representation at Pinterest" (KDD
-2022, arXiv:2205.04507) describes the transformer user model, the dense all-action
+2022, [arXiv:2205.04507](https://arxiv.org/abs/2205.04507)) describes the transformer user model, the dense all-action
 loss over a 28-day horizon, and that this closed most of the gap between real-time and
 daily-batch user embeddings.
 
@@ -688,7 +688,7 @@ scaling behaviour with compute, then online A/B.
 
 **What the source says.** Zhai et al., "Actions Speak Louder than Words: Trillion-
 Parameter Sequential Transducers for Generative Recommendations" (ICML 2024,
-arXiv:2402.17152) introduces HSTU, reports scaling behaviour with compute, and
+[arXiv:2402.17152](https://arxiv.org/abs/2402.17152)) introduces HSTU, reports scaling behaviour with compute, and
 reports online metric gains from deployment on Meta surfaces.
 
 !!! tip "How to say it in the interview: when to bet on the sequence model"
@@ -820,15 +820,15 @@ reports online metric gains from deployment on Meta surfaces.
 - Zhao, Z. et al. "Recommending What Video to Watch Next: A Multitask Ranking System." RecSys 2019.
 - Ma, J. et al. "Modeling Task Relationships in Multi-task Learning with Multi-gate Mixture-of-Experts." KDD 2018.
 - Tang, H. et al. "Progressive Layered Extraction (PLE): A Novel Multi-Task Learning (MTL) Model for Personalized Recommendations." RecSys 2020.
-- Zhou, G. et al. "Deep Interest Network for Click-Through Rate Prediction." KDD 2018 (arXiv:1706.06978); "Deep Interest Evolution Network." AAAI 2019 (arXiv:1809.03672).
-- Pi, Q. et al. "Search-based User Interest Modeling with Lifelong Sequential Behavior Data for Click-Through Rate Prediction." CIKM 2020 (arXiv:2006.05639).
-- Chang, J. et al. "TWIN: TWo-stage Interest Network for Lifelong User Behavior Modeling in CTR Prediction at Kuaishou." KDD 2023 (arXiv:2302.02352).
+- Zhou, G. et al. "Deep Interest Network for Click-Through Rate Prediction." KDD 2018 ([arXiv:1706.06978](https://arxiv.org/abs/1706.06978)); "Deep Interest Evolution Network." AAAI 2019 ([arXiv:1809.03672](https://arxiv.org/abs/1809.03672)).
+- Pi, Q. et al. "Search-based User Interest Modeling with Lifelong Sequential Behavior Data for Click-Through Rate Prediction." CIKM 2020 ([arXiv:2006.05639](https://arxiv.org/abs/2006.05639)).
+- Chang, J. et al. "TWIN: TWo-stage Interest Network for Lifelong User Behavior Modeling in CTR Prediction at Kuaishou." KDD 2023 ([arXiv:2302.02352](https://arxiv.org/abs/2302.02352)).
 - Meta Engineering. "How machine learning powers Facebook's News Feed ranking algorithm." January 2021.
 - Meta Engineering. "Scaling the Instagram Explore recommendations system." August 2023.
-- Liu, Z. et al. "Monolith: Real Time Recommendation System With Collisionless Embedding Table." 2022 (arXiv:2209.07663).
-- Ying, R. et al. "Graph Convolutional Neural Networks for Web-Scale Recommender Systems." KDD 2018 (arXiv:1806.01973).
-- Pancha, N. et al. "PinnerFormer: Sequence Modeling for User Representation at Pinterest." KDD 2022 (arXiv:2205.04507).
-- Zhai, J. et al. "Actions Speak Louder than Words: Trillion-Parameter Sequential Transducers for Generative Recommendations." ICML 2024 (arXiv:2402.17152).
+- Liu, Z. et al. "Monolith: Real Time Recommendation System With Collisionless Embedding Table." 2022 ([arXiv:2209.07663](https://arxiv.org/abs/2209.07663)).
+- Ying, R. et al. "Graph Convolutional Neural Networks for Web-Scale Recommender Systems." KDD 2018 ([arXiv:1806.01973](https://arxiv.org/abs/1806.01973)).
+- Pancha, N. et al. "PinnerFormer: Sequence Modeling for User Representation at Pinterest." KDD 2022 ([arXiv:2205.04507](https://arxiv.org/abs/2205.04507)).
+- Zhai, J. et al. "Actions Speak Louder than Words: Trillion-Parameter Sequential Transducers for Generative Recommendations." ICML 2024 ([arXiv:2402.17152](https://arxiv.org/abs/2402.17152)).
 - Joachims, T., Swaminathan, A., Schnabel, T. "Unbiased Learning-to-Rank with Biased Feedback." WSDM 2017.
 - Singh, A., Joachims, T. "Fairness of Exposure in Rankings." KDD 2018.
 - Netflix Technology Blog. "Artwork Personalization at Netflix." December 2017.

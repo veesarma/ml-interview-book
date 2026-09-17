@@ -570,7 +570,7 @@ over the regression suite on every change. *Evaluate*: report both the judge's s
 and its measured agreement, so a reader knows how much to trust it.
 
 **What the sources say.** Zheng et al., "Judging LLM-as-a-Judge with MT-Bench and
-Chatbot Arena" (NeurIPS 2023 Datasets and Benchmarks, arXiv:2306.05685) studies LLM
+Chatbot Arena" (NeurIPS 2023 Datasets and Benchmarks, [arXiv:2306.05685](https://arxiv.org/abs/2306.05685)) studies LLM
 judges against human preferences, reports agreement levels with human raters, and
 documents biases including position bias, verbosity bias and self-enhancement bias.
 
@@ -716,15 +716,15 @@ documents biases including position bias, verbosity bias and self-enhancement bi
 ## References
 
 - Anthropic. "Introducing Contextual Retrieval." Anthropic engineering blog, September 2024.
-- Lewis, P. et al. "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks." NeurIPS 2020 (arXiv:2005.11401).
-- Karpukhin, V. et al. "Dense Passage Retrieval for Open-Domain Question Answering." EMNLP 2020 (arXiv:2004.04906).
-- Nogueira, R., Cho, K. "Passage Re-ranking with BERT." 2019 (arXiv:1901.04085).
+- Lewis, P. et al. "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks." NeurIPS 2020 ([arXiv:2005.11401](https://arxiv.org/abs/2005.11401)).
+- Karpukhin, V. et al. "Dense Passage Retrieval for Open-Domain Question Answering." EMNLP 2020 ([arXiv:2004.04906](https://arxiv.org/abs/2004.04906)).
+- Nogueira, R., Cho, K. "Passage Re-ranking with BERT." 2019 ([arXiv:1901.04085](https://arxiv.org/abs/1901.04085)).
 - Cormack, G. V., Clarke, C. L. A., Buettcher, S. "Reciprocal Rank Fusion Outperforms Condorcet and Individual Rank Learning Methods." SIGIR 2009.
-- Zheng, L. et al. "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena." NeurIPS 2023 Datasets and Benchmarks (arXiv:2306.05685).
-- Liu, N. F. et al. "Lost in the Middle: How Language Models Use Long Contexts." TACL 2024 (arXiv:2307.03172).
-- Greshake, K. et al. "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection." AISec 2023 (arXiv:2302.12173).
+- Zheng, L. et al. "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena." NeurIPS 2023 Datasets and Benchmarks ([arXiv:2306.05685](https://arxiv.org/abs/2306.05685)).
+- Liu, N. F. et al. "Lost in the Middle: How Language Models Use Long Contexts." TACL 2024 ([arXiv:2307.03172](https://arxiv.org/abs/2307.03172)).
+- Greshake, K. et al. "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection." AISec 2023 ([arXiv:2302.12173](https://arxiv.org/abs/2302.12173)).
 - GitHub Engineering. Posts on how Copilot builds prompts, its latency constraints and its evaluation.
 - LinkedIn Engineering. Posts on building and productionising their generative-AI product experiences (intent routing, retrieval over internal data, evaluation and streaming latency).
 - DoorDash Engineering. Post on their LLM-based support system, including RAG, a response guardrail and LLM-based conversation-quality evaluation.
-- Inan, H. et al. "Llama Guard: LLM-based Input-Output Safeguard for Human-AI Conversations." 2023 (arXiv:2312.06674).
+- Inan, H. et al. "Llama Guard: LLM-based Input-Output Safeguard for Human-AI Conversations." 2023 ([arXiv:2312.06674](https://arxiv.org/abs/2312.06674)).
 - Book cross-references: [retrieval & RAG](../part13-retrieval-eval-reliability/01-retrieval-and-rag.md), [evaluation](../part13-retrieval-eval-reliability/02-evaluation.md), [uncertainty & reliability](../part13-retrieval-eval-reliability/03-uncertainty-reliability.md), [inference systems](../part14-systems/03-inference-systems.md), [fine-tuning & LoRA](../part06-llm-training/06-fine-tuning-lora.md), [SFT](../part07-post-training/01-sft.md), [agents & tool use](../part12-rl/06-agents-tool-use.md), [content moderation](07-content-moderation.md).

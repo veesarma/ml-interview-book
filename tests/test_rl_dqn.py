@@ -84,4 +84,4 @@ def test_train_dqn_reaches_return_threshold():
     rng = np.random.default_rng(1)
     greedy = np.mean([run_episode(env, lambda o: greedy_action(q_net, o), rng) for _ in range(20)])
     assert np.mean(returns[:10]) < -10  # random-ish start
-    assert greedy > -6, greedy  # a random policy scores about -17; a PD controller about -2
+    assert greedy > -6, greedy  # a random policy scores about -16; a PD controller about -3

@@ -858,7 +858,7 @@ preference, not absolute engagement.
     distribution, is affected by style and verbosity, and requires enormous vote volume
     for tight intervals on new models. Paper: ["Chatbot Arena: An Open Platform for
     Evaluating LLMs by Human Preference"](https://arxiv.org/abs/2403.04132),
-    arXiv:2403.04132; the judge-bias analysis is in ["Judging LLM-as-a-Judge with MT-Bench
+    [arXiv:2403.04132](https://arxiv.org/abs/2403.04132); the judge-bias analysis is in ["Judging LLM-as-a-Judge with MT-Bench
     and Chatbot Arena"](https://arxiv.org/abs/2306.05685), NeurIPS 2023, arXiv:2306.05685.
 
 !!! production "Stanford CRFM: HELM (2022)"
@@ -1152,25 +1152,25 @@ could mislead you.
 * Davis & Goadrich, ["The Relationship Between Precision-Recall and ROC Curves"](https://dl.acm.org/doi/10.1145/1143844.1143874), ICML 2006.
 * Saito & Rehmsmeier, ["The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets"](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0118432), PLOS ONE, 2015.
 * Everingham et al., ["The PASCAL Visual Object Classes (VOC) Challenge"](https://link.springer.com/article/10.1007/s11263-009-0275-4), IJCV 2010 (11-point and all-point AP).
-* Lin et al., ["Microsoft COCO: Common Objects in Context"](https://arxiv.org/abs/1405.0312), ECCV 2014, arXiv:1405.0312.
-* Kirillov et al., ["Panoptic Segmentation"](https://arxiv.org/abs/1801.00868), CVPR 2019, arXiv:1801.00868 (PQ = SQ × RQ).
+* Lin et al., ["Microsoft COCO: Common Objects in Context"](https://arxiv.org/abs/1405.0312), ECCV 2014, [arXiv:1405.0312](https://arxiv.org/abs/1405.0312).
+* Kirillov et al., ["Panoptic Segmentation"](https://arxiv.org/abs/1801.00868), CVPR 2019, [arXiv:1801.00868](https://arxiv.org/abs/1801.00868) (PQ = SQ × RQ).
 * Karatzas et al., ["ICDAR 2015 competition on Robust Reading"](https://ieeexplore.ieee.org/document/7333942/), ICDAR 2015 (end-to-end text spotting protocol).
-* Heusel et al., ["GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium"](https://arxiv.org/abs/1706.08500), NeurIPS 2017, arXiv:1706.08500 (FID).
+* Heusel et al., ["GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium"](https://arxiv.org/abs/1706.08500), NeurIPS 2017, [arXiv:1706.08500](https://arxiv.org/abs/1706.08500) (FID).
 * Dowson & Landau, ["The Fréchet distance between multivariate normal distributions"](https://www.sciencedirect.com/science/article/pii/0047259X8290077X), Journal of Multivariate Analysis, 1982.
-* Salimans et al., ["Improved Techniques for Training GANs"](https://arxiv.org/abs/1606.03498), NeurIPS 2016, arXiv:1606.03498 (Inception Score).
-* Kynkäänniemi et al., ["Improved Precision and Recall Metric for Assessing Generative Models"](https://arxiv.org/abs/1904.06991), NeurIPS 2019, arXiv:1904.06991.
-* Zhang et al., ["The Unreasonable Effectiveness of Deep Features as a Perceptual Metric"](https://arxiv.org/abs/1801.03924) (LPIPS), CVPR 2018, arXiv:1801.03924.
-* Hessel et al., ["CLIPScore: A Reference-free Evaluation Metric for Image Captioning"](https://arxiv.org/abs/2104.08718), EMNLP 2021, arXiv:2104.08718.
-* Chen et al., ["Evaluating Large Language Models Trained on Code"](https://arxiv.org/abs/2107.03374), 2021, arXiv:2107.03374 (HumanEval, pass@k).
-* Liang et al., ["Holistic Evaluation of Language Models"](https://arxiv.org/abs/2211.09110) (HELM), TMLR 2023, arXiv:2211.09110.
-* Zheng et al., ["Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena"](https://arxiv.org/abs/2306.05685), NeurIPS 2023, arXiv:2306.05685.
-* Chiang et al., ["Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference"](https://arxiv.org/abs/2403.04132), 2024, arXiv:2403.04132.
+* Salimans et al., ["Improved Techniques for Training GANs"](https://arxiv.org/abs/1606.03498), NeurIPS 2016, [arXiv:1606.03498](https://arxiv.org/abs/1606.03498) (Inception Score).
+* Kynkäänniemi et al., ["Improved Precision and Recall Metric for Assessing Generative Models"](https://arxiv.org/abs/1904.06991), NeurIPS 2019, [arXiv:1904.06991](https://arxiv.org/abs/1904.06991).
+* Zhang et al., ["The Unreasonable Effectiveness of Deep Features as a Perceptual Metric"](https://arxiv.org/abs/1801.03924) (LPIPS), CVPR 2018, [arXiv:1801.03924](https://arxiv.org/abs/1801.03924).
+* Hessel et al., ["CLIPScore: A Reference-free Evaluation Metric for Image Captioning"](https://arxiv.org/abs/2104.08718), EMNLP 2021, [arXiv:2104.08718](https://arxiv.org/abs/2104.08718).
+* Chen et al., ["Evaluating Large Language Models Trained on Code"](https://arxiv.org/abs/2107.03374), 2021, [arXiv:2107.03374](https://arxiv.org/abs/2107.03374) (HumanEval, pass@k).
+* Liang et al., ["Holistic Evaluation of Language Models"](https://arxiv.org/abs/2211.09110) (HELM), TMLR 2023, [arXiv:2211.09110](https://arxiv.org/abs/2211.09110).
+* Zheng et al., ["Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena"](https://arxiv.org/abs/2306.05685), NeurIPS 2023, [arXiv:2306.05685](https://arxiv.org/abs/2306.05685).
+* Chiang et al., ["Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference"](https://arxiv.org/abs/2403.04132), 2024, [arXiv:2403.04132](https://arxiv.org/abs/2403.04132).
 * Bradley & Terry, ["Rank Analysis of Incomplete Block Designs: I. The Method of Paired Comparisons"](https://www.jstor.org/stable/2334029), Biometrika, 1952; Hunter, ["MM algorithms for generalized Bradley-Terry models"](https://projecteuclid.org/journals/annals-of-statistics/volume-32/issue-1/MM-algorithms-for-generalized-Bradley-Terry-models/10.1214/aos/1079120141.full), Annals of Statistics, 2004.
-* Miller, ["Adding Error Bars to Evals: A Statistical Approach to Language Model Evaluations"](https://arxiv.org/abs/2411.00640), Anthropic, 2024, arXiv:2411.00640.
+* Miller, ["Adding Error Bars to Evals: A Statistical Approach to Language Model Evaluations"](https://arxiv.org/abs/2411.00640), Anthropic, 2024, [arXiv:2411.00640](https://arxiv.org/abs/2411.00640).
 * Efron & Tibshirani, *An Introduction to the Bootstrap*, Chapman & Hall, 1993.
-* Jimenez et al., ["SWE-bench: Can Language Models Resolve Real-World GitHub Issues?"](https://arxiv.org/abs/2310.06770), ICLR 2024, arXiv:2310.06770; OpenAI, ["Introducing SWE-bench Verified"](https://openai.com/index/introducing-swe-bench-verified/), 2024.
-* Zhou et al., ["WebArena: A Realistic Web Environment for Building Autonomous Agents"](https://arxiv.org/abs/2307.13854), ICLR 2024, arXiv:2307.13854.
-* Yao et al., ["τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains"](https://arxiv.org/abs/2406.12045), 2024, arXiv:2406.12045.
+* Jimenez et al., ["SWE-bench: Can Language Models Resolve Real-World GitHub Issues?"](https://arxiv.org/abs/2310.06770), ICLR 2024, [arXiv:2310.06770](https://arxiv.org/abs/2310.06770); OpenAI, ["Introducing SWE-bench Verified"](https://openai.com/index/introducing-swe-bench-verified/), 2024.
+* Zhou et al., ["WebArena: A Realistic Web Environment for Building Autonomous Agents"](https://arxiv.org/abs/2307.13854), ICLR 2024, [arXiv:2307.13854](https://arxiv.org/abs/2307.13854).
+* Yao et al., ["τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains"](https://arxiv.org/abs/2406.12045), 2024, [arXiv:2406.12045](https://arxiv.org/abs/2406.12045).
 * Netflix Technology Blog, ["Innovating Faster on Personalization Algorithms at Netflix Using Interleaving"](https://netflixtechblog.com/using-interleaving-in-online-experiments-to-accelerate-algorithm-innovation-at-netflix-a04ee392ec55), 2017.
 * Chapelle, Joachims, Radlinski & Yue, ["Large-scale validation and analysis of interleaved search evaluation"](https://dl.acm.org/doi/10.1145/2094072.2094078), ACM TOIS, 2012.
 * Kohavi, Tang & Xu, *Trustworthy Online Controlled Experiments*, CUP 2020; companion site [experimentguide.com](https://experimentguide.com/).

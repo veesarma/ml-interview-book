@@ -22,11 +22,11 @@
 - **RLHF data** is a different business: preference comparisons, instruction
   demonstrations, expert domain data, and red-teaming, sold to labs whose bottleneck
   moved from compute to data. Anthropic's helpful-and-harmless paper
-  (arXiv:2204.05862) is the public shape of the artefact.
+  ([arXiv:2204.05862](https://arxiv.org/abs/2204.05862)) is the public shape of the artefact.
 - **Evaluation as a product**: the SEAL leaderboards, Humanity's Last Exam
-  (arXiv:2501.14249, with CAIS), GSM1k (arXiv:2405.00332, a contamination probe),
-  SWE-bench Pro (arXiv:2509.16941), MultiChallenge (arXiv:2501.17399), MASK
-  (arXiv:2503.03750) and the Remote Labor Index (arXiv:2510.26787).
+  ([arXiv:2501.14249](https://arxiv.org/abs/2501.14249), with CAIS), GSM1k ([arXiv:2405.00332](https://arxiv.org/abs/2405.00332), a contamination probe),
+  SWE-bench Pro ([arXiv:2509.16941](https://arxiv.org/abs/2509.16941)), MultiChallenge ([arXiv:2501.17399](https://arxiv.org/abs/2501.17399)), MASK
+  ([arXiv:2503.03750](https://arxiv.org/abs/2503.03750)) and the Remote Labor Index ([arXiv:2510.26787](https://arxiv.org/abs/2510.26787)).
 - **The quality levers**, in rough order of power: task design, annotator selection and
   training, model-assisted pre-labelling, consensus and adjudication, gold sets, and
   measurement of inter-annotator agreement. Throwing more annotators at a badly
@@ -62,13 +62,13 @@ double-labelling everything, and pricing that tracks difficulty instead of volum
 
 | Problem | Why it is hard | Public evidence |
 |---|---|---|
-| **Labelling 3D and 4D scenes** | Humans are poor at drawing consistent 3D boxes across a sequence; the label the model needs is a reconstruction, and a drawing is a poor approximation of one. | Scale's AV data-engine product pages; Tesla AI Day 2021/2022 auto-labelling; Uber ATG's Auto4D (arXiv:2101.06586). |
+| **Labelling 3D and 4D scenes** | Humans are poor at drawing consistent 3D boxes across a sequence; the label the model needs is a reconstruction, and a drawing is a poor approximation of one. | Scale's AV data-engine product pages; Tesla AI Day 2021/2022 auto-labelling; Uber ATG's Auto4D ([arXiv:2101.06586](https://arxiv.org/abs/2101.06586)). |
 | **Automating your own labour** | Pre-labelling shifts human effort from drawing to review, but a wrong pre-label biases the reviewer (anchoring). | Scale data-engine product materials; weak-supervision literature. |
 | **Quality control without double-labelling** | Consensus is the obvious answer and it doubles cost; gold sets are cheap but only measure what they cover. | Standard practice; Anthropic's HH dataset paper documents annotator disagreement rates in preference data. |
-| **Preference data that a reward model can learn from** | Annotators disagree, prefer longer answers, and cannot judge expert domains. | InstructGPT (arXiv:2203.02155); Anthropic HH (arXiv:2204.05862). |
-| **Benchmarks that survive contact with frontier models** | Public benchmarks saturate and leak into training data. | GSM1k (arXiv:2405.00332); HLE (arXiv:2501.14249); SWE-bench Pro (arXiv:2509.16941). |
-| **Measuring what models do for real work** | Static question sets say little about long-horizon agentic tasks. | Remote Labor Index (arXiv:2510.26787); MultiChallenge (arXiv:2501.17399). |
-| **Measuring honesty separately from accuracy** | A model can be accurate and still assert things it internally represents as false. | MASK (arXiv:2503.03750). |
+| **Preference data that a reward model can learn from** | Annotators disagree, prefer longer answers, and cannot judge expert domains. | InstructGPT ([arXiv:2203.02155](https://arxiv.org/abs/2203.02155)); Anthropic HH ([arXiv:2204.05862](https://arxiv.org/abs/2204.05862)). |
+| **Benchmarks that survive contact with frontier models** | Public benchmarks saturate and leak into training data. | GSM1k ([arXiv:2405.00332](https://arxiv.org/abs/2405.00332)); HLE ([arXiv:2501.14249](https://arxiv.org/abs/2501.14249)); SWE-bench Pro ([arXiv:2509.16941](https://arxiv.org/abs/2509.16941)). |
+| **Measuring what models do for real work** | Static question sets say little about long-horizon agentic tasks. | Remote Labor Index ([arXiv:2510.26787](https://arxiv.org/abs/2510.26787)); MultiChallenge ([arXiv:2501.17399](https://arxiv.org/abs/2501.17399)). |
+| **Measuring honesty separately from accuracy** | A model can be accurate and still assert things it internally represents as false. | MASK ([arXiv:2503.03750](https://arxiv.org/abs/2503.03750)). |
 
 ## 2. The stack as publicly described
 

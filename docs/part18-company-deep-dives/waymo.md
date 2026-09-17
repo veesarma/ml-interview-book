@@ -16,18 +16,18 @@
   components everywhere, but behind evidence.
 - **Perception**: multi-sensor fusion; the 6th-generation Driver carries 13 cameras,
   4 lidar, 6 radar and external audio receivers (Aug 2024 blog). The Open Dataset
-  (arXiv:1912.04838) is their public shape of the perception problem.
-- **Prediction lineage**: Wayformer (arXiv:2207.05844) encodes agents, road graph and
-  traffic signals with attention and latent queries. MotionLM (arXiv:2309.16534) then
+  ([arXiv:1912.04838](https://arxiv.org/abs/1912.04838)) is their public shape of the perception problem.
+- **Prediction lineage**: Wayformer ([arXiv:2207.05844](https://arxiv.org/abs/2207.05844)) encodes agents, road graph and
+  traffic signals with attention and latent queries. MotionLM ([arXiv:2309.16534](https://arxiv.org/abs/2309.16534)) then
   discretises motion into tokens and decodes *joint* multi-agent futures
   autoregressively, with a plain next-token loss.
-- For simulation: SimulationCity (2021), the open Waymax simulator (arXiv:2310.08710, JAX,
-  built on the Open Motion Dataset), the Sim Agents challenge (arXiv:2305.12032), and a
+- For simulation: SimulationCity (2021), the open Waymax simulator ([arXiv:2310.08710](https://arxiv.org/abs/2310.08710), JAX,
+  built on the Open Motion Dataset), the Sim Agents challenge ([arXiv:2305.12032](https://arxiv.org/abs/2305.12032)), and a
   generative **Waymo World Model** built on Genie 3 (Feb 2026 blog).
-- **End-to-end research**: **EMMA** (arXiv:2410.23262), a Gemini-based multimodal model
+- **End-to-end research**: **EMMA** ([arXiv:2410.23262](https://arxiv.org/abs/2410.23262)), a Gemini-based multimodal model
   that reads camera images and text and writes trajectories, objects and road graph as
   text; explicitly a research model with stated limitations (no lidar, few frames).
-- Scaling laws (arXiv:2506.08228, June 2025 blog): motion forecasting and planning
+- Scaling laws ([arXiv:2506.08228](https://arxiv.org/abs/2506.08228), June 2025 blog): motion forecasting and planning
   quality follows power laws in data, parameters and compute on internal driving data.
 - **Safety**: the Safety Impact hub compares rider-only crash rates with human
   benchmarks; the peer-reviewed 56.7-million-mile comparison (Traffic Injury
@@ -57,11 +57,11 @@ papers at ICCV/NeurIPS/ICRA, so the interview material is largely primary.
 
 | Problem | Why it is hard | Public evidence |
 |---|---|---|
-| **Redundant multi-sensor perception at range** | Fusing lidar, camera and radar with different rates, resolutions and failure modes; long-range detection at highway speed; weather. | 6th-generation Driver blog (sensor counts and redundancy rationale); Waymo Open Dataset (arXiv:1912.04838). |
-| **Joint prediction of interacting agents** | Marginal per-agent forecasts are inconsistent with each other; the planner needs joint futures with calibrated multimodality. | Wayformer (arXiv:2207.05844); MotionLM (arXiv:2309.16534); Open Motion Dataset (arXiv:2104.10133). |
-| **Closed-loop evaluation before real miles** | Log replay is open-loop; reactive simulation needs realistic agents; rare events must be synthesised. | SimulationCity (2021); Waymax (arXiv:2310.08710); Sim Agents challenge (arXiv:2305.12032); Waymo World Model (2026). |
+| **Redundant multi-sensor perception at range** | Fusing lidar, camera and radar with different rates, resolutions and failure modes; long-range detection at highway speed; weather. | 6th-generation Driver blog (sensor counts and redundancy rationale); Waymo Open Dataset ([arXiv:1912.04838](https://arxiv.org/abs/1912.04838)). |
+| **Joint prediction of interacting agents** | Marginal per-agent forecasts are inconsistent with each other; the planner needs joint futures with calibrated multimodality. | Wayformer ([arXiv:2207.05844](https://arxiv.org/abs/2207.05844)); MotionLM ([arXiv:2309.16534](https://arxiv.org/abs/2309.16534)); Open Motion Dataset ([arXiv:2104.10133](https://arxiv.org/abs/2104.10133)). |
+| **Closed-loop evaluation before real miles** | Log replay is open-loop; reactive simulation needs realistic agents; rare events must be synthesised. | SimulationCity (2021); Waymax ([arXiv:2310.08710](https://arxiv.org/abs/2310.08710)); Sim Agents challenge ([arXiv:2305.12032](https://arxiv.org/abs/2305.12032)); Waymo World Model (2026). |
 | **Statistically honest safety claims** | Serious crashes are rare; human benchmarks must be matched on geography and reporting thresholds. | Safety Impact hub; Traffic Injury Prevention paper (2025); Swiss Re collaboration (2023 blog); safety methodologies paper (2020). |
-| **Whether end-to-end multimodal models belong in the loop** | Foundation models bring world knowledge but lack lidar, temporal depth and latency guarantees. | EMMA (arXiv:2410.23262); scaling-laws report (arXiv:2506.08228). |
+| **Whether end-to-end multimodal models belong in the loop** | Foundation models bring world knowledge but lack lidar, temporal depth and latency guarantees. | EMMA ([arXiv:2410.23262](https://arxiv.org/abs/2410.23262)); scaling-laws report ([arXiv:2506.08228](https://arxiv.org/abs/2506.08228)). |
 | **Operating a rider-only fleet** | No driver to intervene; remote humans must help without becoming a latency-critical control loop. | Fleet Response blog (2024). |
 
 ## 2. The stack as publicly described
@@ -126,7 +126,7 @@ claim of acceptable safety without a driver needs independent evidence paths.
 
 **Sources.** "Meet the 6th-generation Waymo Driver" (Waymo blog, Aug 2024); Sun et al.,
 "Scalability in Perception for Autonomous Driving: Waymo Open Dataset" (CVPR 2020,
-arXiv:1912.04838).
+[arXiv:1912.04838](https://arxiv.org/abs/1912.04838)).
 
 !!! tip "How to say it in the interview"
     "For a rider-only vehicle I'd design perception around redundant modalities
@@ -184,10 +184,10 @@ alternative, marginal per-agent mixtures plus post-hoc interaction heuristics, i
 cheaper but produces inconsistent joint futures, which MotionLM's abstract names as the
 motivation.
 
-**Sources.** Nayakanti et al., "Wayformer" (ICRA 2023, arXiv:2207.05844); Seff et al.,
+**Sources.** Nayakanti et al., "Wayformer" (ICRA 2023, [arXiv:2207.05844](https://arxiv.org/abs/2207.05844)); Seff et al.,
 "MotionLM: Multi-Agent Motion Forecasting as Language Modeling" (ICCV 2023,
-arXiv:2309.16534); Ettinger et al., "Large Scale Interactive Motion Forecasting for
-Autonomous Driving: The Waymo Open Motion Dataset" (ICCV 2021, arXiv:2104.10133).
+[arXiv:2309.16534](https://arxiv.org/abs/2309.16534)); Ettinger et al., "Large Scale Interactive Motion Forecasting for
+Autonomous Driving: The Waymo Open Motion Dataset" (ICCV 2021, [arXiv:2104.10133](https://arxiv.org/abs/2104.10133)).
 
 !!! tip "How to say it in the interview"
     "I'd model prediction as joint, autoregressive generation over discrete
@@ -222,7 +222,7 @@ how to score the *realism* of learned traffic agents, by comparing distributions
 kinematic and interaction statistics rather than trajectory error. In February 2026
 Waymo described a generative Waymo World Model built on Google DeepMind's Genie 3 for
 simulation, with the stated purpose of generating realistic, controllable scenarios
-including rare ones. Block-NeRF (CVPR 2022, arXiv:2202.05263), a Waymo research paper
+including rare ones. Block-NeRF (CVPR 2022, [arXiv:2202.05263](https://arxiv.org/abs/2202.05263)), a Waymo research paper
 on city-scale neural rendering, is the earlier public hint of neural sensor
 simulation. The conceptual material is in
 [World models](../part11-perception-autonomy/07-world-models.md) and, for RL in a
@@ -239,10 +239,10 @@ interactive events.
 
 **Sources.** "Simulation City: introducing Waymo's most advanced simulation system yet"
 (Waymo blog, 2021); Gulino et al., "Waymax: An Accelerated, Data-Driven Simulator for
-Large-Scale Autonomous Driving Research" (NeurIPS 2023, arXiv:2310.08710; code on
-GitHub); Montali et al., "The Waymo Open Sim Agents Challenge" (arXiv:2305.12032);
+Large-Scale Autonomous Driving Research" (NeurIPS 2023, [arXiv:2310.08710](https://arxiv.org/abs/2310.08710); code on
+GitHub); Montali et al., "The Waymo Open Sim Agents Challenge" ([arXiv:2305.12032](https://arxiv.org/abs/2305.12032));
 "The Waymo World Model: A New Frontier for Autonomous Driving Simulation" (Waymo blog,
-Feb 2026); Tancik et al., "Block-NeRF" (CVPR 2022, arXiv:2202.05263).
+Feb 2026); Tancik et al., "Block-NeRF" (CVPR 2022, [arXiv:2202.05263](https://arxiv.org/abs/2202.05263)).
 
 !!! tip "How to say it in the interview"
     "I'd build evaluation in three tiers and make closed-loop simulation the
@@ -289,8 +289,8 @@ publish it as research and to state the gaps, which is itself the answer to "wou
 you deploy it?".
 
 **Sources.** Hwang et al., "EMMA: End-to-End Multimodal Model for Autonomous Driving"
-(arXiv:2410.23262; blog "Introducing EMMA", Oct 2024; research page); Baniodeh et al.,
-"Scaling Laws of Motion Forecasting and Planning, A Technical Report" (arXiv:2506.08228;
+([arXiv:2410.23262](https://arxiv.org/abs/2410.23262); blog "Introducing EMMA", Oct 2024; research page); Baniodeh et al.,
+"Scaling Laws of Motion Forecasting and Planning, A Technical Report" ([arXiv:2506.08228](https://arxiv.org/abs/2506.08228);
 blog, June 2025).
 
 !!! tip "How to say it in the interview"

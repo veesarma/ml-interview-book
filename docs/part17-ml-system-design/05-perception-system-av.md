@@ -254,7 +254,7 @@ distribution's quality.
 **Backward projection (query-based attention).** Define queries on the BEV grid (or
 for objects) and let each query attend to the image features it projects into, using
 the known camera geometry to restrict attention (BEVFormer, Li et al., ECCV 2022,
-arXiv:2203.17270, which adds temporal self-attention over previous BEV features).
+[arXiv:2203.17270](https://arxiv.org/abs/2203.17270), which adds temporal self-attention over previous BEV features).
 No explicit depth estimate is needed (the network learns where to look) and
 temporal fusion falls out naturally. More expensive; needs careful positional
 encoding of the camera geometry.
@@ -328,7 +328,7 @@ estimation theory; the design decisions here are:
 | Fusion level | What it is | Pro | Con | Use when |
 |---|---|---|---|---|
 | Late / track-level | Each sensor produces tracks; a fusion filter associates them | Modular, degrades gracefully, easy to attribute failures, each sensor testable alone | Cannot combine sub-threshold evidence; association errors | Safety-critical redundancy; heterogeneous teams; early programmes |
-| Mid / feature-level (BEV) | Camera and lidar/radar features fused in the shared BEV grid (BEVFusion, Liu et al., ICRA 2023, arXiv:2205.13542) | Best accuracy; combines weak evidence; one model | A sensor dropout changes the input distribution; harder to attribute failures | Mature stack with the training data to cover dropout cases |
+| Mid / feature-level (BEV) | Camera and lidar/radar features fused in the shared BEV grid (BEVFusion, Liu et al., ICRA 2023, [arXiv:2205.13542](https://arxiv.org/abs/2205.13542)) | Best accuracy; combines weak evidence; one model | A sensor dropout changes the input distribution; harder to attribute failures | Mature stack with the training data to cover dropout cases |
 | Early / raw | Raw pixels and points into one network | Maximum information | Brittle to calibration and sensor changes; huge data cost | Rarely in production |
 
 The nuance interviewers probe: **radar is not a worse lidar**. Radar measures radial
@@ -628,7 +628,7 @@ simulation (including reactive-agent simulation) scenario libraries, and structu
 on-road testing before any ODD expansion.
 
 **What the sources say.** Waymo has published the Waymo Open Dataset ("Scalability in
-Perception for Autonomous Driving: Waymo Open Dataset", CVPR 2020, arXiv:1912.04838)
+Perception for Autonomous Driving: Waymo Open Dataset", CVPR 2020, [arXiv:1912.04838](https://arxiv.org/abs/1912.04838))
 with multi-sensor data and 3D labels, the Waymo Open Motion Dataset for behaviour
 prediction, and Waymax ("Waymax: An Accelerated, Data-Driven Simulator for
 Large-Scale Autonomous Driving Research", NeurIPS 2023 Datasets and Benchmarks), a
@@ -717,12 +717,12 @@ production vehicle has it. *Evaluate*: per-range detection metrics, because the
 methods differ most at long range where depth is least certain.
 
 **What the sources say.** Philion & Fidler, "Lift, Splat, Shoot" (ECCV 2020,
-arXiv:2008.05711) introduced the depth-distribution lifting of multi-camera features
-into a BEV grid. Li et al., "BEVFormer" (ECCV 2022, arXiv:2203.17270) used spatial
+[arXiv:2008.05711](https://arxiv.org/abs/2008.05711)) introduced the depth-distribution lifting of multi-camera features
+into a BEV grid. Li et al., "BEVFormer" (ECCV 2022, [arXiv:2203.17270](https://arxiv.org/abs/2203.17270)) used spatial
 cross-attention from BEV queries into image features plus temporal self-attention
-over past BEV features. Liu et al., "BEVFusion" (ICRA 2023, arXiv:2205.13542)
+over past BEV features. Liu et al., "BEVFusion" (ICRA 2023, [arXiv:2205.13542](https://arxiv.org/abs/2205.13542))
 unified camera and lidar features in the shared BEV space. Lang et al.,
-"PointPillars" (CVPR 2019, arXiv:1812.05784) is the efficient lidar-detection
+"PointPillars" (CVPR 2019, [arXiv:1812.05784](https://arxiv.org/abs/1812.05784)) is the efficient lidar-detection
 baseline these are compared against.
 
 !!! tip "How to say it in the interview: pick the BEV mechanism on evidence"
@@ -959,15 +959,15 @@ simulation-based scenario generation for rare events in their technical material
 ## References
 
 - Tesla. AI Day 2021 and AI Day 2022 presentations (multi-camera BEV fusion, HydraNet multi-task architecture, video/temporal module, occupancy networks, auto-labelling, the data engine, shadow mode).
-- Sun, P. et al. "Scalability in Perception for Autonomous Driving: Waymo Open Dataset." CVPR 2020 (arXiv:1912.04838).
-- Ettinger, S. et al. "Large Scale Interactive Motion Forecasting for Autonomous Driving: The Waymo Open Motion Dataset." ICCV 2021 (arXiv:2104.10133).
-- Gulino, C. et al. "Waymax: An Accelerated, Data-Driven Simulator for Large-Scale Autonomous Driving Research." NeurIPS 2023 Datasets and Benchmarks (arXiv:2310.08710).
+- Sun, P. et al. "Scalability in Perception for Autonomous Driving: Waymo Open Dataset." CVPR 2020 ([arXiv:1912.04838](https://arxiv.org/abs/1912.04838)).
+- Ettinger, S. et al. "Large Scale Interactive Motion Forecasting for Autonomous Driving: The Waymo Open Motion Dataset." ICCV 2021 ([arXiv:2104.10133](https://arxiv.org/abs/2104.10133)).
+- Gulino, C. et al. "Waymax: An Accelerated, Data-Driven Simulator for Large-Scale Autonomous Driving Research." NeurIPS 2023 Datasets and Benchmarks ([arXiv:2310.08710](https://arxiv.org/abs/2310.08710)).
 - Waymo. Safety report and safety-framework publications; Waymo blog posts on simulation and on driverless operation.
 - NVIDIA. DRIVE platform developer documentation and technical blog posts on DRIVE perception DNNs, TensorRT inference optimisation, and automotive functional safety.
-- Philion, J., Fidler, S. "Lift, Splat, Shoot: Encoding Images from Arbitrary Camera Rigs by Implicitly Unprojecting to 3D." ECCV 2020 (arXiv:2008.05711).
-- Li, Z. et al. "BEVFormer: Learning Bird's-Eye-View Representation from Multi-Camera Images via Spatiotemporal Transformers." ECCV 2022 (arXiv:2203.17270).
-- Liu, Z. et al. "BEVFusion: Multi-Task Multi-Sensor Fusion with Unified Bird's-Eye View Representation." ICRA 2023 (arXiv:2205.13542).
-- Lang, A. H. et al. "PointPillars: Fast Encoders for Object Detection from Point Clouds." CVPR 2019 (arXiv:1812.05784).
-- Mescheder, L. et al. "Occupancy Networks: Learning 3D Reconstruction in Function Space." CVPR 2019 (arXiv:1812.03828).
-- Caesar, H. et al. "nuScenes: A Multimodal Dataset for Autonomous Driving." CVPR 2020 (arXiv:1903.11027).
+- Philion, J., Fidler, S. "Lift, Splat, Shoot: Encoding Images from Arbitrary Camera Rigs by Implicitly Unprojecting to 3D." ECCV 2020 ([arXiv:2008.05711](https://arxiv.org/abs/2008.05711)).
+- Li, Z. et al. "BEVFormer: Learning Bird's-Eye-View Representation from Multi-Camera Images via Spatiotemporal Transformers." ECCV 2022 ([arXiv:2203.17270](https://arxiv.org/abs/2203.17270)).
+- Liu, Z. et al. "BEVFusion: Multi-Task Multi-Sensor Fusion with Unified Bird's-Eye View Representation." ICRA 2023 ([arXiv:2205.13542](https://arxiv.org/abs/2205.13542)).
+- Lang, A. H. et al. "PointPillars: Fast Encoders for Object Detection from Point Clouds." CVPR 2019 ([arXiv:1812.05784](https://arxiv.org/abs/1812.05784)).
+- Mescheder, L. et al. "Occupancy Networks: Learning 3D Reconstruction in Function Space." CVPR 2019 ([arXiv:1812.03828](https://arxiv.org/abs/1812.03828)).
+- Caesar, H. et al. "nuScenes: A Multimodal Dataset for Autonomous Driving." CVPR 2020 ([arXiv:1903.11027](https://arxiv.org/abs/1903.11027)).
 - Book cross-references: [multi-camera & BEV](../part11-perception-autonomy/02-multi-camera-bev.md), [sensor fusion](../part11-perception-autonomy/03-sensor-fusion.md), [tracking](../part11-perception-autonomy/04-tracking.md), [occupancy & temporal perception](../part11-perception-autonomy/05-occupancy-temporal.md), [prediction & planning](../part11-perception-autonomy/06-prediction-planning.md), [world models](../part11-perception-autonomy/07-world-models.md), [perception foundation models](../part11-perception-autonomy/01-perception-foundation-models.md), [weak supervision & auto-labeling](../part10-self-supervised/03-weak-supervision-and-auto-labeling.md), [distributed training](../part14-systems/01-distributed-training.md).

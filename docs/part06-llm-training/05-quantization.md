@@ -349,8 +349,8 @@ most common misunderstanding: quantisation is a memory-traffic optimisation firs
     4-bit NormalFloat (quantiles of a Gaussian), double quantisation of the scales, and
     paged optimisers so a 65B model could be fine-tuned on one 48 GB GPU (chapter 6).
     Sources: *LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale* (NeurIPS
-    2022, arXiv:2208.07339); *QLoRA: Efficient Finetuning of Quantized LLMs* (NeurIPS 2023,
-    arXiv:2305.14314).
+    2022, [arXiv:2208.07339](https://arxiv.org/abs/2208.07339)); *QLoRA: Efficient Finetuning of Quantized LLMs* (NeurIPS 2023,
+    [arXiv:2305.14314](https://arxiv.org/abs/2305.14314)).
 
 !!! production "IST Austria / MIT: GPTQ and AWQ as the serving standard"
     GPTQ (2022) quantised OPT-175B and BLOOM to 3–4 bits in a few GPU-hours with negligible
@@ -360,9 +360,9 @@ most common misunderstanding: quantisation is a memory-traffic optimisation firs
     load for 4-bit serving; the decision between them is usually made by kernel availability
     on the target hardware rather than accuracy.
     Sources: *GPTQ: Accurate Post-Training Quantization for Generative Pre-trained
-    Transformers* (ICLR 2023, arXiv:2210.17323); *AWQ: Activation-aware Weight Quantization
-    for LLM Compression and Acceleration* (MLSys 2024, arXiv:2306.00978); *SmoothQuant*
-    (ICML 2023, arXiv:2211.10438).
+    Transformers* (ICLR 2023, [arXiv:2210.17323](https://arxiv.org/abs/2210.17323)); *AWQ: Activation-aware Weight Quantization
+    for LLM Compression and Acceleration* (MLSys 2024, [arXiv:2306.00978](https://arxiv.org/abs/2306.00978)); *SmoothQuant*
+    (ICML 2023, [arXiv:2211.10438](https://arxiv.org/abs/2211.10438)).
 
 !!! production "Meta: Llama 3 FP8 and quantised releases"
     The Llama 3 paper describes FP8 inference for the 405B model with per-row/per-channel
@@ -469,17 +469,14 @@ most common misunderstanding: quantisation is a memory-traffic optimisation firs
 
 ## References
 
-Hyperlinked entries were verified at build time; entries without a link are given by title
-and arXiv id.
-
 - DeepSeek-AI. *DeepSeek-V3 Technical Report*. 2024. [arXiv:2412.19437](https://arxiv.org/abs/2412.19437)
 - Meta AI. *The Llama 3 Herd of Models*. 2024. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783)
-- Dettmers et al. *LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale*. NeurIPS 2022. arXiv:2208.07339
-- Frantar et al. *GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers*. ICLR 2023. arXiv:2210.17323
-- Lin et al. *AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration*. MLSys 2024. arXiv:2306.00978
-- Xiao et al. *SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models*. ICML 2023. arXiv:2211.10438
-- Dettmers et al. *QLoRA: Efficient Finetuning of Quantized LLMs*. NeurIPS 2023. arXiv:2305.14314
-- Micikevicius et al. *FP8 Formats for Deep Learning*. 2022. arXiv:2209.05433
-- Frantar, Alistarh. *Optimal Brain Compression: A Framework for Accurate Post-Training Quantization and Pruning*. NeurIPS 2022. arXiv:2208.11580 (OBQ)
-- Liu et al. *KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache*. ICML 2024. arXiv:2402.02750
-- Bengio, Léonard, Courville. *Estimating or Propagating Gradients Through Stochastic Neurons for Conditional Computation*. 2013. arXiv:1308.3432 (STE)
+- Dettmers et al. *LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale*. NeurIPS 2022. [arXiv:2208.07339](https://arxiv.org/abs/2208.07339)
+- Frantar et al. *GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers*. ICLR 2023. [arXiv:2210.17323](https://arxiv.org/abs/2210.17323)
+- Lin et al. *AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration*. MLSys 2024. [arXiv:2306.00978](https://arxiv.org/abs/2306.00978)
+- Xiao et al. *SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models*. ICML 2023. [arXiv:2211.10438](https://arxiv.org/abs/2211.10438)
+- Dettmers et al. *QLoRA: Efficient Finetuning of Quantized LLMs*. NeurIPS 2023. [arXiv:2305.14314](https://arxiv.org/abs/2305.14314)
+- Micikevicius et al. *FP8 Formats for Deep Learning*. 2022. [arXiv:2209.05433](https://arxiv.org/abs/2209.05433)
+- Frantar, Alistarh. *Optimal Brain Compression: A Framework for Accurate Post-Training Quantization and Pruning*. NeurIPS 2022. [arXiv:2208.11580](https://arxiv.org/abs/2208.11580) (OBQ)
+- Liu et al. *KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache*. ICML 2024. [arXiv:2402.02750](https://arxiv.org/abs/2402.02750)
+- Bengio, Léonard, Courville. *Estimating or Propagating Gradients Through Stochastic Neurons for Conditional Computation*. 2013. [arXiv:1308.3432](https://arxiv.org/abs/1308.3432) (STE)

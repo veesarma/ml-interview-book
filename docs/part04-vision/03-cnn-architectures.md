@@ -57,7 +57,7 @@ $$
 
 Compare a plain network, where $\frac{\partial \mathcal{L}}{\partial x_l} = \frac{\partial \mathcal{L}}{\partial x_L}\prod_{i=l}^{L-1} J_i$. That is a product of Jacobians, whose singular values multiply, so any systematic deviation from 1 gives exponential decay or growth in depth. In the residual case the $I$ term survives whatever the $F$ Jacobians do, so the gradient cannot vanish from depth alone. Residual connections add a well-conditioned optimisation path, and they add no expressive power.
 
-Two caveats a staff candidate should state. The identity term is exact only when nothing sits between the addition and the next block's input. With post-activation, $y = \mathrm{ReLU}(x + F(x))$, the path is masked by $\mathrm{ReLU}'$. He et al.'s pre-activation variant (arXiv:1603.05027) moves BN and ReLU inside $F$, giving $x_{l+1} = x_l + F(\mathrm{ReLU}(\mathrm{BN}(x_l)))$ and a clean identity path all the way to the output, which is what let them train 1001-layer nets.
+Two caveats a staff candidate should state. The identity term is exact only when nothing sits between the addition and the next block's input. With post-activation, $y = \mathrm{ReLU}(x + F(x))$, the path is masked by $\mathrm{ReLU}'$. He et al.'s pre-activation variant ([arXiv:1603.05027](https://arxiv.org/abs/1603.05027)) moves BN and ReLU inside $F$, giving $x_{l+1} = x_l + F(\mathrm{ReLU}(\mathrm{BN}(x_l)))$ and a clean identity path all the way to the output, which is what let them train 1001-layer nets.
 
 The second caveat is variance. $\mathrm{Var}[x_{l+1}] = \mathrm{Var}[x_l] + \mathrm{Var}[F]$, so activations grow linearly with depth unless BN rescales them. Residual nets and normalisation arrived together for that reason, and it is why zero-initialising the last BN $\gamma$ in each block, so that $F \equiv 0$ at init, stabilises large-batch training.
 
@@ -69,7 +69,7 @@ $$
 x_3 = x_0 + F_1(x_0) + F_2(x_0 + F_1(x_0)) + F_3(\cdots),
 $$
 
-which Veit, Wilber and Belongie (NeurIPS 2016, arXiv:1605.06431) read as a sum over $2^n$ paths through the network, one per subset of blocks taken. Their experiments: deleting a single residual block from a trained ResNet-110 barely changes accuracy, while deleting a layer from VGG destroys it; shuffling blocks degrades gracefully; and the gradient magnitude is dominated by paths of length 5 to 17 even in a 110-layer net.
+which Veit, Wilber and Belongie (NeurIPS 2016, [arXiv:1605.06431](https://arxiv.org/abs/1605.06431)) read as a sum over $2^n$ paths through the network, one per subset of blocks taken. Their experiments: deleting a single residual block from a trained ResNet-110 barely changes accuracy, while deleting a layer from VGG destroys it; shuffling blocks degrades gracefully; and the gradient magnitude is dominated by paths of length 5 to 17 even in a 110-layer net.
 
 Depth in a ResNet buys an ensemble of many shallow-ish functions rather than one very deep composition. That also explains why stochastic depth works as a regulariser, and why ResNets tolerate layer-level surgery during deployment.
 
@@ -87,7 +87,7 @@ Inception factorises differently. Replace $5\times5$ by two stacked $3\times3$, 
 
 ### 2.4 Squeeze-and-Excitation
 
-A conv's output channel at a pixel depends only on its receptive field. SE (Hu et al., CVPR 2018, arXiv:1709.01507) injects global context as a per-channel gate:
+A conv's output channel at a pixel depends only on its receptive field. SE (Hu et al., CVPR 2018, [arXiv:1709.01507](https://arxiv.org/abs/1709.01507)) injects global context as a per-channel gate:
 
 $$
 z = \mathrm{GAP}(x) \in \R^{C},\qquad s = \sigma\big(W_2\,\mathrm{ReLU}(W_1 z)\big) \in (0,1)^C,\qquad y_{c} = s_c\, x_{c}.
@@ -97,7 +97,7 @@ With reduction $r$ the cost is $2C^2/r$ MACs per image rather than per pixel, ne
 
 ### 2.5 Compound scaling (EfficientNet)
 
-Given a baseline network you can scale depth $d$, width $w$ or resolution $r$, and FLOPs scale as $d\,w^2\,r^2$. Tan and Le (ICML 2019, arXiv:1905.11946) found that scaling one dimension saturates quickly, and proposed tying them:
+Given a baseline network you can scale depth $d$, width $w$ or resolution $r$, and FLOPs scale as $d\,w^2\,r^2$. Tan and Le (ICML 2019, [arXiv:1905.11946](https://arxiv.org/abs/1905.11946)) found that scaling one dimension saturates quickly, and proposed tying them:
 
 $$
 d = \alpha^\phi,\quad w = \beta^\phi,\quad r = \gamma^\phi \quad \text{subject to}\quad \alpha\beta^2\gamma^2 \approx 2,\ \ \alpha,\beta,\gamma \ge 1,
@@ -107,7 +107,7 @@ so FLOPs grow as $2^\phi$ and a single knob $\phi$ moves you along the accuracy-
 
 ### 2.6 What ConvNeXt actually changed
 
-Liu et al. (CVPR 2022, arXiv:2201.03545) took ResNet-50, which scores 76.1% top-1 under the original recipe, and applied one change at a time, reporting accuracy after each. The published sequence:
+Liu et al. (CVPR 2022, [arXiv:2201.03545](https://arxiv.org/abs/2201.03545)) took ResNet-50, which scores 76.1% top-1 under the original recipe, and applied one change at a time, reporting accuracy after each. The published sequence:
 
 | Step | Change | Top-1 |
 |---|---|---|
@@ -263,13 +263,13 @@ Backbone selection:
 ## 5. In production
 
 !!! production "Meta (FAIR): ResNet, and then proving the recipe mattered"
-    He et al.'s "Deep Residual Learning for Image Recognition" (CVPR 2016, arXiv:1512.03385) won ILSVRC-2015 with a 152-layer network at 3.57% top-5 error, and the residual block became the default unit of computer vision. The business problem was better features for everything downstream, and the rejected alternative was more layers without skips, which the paper shows degrading. Six years later the same lab's "A ConvNet for the 2020s" (arXiv:2201.03545) re-ran ResNet-50 under a modern recipe and got 78.8% before changing any architecture, then 82.0% after a sequence of small modernisations, matching Swin-T. Together the two papers are the best answer to "how much of progress is architecture?".
+    He et al.'s "Deep Residual Learning for Image Recognition" (CVPR 2016, [arXiv:1512.03385](https://arxiv.org/abs/1512.03385)) won ILSVRC-2015 with a 152-layer network at 3.57% top-5 error, and the residual block became the default unit of computer vision. The business problem was better features for everything downstream, and the rejected alternative was more layers without skips, which the paper shows degrading. Six years later the same lab's "A ConvNet for the 2020s" ([arXiv:2201.03545](https://arxiv.org/abs/2201.03545)) re-ran ResNet-50 under a modern recipe and got 78.8% before changing any architecture, then 82.0% after a sequence of small modernisations, matching Swin-T. Together the two papers are the best answer to "how much of progress is architecture?".
 
 !!! production "Google: EfficientNet, MobileNet and on-device vision"
-    Tan and Le's EfficientNet (ICML 2019, arXiv:1905.11946) gave a principled scaling rule over an MBConv and SE backbone found by NAS, reaching 84.3% top-1 with B7 at far fewer parameters than contemporaries. EfficientDet (arXiv:1911.09070) carried compound scaling into detection with BiFPN. For on-device, the MobileNet line (V1 arXiv:1704.04861, V2 arXiv:1801.04381, V3 arXiv:1905.02244) traded dense convs for depthwise-separable, then inverted residuals with linear bottlenecks, then a NAS-tuned layout with hard-swish chosen because it is cheap and quantisation-friendly on mobile. In each case the objective Google optimised was measured on-device latency rather than FLOPs, and MobileNetV3's paper optimises a latency-aware objective directly.
+    Tan and Le's EfficientNet (ICML 2019, [arXiv:1905.11946](https://arxiv.org/abs/1905.11946)) gave a principled scaling rule over an MBConv and SE backbone found by NAS, reaching 84.3% top-1 with B7 at far fewer parameters than contemporaries. EfficientDet ([arXiv:1911.09070](https://arxiv.org/abs/1911.09070)) carried compound scaling into detection with BiFPN. For on-device, the MobileNet line (V1 [arXiv:1704.04861](https://arxiv.org/abs/1704.04861), V2 [arXiv:1801.04381](https://arxiv.org/abs/1801.04381), V3 [arXiv:1905.02244](https://arxiv.org/abs/1905.02244)) traded dense convs for depthwise-separable, then inverted residuals with linear bottlenecks, then a NAS-tuned layout with hard-swish chosen because it is cheap and quantisation-friendly on mobile. In each case the objective Google optimised was measured on-device latency rather than FLOPs, and MobileNetV3's paper optimises a latency-aware objective directly.
 
 !!! production "NVIDIA: the large-batch ImageNet recipe and MLPerf"
-    Goyal et al. (Meta, 2017, arXiv:1706.02677) showed ResNet-50 training at batch 8192 in one hour on 256 GPUs with no accuracy loss, using three ingredients that are now standard: linear LR scaling with batch size, a gradual warm-up over the first five epochs or so, and zero-initialising the last BN $\gamma$ of each residual block. NVIDIA's MLPerf ResNet-50 submissions industrialised this with mixed precision, channels-last, fused BN and ReLU, DALI data loading, and LARS at extreme batch sizes, driving time-to-train from hours to under a minute on large clusters. See [distributed training](../part14-systems/01-distributed-training.md).
+    Goyal et al. (Meta, 2017, [arXiv:1706.02677](https://arxiv.org/abs/1706.02677)) showed ResNet-50 training at batch 8192 in one hour on 256 GPUs with no accuracy loss, using three ingredients that are now standard: linear LR scaling with batch size, a gradual warm-up over the first five epochs or so, and zero-initialising the last BN $\gamma$ of each residual block. NVIDIA's MLPerf ResNet-50 submissions industrialised this with mixed precision, channels-last, fused BN and ReLU, DALI data loading, and LARS at extreme batch sizes, driving time-to-train from hours to under a minute on large clusters. See [distributed training](../part14-systems/01-distributed-training.md).
 
 !!! production "Apple: CNNs on the Neural Engine"
     Apple's Core ML tooling and its ML research write-ups on deploying vision models on-device emphasise the constraints this chapter's systems section lists: prefer operations the Neural Engine executes natively, keep activations in a layout the compiler can fuse, and quantise weights per channel. Apple's published guidance on deploying Transformers on the Neural Engine (a 2022 Apple Machine Learning Research article) makes the general point directly: the fastest model is the one whose primitive ops map to the accelerator, which is why mobile CNN families, and mobile-friendly ViT hybrids, keep their block vocabulary small. Search "Apple Machine Learning Research deploying Transformers on the Apple Neural Engine".
@@ -278,7 +278,7 @@ Backbone selection:
 
 !!! interview "Derive why residual connections help. Is it about vanishing gradients?"
     Partly, and say it precisely. Unrolled, $x_L = x_l + \sum_{i\ge l} F(x_i)$, so $\partial\mathcal{L}/\partial x_l = \partial\mathcal{L}/\partial x_L\,(I + \sum \partial F/\partial x_l)$. The $I$ term means the gradient reaching layer $l$ is never a pure product of Jacobians, so it cannot decay exponentially with depth. The original motivation was the degradation problem, where deeper plain nets had worse training error, an optimisation failure rather than a gradient-magnitude failure alone, and the fix is that the identity is now easy to represent with $F = 0$.
-    **Staff follow-up:** *Is a ResNet more expressive than a plain net of the same size?* No. Any residual net can be written as a plain net with the same parameter count by folding the skip into the weights when shapes match. The gain is conditioning of the loss surface, which Li et al.'s loss-landscape visualisations (arXiv:1712.09913) show clearly: skips turn a chaotic surface into a near-convex basin.
+    **Staff follow-up:** *Is a ResNet more expressive than a plain net of the same size?* No. Any residual net can be written as a plain net with the same parameter count by folding the skip into the weights when shapes match. The gain is conditioning of the loss surface, which Li et al.'s loss-landscape visualisations ([arXiv:1712.09913](https://arxiv.org/abs/1712.09913)) show clearly: skips turn a chaotic surface into a near-convex basin.
 
 !!! interview "Why zero-initialise the last BatchNorm γ in each residual block?"
     It makes $F(x) = 0$ at initialisation, so every block is the identity and the network starts with the effective depth of its shortcut path. That keeps activation and gradient variance from compounding across hundreds of blocks, and it is what allows the aggressive learning rates of large-batch training. Goyal et al. list it as one of three ingredients for batch-8192 ResNet-50.
@@ -335,7 +335,7 @@ Backbone selection:
 5. ★★★ You inherit a production ResNet-50 classifier at 76.5% top-1, trained with the 2016 recipe (90 epochs, SGD, step LR, random crop and flip). You have one week of 8-GPU time. Give a prioritised plan to raise accuracy without changing the architecture, with expected gains and risks.
 
     ??? success "Solution"
-        Priority order, drawn from the "ResNet strikes back" ablations (arXiv:2110.00476). (1) Longer schedule with cosine LR, 5-epoch warm-up, and AdamW or LAMB: the largest single lever, worth about 1.5 to 2.5 points, costing most of the week. (2) Modern augmentation, RandAugment plus Mixup plus CutMix plus random erasing, worth 1 to 2 points, with the risk that it needs the longer schedule or it hurts, because heavy augmentation underfits at 90 epochs. (3) Label smoothing 0.1 and no weight decay on BN and bias, worth 0.3 to 0.5, essentially free. (4) EMA of weights, worth 0.2 to 0.4, free at inference. (5) Test-time resolution increase, training at 176 and testing at 224, the FixRes effect, worth about 0.5, free. Expected landing zone 79 to 80.4%. Risks to call out: the new model's calibration and its behaviour on your production distribution both change, so re-validate downstream thresholds, and heavy augmentation can shift the feature space enough to break a frozen downstream head.
+        Priority order, drawn from the "ResNet strikes back" ablations ([arXiv:2110.00476](https://arxiv.org/abs/2110.00476)). (1) Longer schedule with cosine LR, 5-epoch warm-up, and AdamW or LAMB: the largest single lever, worth about 1.5 to 2.5 points, costing most of the week. (2) Modern augmentation, RandAugment plus Mixup plus CutMix plus random erasing, worth 1 to 2 points, with the risk that it needs the longer schedule or it hurts, because heavy augmentation underfits at 90 epochs. (3) Label smoothing 0.1 and no weight decay on BN and bias, worth 0.3 to 0.5, essentially free. (4) EMA of weights, worth 0.2 to 0.4, free at inference. (5) Test-time resolution increase, training at 176 and testing at 224, the FixRes effect, worth about 0.5, free. Expected landing zone 79 to 80.4%. Risks to call out: the new model's calibration and its behaviour on your production distribution both change, so re-validate downstream thresholds, and heavy augmentation can shift the feature space enough to break a frozen downstream head.
 
 ## References
 
@@ -343,18 +343,18 @@ Links could not be verified from this build environment, so titles, venues and a
 
 - Y. LeCun et al., "Gradient-Based Learning Applied to Document Recognition", Proc. IEEE, 1998 (LeNet-5).
 - A. Krizhevsky, I. Sutskever, G. Hinton, "ImageNet Classification with Deep Convolutional Neural Networks", NeurIPS 2012 (AlexNet).
-- K. Simonyan and A. Zisserman, "Very Deep Convolutional Networks for Large-Scale Image Recognition", ICLR 2015, arXiv:1409.1556 (VGG).
-- C. Szegedy et al., "Going Deeper with Convolutions", CVPR 2015, arXiv:1409.4842, and "Rethinking the Inception Architecture", CVPR 2016, arXiv:1512.00567.
-- K. He et al., "Deep Residual Learning for Image Recognition", CVPR 2016, arXiv:1512.03385.
-- K. He et al., "Identity Mappings in Deep Residual Networks", ECCV 2016, arXiv:1603.05027 (pre-activation).
-- A. Veit, M. Wilber, S. Belongie, "Residual Networks Behave Like Ensembles of Relatively Shallow Networks", NeurIPS 2016, arXiv:1605.06431.
-- G. Huang et al., "Densely Connected Convolutional Networks", CVPR 2017, arXiv:1608.06993 (DenseNet).
-- J. Hu, L. Shen, G. Sun, "Squeeze-and-Excitation Networks", CVPR 2018, arXiv:1709.01507.
-- S. Xie et al., "Aggregated Residual Transformations for Deep Neural Networks", CVPR 2017, arXiv:1611.05431 (ResNeXt).
-- M. Tan and Q. Le, "EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks", ICML 2019, arXiv:1905.11946.
-- A. Howard et al., "MobileNets", arXiv:1704.04861; M. Sandler et al., "MobileNetV2", arXiv:1801.04381; A. Howard et al., "Searching for MobileNetV3", arXiv:1905.02244.
-- I. Radosavovic et al., "Designing Network Design Spaces", CVPR 2020, arXiv:2003.13678 (RegNet).
-- Z. Liu et al., "A ConvNet for the 2020s", CVPR 2022, arXiv:2201.03545.
-- P. Goyal et al., "Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour", 2017, arXiv:1706.02677.
-- R. Wightman, H. Touvron, H. Jégou, "ResNet strikes back: An improved training procedure in timm", 2021, arXiv:2110.00476.
-- H. Li, Z. Xu, G. Taylor, C. Studer, T. Goldstein, NeurIPS 2018, arXiv:1712.09913, on visualising the loss surface of deep nets with and without skip connections.
+- K. Simonyan and A. Zisserman, "Very Deep Convolutional Networks for Large-Scale Image Recognition", ICLR 2015, [arXiv:1409.1556](https://arxiv.org/abs/1409.1556) (VGG).
+- C. Szegedy et al., "Going Deeper with Convolutions", CVPR 2015, [arXiv:1409.4842](https://arxiv.org/abs/1409.4842), and "Rethinking the Inception Architecture", CVPR 2016, [arXiv:1512.00567](https://arxiv.org/abs/1512.00567).
+- K. He et al., "Deep Residual Learning for Image Recognition", CVPR 2016, [arXiv:1512.03385](https://arxiv.org/abs/1512.03385).
+- K. He et al., "Identity Mappings in Deep Residual Networks", ECCV 2016, [arXiv:1603.05027](https://arxiv.org/abs/1603.05027) (pre-activation).
+- A. Veit, M. Wilber, S. Belongie, "Residual Networks Behave Like Ensembles of Relatively Shallow Networks", NeurIPS 2016, [arXiv:1605.06431](https://arxiv.org/abs/1605.06431).
+- G. Huang et al., "Densely Connected Convolutional Networks", CVPR 2017, [arXiv:1608.06993](https://arxiv.org/abs/1608.06993) (DenseNet).
+- J. Hu, L. Shen, G. Sun, "Squeeze-and-Excitation Networks", CVPR 2018, [arXiv:1709.01507](https://arxiv.org/abs/1709.01507).
+- S. Xie et al., "Aggregated Residual Transformations for Deep Neural Networks", CVPR 2017, [arXiv:1611.05431](https://arxiv.org/abs/1611.05431) (ResNeXt).
+- M. Tan and Q. Le, "EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks", ICML 2019, [arXiv:1905.11946](https://arxiv.org/abs/1905.11946).
+- A. Howard et al., "MobileNets", [arXiv:1704.04861](https://arxiv.org/abs/1704.04861); M. Sandler et al., "MobileNetV2", [arXiv:1801.04381](https://arxiv.org/abs/1801.04381); A. Howard et al., "Searching for MobileNetV3", [arXiv:1905.02244](https://arxiv.org/abs/1905.02244).
+- I. Radosavovic et al., "Designing Network Design Spaces", CVPR 2020, [arXiv:2003.13678](https://arxiv.org/abs/2003.13678) (RegNet).
+- Z. Liu et al., "A ConvNet for the 2020s", CVPR 2022, [arXiv:2201.03545](https://arxiv.org/abs/2201.03545).
+- P. Goyal et al., "Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour", 2017, [arXiv:1706.02677](https://arxiv.org/abs/1706.02677).
+- R. Wightman, H. Touvron, H. Jégou, "ResNet strikes back: An improved training procedure in timm", 2021, [arXiv:2110.00476](https://arxiv.org/abs/2110.00476).
+- H. Li, Z. Xu, G. Taylor, C. Studer, T. Goldstein, NeurIPS 2018, [arXiv:1712.09913](https://arxiv.org/abs/1712.09913), on visualising the loss surface of deep nets with and without skip connections.

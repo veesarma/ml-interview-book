@@ -49,7 +49,7 @@ with $r_0 = 1$ and $j_0 = 1$. Three $3\times3$ stride-1 layers give $r = 1 + 2 +
 
 Strides are the cheap way to grow the receptive field, since each halving doubles the growth rate of every later layer. Dilation grows it without losing resolution. A detector's largest-object head has to sit at a stage whose $r$ exceeds the largest object, which is one reason RetinaNet adds $P_6$ and $P_7$.
 
-Luo et al. (NeurIPS 2016, arXiv:1701.04128) showed that the effective receptive field, $\partial y_{\text{centre}}/\partial x$, is Gaussian-distributed, and that its radius grows as $O(\sqrt{L})$ rather than $O(L)$ for stride-1 stacks. The theoretical box overstates what the network sees. Residual connections and downsampling widen the effective field, which is part of why ResNets outperform VGG at the same depth.
+Luo et al. (NeurIPS 2016, [arXiv:1701.04128](https://arxiv.org/abs/1701.04128)) showed that the effective receptive field, $\partial y_{\text{centre}}/\partial x$, is Gaussian-distributed, and that its radius grows as $O(\sqrt{L})$ rather than $O(L)$ for stride-1 stacks. The theoretical box overstates what the network sees. Residual connections and downsampling widen the effective field, which is part of why ResNets outperform VGG at the same depth.
 
 ### 2.3 Parameters and FLOPs
 
@@ -93,7 +93,7 @@ A stride-$s$ transposed conv places a copy of the $k\times k$ kernel, scaled by 
 
 ### 2.6 Winograd and FFT, for literacy
 
-Winograd's minimal filtering algorithm $F(m, r)$ computes $m$ outputs of an $r$-tap 1-D filter with $m + r - 1$ multiplies instead of $mr$. For $F(2\times2, 3\times3)$ the 2-D count is 16 against 36, so $2.25\times$ fewer multiplies, at the cost of a few additions and a transform of the input tiles and weights (Lavin and Gray, CVPR 2016, arXiv:1509.09308). cuDNN uses it for $3\times3$ stride-1 convs in FP32 and FP16, which is one reason the $3\times3$ kernel is so entrenched. Larger tiles such as $F(4\times4, 3\times3)$ save more multiplies and lose numerical precision, enough to break INT8 accuracy. FFT convolution costs $O(HW\log HW)$ independent of $k$ and wins for $k \gtrsim 11$, which is relevant again now that ConvNeXt and RepLKNet use $7\times7$ to $31\times31$ depthwise kernels.
+Winograd's minimal filtering algorithm $F(m, r)$ computes $m$ outputs of an $r$-tap 1-D filter with $m + r - 1$ multiplies instead of $mr$. For $F(2\times2, 3\times3)$ the 2-D count is 16 against 36, so $2.25\times$ fewer multiplies, at the cost of a few additions and a transform of the input tiles and weights (Lavin and Gray, CVPR 2016, [arXiv:1509.09308](https://arxiv.org/abs/1509.09308)). cuDNN uses it for $3\times3$ stride-1 convs in FP32 and FP16, which is one reason the $3\times3$ kernel is so entrenched. Larger tiles such as $F(4\times4, 3\times3)$ save more multiplies and lose numerical precision, enough to break INT8 accuracy. FFT convolution costs $O(HW\log HW)$ independent of $k$ and wins for $k \gtrsim 11$, which is relevant again now that ConvNeXt and RepLKNet use $7\times7$ to $31\times31$ depthwise kernels.
 
 ## 3. Implementation
 
@@ -239,13 +239,13 @@ Choosing between the variants:
 ## 5. In production
 
 !!! production "Google: MobileNet's depthwise-separable convolution for on-device vision"
-    Howard et al., "MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications" (2017, arXiv:1704.04861) built an ImageNet backbone entirely from depthwise-separable blocks and derived the $1/C_o + 1/k^2$ cost ratio as equation 5 of the paper. The rejected alternative was shrinking a standard network by using fewer channels and lower resolution, which loses accuracy faster than factorising the convolution does. MobileNet's width and resolution multipliers were then added on top for a tunable latency-accuracy curve. It became the default on-device backbone in Google products and in TensorFlow Lite examples. MobileNetV2 (arXiv:1801.04381) added inverted residuals and linear bottlenecks, and V3 (arXiv:1905.02244) searched the block layout against Pixel CPU latency. See [CNN architectures](03-cnn-architectures.md).
+    Howard et al., "MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications" (2017, [arXiv:1704.04861](https://arxiv.org/abs/1704.04861)) built an ImageNet backbone entirely from depthwise-separable blocks and derived the $1/C_o + 1/k^2$ cost ratio as equation 5 of the paper. The rejected alternative was shrinking a standard network by using fewer channels and lower resolution, which loses accuracy faster than factorising the convolution does. MobileNet's width and resolution multipliers were then added on top for a tunable latency-accuracy curve. It became the default on-device backbone in Google products and in TensorFlow Lite examples. MobileNetV2 ([arXiv:1801.04381](https://arxiv.org/abs/1801.04381)) added inverted residuals and linear bottlenecks, and V3 ([arXiv:1905.02244](https://arxiv.org/abs/1905.02244)) searched the block layout against Pixel CPU latency. See [CNN architectures](03-cnn-architectures.md).
 
 !!! production "NVIDIA: TensorRT chooses the convolution algorithm per layer"
     TensorRT's builder times every eligible kernel implementation (implicit GEMM, Winograd, FFT, direct) for each layer's exact shape and precision, bakes the winner into the engine, and fuses conv with bias and activation, plus following pointwise ops where it can. The practical answer to "which algorithm is fastest" is that it depends on $k$, stride, channel count, batch and precision, so you measure rather than reason. Source: NVIDIA TensorRT Developer Guide (search "TensorRT builder tactics layer fusion"). The trade-off is a build that takes minutes per model, in exchange for a shape-specialised engine.
 
 !!! production "Meta: ConvNeXt's 7×7 depthwise kernels"
-    Liu et al., "A ConvNet for the 2020s" (CVPR 2022, arXiv:2201.03545) moved the ResNet's $3\times3$ conv to a $7\times7$ depthwise conv placed before the $1\times1$ expansion, mirroring a Transformer block's attention-then-MLP order. Larger kernels were affordable only because they were depthwise, and the paper reports that going beyond $7\times7$ saturates. This is the modern datapoint for the large-kernel, cheap-channel-wise trade-off, and it is why FFT and implicit-GEMM depthwise kernels matter again.
+    Liu et al., "A ConvNet for the 2020s" (CVPR 2022, [arXiv:2201.03545](https://arxiv.org/abs/2201.03545)) moved the ResNet's $3\times3$ conv to a $7\times7$ depthwise conv placed before the $1\times1$ expansion, mirroring a Transformer block's attention-then-MLP order. Larger kernels were affordable only because they were depthwise, and the paper reports that going beyond $7\times7$ saturates. This is the modern datapoint for the large-kernel, cheap-channel-wise trade-off, and it is why FFT and implicit-GEMM depthwise kernels matter again.
 
 !!! production "Distill: checkerboard artefacts and the resize-conv fix"
     Odena, Dumoulin and Olah, "Deconvolution and Checkerboard Artifacts" (Distill, 2016) traced the periodic artefacts in GAN and super-resolution outputs to uneven overlap in stride-2 transposed convolutions with $3\times3$ or $5\times5$ kernels, and showed that nearest-neighbour resize followed by a standard conv removes them. Most modern decoders, in segmentation and in diffusion U-Nets, use resize plus conv or PixelShuffle for this reason.
@@ -316,12 +316,12 @@ Choosing between the variants:
 
 Links could not be verified from this build environment, so titles, venues and arXiv IDs are given for you to search.
 
-- V. Dumoulin and F. Visin, "A guide to convolution arithmetic for deep learning", 2016, arXiv:1603.07285.
-- W. Luo et al., "Understanding the Effective Receptive Field in Deep Convolutional Neural Networks", NeurIPS 2016, arXiv:1701.04128.
-- A. Howard et al., "MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications", 2017, arXiv:1704.04861.
-- A. Lavin and S. Gray, "Fast Algorithms for Convolutional Neural Networks", CVPR 2016, arXiv:1509.09308.
+- V. Dumoulin and F. Visin, "A guide to convolution arithmetic for deep learning", 2016, [arXiv:1603.07285](https://arxiv.org/abs/1603.07285).
+- W. Luo et al., "Understanding the Effective Receptive Field in Deep Convolutional Neural Networks", NeurIPS 2016, [arXiv:1701.04128](https://arxiv.org/abs/1701.04128).
+- A. Howard et al., "MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications", 2017, [arXiv:1704.04861](https://arxiv.org/abs/1704.04861).
+- A. Lavin and S. Gray, "Fast Algorithms for Convolutional Neural Networks", CVPR 2016, [arXiv:1509.09308](https://arxiv.org/abs/1509.09308).
 - A. Odena, V. Dumoulin, C. Olah, "Deconvolution and Checkerboard Artifacts", Distill, 2016.
-- F. Yu and V. Koltun, "Multi-Scale Context Aggregation by Dilated Convolutions", ICLR 2016, arXiv:1511.07122.
-- Z. Liu et al., "A ConvNet for the 2020s", CVPR 2022, arXiv:2201.03545.
+- F. Yu and V. Koltun, "Multi-Scale Context Aggregation by Dilated Convolutions", ICLR 2016, [arXiv:1511.07122](https://arxiv.org/abs/1511.07122).
+- Z. Liu et al., "A ConvNet for the 2020s", CVPR 2022, [arXiv:2201.03545](https://arxiv.org/abs/2201.03545).
 - K. Chellapilla, S. Puri, P. Simard, "High Performance Convolutional Neural Networks for Document Processing", 2006, the original im2col-as-GEMM formulation.
 - NVIDIA, *TensorRT Developer Guide*, on builder tactics and layer fusion.

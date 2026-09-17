@@ -123,7 +123,7 @@ tells you exactly which symbols to reproduce and what to run.
 
 ```bash
 pip install -e .
-pytest tests/test_rl_ -q          # all of Part XII's implementations
+pytest tests/test_rl_*.py -q   # all of Part XII's implementations
 python figures/part12_gridworld_values.py   # regenerate any figure
 ```
 

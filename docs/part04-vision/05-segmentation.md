@@ -49,7 +49,7 @@ $$
 
 and mIoU averages over classes present in the ground truth or the prediction. Accumulating the confusion matrix across the dataset before dividing, instead of averaging per-image IoUs, matters because a class absent from an image would otherwise contribute a $0/0$ that implementations handle inconsistently. Cityscapes and ADE20K both use the dataset-level definition.
 
-**Panoptic Quality.** Kirillov et al. (CVPR 2019, arXiv:1801.00868) match predicted and ground-truth segments by IoU, requiring $\mathrm{IoU} > 0.5$. Above that threshold a prediction can match at most one ground-truth segment and vice versa, because two segments each overlapping a third by more than half would together exceed its area. The matching is therefore unique with no assignment algorithm needed. Then
+**Panoptic Quality.** Kirillov et al. (CVPR 2019, [arXiv:1801.00868](https://arxiv.org/abs/1801.00868)) match predicted and ground-truth segments by IoU, requiring $\mathrm{IoU} > 0.5$. Above that threshold a prediction can match at most one ground-truth segment and vice versa, because two segments each overlapping a third by more than half would together exceed its area. The matching is therefore unique with no assignment algorithm needed. Then
 
 $$
 \boxed{\;\mathrm{PQ} = \frac{\sum_{(p,g)\in TP}\mathrm{IoU}(p,g)}{|TP| + \frac12|FP| + \frac12|FN|} = \mathrm{SQ}\times\mathrm{RQ}\;}
@@ -91,7 +91,7 @@ $$
 \hat{y}[h, w] = \arg\max_{k}\ \sum_{i=1}^{N} p_i(k)\, m_i[h, w].
 $$
 
-MaskFormer (Cheng et al., NeurIPS 2021, arXiv:2107.06278) showed that this formulation, trained with DETR-style bipartite matching, matches or beats per-pixel models on semantic segmentation while also producing instance and panoptic output with no architectural change. Mask2Former (CVPR 2022, arXiv:2112.01527) added masked attention, where each query attends only within its own predicted mask region from the previous layer, which both speeds convergence and improves small objects.
+MaskFormer (Cheng et al., NeurIPS 2021, [arXiv:2107.06278](https://arxiv.org/abs/2107.06278)) showed that this formulation, trained with DETR-style bipartite matching, matches or beats per-pixel models on semantic segmentation while also producing instance and panoptic output with no architectural change. Mask2Former (CVPR 2022, [arXiv:2112.01527](https://arxiv.org/abs/2112.01527)) added masked attention, where each query attends only within its own predicted mask region from the previous layer, which both speeds convergence and improves small objects.
 
 The unification argument is structural. Semantic segmentation is mask classification where masks of the same class get merged. Instance segmentation is mask classification restricted to thing classes. Panoptic is mask classification with an argmax over the whole set. One model, three post-processing rules.
 
@@ -107,7 +107,7 @@ $$
 
 The Dice coefficient is F1 computed on pixels, so it is a ratio and therefore scale-free: a 50-pixel object and a 50,000-pixel object contribute comparably. The gradient of Dice with respect to a prediction depends on the whole region's current overlap, which makes it non-decomposable across pixels and slightly noisier per batch, so it is almost always summed with CE rather than used alone. The $\epsilon$ in both numerator and denominator keeps an empty class at loss 0 instead of $0/0$.
 
-Boundary losses up-weight pixels near label transitions. The original U-Net used a morphology-derived weight map that also separated touching cells. A cheap version dilates the set of pixels whose label differs from a neighbour and multiplies CE by a constant there, which is what `boundary_weight_map` implements. Newer alternatives include the Boundary loss of Kervadec et al. (arXiv:1812.07032), which integrates a distance transform, and Lovász-Softmax (arXiv:1705.08790), a convex surrogate for IoU itself.
+Boundary losses up-weight pixels near label transitions. The original U-Net used a morphology-derived weight map that also separated touching cells. A cheap version dilates the set of pixels whose label differs from a neighbour and multiplies CE by a constant there, which is what `boundary_weight_map` implements. Newer alternatives include the Boundary loss of Kervadec et al. ([arXiv:1812.07032](https://arxiv.org/abs/1812.07032)), which integrates a distance transform, and Lovász-Softmax ([arXiv:1705.08790](https://arxiv.org/abs/1705.08790)), a convex surrogate for IoU itself.
 
 ## 3. Implementation
 
@@ -254,14 +254,14 @@ Choosing an architecture:
 ## 5. In production
 
 !!! production "Meta: Mask R-CNN, Detectron2 and the SAM data engine"
-    Mask R-CNN (He et al., ICCV 2017, arXiv:1703.06870) added a small fully-convolutional mask head to Faster R-CNN and replaced ROIPool with ROIAlign. The mask head predicts one $28\times28$ binary mask per class and takes the mask for the predicted class, which decouples mask prediction from class competition and avoids the softmax-over-classes coupling that hurt earlier approaches. It became the default instance-segmentation system in industry through Detectron and Detectron2.
-    Segment Anything (Kirillov et al., 2023, arXiv:2304.02643) then changed the interface. The design splits into a heavy ViT-H image encoder run once per image, a light prompt encoder for points, boxes, masks and text, and a mask decoder of two transformer layers that runs in a few milliseconds, so an interactive tool can respond to every click without re-encoding. Ambiguity is handled by emitting three masks per prompt, at roughly whole, part and subpart granularity, with a predicted IoU score for each, and training against the best-matching one. The 1.1B-mask SA-1B dataset came from a three-stage data engine: assisted-manual annotation with the model in the loop, then semi-automatic annotation where the model proposes confident masks and annotators fill gaps, then fully automatic generation with a $32\times32$ point grid plus filtering by predicted IoU and stability. See [weak supervision and auto-labeling](../part10-self-supervised/03-weak-supervision-and-auto-labeling.md).
+    Mask R-CNN (He et al., ICCV 2017, [arXiv:1703.06870](https://arxiv.org/abs/1703.06870)) added a small fully-convolutional mask head to Faster R-CNN and replaced ROIPool with ROIAlign. The mask head predicts one $28\times28$ binary mask per class and takes the mask for the predicted class, which decouples mask prediction from class competition and avoids the softmax-over-classes coupling that hurt earlier approaches. It became the default instance-segmentation system in industry through Detectron and Detectron2.
+    Segment Anything (Kirillov et al., 2023, [arXiv:2304.02643](https://arxiv.org/abs/2304.02643)) then changed the interface. The design splits into a heavy ViT-H image encoder run once per image, a light prompt encoder for points, boxes, masks and text, and a mask decoder of two transformer layers that runs in a few milliseconds, so an interactive tool can respond to every click without re-encoding. Ambiguity is handled by emitting three masks per prompt, at roughly whole, part and subpart granularity, with a predicted IoU score for each, and training against the best-matching one. The 1.1B-mask SA-1B dataset came from a three-stage data engine: assisted-manual annotation with the model in the loop, then semi-automatic annotation where the model proposes confident masks and annotators fill gaps, then fully automatic generation with a $32\times32$ point grid plus filtering by predicted IoU and stability. See [weak supervision and auto-labeling](../part10-self-supervised/03-weak-supervision-and-auto-labeling.md).
 
 !!! production "Google: DeepLab and atrous convolution for on-device segmentation"
-    The DeepLab line (v1 arXiv:1412.7062, v2 arXiv:1606.00915, v3 arXiv:1706.05587, v3+ arXiv:1802.02611) argued that the repeated striding inherited from classification backbones is the wrong trade for dense prediction, and replaced it with atrous convolution plus ASPP. v3+ added a light decoder with one low-level skip, recovering boundary quality at a fraction of a full U-Net decoder's cost. Google shipped related segmentation models on-device for features such as portrait mode and video background replacement, where the constraint is a few milliseconds per frame on a phone, and the published mobile variants use depthwise-separable atrous convs and reduced ASPP rates for that reason.
+    The DeepLab line (v1 [arXiv:1412.7062](https://arxiv.org/abs/1412.7062), v2 [arXiv:1606.00915](https://arxiv.org/abs/1606.00915), v3 [arXiv:1706.05587](https://arxiv.org/abs/1706.05587), v3+ [arXiv:1802.02611](https://arxiv.org/abs/1802.02611)) argued that the repeated striding inherited from classification backbones is the wrong trade for dense prediction, and replaced it with atrous convolution plus ASPP. v3+ added a light decoder with one low-level skip, recovering boundary quality at a fraction of a full U-Net decoder's cost. Google shipped related segmentation models on-device for features such as portrait mode and video background replacement, where the constraint is a few milliseconds per frame on a phone, and the published mobile variants use depthwise-separable atrous convs and reduced ASPP rates for that reason.
 
 !!! production "Meta and the research community: Mask2Former as one model for three tasks"
-    MaskFormer (arXiv:2107.06278) and Mask2Former (arXiv:2112.01527) replaced per-pixel classification with mask classification and reported that a single architecture, trained separately per dataset, sets competitive numbers on semantic, instance and panoptic benchmarks at once. The engineering benefit is the one a platform team cares about: one codebase, one set of training infrastructure and one inference path for three product surfaces, instead of three specialised stacks with separate maintenance.
+    MaskFormer ([arXiv:2107.06278](https://arxiv.org/abs/2107.06278)) and Mask2Former ([arXiv:2112.01527](https://arxiv.org/abs/2112.01527)) replaced per-pixel classification with mask classification and reported that a single architecture, trained separately per dataset, sets competitive numbers on semantic, instance and panoptic benchmarks at once. The engineering benefit is the one a platform team cares about: one codebase, one set of training infrastructure and one inference path for three product surfaces, instead of three specialised stacks with separate maintenance.
 
 !!! production "NVIDIA: segmentation in TensorRT and the resolution budget"
     Deploying segmentation with TensorRT makes the resolution decision explicit, since activation memory at stride 4 on a 2 MP input dominates the engine's workspace, and the argmax plus resize post-processing has to be in the graph or it becomes a separate memory-bound pass. NVIDIA's DeepStream segmentation samples run the network at reduced resolution and upsample the label map on the GPU for exactly this reason. Source: NVIDIA DeepStream SDK documentation and TensorRT Developer Guide (search "DeepStream semantic segmentation sample").
@@ -313,7 +313,7 @@ Choosing an architecture:
     ??? success "Solution"
         Suppose prediction $P$ matches disjoint ground truths $G_1$ and $G_2$ with $\mathrm{IoU} > 0.5$ each. Then $|P \cap G_i| > \frac12|P \cup G_i| \ge \frac12 |P|$, so $|P\cap G_1| + |P \cap G_2| > |P|$. The two intersections are disjoint subsets of $P$, which contradicts their sum exceeding $|P|$. At exactly 0.5 the inequality is not strict and ties are possible, so PQ requires strict inequality. Any threshold above 0.5 gives unique matching, and 0.5 is the smallest such value, which keeps the metric as permissive as uniqueness allows.
 
-4. ★★★ (coding) Implement `lovasz_softmax_flat(probs, labels)` for the binary case following Berman et al. (arXiv:1705.08790): sort the per-pixel errors descending, compute the gradient of the Lovász extension of the Jaccard loss from the sorted cumulative false-positive and false-negative counts, and take the dot product with the sorted errors. Verify it equals $1 - \mathrm{IoU}$ for hard 0/1 predictions.
+4. ★★★ (coding) Implement `lovasz_softmax_flat(probs, labels)` for the binary case following Berman et al. ([arXiv:1705.08790](https://arxiv.org/abs/1705.08790)): sort the per-pixel errors descending, compute the gradient of the Lovász extension of the Jaccard loss from the sorted cumulative false-positive and false-negative counts, and take the dot product with the sorted errors. Verify it equals $1 - \mathrm{IoU}$ for hard 0/1 predictions.
 
     ??? success "Solution"
         ```python
@@ -343,16 +343,16 @@ Choosing an architecture:
 
 Links could not be verified from this build environment, so titles, venues and arXiv IDs are given for you to search.
 
-- J. Long, E. Shelhamer, T. Darrell, "Fully Convolutional Networks for Semantic Segmentation", CVPR 2015, arXiv:1411.4038.
-- O. Ronneberger, P. Fischer, T. Brox, "U-Net: Convolutional Networks for Biomedical Image Segmentation", MICCAI 2015, arXiv:1505.04597.
-- K. He et al., "Mask R-CNN", ICCV 2017, arXiv:1703.06870.
-- L.-C. Chen et al., "Rethinking Atrous Convolution for Semantic Image Segmentation", 2017, arXiv:1706.05587 (DeepLabv3), and "Encoder-Decoder with Atrous Separable Convolution", ECCV 2018, arXiv:1802.02611 (v3+).
-- A. Kirillov et al., "Panoptic Segmentation", CVPR 2019, arXiv:1801.00868, which defines PQ.
-- B. Cheng et al., "Per-Pixel Classification is Not All You Need for Semantic Segmentation", NeurIPS 2021, arXiv:2107.06278 (MaskFormer).
-- B. Cheng et al., "Masked-attention Mask Transformer for Universal Image Segmentation", CVPR 2022, arXiv:2112.01527 (Mask2Former).
-- E. Xie et al., "SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers", NeurIPS 2021, arXiv:2105.15203.
-- A. Kirillov et al., "Segment Anything", ICCV 2023, arXiv:2304.02643.
-- A. Kirillov et al., "PointRend: Image Segmentation as Rendering", CVPR 2020, arXiv:1912.08193.
-- M. Berman, A. Triki, M. Blaschko, "The Lovász-Softmax Loss", CVPR 2018, arXiv:1705.08790.
-- H. Kervadec et al., "Boundary loss for highly unbalanced segmentation", MIDL 2019, arXiv:1812.07032.
+- J. Long, E. Shelhamer, T. Darrell, "Fully Convolutional Networks for Semantic Segmentation", CVPR 2015, [arXiv:1411.4038](https://arxiv.org/abs/1411.4038).
+- O. Ronneberger, P. Fischer, T. Brox, "U-Net: Convolutional Networks for Biomedical Image Segmentation", MICCAI 2015, [arXiv:1505.04597](https://arxiv.org/abs/1505.04597).
+- K. He et al., "Mask R-CNN", ICCV 2017, [arXiv:1703.06870](https://arxiv.org/abs/1703.06870).
+- L.-C. Chen et al., "Rethinking Atrous Convolution for Semantic Image Segmentation", 2017, [arXiv:1706.05587](https://arxiv.org/abs/1706.05587) (DeepLabv3), and "Encoder-Decoder with Atrous Separable Convolution", ECCV 2018, [arXiv:1802.02611](https://arxiv.org/abs/1802.02611) (v3+).
+- A. Kirillov et al., "Panoptic Segmentation", CVPR 2019, [arXiv:1801.00868](https://arxiv.org/abs/1801.00868), which defines PQ.
+- B. Cheng et al., "Per-Pixel Classification is Not All You Need for Semantic Segmentation", NeurIPS 2021, [arXiv:2107.06278](https://arxiv.org/abs/2107.06278) (MaskFormer).
+- B. Cheng et al., "Masked-attention Mask Transformer for Universal Image Segmentation", CVPR 2022, [arXiv:2112.01527](https://arxiv.org/abs/2112.01527) (Mask2Former).
+- E. Xie et al., "SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers", NeurIPS 2021, [arXiv:2105.15203](https://arxiv.org/abs/2105.15203).
+- A. Kirillov et al., "Segment Anything", ICCV 2023, [arXiv:2304.02643](https://arxiv.org/abs/2304.02643).
+- A. Kirillov et al., "PointRend: Image Segmentation as Rendering", CVPR 2020, [arXiv:1912.08193](https://arxiv.org/abs/1912.08193).
+- M. Berman, A. Triki, M. Blaschko, "The Lovász-Softmax Loss", CVPR 2018, [arXiv:1705.08790](https://arxiv.org/abs/1705.08790).
+- H. Kervadec et al., "Boundary loss for highly unbalanced segmentation", MIDL 2019, [arXiv:1812.07032](https://arxiv.org/abs/1812.07032).
 - NVIDIA, *DeepStream SDK documentation* and *TensorRT Developer Guide*, on segmentation deployment.

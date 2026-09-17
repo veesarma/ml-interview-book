@@ -187,20 +187,20 @@ so a never-seen pair $(i, j)$ still gets a score from $v_i$ and $v_j$, which wer
 each learned from other pairs. Cost is $O(kn)$ via the identity
 $\sum_{i<j}\langle v_i, v_j\rangle x_i x_j = \tfrac12 \sum_f \bigl[(\sum_i v_{if} x_i)^2 - \sum_i v_{if}^2 x_i^2\bigr]$.
 
-**Wide & Deep** (Cheng et al., 2016, arXiv:1606.07792, Google Play): a wide linear
+**Wide & Deep** (Cheng et al., 2016, [arXiv:1606.07792](https://arxiv.org/abs/1606.07792), Google Play): a wide linear
 part over hand-crossed ids (memorisation) plus a deep MLP over embeddings
 (generalisation), trained jointly. **DeepFM** (Guo et al., IJCAI 2017,
-arXiv:1703.04247) replaces the hand-crossed wide part with an FM over the same
+[arXiv:1703.04247](https://arxiv.org/abs/1703.04247)) replaces the hand-crossed wide part with an FM over the same
 embeddings the deep part uses, so no manual crosses remain.
 
-**Deep & Cross Network** (Wang et al., ADKDD 2017, arXiv:1708.05123) learns bounded-
+**Deep & Cross Network** (Wang et al., ADKDD 2017, [arXiv:1708.05123](https://arxiv.org/abs/1708.05123)) learns bounded-
 degree polynomial crosses explicitly with a cross layer,
 $x_{l+1} = x_0\, (w_l^\top x_l) + b_l + x_l$; **DCN-v2** (Wang et al., WWW 2021,
-arXiv:2008.13535) makes the cross full-rank, $x_{l+1} = x_0 \odot (W_l x_l + b_l) + x_l$,
+[arXiv:2008.13535](https://arxiv.org/abs/2008.13535)) makes the cross full-rank, $x_{l+1} = x_0 \odot (W_l x_l + b_l) + x_l$,
 with a low-rank mixture-of-experts variant for cost, and reports production
 deployment at Google with gains over the original DCN.
 
-**DLRM** (Naumov et al., 2019, arXiv:1906.00091, Meta): embedding tables for sparse
+**DLRM** (Naumov et al., 2019, [arXiv:1906.00091](https://arxiv.org/abs/1906.00091), Meta): embedding tables for sparse
 ids, a bottom MLP for dense features, pairwise **dot-product interactions** between
 all embedding vectors and the dense projection, then a top MLP. DLRM's contribution
 is as much systems as modelling: the embedding tables are *model-parallel* across
@@ -221,7 +221,7 @@ them as heads on a shared trunk (MMoE/PLE as in the feed chapter) with the
 click-through and conversion labels.
 
 The subtlety: CVR labels exist only for clicked impressions, and at serving time the
-model must score *every* impression. **ESMM** (Ma et al., SIGIR 2018, arXiv:1804.07931,
+model must score *every* impression. **ESMM** (Ma et al., SIGIR 2018, [arXiv:1804.07931](https://arxiv.org/abs/1804.07931),
 Alibaba) trains on the entire impression space by modelling
 $P(\text{click}, \text{conv} \mid x) = P(\text{click} \mid x)\, P(\text{conv} \mid \text{click}, x)$
 with two heads whose product is trained against the "click-and-convert" label over
@@ -323,7 +323,7 @@ still does not fit on one host. Options, in the order to mention them:
 
 - *Hashing* ids into a fixed table ($2^{30}$ rows) with collisions; the collisions
   are noise the model tolerates, and the table size is a knob.
-- *Compositional embeddings* (Shi et al., KDD 2020, arXiv:1909.02107, Facebook):
+- *Compositional embeddings* (Shi et al., KDD 2020, [arXiv:1909.02107](https://arxiv.org/abs/1909.02107), Facebook):
   quotient-remainder trick: two small tables indexed by $\lfloor id / m \rfloor$ and
   $id \bmod m$, combined by element-wise product, giving unique vectors with
   $O(\sqrt{N})$ memory.
@@ -531,11 +531,11 @@ host memory or sharded across accelerators. *Evaluate*: accuracy on public
 benchmarks and throughput.
 
 **What the source says.** Naumov et al., "Deep Learning Recommendation Model for
-Personalization and Recommendation Systems" (2019, arXiv:1906.00091) describes
+Personalization and Recommendation Systems" (2019, [arXiv:1906.00091](https://arxiv.org/abs/1906.00091)) describes
 DLRM's architecture and its hybrid model-parallel (embeddings) / data-parallel (MLP)
 training with all-to-all communication. Shi et al., "Compositional Embeddings Using
 Complementary Partitions for Memory-Efficient Recommendation Systems" (KDD 2020,
-arXiv:1909.02107) describes the quotient-remainder trick for shrinking tables.
+[arXiv:1909.02107](https://arxiv.org/abs/1909.02107)) describes the quotient-remainder trick for shrinking tables.
 
 !!! tip "How to say it in the interview: embedding memory"
     "For the id features I'd budget the embedding memory first: ten billion ids at
@@ -593,7 +593,7 @@ against the click-and-convert label; shared embeddings. *Evaluate*: CVR AUC on t
 full space.
 
 **What the source says.** Ma et al., "Entire Space Multi-Task Model: An Effective
-Approach for Estimating Post-Click Conversion Rate" (SIGIR 2018, arXiv:1804.07931)
+Approach for Estimating Post-Click Conversion Rate" (SIGIR 2018, [arXiv:1804.07931](https://arxiv.org/abs/1804.07931))
 introduces ESMM to address sample selection bias and data sparsity in CVR
 estimation, with results on Taobao data.
 
@@ -720,17 +720,17 @@ advertiser and platform outcomes.
 
 - McMahan, H. B. et al. "Ad Click Prediction: a View from the Trenches." KDD 2013.
 - He, X. et al. "Practical Lessons from Predicting Clicks on Ads at Facebook." ADKDD 2014.
-- Naumov, M. et al. "Deep Learning Recommendation Model for Personalization and Recommendation Systems." 2019 (arXiv:1906.00091).
-- Shi, H.-J. M. et al. "Compositional Embeddings Using Complementary Partitions for Memory-Efficient Recommendation Systems." KDD 2020 (arXiv:1909.02107).
-- Cheng, H.-T. et al. "Wide & Deep Learning for Recommender Systems." DLRS 2016 (arXiv:1606.07792).
-- Guo, H. et al. "DeepFM: A Factorization-Machine based Neural Network for CTR Prediction." IJCAI 2017 (arXiv:1703.04247).
-- Wang, R. et al. "Deep & Cross Network for Ad Click Predictions." ADKDD 2017 (arXiv:1708.05123).
-- Wang, R. et al. "DCN V2: Improved Deep & Cross Network and Practical Lessons for Web-scale Learning to Rank Systems." WWW 2021 (arXiv:2008.13535).
+- Naumov, M. et al. "Deep Learning Recommendation Model for Personalization and Recommendation Systems." 2019 ([arXiv:1906.00091](https://arxiv.org/abs/1906.00091)).
+- Shi, H.-J. M. et al. "Compositional Embeddings Using Complementary Partitions for Memory-Efficient Recommendation Systems." KDD 2020 ([arXiv:1909.02107](https://arxiv.org/abs/1909.02107)).
+- Cheng, H.-T. et al. "Wide & Deep Learning for Recommender Systems." DLRS 2016 ([arXiv:1606.07792](https://arxiv.org/abs/1606.07792)).
+- Guo, H. et al. "DeepFM: A Factorization-Machine based Neural Network for CTR Prediction." IJCAI 2017 ([arXiv:1703.04247](https://arxiv.org/abs/1703.04247)).
+- Wang, R. et al. "Deep & Cross Network for Ad Click Predictions." ADKDD 2017 ([arXiv:1708.05123](https://arxiv.org/abs/1708.05123)).
+- Wang, R. et al. "DCN V2: Improved Deep & Cross Network and Practical Lessons for Web-scale Learning to Rank Systems." WWW 2021 ([arXiv:2008.13535](https://arxiv.org/abs/2008.13535)).
 - Rendle, S. "Factorization Machines." ICDM 2010.
 - Weinberger, K. et al. "Feature Hashing for Large Scale Multitask Learning." ICML 2009.
 - Chapelle, O. "Modeling Delayed Feedback in Display Advertising." KDD 2014.
 - Ktena, S. I. et al. "Addressing Delayed Feedback for Continuous Training with Neural Networks in CTR prediction." RecSys 2019.
-- Ma, X. et al. "Entire Space Multi-Task Model: An Effective Approach for Estimating Post-Click Conversion Rate." SIGIR 2018 (arXiv:1804.07931).
+- Ma, X. et al. "Entire Space Multi-Task Model: An Effective Approach for Estimating Post-Click Conversion Rate." SIGIR 2018 ([arXiv:1804.07931](https://arxiv.org/abs/1804.07931)).
 - Agarwal, D. et al. "Budget pacing for targeted online advertisements at LinkedIn." KDD 2014.
 - Xu, J. et al. "Smart Pacing for Effective Online Ad Campaign Optimization." KDD 2015.
 - Edelman, B., Ostrovsky, M., Schwarz, M. "Internet Advertising and the Generalized Second-Price Auction." American Economic Review 2007.

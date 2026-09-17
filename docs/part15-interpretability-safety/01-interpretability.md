@@ -497,7 +497,7 @@ falsify it.
     behaviour by activating features. Rejected: neuron-level analysis, on the grounds that
     superposition makes it the wrong unit.
     *Source: Bricken et al., "Towards Monosemanticity: Decomposing Language Models With Dictionary
-    Learning", Transformer Circuits Thread, 2023.*
+    Learning", [Transformer Circuits Thread, 2023](https://transformer-circuits.pub/2023/monosemantic-features).*
 
 !!! production "Anthropic: Scaling Monosemanticity (2024)"
     Problem: does dictionary learning work on a production model. Built: SAEs on Claude 3 Sonnet's
@@ -507,7 +507,7 @@ falsify it.
     features. The paper is the reference for "interpretability at production scale" and for the
     honest limitations section (feature completeness, cost, evaluation).
     *Source: Templeton et al., "Scaling Monosemanticity: Extracting Interpretable Features from
-    Claude 3 Sonnet", Transformer Circuits Thread, 2024.*
+    Claude 3 Sonnet", [Transformer Circuits Thread, 2024](https://transformer-circuits.pub/2024/scaling-monosemanticity/).*
 
 !!! production "Anthropic: induction heads and in-context learning (2022)"
     Problem: where does in-context learning come from. Built: a circuit-level account of induction
@@ -515,8 +515,9 @@ falsify it.
     token and copy what followed it", together with evidence that their formation coincides with a
     visible bump in the training loss curve and with the onset of in-context learning. This is the
     strongest existing example of a discovered mechanism tied to a capability.
-    *Sources: Elhage et al., "A Mathematical Framework for Transformer Circuits", 2021;
-    Olsson et al., "In-context Learning and Induction Heads", 2022, arXiv:2209.11895.*
+    *Sources: Elhage et al., ["A Mathematical Framework for Transformer Circuits", 2021](https://transformer-circuits.pub/2021/framework/index.html);
+    Olsson et al., ["In-context Learning and Induction Heads", 2022](https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html),
+    [arXiv:2209.11895](https://arxiv.org/abs/2209.11895).*
 
 !!! production "Google: model cards, and interpretability as documentation"
     Problem: models were shipped without a standard statement of intended use and evaluated
@@ -524,7 +525,7 @@ falsify it.
     use, out-of-scope use, disaggregated evaluation, and ethical considerations, now a common
     requirement in regulated deployments. Interpretability results are what populate the
     limitations and failure-mode sections.
-    *Source: Mitchell et al., "Model Cards for Model Reporting", FAT* 2019, arXiv:1810.03993.*
+    *Source: Mitchell et al., "Model Cards for Model Reporting", FAT* 2019, [arXiv:1810.03993](https://arxiv.org/abs/1810.03993).*
 
 !!! production "Google Brain: sanity checks for saliency maps (2018)"
     Problem: saliency methods were being adopted without validation. Built: two randomisation
@@ -532,7 +533,7 @@ falsify it.
     widely used methods produce nearly unchanged maps under both, meaning they act partly as edge
     detectors independent of the learned function. The practical consequence is that these two
     tests are now the minimum bar before publishing an attribution result.
-    *Source: Adebayo et al., "Sanity Checks for Saliency Maps", NeurIPS 2018, arXiv:1810.03292.*
+    *Source: Adebayo et al., "Sanity Checks for Saliency Maps", NeurIPS 2018, [arXiv:1810.03292](https://arxiv.org/abs/1810.03292).*
 
 ## 6. Interview questions and strong answers
 
@@ -665,36 +666,33 @@ falsify it.
 
 ## References
 
-Links are omitted where they could not be verified from this environment; search the exact title
-and venue.
-
 * Simonyan, K., Vedaldi, A., Zisserman, A. *Deep Inside Convolutional Networks: Visualising Image
-  Classification Models and Saliency Maps.* ICLR workshop 2014. arXiv:1312.6034.
-* Smilkov, D. et al. *SmoothGrad: removing noise by adding noise.* 2017. arXiv:1706.03825.
+  Classification Models and Saliency Maps.* ICLR workshop 2014. [arXiv:1312.6034](https://arxiv.org/abs/1312.6034).
+* Smilkov, D. et al. *SmoothGrad: removing noise by adding noise.* 2017. [arXiv:1706.03825](https://arxiv.org/abs/1706.03825).
 * Sundararajan, M., Taly, A., Yan, Q. *Axiomatic Attribution for Deep Networks.* ICML 2017.
-  arXiv:1703.01365.
+  [arXiv:1703.01365](https://arxiv.org/abs/1703.01365).
 * Selvaraju, R. R. et al. *Grad-CAM: Visual Explanations from Deep Networks via Gradient-based
-  Localization.* ICCV 2017. arXiv:1610.02391.
+  Localization.* ICCV 2017. [arXiv:1610.02391](https://arxiv.org/abs/1610.02391).
 * Zhou, B. et al. *Learning Deep Features for Discriminative Localization.* CVPR 2016.
-  arXiv:1512.04150 (CAM, the special case Grad-CAM generalises).
-* Adebayo, J. et al. *Sanity Checks for Saliency Maps.* NeurIPS 2018. arXiv:1810.03292.
-* Jain, S., Wallace, B. C. *Attention is not Explanation.* NAACL 2019. arXiv:1902.10186.
-* Wiegreffe, S., Pinter, Y. *Attention is not not Explanation.* EMNLP 2019. arXiv:1908.04626.
+  [arXiv:1512.04150](https://arxiv.org/abs/1512.04150) (CAM, the special case Grad-CAM generalises).
+* Adebayo, J. et al. *Sanity Checks for Saliency Maps.* NeurIPS 2018. [arXiv:1810.03292](https://arxiv.org/abs/1810.03292).
+* Jain, S., Wallace, B. C. *Attention is not Explanation.* NAACL 2019. [arXiv:1902.10186](https://arxiv.org/abs/1902.10186).
+* Wiegreffe, S., Pinter, Y. *Attention is not not Explanation.* EMNLP 2019. [arXiv:1908.04626](https://arxiv.org/abs/1908.04626).
 * Hewitt, J., Liang, P. *Designing and Interpreting Probes with Control Tasks.* EMNLP 2019.
-  arXiv:1909.03368.
+  [arXiv:1909.03368](https://arxiv.org/abs/1909.03368).
 * Meng, K. et al. *Locating and Editing Factual Associations in GPT.* NeurIPS 2022.
-  arXiv:2202.05262.
-* Vig, J. et al. *Investigating Gender Bias in Language Models Using Causal Mediation Analysis.*
+  [arXiv:2202.05262](https://arxiv.org/abs/2202.05262).
+* Vig, J. et al. [*Investigating Gender Bias in Language Models Using Causal Mediation Analysis.*](https://proceedings.neurips.cc/paper/2020/hash/92650b2e92217715fe312e6fa7b90d82-Abstract.html)
   NeurIPS 2020.
-* Elhage, N. et al. *A Mathematical Framework for Transformer Circuits.* Transformer Circuits
+* Elhage, N. et al. [*A Mathematical Framework for Transformer Circuits.*](https://transformer-circuits.pub/2021/framework/index.html) Transformer Circuits
   Thread, 2021.
-* Olsson, C. et al. *In-context Learning and Induction Heads.* Transformer Circuits Thread, 2022.
-  arXiv:2209.11895.
-* Bricken, T. et al. *Towards Monosemanticity: Decomposing Language Models With Dictionary
-  Learning.* Transformer Circuits Thread, 2023.
-* Templeton, A. et al. *Scaling Monosemanticity: Extracting Interpretable Features from Claude 3
-  Sonnet.* Transformer Circuits Thread, 2024.
-* Elhage, N. et al. *Toy Models of Superposition.* Transformer Circuits Thread, 2022.
-  arXiv:2209.10652.
-* nostalgebraist. *interpreting GPT: the logit lens.* LessWrong, 2020.
-* Mitchell, M. et al. *Model Cards for Model Reporting.* FAT* 2019. arXiv:1810.03993.
+* Olsson, C. et al. [*In-context Learning and Induction Heads.*](https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html) Transformer Circuits Thread, 2022.
+  [arXiv:2209.11895](https://arxiv.org/abs/2209.11895).
+* Bricken, T. et al. [*Towards Monosemanticity: Decomposing Language Models With Dictionary
+  Learning.*](https://transformer-circuits.pub/2023/monosemantic-features) Transformer Circuits Thread, 2023.
+* Templeton, A. et al. [*Scaling Monosemanticity: Extracting Interpretable Features from Claude 3
+  Sonnet.*](https://transformer-circuits.pub/2024/scaling-monosemanticity/) Transformer Circuits Thread, 2024.
+* Elhage, N. et al. [*Toy Models of Superposition.*](https://transformer-circuits.pub/2022/toy_model/index.html) Transformer Circuits Thread, 2022.
+  [arXiv:2209.10652](https://arxiv.org/abs/2209.10652).
+* nostalgebraist. [*interpreting GPT: the logit lens.*](https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-gpt-the-logit-lens) LessWrong, 2020.
+* Mitchell, M. et al. *Model Cards for Model Reporting.* FAT* 2019. [arXiv:1810.03993](https://arxiv.org/abs/1810.03993).

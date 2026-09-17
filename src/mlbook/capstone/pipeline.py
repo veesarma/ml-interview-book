@@ -65,8 +65,9 @@ class PipelineConfig:
     dpo_beta: float = 0.1
 
     grpo_steps: int = 25
-    grpo_prompts_per_step: int = 8
-    grpo_group_size: int = 6
+    grpo_prompts_per_step: int = 6
+    grpo_group_size: int = 8
+    grpo_oversample: int = 4
     grpo_lr: float = 1e-4
     grpo_temperature: float = 1.0
     grpo_kl_coef: float = 0.02
@@ -173,8 +174,9 @@ def _run_pipeline(config: PipelineConfig, verbose: bool) -> dict[str, object]:
     grpo_report = run_grpo(
         model, grpo_reference, train,
         steps=config.grpo_steps, prompts_per_step=config.grpo_prompts_per_step,
-        group_size=config.grpo_group_size, lr=config.grpo_lr,
-        kl_coef=config.grpo_kl_coef, temperature=config.grpo_temperature, seed=config.seed,
+        group_size=config.grpo_group_size, oversample=config.grpo_oversample,
+        lr=config.grpo_lr, kl_coef=config.grpo_kl_coef,
+        temperature=config.grpo_temperature, seed=config.seed,
     )
     timings["grpo"] = time.perf_counter() - t0
     acc["grpo"] = accuracy(model, evaluation)

@@ -17,7 +17,7 @@ Apple sells hardware, and increasingly the services attached to it, so its ML ex
 | Neural Engine efficiency | A model that is fast on a GPU can be slow on the ANE; memory layout and op choice dominate | "Deploying Transformers on the Apple Neural Engine" (Apple ML Research, 2022); Core ML Tools documentation |
 | Biometric authentication | False-accept rates must be extremely low, spoofing is adversarial, and the template can never leave the device | Apple Platform Security guide (Face ID / Touch ID security); "About Face ID advanced technology" (Apple Support) |
 | Speech and Siri | Wake word at near-zero power, speaker personalisation, on-device dictation, synthesis quality | "Hey Siri: An On-device DNN-powered Voice Trigger for Apple's Personal Assistant" (2017); "Personalized Hey Siri" (2018); "Deep Learning for Siri's Voice" (2017) |
-| Foundation models on a phone | A useful LLM in a phone's memory budget, with adapters for many features, plus a private server tier for the hard cases | "Apple Intelligence Foundation Language Models" (2024, arXiv 2407.21075) and the 2025 update; "Private Cloud Compute: A new frontier for AI privacy in the cloud" (Apple Security Research, 2024) |
+| Foundation models on a phone | A useful LLM in a phone's memory budget, with adapters for many features, plus a private server tier for the hard cases | "Apple Intelligence Foundation Language Models" (2024, [arXiv:2407.21075](https://arxiv.org/abs/2407.21075)) and the 2025 update; "Private Cloud Compute: A new frontier for AI privacy in the cloud" (Apple Security Research, 2024) |
 | Multimodal research | Vision-language models that could run in Apple's constraints | "MM1: Methods, Analysis & Insights from Multimodal LLM Pre-training" (2024, arXiv 2403.09611); "Ferret-UI: Grounded Mobile UI Understanding with Multimodal LLMs" (2024); "OpenELM" (2024) |
 | Learning without collecting data | Improving models from usage without a central log of what users did | "Learning with Privacy at Scale" (Apple ML Journal, 2017); "Understanding Aggregate Trends for Apple Intelligence Using Differential Privacy" (Apple ML Research, 2025) |
 | Developer platform | Third-party models must run well on the same silicon | Core ML, Vision, Natural Language and Create ML documentation; WWDC sessions on Core ML performance and on the Vision framework |
@@ -226,7 +226,7 @@ flowchart TB
 
 **Foundation models and private serving**
 
-* Apple, "Apple Intelligence Foundation Language Models", 2024 (arXiv 2407.21075), and the 2025 technical report update.
+* Apple, "Apple Intelligence Foundation Language Models", 2024. [arXiv:2407.21075](https://arxiv.org/abs/2407.21075) · and the 2025 technical report update.
 * Apple Security Research, "Private Cloud Compute: A new frontier for AI privacy in the cloud", 2024.
 * McKinzie et al., "MM1: Methods, Analysis & Insights from Multimodal LLM Pre-training", 2024 (arXiv 2403.09611).
 * You et al., "Ferret-UI: Grounded Mobile UI Understanding with Multimodal LLMs", 2024.

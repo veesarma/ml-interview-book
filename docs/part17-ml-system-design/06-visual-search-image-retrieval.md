@@ -183,7 +183,7 @@ product id) plus the metric head. The auxiliary supervision stabilises training 
 gives attribute features the re-ranker can use.
 
 **CLIP-style pretraining** (Radford et al., "Learning Transferable Visual Models From
-Natural Language Supervision", ICML 2021, arXiv:2103.00020) aligns images and text in
+Natural Language Supervision", ICML 2021, [arXiv:2103.00020](https://arxiv.org/abs/2103.00020)) aligns images and text in
 one space from web-scale pairs, which gives text-refined visual search almost for
 free and a strong initialisation. Fine-tuning on catalogue pairs is still required,
 since CLIP-style pretraining learns semantic similarity rather than
@@ -235,9 +235,9 @@ Practical arithmetic to do out loud: one billion vectors at 128 dimensions in fp
 32 GB, which fits in one large host's memory with room for the coarse quantiser. That
 difference decides the architecture, so measure the recall cost of the compression on
 your own data before choosing. FAISS (Johnson, Douze & Jégou, "Billion-scale
-similarity search with GPUs", arXiv:1702.08734) is the reference implementation for
-the IVF-PQ family; HNSW comes from Malkov & Yashunin (arXiv:1603.09320); ScaNN
-(Guo et al., ICML 2020, arXiv:1908.10396) adds anisotropic quantisation tuned for
+similarity search with GPUs", [arXiv:1702.08734](https://arxiv.org/abs/1702.08734)) is the reference implementation for
+the IVF-PQ family; HNSW comes from Malkov & Yashunin ([arXiv:1603.09320](https://arxiv.org/abs/1603.09320)); ScaNN
+(Guo et al., ICML 2020, [arXiv:1908.10396](https://arxiv.org/abs/1908.10396)) adds anisotropic quantisation tuned for
 inner-product search.
 
 **Sharding and routing.** Partition by vertical or by a coarse cluster id so a query
@@ -413,15 +413,15 @@ object detection to turn a scene into objects; a light re-ranker for precision.
 incremental indexing. *Evaluate*: offline relevance plus live A/B on engagement.
 
 **What the sources say.** Jing et al., "Visual Search at Pinterest" (KDD 2015,
-arXiv:1505.07647) describes building a visual search system with commodity components
+[arXiv:1505.07647](https://arxiv.org/abs/1505.07647)) describes building a visual search system with commodity components
 and reports engagement gains from visual-similarity products. Zhai et al., "Visual
-Discovery at Pinterest" (WWW 2017, arXiv:1702.04680) covers the move to object-level
+Discovery at Pinterest" (WWW 2017, [arXiv:1702.04680](https://arxiv.org/abs/1702.04680)) covers the move to object-level
 search and the Lens product. Zhai et al., "Learning a Unified Embedding for Visual
-Search at Pinterest" (KDD 2019, arXiv:1908.01707) reports replacing several
+Search at Pinterest" (KDD 2019, [arXiv:1908.01707](https://arxiv.org/abs/1908.01707)) reports replacing several
 specialised embeddings with one multi-task embedding serving several products, which
 simplified serving and improved metrics. Beal et al., "Billion-scale pretraining with
 vision transformers for multi-task visual representations" (WACV 2022,
-arXiv:2108.05887) describes their later transformer-based unified representation.
+[arXiv:2108.05887](https://arxiv.org/abs/2108.05887)) describes their later transformer-based unified representation.
 
 !!! tip "How to say it in the interview: one embedding, many surfaces"
     "I'd train one embedding and use it for visual search, related pins and
@@ -466,7 +466,7 @@ compressed codes to keep memory in budget. *Evaluate*: offline retrieval metrics
 then A/B.
 
 **What the source says.** Yang et al., "Visual Search at eBay" (KDD 2017,
-arXiv:1706.03154) describes a deployed visual search system over a large, rapidly
+[arXiv:1706.03154](https://arxiv.org/abs/1706.03154)) describes a deployed visual search system over a large, rapidly
 changing inventory, including category recognition to constrain the search, binary
 semantic-hash style representations for efficiency, and a scalable serving
 infrastructure that handles inventory churn.
@@ -566,13 +566,13 @@ inserts with periodic rebuilds. *Evaluate*: recall against brute force on a fixe
 sample after every build.
 
 **What the sources say.** Johnson, Douze & Jégou, "Billion-scale similarity search
-with GPUs" (arXiv:1702.08734) describes the FAISS design and reports billion-scale
+with GPUs" ([arXiv:1702.08734](https://arxiv.org/abs/1702.08734)) describes the FAISS design and reports billion-scale
 k-NN construction on GPUs. Jégou, Douze & Schmid, "Product Quantization for Nearest
 Neighbor Search" (IEEE TPAMI 2011) is the original PQ method. Malkov & Yashunin,
 "Efficient and robust approximate nearest neighbor search using Hierarchical
-Navigable Small World graphs" (arXiv:1603.09320) is HNSW. Guo et al., "Accelerating
+Navigable Small World graphs" ([arXiv:1603.09320](https://arxiv.org/abs/1603.09320)) is HNSW. Guo et al., "Accelerating
 Large-Scale Inference with Anisotropic Vector Quantization" (ICML 2020,
-arXiv:1908.10396) is ScaNN's quantisation tuned for inner product.
+[arXiv:1908.10396](https://arxiv.org/abs/1908.10396)) is ScaNN's quantisation tuned for inner product.
 
 !!! tip "How to say it in the interview: pick the index from the memory budget"
     "I'd start from memory. A billion vectors at 128 dimensions in float32 is
@@ -718,16 +718,16 @@ arXiv:1908.10396) is ScaNN's quantisation tuned for inner product.
 
 ## References
 
-- Jing, Y. et al. "Visual Search at Pinterest." KDD 2015 (arXiv:1505.07647).
-- Zhai, A. et al. "Visual Discovery at Pinterest." WWW 2017 (arXiv:1702.04680).
-- Zhai, A. et al. "Learning a Unified Embedding for Visual Search at Pinterest." KDD 2019 (arXiv:1908.01707).
-- Beal, J. et al. "Billion-scale pretraining with vision transformers for multi-task visual representations." WACV 2022 (arXiv:2108.05887).
-- Yang, F. et al. "Visual Search at eBay." KDD 2017 (arXiv:1706.03154).
+- Jing, Y. et al. "Visual Search at Pinterest." KDD 2015 ([arXiv:1505.07647](https://arxiv.org/abs/1505.07647)).
+- Zhai, A. et al. "Visual Discovery at Pinterest." WWW 2017 ([arXiv:1702.04680](https://arxiv.org/abs/1702.04680)).
+- Zhai, A. et al. "Learning a Unified Embedding for Visual Search at Pinterest." KDD 2019 ([arXiv:1908.01707](https://arxiv.org/abs/1908.01707)).
+- Beal, J. et al. "Billion-scale pretraining with vision transformers for multi-task visual representations." WACV 2022 ([arXiv:2108.05887](https://arxiv.org/abs/2108.05887)).
+- Yang, F. et al. "Visual Search at eBay." KDD 2017 ([arXiv:1706.03154](https://arxiv.org/abs/1706.03154)).
 - Zhang, Y. et al. "Visual Search at Alibaba." KDD 2018.
-- Radford, A. et al. "Learning Transferable Visual Models From Natural Language Supervision." ICML 2021 (arXiv:2103.00020).
-- Johnson, J., Douze, M., Jégou, H. "Billion-scale similarity search with GPUs." 2017 (arXiv:1702.08734).
+- Radford, A. et al. "Learning Transferable Visual Models From Natural Language Supervision." ICML 2021 ([arXiv:2103.00020](https://arxiv.org/abs/2103.00020)).
+- Johnson, J., Douze, M., Jégou, H. "Billion-scale similarity search with GPUs." 2017 ([arXiv:1702.08734](https://arxiv.org/abs/1702.08734)).
 - Jégou, H., Douze, M., Schmid, C. "Product Quantization for Nearest Neighbor Search." IEEE TPAMI 2011.
-- Malkov, Y., Yashunin, D. "Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs." 2016 (arXiv:1603.09320).
-- Guo, R. et al. "Accelerating Large-Scale Inference with Anisotropic Vector Quantization" (ScaNN). ICML 2020 (arXiv:1908.10396).
+- Malkov, Y., Yashunin, D. "Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs." 2016 ([arXiv:1603.09320](https://arxiv.org/abs/1603.09320)).
+- Guo, R. et al. "Accelerating Large-Scale Inference with Anisotropic Vector Quantization" (ScaNN). ICML 2020 ([arXiv:1908.10396](https://arxiv.org/abs/1908.10396)).
 - Google. Lens product documentation and Search blog posts on Lens modes and multisearch.
 - Book cross-references: [CLIP & contrastive learning](../part08-multimodal/03-clip-contrastive.md), [retrieval & RAG](../part13-retrieval-eval-reliability/01-retrieval-and-rag.md), [OCR & document understanding](09-ocr-document-understanding.md), [content moderation](07-content-moderation.md).

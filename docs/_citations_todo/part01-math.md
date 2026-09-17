@@ -1,0 +1,93 @@
+# Unverified citations: Part I (mathematical foundations)
+
+Each line is a source cited in the chapter by title, venue and year with no URL.
+The citations editor who added links to this part ran out of WebSearch budget
+before reaching these (STYLE.md section 4). A later pass with fresh budget should
+verify each one, add the link to the chapter, and tick the box.
+
+- [ ] docs/part01-math/01-linear-algebra.md | G. Strang, *Introduction to Linear Algebra*, 5th ed., Wellesley-Cambridge Press, 2016 (and MIT OCW 18.06)
+- [ ] docs/part01-math/01-linear-algebra.md | C. Eckart & G. Young, "The approximation of one matrix by another of lower rank", *Psychometrika*, 1936
+- [ ] docs/part01-math/01-linear-algebra.md | N. Halko, P.-G. Martinsson & J. Tropp, "Finding Structure with Randomness: Probabilistic Algorithms for Constructing Approximate Matrix Decompositions", *SIAM Review*, 2011 (arXiv:0909.4061)
+- [ ] docs/part01-math/01-linear-algebra.md | Y. Koren, R. Bell & C. Volinsky, "Matrix Factorization Techniques for Recommender Systems", *IEEE Computer*, 2009
+- [ ] docs/part01-math/01-linear-algebra.md | E. Hu et al., "LoRA: Low-Rank Adaptation of Large Language Models", ICLR 2022 (arXiv:2106.09685)
+- [ ] docs/part01-math/01-linear-algebra.md | T. Miyato et al., "Spectral Normalization for Generative Adversarial Networks", ICLR 2018 (arXiv:1802.05957)
+- [ ] docs/part01-math/01-linear-algebra.md | A. Vaswani et al., "Attention Is All You Need", NeurIPS 2017 (arXiv:1706.03762)
+- [ ] docs/part01-math/01-linear-algebra.md | A. Bewley et al., "Simple Online and Realtime Tracking", ICIP 2016 (arXiv:1602.00763)
+- [ ] docs/part01-math/01-linear-algebra.md | N. Wojke, A. Bewley & D. Paulus, "Simple Online and Realtime Tracking with a Deep Association Metric", ICIP 2017 (arXiv:1703.07402)
+- [ ] docs/part01-math/01-linear-algebra.md | X. Weng et al., "3D Multi-Object Tracking: A Baseline and New Evaluation Metrics", IROS 2020 (arXiv:1907.03961)
+- [ ] docs/part01-math/01-linear-algebra.md | K. Petersen & M. Pedersen, *The Matrix Cookbook*, Technical University of Denmark, 2012
+- [ ] docs/part01-math/02-calculus-matrix-calculus.md | K. Petersen & M. Pedersen, *The Matrix Cookbook*, Technical University of Denmark, 2012
+- [ ] docs/part01-math/02-calculus-matrix-calculus.md | D. Rumelhart, G. Hinton & R. Williams, "Learning representations by back-propagating errors", *Nature* 323, 1986
+- [ ] docs/part01-math/02-calculus-matrix-calculus.md | A. G. Baydin, B. Pearlmutter, A. Radul & J. Siskind, "Automatic Differentiation in Machine Learning: a Survey", *JMLR* 18, 2018 (arXiv:1502.05767)
+- [ ] docs/part01-math/02-calculus-matrix-calculus.md | T. Dao, D. Fu, S. Ermon, A. Rudra & C. Ré, "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness", NeurIPS 2022 (arXiv:2205.14135)
+- [ ] docs/part01-math/02-calculus-matrix-calculus.md | T. Dao, "FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning", 2023 (arXiv:2307.08691)
+- [ ] docs/part01-math/02-calculus-matrix-calculus.md | P. Micikevicius et al., "Mixed Precision Training", ICLR 2018 (arXiv:1710.03740)
+- [ ] docs/part01-math/02-calculus-matrix-calculus.md | J. Cohen et al., "Gradient Descent on Neural Networks Typically Occurs at the Edge of Stability", ICLR 2021 (arXiv:2103.00065)
+- [ ] docs/part01-math/02-calculus-matrix-calculus.md | Stanford CS231n course notes, "Neural Networks Part 3: Learning and Evaluation" (gradient checks section)
+- [ ] docs/part01-math/02-calculus-matrix-calculus.md | S. Boyd & L. Vandenberghe, *Convex Optimization*, Cambridge University Press, 2004 (chapter 5 on duality and KKT)
+- [ ] docs/part01-math/03-probability.md | C. Bishop, *Pattern Recognition and Machine Learning*, Springer, 2006 (chapters 1–2; §2.3 for Gaussian conditioning)
+- [ ] docs/part01-math/03-probability.md | K. Murphy, *Probabilistic Machine Learning: An Introduction*, MIT Press, 2022
+- [ ] docs/part01-math/03-probability.md | R. Kalman, "A New Approach to Linear Filtering and Prediction Problems", *Journal of Basic Engineering*, 1960
+- [ ] docs/part01-math/03-probability.md | O. Chapelle & L. Li, "An Empirical Evaluation of Thompson Sampling", NeurIPS 2011
+- [ ] docs/part01-math/03-probability.md | D. Russo, B. Van Roy, A. Kazerouni, I. Osband & Z. Wen, "A Tutorial on Thompson Sampling", *Foundations and Trends in ML*, 2018 (arXiv:1707.02038)
+- [ ] docs/part01-math/03-probability.md | D. Blei, A. Ng & M. Jordan, "Latent Dirichlet Allocation", *JMLR* 3, 2003
+- [ ] docs/part01-math/03-probability.md | D. Kingma & M. Welling, "Auto-Encoding Variational Bayes", ICLR 2014 (arXiv:1312.6114)
+- [ ] docs/part01-math/03-probability.md | A. Bewley et al., "Simple Online and Realtime Tracking", ICIP 2016 (arXiv:1602.00763); N. Wojke et al., ICIP 2017 (arXiv:1703.07402); X. Weng et al., IROS 2020 (arXiv:1907.03961)
+- [ ] docs/part01-math/03-probability.md | C. Rasmussen & C. Williams, *Gaussian Processes for Machine Learning*, MIT Press, 2006 (chapter 2)
+- [ ] docs/part01-math/04-statistics.md | R. Kohavi, A. Deng, B. Frasca, T. Walker, Y. Xu & N. Pohlmann, "Online Controlled Experiments at Large Scale", KDD 2013
+- [ ] docs/part01-math/04-statistics.md | A. Deng, Y. Xu, R. Kohavi & T. Walker, "Improving the Sensitivity of Online Controlled Experiments by Utilizing Pre-Experiment Data", WSDM 2013
+- [ ] docs/part01-math/04-statistics.md | R. Kohavi, D. Tang & Y. Xu, *Trustworthy Online Controlled Experiments: A Practical Guide to A/B Testing*, Cambridge University Press, 2020
+- [ ] docs/part01-math/04-statistics.md | Netflix Technology Blog, "It's All A/Bout Testing: The Netflix Experimentation Platform", 2016; M. Tingley et al., "Decision Making at Netflix" series, 2021
+- [ ] docs/part01-math/04-statistics.md | J. Overgoor, "Experiments at Airbnb", Airbnb Engineering, 2014; M. Shen et al., "Selection Bias in Online Experimentation", Airbnb Engineering, 2018
+- [ ] docs/part01-math/04-statistics.md | C. Guo, G. Pleiss, Y. Sun & K. Weinberger, "On Calibration of Modern Neural Networks", ICML 2017 (arXiv:1706.04599)
+- [ ] docs/part01-math/04-statistics.md | B. Efron & R. Tibshirani, *An Introduction to the Bootstrap*, Chapman & Hall, 1993
+- [ ] docs/part01-math/04-statistics.md | L. Wasserman, *All of Statistics*, Springer, 2004
+- [ ] docs/part01-math/04-statistics.md | T. Hastie, R. Tibshirani & J. Friedman, *The Elements of Statistical Learning*, 2nd ed., Springer, 2009 (chapter 7 on bias–variance and model assessment)
+- [ ] docs/part01-math/04-statistics.md | Y. Gal & Z. Ghahramani, "Dropout as a Bayesian Approximation", ICML 2016 (arXiv:1506.02142)
+- [ ] docs/part01-math/05-information-theory.md | C. Shannon, "A Mathematical Theory of Communication", *Bell System Technical Journal*, 1948
+- [ ] docs/part01-math/05-information-theory.md | T. Cover & J. Thomas, *Elements of Information Theory*, 2nd ed., Wiley, 2006
+- [ ] docs/part01-math/05-information-theory.md | D. MacKay, *Information Theory, Inference, and Learning Algorithms*, Cambridge University Press, 2003
+- [ ] docs/part01-math/05-information-theory.md | L. Ouyang et al., "Training language models to follow instructions with human feedback", NeurIPS 2022 (arXiv:2203.02155)
+- [ ] docs/part01-math/05-information-theory.md | J. Schulman et al., "Proximal Policy Optimization Algorithms", 2017 (arXiv:1707.06347)
+- [ ] docs/part01-math/05-information-theory.md | A. van den Oord, Y. Li & O. Vinyals, "Representation Learning with Contrastive Predictive Coding", 2018 (arXiv:1807.03748)
+- [ ] docs/part01-math/05-information-theory.md | B. Poole et al., "On Variational Bounds of Mutual Information", ICML 2019 (arXiv:1905.06922)
+- [ ] docs/part01-math/05-information-theory.md | A. Radford et al., "Learning Transferable Visual Models From Natural Language Supervision", ICML 2021 (arXiv:2103.00020)
+- [ ] docs/part01-math/05-information-theory.md | G. Hinton, O. Vinyals & J. Dean, "Distilling the Knowledge in a Neural Network", 2015 (arXiv:1503.02531)
+- [ ] docs/part01-math/05-information-theory.md | Y. Gu et al., "MiniLLM: Knowledge Distillation of Large Language Models", ICLR 2024 (arXiv:2306.08543); R. Agarwal et al., "On-Policy Distillation of Language Models: Learning from Self-Generated Mistakes", ICLR 2024 (arXiv:2306.13649)
+- [ ] docs/part01-math/05-information-theory.md | Gemma Team, "Gemma 2: Improving Open Language Models at a Practical Size", 2024 (arXiv:2408.00118)
+- [ ] docs/part01-math/05-information-theory.md | L. Gao et al., "The Pile: An 800GB Dataset of Diverse Text for Language Modeling", 2020 (arXiv:2101.00027)
+- [ ] docs/part01-math/05-information-theory.md | G. Delétang et al., "Language Modeling Is Compression", ICLR 2024 (arXiv:2309.10668)
+- [ ] docs/part01-math/05-information-theory.md | Z. Allen-Zhu & Y. Li, "Physics of Language Models: Part 3.3, Knowledge Capacity Scaling Laws", 2024 (arXiv:2404.05405)
+- [ ] docs/part01-math/05-information-theory.md | D. Kingma & M. Welling, "Auto-Encoding Variational Bayes", ICLR 2014 (arXiv:1312.6114)
+- [ ] docs/part01-math/05-information-theory.md | I. Goodfellow et al., "Generative Adversarial Nets", NeurIPS 2014 (arXiv:1406.2661)
+- [ ] docs/part01-math/06-optimization.md | D. Kingma & J. Ba, "Adam: A Method for Stochastic Optimization", ICLR 2015 (arXiv:1412.6980)
+- [ ] docs/part01-math/06-optimization.md | I. Loshchilov & F. Hutter, "Decoupled Weight Decay Regularization", ICLR 2019 (arXiv:1711.05101)
+- [ ] docs/part01-math/06-optimization.md | I. Loshchilov & F. Hutter, "SGDR: Stochastic Gradient Descent with Warm Restarts", ICLR 2017 (arXiv:1608.03983)
+- [ ] docs/part01-math/06-optimization.md | J. Duchi, E. Hazan & Y. Singer, "Adaptive Subgradient Methods for Online Learning and Stochastic Optimization", *JMLR* 12, 2011 (AdaGrad)
+- [ ] docs/part01-math/06-optimization.md | T. Tieleman & G. Hinton, "Lecture 6.5, RMSProp", Coursera: Neural Networks for Machine Learning, 2012
+- [ ] docs/part01-math/06-optimization.md | Y. Nesterov, "A method for solving the convex programming problem with convergence rate $O(1/k^2)$", *Soviet Mathematics Doklady*, 1983
+- [ ] docs/part01-math/06-optimization.md | R. Pascanu, T. Mikolov & Y. Bengio, "On the difficulty of training Recurrent Neural Networks", ICML 2013 (arXiv:1211.5063)
+- [ ] docs/part01-math/06-optimization.md | P. Goyal et al., "Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour", 2017 (arXiv:1706.02677)
+- [ ] docs/part01-math/06-optimization.md | L. Liu et al., "On the Variance of the Adaptive Learning Rate and Beyond", ICLR 2020 (arXiv:1908.03265) (RAdam)
+- [ ] docs/part01-math/06-optimization.md | S. McCandlish, J. Kaplan, S. Amodei et al., "An Empirical Model of Large-Batch Training", 2018 (arXiv:1812.06162)
+- [ ] docs/part01-math/06-optimization.md | Y. Dauphin et al., "Identifying and attacking the saddle point problem in high-dimensional non-convex optimization", NeurIPS 2014 (arXiv:1406.2572)
+- [ ] docs/part01-math/06-optimization.md | R. Ge, F. Huang, C. Jin & Y. Yuan, "Escaping From Saddle Points, Online Stochastic Gradient for Tensor Decomposition", COLT 2015 (arXiv:1503.02101)
+- [ ] docs/part01-math/06-optimization.md | V. Gupta, T. Koren & Y. Singer, "Shampoo: Preconditioned Stochastic Tensor Optimization", ICML 2018 (arXiv:1802.09568)
+- [ ] docs/part01-math/06-optimization.md | K. Jordan et al., "Muon: An optimizer for hidden layers in neural networks", 2024
+- [ ] docs/part01-math/06-optimization.md | G. Yang & E. Hu, "Feature Learning in Infinite-Width Neural Networks", ICML 2021 (arXiv:2011.14522); G. Yang et al., "Tensor Programs V: Tuning Large Neural Networks via Zero-Shot Hyperparameter Transfer", 2022 (arXiv:2203.03466)
+- [ ] docs/part01-math/06-optimization.md | T. Dettmers, M. Lewis, S. Shleifer & L. Zettlemoyer, "8-bit Optimizers via Block-wise Quantization", ICLR 2022 (arXiv:2110.02861)
+- [ ] docs/part01-math/06-optimization.md | N. Shazeer & M. Stern, "Adafactor: Adaptive Learning Rates with Sublinear Memory Cost", ICML 2018 (arXiv:1804.04235)
+- [ ] docs/part01-math/06-optimization.md | H. Touvron et al., "Llama 2: Open Foundation and Fine-Tuned Chat Models", 2023 (arXiv:2307.09288); "LLaMA: Open and Efficient Foundation Language Models", 2023 (arXiv:2302.13971)
+- [ ] docs/part01-math/06-optimization.md | Team OLMo, "2 OLMo 2 Furious", 2024 (arXiv:2501.00656)
+- [ ] docs/part01-math/06-optimization.md | DeepSeek-AI, "DeepSeek-V3 Technical Report", 2024 (arXiv:2412.19437)
+- [ ] docs/part01-math/06-optimization.md | S. Hu et al., "MiniCPM: Unveiling the Potential of Small Language Models with Scalable Training Strategies", 2024 (arXiv:2404.06395)
+- [ ] docs/part01-math/06-optimization.md | T. Brown et al., "Language Models are Few-Shot Learners", NeurIPS 2020 (arXiv:2005.14165)
+- [ ] docs/part01-math/06-optimization.md | S. Boyd & L. Vandenberghe, *Convex Optimization*, Cambridge University Press, 2004
+- [ ] docs/part01-math/07-tensor-shapes-broadcasting.md | NumPy documentation, "Broadcasting" and "Internal memory layout of an ndarray", NumPy User Guide
+- [ ] docs/part01-math/07-tensor-shapes-broadcasting.md | PyTorch documentation, "Broadcasting semantics", "Tensor Views", and `torch.nn.functional.scaled_dot_product_attention`
+- [ ] docs/part01-math/07-tensor-shapes-broadcasting.md | A. Rogozhnikov, "Einops: Clear and Reliable Tensor Manipulations with Einstein-like Notation", ICLR 2022
+- [ ] docs/part01-math/07-tensor-shapes-broadcasting.md | T. Dao, D. Fu, S. Ermon, A. Rudra & C. Ré, "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness", NeurIPS 2022 (arXiv:2205.14135); T. Dao, "FlashAttention-2", 2023 (arXiv:2307.08691)
+- [ ] docs/part01-math/07-tensor-shapes-broadcasting.md | Y. Xu et al., "GSPMD: General and Scalable Parallelization for ML Computation Graphs", 2021 (arXiv:2105.04663)
+- [ ] docs/part01-math/07-tensor-shapes-broadcasting.md | A. Chowdhery et al., "PaLM: Scaling Language Modeling with Pathways", 2022 (arXiv:2204.02311)
+- [ ] docs/part01-math/07-tensor-shapes-broadcasting.md | A. Vaswani et al., "Attention Is All You Need", NeurIPS 2017 (arXiv:1706.03762)
+- [ ] docs/part01-math/07-tensor-shapes-broadcasting.md | J. Ainslie et al., "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints", EMNLP 2023 (arXiv:2305.13245)

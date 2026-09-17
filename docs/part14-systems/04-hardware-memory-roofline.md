@@ -358,8 +358,8 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
     model" so that kernel authors could see, in one plot, whether to optimise memory traffic or
     arithmetic. It became the standard first slide of every performance review because it turns a
     vague "is this fast?" into a specific "which roof are we under, and how far below it?".
-    *Source: Williams, S., Waterman, A., Patterson, D., "Roofline: An Insightful Visual
-    Performance Model for Multicore Architectures", CACM 52(4), 2009.*
+    *Source: Williams, S., Waterman, A., Patterson, D., ["Roofline: An Insightful Visual
+    Performance Model for Multicore Architectures", CACM 52(4), 2009](https://dl.acm.org/doi/10.1145/1498765.1498785).*
 
 !!! production "Stanford: FlashAttention: an IO-aware algorithm (2022–2023)"
     Problem: attention was memory-bound because the $T\times T$ score matrix round-tripped through
@@ -368,7 +368,7 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
     non-matmul FLOPs. The framing (count HBM accesses, not FLOPs) is the transferable lesson,
     and it is the same lesson the roofline teaches.
     *Sources: Dao et al., "FlashAttention: Fast and Memory-Efficient Exact Attention with
-    IO-Awareness", NeurIPS 2022, arXiv:2205.14135; Dao, "FlashAttention-2", 2023, arXiv:2307.08691.*
+    IO-Awareness", NeurIPS 2022, [arXiv:2205.14135](https://arxiv.org/abs/2205.14135); Dao, "FlashAttention-2", 2023, [arXiv:2307.08691](https://arxiv.org/abs/2307.08691).*
 
 !!! production "Google: TPU v4 and the case for a dedicated fabric (2023)"
     Google's TPU v4 paper describes optically reconfigurable interconnect (OCS) between chips in
@@ -377,9 +377,9 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
     array plus a purpose-built fabric: maximise reuse inside the MXU, and do not make the network
     a general-purpose PCIe tree.
     *Source: Jouppi et al., "TPU v4: An Optically Reconfigurable Supercomputer for Machine
-    Learning with Hardware Support for Embeddings", ISCA 2023, arXiv:2304.01433; and Jouppi et
+    Learning with Hardware Support for Embeddings", ISCA 2023, [arXiv:2304.01433](https://arxiv.org/abs/2304.01433); and Jouppi et
     al., "In-Datacenter Performance Analysis of a Tensor Processing Unit", ISCA 2017,
-    arXiv:1704.04760 for the original systolic-array analysis, which is itself a roofline study.*
+    [arXiv:1704.04760](https://arxiv.org/abs/1704.04760) for the original systolic-array analysis, which is itself a roofline study.*
 
 !!! production "OpenAI: Triton (2021)"
     Problem: writing CUDA for every fused kernel is expensive, but PyTorch's op-by-op execution
@@ -387,8 +387,9 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
     you write a *tile* program and the compiler handles vectorisation, shared-memory staging and
     scheduling. It is now the backend for many `torch.compile`-generated kernels, i.e. the
     fusion argument in §2.6, industrialised.
-    *Source: Tillet, Kung & Cox, "Triton: an intermediate language and compiler for tiled neural
-    network computations", MAPL 2019, and the OpenAI Triton documentation/repository.*
+    *Source: Tillet, Kung & Cox, ["Triton: an intermediate language and compiler for tiled neural
+    network computations", MAPL 2019](https://dl.acm.org/doi/10.1145/3315508.3329973), and the
+    [Triton documentation](https://triton-lang.org/main/index.html).*
 
 !!! production "NVIDIA: Hopper (H100), and why the ridge moved"
     H100 SXM's published dense BF16 tensor-core throughput (989 TFLOP/s with the sparsity feature
@@ -396,7 +397,9 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
     The same model, unchanged, is therefore *more* likely to be memory-bound on newer hardware,
     which is the quantitative reason FlashAttention, quantisation and GQA became mandatory rather
     than optional in the H100 generation.
-    *Source: NVIDIA H100 and A100 datasheets / architecture whitepapers.*
+    *Source: the [NVIDIA H100 datasheet](https://resources.nvidia.com/en-us-tensor-core/nvidia-tensor-core-gpu-datasheet),
+    which prints 1,979 TFLOP/s BF16 with sparsity, and the
+    [A100 80 GB datasheet](https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/a100-80gb-datasheet-update-nvidia-us-1521051-r2-web.pdf).*
 
 ## 6. Interview questions and strong answers
 
@@ -517,23 +520,23 @@ bandwidth) is a genuinely staff-level observation and a good thing to say out lo
 
 ## References
 
-Links are omitted where they could not be verified from this environment; search the exact
-title and venue.
-
-* Williams, S., Waterman, A., Patterson, D. *Roofline: An Insightful Visual Performance Model for
-  Multicore Architectures.* Communications of the ACM 52(4), 2009.
+* Williams, S., Waterman, A., Patterson, D. [*Roofline: An Insightful Visual Performance Model for
+  Multicore Architectures.*](https://dl.acm.org/doi/10.1145/1498765.1498785) Communications of the ACM 52(4), 2009.
 * Dao, T. et al. *FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness.*
-  NeurIPS 2022. arXiv:2205.14135.
+  NeurIPS 2022. [arXiv:2205.14135](https://arxiv.org/abs/2205.14135).
 * Dao, T. *FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning.*
-  2023. arXiv:2307.08691.
+  2023. [arXiv:2307.08691](https://arxiv.org/abs/2307.08691).
 * Jouppi, N. et al. *In-Datacenter Performance Analysis of a Tensor Processing Unit.* ISCA 2017.
-  arXiv:1704.04760.
+  [arXiv:1704.04760](https://arxiv.org/abs/1704.04760).
 * Jouppi, N. et al. *TPU v4: An Optically Reconfigurable Supercomputer for Machine Learning with
-  Hardware Support for Embeddings.* ISCA 2023. arXiv:2304.01433.
-* Tillet, P., Kung, H. T., Cox, D. *Triton: An Intermediate Language and Compiler for Tiled Neural
-  Network Computations.* MAPL 2019, and the OpenAI Triton documentation.
-* Pope, R. et al. *Efficiently Scaling Transformer Inference.* MLSys 2023. arXiv:2211.05102.
-* NVIDIA. *NVIDIA H100 Tensor Core GPU Architecture* whitepaper and H100/A100 datasheets
+  Hardware Support for Embeddings.* ISCA 2023. [arXiv:2304.01433](https://arxiv.org/abs/2304.01433).
+* Tillet, P., Kung, H. T., Cox, D. [*Triton: An Intermediate Language and Compiler for Tiled Neural
+  Network Computations.*](https://dl.acm.org/doi/10.1145/3315508.3329973) MAPL 2019, and the
+  [Triton documentation](https://triton-lang.org/main/index.html).
+* Pope, R. et al. *Efficiently Scaling Transformer Inference.* MLSys 2023. [arXiv:2211.05102](https://arxiv.org/abs/2211.05102).
+* NVIDIA. [*NVIDIA H100 Tensor Core GPU Architecture*](https://resources.nvidia.com/en-us-hopper-architecture/nvidia-h100-tensor-c)
+  whitepaper, the [H100 datasheet](https://resources.nvidia.com/en-us-tensor-core/nvidia-tensor-core-gpu-datasheet) and the
+  [A100 80 GB datasheet](https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/a100-80gb-datasheet-update-nvidia-us-1521051-r2-web.pdf)
   (peak BF16 throughput, HBM bandwidth, NVLink and PCIe figures).
-* Chowdhery, A. et al. *PaLM: Scaling Language Modeling with Pathways.* 2022. arXiv:2204.02311
+* Chowdhery, A. et al. *PaLM: Scaling Language Modeling with Pathways.* 2022. [arXiv:2204.02311](https://arxiv.org/abs/2204.02311)
   (the model-FLOPs-utilisation definition used throughout Part XIV).

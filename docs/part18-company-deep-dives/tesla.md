@@ -104,7 +104,7 @@ The mathematics is the cross-attention view-transform derived in
 [Multi-camera & BEV](../part11-perception-autonomy/02-multi-camera-bev.md): the query
 $q_{ij} \in \R^{d}$ for cell $(i,j)$ attends over keys built from image features and
 their camera geometry, so the network learns the projection instead of being given
-explicit depth. The alternative family (Lift-Splat-Shoot, arXiv:2008.05711) makes depth
+explicit depth. The alternative family (Lift-Splat-Shoot, [arXiv:2008.05711](https://arxiv.org/abs/2008.05711)) makes depth
 explicit as a per-pixel categorical distribution and "splats" features into BEV; the
 attention route Tesla described avoids committing to a depth bin and lets the model
 use context, at the cost of being harder to interpret.

@@ -787,10 +787,10 @@ for why PR curves, not ROC, belong in imbalanced evaluation.
 - Dal Pozzolo, A. et al. "Credit Card Fraud Detection: A Realistic Modeling and a Novel Learning Strategy." IEEE Transactions on Neural Networks and Learning Systems, 2018.
 - Saito, T., Rehmsmeier, M. "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets." PLoS ONE, 2015.
 - Liu, F. T., Ting, K. M., Zhou, Z.-H. "Isolation Forest." ICDM 2008.
-- Chen, T., Guestrin, C. "XGBoost: A Scalable Tree Boosting System." KDD 2016 (arXiv:1603.02754).
-- Hamilton, W. L., Ying, R., Leskovec, J. "Inductive Representation Learning on Large Graphs" (GraphSAGE). NeurIPS 2017 (arXiv:1706.02216).
+- Chen, T., Guestrin, C. "XGBoost: A Scalable Tree Boosting System." KDD 2016 ([arXiv:1603.02754](https://arxiv.org/abs/1603.02754)).
+- Hamilton, W. L., Ying, R., Leskovec, J. "Inductive Representation Learning on Large Graphs" (GraphSAGE). NeurIPS 2017 ([arXiv:1706.02216](https://arxiv.org/abs/1706.02216)).
 - Uber Engineering. "Meet Michelangelo: Uber's Machine Learning Platform" and subsequent posts on real-time features and risk use cases.
 - Airbnb Engineering. Trust-and-safety posts on their risk decision framework and graph-based fraud detection.
 - Amazon Web Services. "Amazon Fraud Detector" developer documentation.
-- Lundberg, S., Lee, S.-I. "A Unified Approach to Interpreting Model Predictions" (SHAP). NeurIPS 2017 (arXiv:1705.07874).
+- Lundberg, S., Lee, S.-I. "A Unified Approach to Interpreting Model Predictions" (SHAP). NeurIPS 2017 ([arXiv:1705.07874](https://arxiv.org/abs/1705.07874)).
 - Book cross-references: [ads calibration and down-sampling](03-ads-ctr-prediction.md), [uncertainty & reliability](../part13-retrieval-eval-reliability/03-uncertainty-reliability.md), [ML platform & point-in-time features](12-ml-platform-feature-store-monitoring.md).

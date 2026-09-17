@@ -544,8 +544,9 @@ objective and discards local detail. LLaVA-1.5 ablated this and kept the penulti
     LLaVA-NeXT added AnyRes tiling for higher effective resolution. The rejected alternative
     was the Q-Former: the authors report the simpler projector works better at this scale and
     is far easier to train. Sources: *Visual Instruction Tuning*, Liu et al., NeurIPS 2023
-    (arXiv:2304.08485); *Improved Baselines with Visual Instruction Tuning*, Liu et al., CVPR
-    2024 (arXiv:2310.03744); the LLaVA-NeXT blog post, January 2024.
+    ([arXiv:2304.08485](https://arxiv.org/abs/2304.08485)); *Improved Baselines with Visual Instruction Tuning*, Liu et al., CVPR
+    2024 ([arXiv:2310.03744](https://arxiv.org/abs/2310.03744)); the
+    [LLaVA-NeXT blog post, January 2024](https://llava-vl.github.io/blog/2024-01-30-llava-next/).
 
 !!! production "DeepMind: Flamingo's gated cross-attention over a frozen LLM"
     Flamingo's problem was few-shot multimodal learning without retraining a language model.
@@ -555,7 +556,7 @@ objective and discards local detail. LLaVA-1.5 ablated this and kept the penulti
     image-text sequences work naturally and preserves the LLM's text ability exactly at
     initialisation. They rejected fine-tuning the LLM, which would have cost far more and
     degraded the language model. Source: *Flamingo: a Visual Language Model for Few-Shot
-    Learning*, Alayrac et al., NeurIPS 2022 (arXiv:2204.14198).
+    Learning*, Alayrac et al., NeurIPS 2022 ([arXiv:2204.14198](https://arxiv.org/abs/2204.14198)).
 
 !!! production "Salesforce: BLIP-2's Q-Former as a cheap bridge to frozen LLMs"
     BLIP-2 keeps both the image encoder and the LLM frozen and trains only a Q-Former: 32
@@ -564,16 +565,16 @@ objective and discards local detail. LLaVA-1.5 ablated this and kept the penulti
     objective against the frozen LLM. The motivation was cost, training only a small bridge
     module, and the trade-off is the fixed 32-token bottleneck, which limits fine-grained
     reading. Source: *BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image
-    Encoders and Large Language Models*, Li et al., ICML 2023 (arXiv:2301.12597).
+    Encoders and Large Language Models*, Li et al., ICML 2023 ([arXiv:2301.12597](https://arxiv.org/abs/2301.12597)).
 
 !!! production "Meta: Llama 3.2-Vision keeps the text model untouched"
     Meta's Llama 3.2 11B and 90B vision models add a separately trained image encoder and
     cross-attention layers into the pretrained text model, and Meta's announcement states that
     the language model's weights are not updated, so text-only behaviour is preserved exactly.
     That is the practical argument for the Flamingo-style design in a product line where the
-    text models must not regress. Source: Meta AI blog, *Llama 3.2: Revolutionizing edge AI
-    and vision with open, customizable models*, September 2024; the Llama 3 herd of models
-    paper, arXiv:2407.21783.
+    text models must not regress. Source: [Meta AI blog, *Llama 3.2: Revolutionizing edge AI
+    and vision with open, customizable models*, September 2024](https://ai.meta.com/blog/llama-3-2-connect-2024-vision-edge-mobile-devices/); the Llama 3 herd of models
+    paper, [arXiv:2407.21783](https://arxiv.org/abs/2407.21783).
 
 !!! production "Alibaba: Qwen2-VL's native dynamic resolution and M-RoPE"
     Qwen2-VL processes images at their native resolution, producing a variable number of
@@ -583,9 +584,9 @@ objective and discards local detail. LLaVA-1.5 ablated this and kept the penulti
     structure and the model can extrapolate. The report frames this as the fix for the
     fixed-resolution squashing that hurts documents and video. Sources: *Qwen2-VL: Enhancing
     Vision-Language Model's Perception of the World at Any Resolution*, Wang et al., 2024
-    (arXiv:2409.12191); InternVL's pixel-shuffle variant: *InternVL: Scaling up Vision
+    ([arXiv:2409.12191](https://arxiv.org/abs/2409.12191)); InternVL's pixel-shuffle variant: *InternVL: Scaling up Vision
     Foundation Models and Aligning for Generic Visual-Linguistic Tasks*, Chen et al., CVPR
-    2024 (arXiv:2312.14238).
+    2024 ([arXiv:2312.14238](https://arxiv.org/abs/2312.14238)).
 
 !!! production "Document VLMs: Donut and Nougat as the OCR-free precursors"
     Donut (Clova AI) removed the OCR engine from document understanding entirely: a Swin
@@ -594,8 +595,8 @@ objective and discards local detail. LLaVA-1.5 ablated this and kept the penulti
     applies the same encoder-decoder recipe to scientific PDFs, emitting markup. Both are
     direct ancestors of the document-focused VLMs, and the reason resolution and an unfrozen
     vision tower matter for this domain. Sources: *OCR-free Document Understanding Transformer*
-    (Donut), Kim et al., ECCV 2022 (arXiv:2111.15664); *Nougat: Neural Optical Understanding
-    for Academic Documents*, Blecher et al., 2023 (arXiv:2308.13418). See
+    (Donut), Kim et al., ECCV 2022 ([arXiv:2111.15664](https://arxiv.org/abs/2111.15664)); *Nougat: Neural Optical Understanding
+    for Academic Documents*, Blecher et al., 2023 ([arXiv:2308.13418](https://arxiv.org/abs/2308.13418)). See
     [OCR and document understanding](../part17-ml-system-design/09-ocr-document-understanding.md).
 
 ## 6. Interview questions and strong answers
@@ -789,22 +790,19 @@ objective and discards local detail. LLaVA-1.5 ablated this and kept the penulti
 
 ## References
 
-Sources are listed by title, venue and arXiv identifier. External links could not be
-verified from this build environment, so search the title or the identifier.
-
-* Liu et al., *Visual Instruction Tuning* (LLaVA), NeurIPS 2023. arXiv:2304.08485.
-* Liu et al., *Improved Baselines with Visual Instruction Tuning* (LLaVA-1.5), CVPR 2024. arXiv:2310.03744.
-* Liu et al., *LLaVA-NeXT: Improved reasoning, OCR, and world knowledge*, LLaVA blog, January 2024.
-* Alayrac et al., *Flamingo: a Visual Language Model for Few-Shot Learning*, NeurIPS 2022. arXiv:2204.14198.
-* Li et al., *BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models*, ICML 2023. arXiv:2301.12597.
-* Jaegle et al., *Perceiver IO: A General Architecture for Structured Inputs and Outputs*, ICLR 2022. arXiv:2107.14795.
-* Dubey et al., *The Llama 3 Herd of Models*, 2024. arXiv:2407.21783. Meta AI blog, *Llama 3.2: Revolutionizing edge AI and vision with open, customizable models*, September 2024.
-* Wang et al., *Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution*, 2024. arXiv:2409.12191.
-* Bai et al., *Qwen-VL: A Versatile Vision-Language Model for Understanding, Localization, Text Reading, and Beyond*, 2023. arXiv:2308.12966.
-* Chen et al., *InternVL: Scaling up Vision Foundation Models and Aligning for Generic Visual-Linguistic Tasks*, CVPR 2024. arXiv:2312.14238.
-* Beyer et al., *PaliGemma: A versatile 3B VLM for transfer*, 2024. arXiv:2407.07726.
-* Laurençon et al., *What matters when building vision-language models?* (Idefics2), NeurIPS 2024. arXiv:2405.02246.
-* Kim et al., *OCR-free Document Understanding Transformer* (Donut), ECCV 2022. arXiv:2111.15664.
-* Blecher et al., *Nougat: Neural Optical Understanding for Academic Documents*, 2023. arXiv:2308.13418.
-* Li et al., *Evaluating Object Hallucination in Large Vision-Language Models* (POPE), EMNLP 2023. arXiv:2305.10355.
-* Leng et al., *Mitigating Object Hallucinations in Large Vision-Language Models through Visual Contrastive Decoding*, CVPR 2024. arXiv:2311.16922.
+* Liu et al., *Visual Instruction Tuning* (LLaVA), NeurIPS 2023. [arXiv:2304.08485](https://arxiv.org/abs/2304.08485).
+* Liu et al., *Improved Baselines with Visual Instruction Tuning* (LLaVA-1.5), CVPR 2024. [arXiv:2310.03744](https://arxiv.org/abs/2310.03744).
+* Liu et al., *LLaVA-NeXT: Improved reasoning, OCR, and world knowledge*, [LLaVA blog, January 2024](https://llava-vl.github.io/blog/2024-01-30-llava-next/).
+* Alayrac et al., *Flamingo: a Visual Language Model for Few-Shot Learning*, NeurIPS 2022. [arXiv:2204.14198](https://arxiv.org/abs/2204.14198).
+* Li et al., *BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models*, ICML 2023. [arXiv:2301.12597](https://arxiv.org/abs/2301.12597).
+* Jaegle et al., *Perceiver IO: A General Architecture for Structured Inputs and Outputs*, ICLR 2022. [arXiv:2107.14795](https://arxiv.org/abs/2107.14795).
+* Dubey et al., *The Llama 3 Herd of Models*, 2024. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783). [Meta AI blog, *Llama 3.2: Revolutionizing edge AI and vision with open, customizable models*, September 2024](https://ai.meta.com/blog/llama-3-2-connect-2024-vision-edge-mobile-devices/).
+* Wang et al., *Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution*, 2024. [arXiv:2409.12191](https://arxiv.org/abs/2409.12191).
+* Bai et al., *Qwen-VL: A Versatile Vision-Language Model for Understanding, Localization, Text Reading, and Beyond*, 2023. [arXiv:2308.12966](https://arxiv.org/abs/2308.12966).
+* Chen et al., *InternVL: Scaling up Vision Foundation Models and Aligning for Generic Visual-Linguistic Tasks*, CVPR 2024. [arXiv:2312.14238](https://arxiv.org/abs/2312.14238).
+* Beyer et al., *PaliGemma: A versatile 3B VLM for transfer*, 2024. [arXiv:2407.07726](https://arxiv.org/abs/2407.07726).
+* Laurençon et al., *What matters when building vision-language models?* (Idefics2), NeurIPS 2024. [arXiv:2405.02246](https://arxiv.org/abs/2405.02246).
+* Kim et al., *OCR-free Document Understanding Transformer* (Donut), ECCV 2022. [arXiv:2111.15664](https://arxiv.org/abs/2111.15664).
+* Blecher et al., *Nougat: Neural Optical Understanding for Academic Documents*, 2023. [arXiv:2308.13418](https://arxiv.org/abs/2308.13418).
+* Li et al., *Evaluating Object Hallucination in Large Vision-Language Models* (POPE), EMNLP 2023. [arXiv:2305.10355](https://arxiv.org/abs/2305.10355).
+* Leng et al., *Mitigating Object Hallucinations in Large Vision-Language Models through Visual Contrastive Decoding*, CVPR 2024. [arXiv:2311.16922](https://arxiv.org/abs/2311.16922).

@@ -558,8 +558,8 @@ covered in [Part X](../part10-self-supervised/01-self-supervised-learning.md)) c
     heavy encoder run once per image so that a lightweight prompt decoder can answer many
     prompts interactively. The global blocks are the minimum needed to propagate context
     across windows. Sources: *Segment Anything*, Kirillov et al., ICCV 2023
-    (arXiv:2304.02643); *Exploring Plain Vision Transformer Backbones for Object Detection*,
-    Li et al., ECCV 2022 (arXiv:2203.16527).
+    ([arXiv:2304.02643](https://arxiv.org/abs/2304.02643)); *Exploring Plain Vision Transformer Backbones for Object Detection*,
+    Li et al., ECCV 2022 ([arXiv:2203.16527](https://arxiv.org/abs/2203.16527)).
 
 !!! production "Google: ViT-22B and the SigLIP encoders used by PaliGemma"
     Google scaled a plain ViT to 22B parameters by adding QK-normalisation and parallel
@@ -567,8 +567,8 @@ covered in [Part X](../part10-self-supervised/01-self-supervised-learning.md)) c
     the blocker before those changes rather than data. The SigLIP ViTs used as the vision
     tower in PaliGemma are plain ViTs with an attention-pooling head instead of a CLS token,
     trained contrastively at 224 to 896 px. Sources: *Scaling Vision Transformers to 22
-    Billion Parameters*, Dehghani et al., ICML 2023 (arXiv:2302.05442); *PaliGemma: A
-    versatile 3B VLM for transfer*, Beyer et al., 2024 (arXiv:2407.07726).
+    Billion Parameters*, Dehghani et al., ICML 2023 ([arXiv:2302.05442](https://arxiv.org/abs/2302.05442)); *PaliGemma: A
+    versatile 3B VLM for transfer*, Beyer et al., 2024 ([arXiv:2407.07726](https://arxiv.org/abs/2407.07726)).
 
 !!! production "Meta (FAIR): DINOv2 with registers as a frozen dense backbone"
     DINOv2 is a ViT-g trained with self-distillation on a curated 142M-image set and served
@@ -577,8 +577,8 @@ covered in [Part X](../part10-self-supervised/01-self-supervised-learning.md)) c
     regions. The trade-off is four extra tokens per image, which is negligible compute, in
     exchange for clean attention maps and better linear-probe dense transfer. Sources:
     *DINOv2: Learning Robust Visual Features without Supervision*, Oquab et al., 2023
-    (arXiv:2304.07193); *Vision Transformers Need Registers*, Darcet et al., ICLR 2024
-    (arXiv:2309.16588).
+    ([arXiv:2304.07193](https://arxiv.org/abs/2304.07193)); *Vision Transformers Need Registers*, Darcet et al., ICLR 2024
+    ([arXiv:2309.16588](https://arxiv.org/abs/2309.16588)).
 
 !!! production "Tesla: Transformer fusion of multi-camera features (public talk)"
     At Tesla AI Day 2021 the perception team described replacing per-camera detection with a
@@ -762,21 +762,18 @@ covered in [Part X](../part10-self-supervised/01-self-supervised-learning.md)) c
 
 ## References
 
-Sources are listed by title, venue and arXiv identifier. External links could not be
-verified from this build environment, so search the title or the identifier.
-
-* Dosovitskiy et al., *An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale*, ICLR 2021. arXiv:2010.11929.
-* Touvron et al., *Training data-efficient image transformers and distillation through attention* (DeiT), ICML 2021. arXiv:2012.12877.
-* Liu et al., *Swin Transformer: Hierarchical Vision Transformer using Shifted Windows*, ICCV 2021. arXiv:2103.14030.
-* Wang et al., *Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions*, ICCV 2021. arXiv:2102.12122.
-* Liu et al., *A ConvNet for the 2020s* (ConvNeXt), CVPR 2022. arXiv:2201.03545.
-* Dehghani et al., *Scaling Vision Transformers to 22 Billion Parameters*, ICML 2023. arXiv:2302.05442.
-* Darcet et al., *Vision Transformers Need Registers*, ICLR 2024. arXiv:2309.16588.
-* Beyer et al., *FlexiViT: One Model for All Patch Sizes*, CVPR 2023. arXiv:2212.08013.
-* Dehghani et al., *Patch n' Pack: NaViT, a Vision Transformer for any Aspect Ratio and Resolution*, NeurIPS 2023. arXiv:2307.06304.
-* Li et al., *Exploring Plain Vision Transformer Backbones for Object Detection* (ViTDet), ECCV 2022. arXiv:2203.16527.
-* He et al., *Masked Autoencoders Are Scalable Vision Learners*, CVPR 2022. arXiv:2111.06377.
-* Oquab et al., *DINOv2: Learning Robust Visual Features without Supervision*, 2023. arXiv:2304.07193.
-* Kirillov et al., *Segment Anything*, ICCV 2023. arXiv:2304.02643.
-* Beyer et al., *PaliGemma: A versatile 3B VLM for transfer*, 2024. arXiv:2407.07726.
+* Dosovitskiy et al., *An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale*, ICLR 2021. [arXiv:2010.11929](https://arxiv.org/abs/2010.11929).
+* Touvron et al., *Training data-efficient image transformers and distillation through attention* (DeiT), ICML 2021. [arXiv:2012.12877](https://arxiv.org/abs/2012.12877).
+* Liu et al., *Swin Transformer: Hierarchical Vision Transformer using Shifted Windows*, ICCV 2021. [arXiv:2103.14030](https://arxiv.org/abs/2103.14030).
+* Wang et al., *Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions*, ICCV 2021. [arXiv:2102.12122](https://arxiv.org/abs/2102.12122).
+* Liu et al., *A ConvNet for the 2020s* (ConvNeXt), CVPR 2022. [arXiv:2201.03545](https://arxiv.org/abs/2201.03545).
+* Dehghani et al., *Scaling Vision Transformers to 22 Billion Parameters*, ICML 2023. [arXiv:2302.05442](https://arxiv.org/abs/2302.05442).
+* Darcet et al., *Vision Transformers Need Registers*, ICLR 2024. [arXiv:2309.16588](https://arxiv.org/abs/2309.16588).
+* Beyer et al., *FlexiViT: One Model for All Patch Sizes*, CVPR 2023. [arXiv:2212.08013](https://arxiv.org/abs/2212.08013).
+* Dehghani et al., *Patch n' Pack: NaViT, a Vision Transformer for any Aspect Ratio and Resolution*, NeurIPS 2023. [arXiv:2307.06304](https://arxiv.org/abs/2307.06304).
+* Li et al., *Exploring Plain Vision Transformer Backbones for Object Detection* (ViTDet), ECCV 2022. [arXiv:2203.16527](https://arxiv.org/abs/2203.16527).
+* He et al., *Masked Autoencoders Are Scalable Vision Learners*, CVPR 2022. [arXiv:2111.06377](https://arxiv.org/abs/2111.06377).
+* Oquab et al., *DINOv2: Learning Robust Visual Features without Supervision*, 2023. [arXiv:2304.07193](https://arxiv.org/abs/2304.07193).
+* Kirillov et al., *Segment Anything*, ICCV 2023. [arXiv:2304.02643](https://arxiv.org/abs/2304.02643).
+* Beyer et al., *PaliGemma: A versatile 3B VLM for transfer*, 2024. [arXiv:2407.07726](https://arxiv.org/abs/2407.07726).
 * Tesla AI Day 2021, recorded public talk, multi-camera Transformer fusion segment.

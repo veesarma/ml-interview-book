@@ -23,6 +23,10 @@ import numpy as np
 import pytest
 import torch
 
+# The sandbox has 4 cores and oversubscribes badly: a tiny CNN forward and
+# backward takes 7 s on 4 threads and 0.18 s on 1. Pin it for the whole suite.
+torch.set_num_threads(1)
+
 ROOT = Path(__file__).resolve().parents[1]
 PRACTICE = ROOT / "practice"
 

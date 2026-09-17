@@ -3,7 +3,7 @@
 > **Why this matters at staff level.** ByteDance is the clearest public example of a company whose product *is* its recommender: TikTok's For You feed learns from a user within minutes, and the company published the system that makes that possible (Monolith). Interviews probe real-time training and serving, embedding-table design, content understanding for short video, moderation at upload rate, and increasingly the Seed/Doubao foundation-model stack and its training infrastructure (MegaScale). Strong signal is reasoning about *freshness as the product* and its costs.
 
 !!! warning "Sources in this chapter"
-    Claims are tied to public ByteDance/TikTok papers, newsroom posts and talks, cited by exact title, venue and year in [Sources](#sources). URLs are omitted where they could not be verified in the build environment (STYLE.md §4). Anything not in a public source is marked **inference**.
+    Claims are tied to public ByteDance/TikTok papers, newsroom posts and talks, cited by exact title, venue and year in [Sources](#sources), with a link to the primary source wherever that link could be verified (STYLE.md §4). Where a source carries no link, search the exact title. Anything not in a public source is marked **inference**.
 
 ## 1. The business in one paragraph
 
@@ -41,7 +41,7 @@ flowchart LR
   TS[Trust & safety classifiers + human moderation] --> SV
 ```
 
-*What is public (Monolith, 2022):* a Kafka-based log stream, a Flink online joiner that matches features with delayed labels, online training that streams updates into a parameter server, cuckoo-hash embedding tables that avoid collisions and support expiry of stale IDs, and a parameter synchronisation scheme that pushes sparse updates to serving at minute granularity while dense parameters sync less often; the paper also documents a negative-sampling correction for the online joiner. The TikTok newsroom post lists the signal categories (interactions, video information such as captions/sounds/hashtags, device and account settings). *Inference:* the specific model families used in ranking today, the number of funnel stages and the content-understanding models that feed features are not published in detail.
+*What is public ([Monolith, 2022](https://arxiv.org/abs/2209.07663)):* a Kafka-based log stream, a Flink online joiner that matches features with delayed labels, online training that streams updates into a parameter server, cuckoo-hash embedding tables that avoid collisions and support expiry of stale IDs, and a parameter synchronisation scheme that pushes sparse updates to serving at minute granularity while dense parameters sync less often; the paper also documents a negative-sampling correction for the online joiner. The [TikTok newsroom post](https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you) lists the signal categories (interactions, video information such as captions/sounds/hashtags, device and account settings). *Inference:* the specific model families used in ranking today, the number of funnel stages and the content-understanding models that feed features are not published in detail.
 
 ![Hashed embedding tables collide long before they are full](../assets/figures/part18_consumer_hash_collisions.png){ width="640" }
 
@@ -99,7 +99,7 @@ flowchart LR
 
 ### 4.5 MegaScale and the Seed/Doubao stack
 
-**What is public.** MegaScale (NSDI 2024) describes training LLMs on more than 10,000 GPUs with co-designed algorithm and system changes (parallel transformer blocks, sliding-window attention, LAMB optimiser, communication overlap, custom kernels, and a diagnostic stack for stragglers) and reports model FLOPs utilisation improvements over Megatron-LM at that scale. BytePS (SOSP 2019 / OSDI 2020) is the earlier communication-scheduling work. The Seed group publishes model reports (Seed1.5-VL for vision-language, Seed-Thinking for reasoning) and Doubao is the consumer/enterprise model family served on Volcano Engine.
+**What is public.** MegaScale (NSDI 2024, [arXiv:2402.15627](https://arxiv.org/abs/2402.15627)) describes training LLMs on more than 10,000 GPUs with co-designed algorithm and system changes (parallel transformer blocks, sliding-window attention, LAMB optimiser, communication overlap, custom kernels, and a diagnostic stack for stragglers) and reports model FLOPs utilisation improvements over Megatron-LM at that scale. BytePS (SOSP 2019 / OSDI 2020) is the earlier communication-scheduling work. The Seed group publishes model reports (Seed1.5-VL for vision-language, Seed1.5-Thinking for reasoning) and Doubao is the consumer/enterprise model family served on Volcano Engine.
 
 **Why it matters.** Interviews for Seed and infra roles ask about MFU at scale, failure recovery, and multimodal pretraining data; see [distributed training](../part14-systems/01-distributed-training.md) and [multimodal foundation models](../part08-multimodal/05-multimodal-foundation.md).
 
@@ -190,22 +190,22 @@ flowchart LR
 
 **Recommendation**
 
-* Liu et al., "Monolith: Real Time Recommendation System With Collisionless Embedding Table", 2022 (arXiv 2209.07663).
-* Gao et al., "Deep Retrieval: Learning A Retrievable Structure for Large-Scale Recommendations", 2020 (arXiv 2007.07203).
-* TikTok Newsroom, "How TikTok recommends videos #ForYou", June 2020.
+* Liu et al., "Monolith: Real Time Recommendation System With Collisionless Embedding Table", ORSUM workshop at RecSys 2022. [arXiv:2209.07663](https://arxiv.org/abs/2209.07663)
+* Gao et al., "Deep Retrieval: Learning A Retrievable Structure for Large-Scale Recommendations", 2020. [arXiv:2007.07203](https://arxiv.org/abs/2007.07203)
+* TikTok Newsroom, "How TikTok recommends videos #ForYou", June 2020. [newsroom.tiktok.com](https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you)
 
 **Perception and content**
 
-* Zhang et al., "ByteTrack: Multi-Object Tracking by Associating Every Detection Box", ECCV 2022.
-* Yang et al., "Depth Anything: Unleashing the Power of Large-Scale Unlabeled Data", CVPR 2024 (HKU and TikTok).
-* ByteDance Seed, "Seed1.5-VL Technical Report", 2025; Seedream and Seedance model reports, 2025.
+* Zhang et al., "ByteTrack: Multi-Object Tracking by Associating Every Detection Box", ECCV 2022. [arXiv:2110.06864](https://arxiv.org/abs/2110.06864)
+* Yang et al., "Depth Anything: Unleashing the Power of Large-Scale Unlabeled Data", CVPR 2024 (HKU and TikTok). [arXiv:2401.10891](https://arxiv.org/abs/2401.10891)
+* ByteDance Seed, "Seed1.5-VL Technical Report", 2025 ([arXiv:2505.07062](https://arxiv.org/abs/2505.07062)); "Seedream 3.0 Technical Report", 2025 ([arXiv:2504.11346](https://arxiv.org/abs/2504.11346)); "Seedance 1.0: Exploring the Boundaries of Video Generation Models", 2025 ([arXiv:2506.09113](https://arxiv.org/abs/2506.09113)).
 
 **Trust and safety**
 
-* TikTok Transparency Center, Community Guidelines Enforcement Reports (quarterly).
+* TikTok Transparency Center, Community Guidelines Enforcement Reports (quarterly). [tiktok.com/safety](https://www.tiktok.com/safety/en/transparency/community-guidelines-enforcement)
 
 **Infrastructure and foundation models**
 
-* Jiang et al., "MegaScale: Scaling Large Language Model Training to More Than 10,000 GPUs", NSDI 2024 (arXiv 2402.15627).
-* Peng et al., "A Generic Communication Scheduler for Distributed DNN Training Acceleration", SOSP 2019; Jiang et al., "A Unified Architecture for Accelerating Distributed DNN Training in Heterogeneous GPU/CPU Clusters", OSDI 2020 (BytePS).
-* ByteDance Seed, "Seed-Thinking-v1.5" technical report, 2025; Volcano Engine Doubao model documentation.
+* Jiang et al., "MegaScale: Scaling Large Language Model Training to More Than 10,000 GPUs", NSDI 2024. [arXiv:2402.15627](https://arxiv.org/abs/2402.15627)
+* Peng et al., "A Generic Communication Scheduler for Distributed DNN Training Acceleration", SOSP 2019 ([ACM DL](https://dl.acm.org/doi/10.1145/3341301.3359642)); Jiang et al., "A Unified Architecture for Accelerating Distributed DNN Training in Heterogeneous GPU/CPU Clusters", OSDI 2020, BytePS ([usenix.org](https://www.usenix.org/conference/osdi20/presentation/jiang)).
+* ByteDance Seed, "Seed1.5-Thinking: Advancing Superb Reasoning Models with Reinforcement Learning", 2025 ([arXiv:2504.13914](https://arxiv.org/abs/2504.13914)); Volcano Engine Doubao model documentation.

@@ -424,7 +424,7 @@ Activations are excluded and dominate at long sequence length; gradient checkpoi
     with quality on par or better on GLUE/WikiSQL, and (the deployment argument) *no*
     inference latency because the update merges. Rejected alternative: adapters, which were
     already known to work but add sequential depth and measurable latency at small batch.
-    Source: *LoRA: Low-Rank Adaptation of Large Language Models* (ICLR 2022, arXiv:2106.09685).
+    Source: *LoRA: Low-Rank Adaptation of Large Language Models* (ICLR 2022, [arXiv:2106.09685](https://arxiv.org/abs/2106.09685)).
 
 !!! production "University of Washington: QLoRA"
     Problem: even LoRA needs the frozen base in 16-bit, so 65B did not fit on one GPU.
@@ -434,7 +434,7 @@ Activations are excluded and dominate at long sequence length; gradient checkpoi
     trained LoRA adapters in bf16 on top. Result: 65B fine-tuned on a single 48 GB GPU with
     16-bit fine-tuning quality, and the Guanaco model family. The trade-off they accepted:
     slower steps from dequantising the base on every forward.
-    Source: *QLoRA: Efficient Finetuning of Quantized LLMs* (NeurIPS 2023, arXiv:2305.14314).
+    Source: *QLoRA: Efficient Finetuning of Quantized LLMs* (NeurIPS 2023, [arXiv:2305.14314](https://arxiv.org/abs/2305.14314)).
 
 !!! production "Anyscale: "fine-tuning is for form, not facts""
     Anyscale's LoRA fine-tuning posts (2023) benchmarked LoRA against full fine-tuning across
@@ -455,8 +455,8 @@ Activations are excluded and dominate at long sequence length; gradient checkpoi
     batch. S-LoRA reports serving thousands of adapters concurrently with throughput
     improvements of an order of magnitude over naive per-adapter batching. This is the
     architecture behind multi-LoRA support in vLLM.
-    Sources: *S-LoRA: Serving Thousands of Concurrent LoRA Adapters* (arXiv:2311.03285);
-    *Punica: Multi-Tenant LoRA Serving* (MLSys 2024, arXiv:2310.18547).
+    Sources: *S-LoRA: Serving Thousands of Concurrent LoRA Adapters* ([arXiv:2311.03285](https://arxiv.org/abs/2311.03285));
+    *Punica: Multi-Tenant LoRA Serving* (MLSys 2024, [arXiv:2310.18547](https://arxiv.org/abs/2310.18547)).
 
 ## 6. Interview questions and strong answers
 
@@ -596,18 +596,15 @@ Activations are excluded and dominate at long sequence length; gradient checkpoi
 
 ## References
 
-Hyperlinked entries were verified at build time; entries without a link are given by title
-and arXiv id so you can search them.
-
 - Meta AI. *The Llama 3 Herd of Models*. 2024. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783)
-- Hu et al. *LoRA: Low-Rank Adaptation of Large Language Models*. ICLR 2022. arXiv:2106.09685
-- Dettmers et al. *QLoRA: Efficient Finetuning of Quantized LLMs*. NeurIPS 2023. arXiv:2305.14314
-- Houlsby et al. *Parameter-Efficient Transfer Learning for NLP*. ICML 2019. arXiv:1902.00751 (bottleneck adapters)
-- Li, Liang. *Prefix-Tuning: Optimizing Continuous Prompts for Generation*. ACL 2021. arXiv:2101.00190
-- Lester, Al-Rfou, Constant. *The Power of Scale for Parameter-Efficient Prompt Tuning*. EMNLP 2021. arXiv:2104.08691
-- Liu et al. *DoRA: Weight-Decomposed Low-Rank Adaptation*. ICML 2024. arXiv:2402.09353
-- Sheng et al. *S-LoRA: Serving Thousands of Concurrent LoRA Adapters*. 2023. arXiv:2311.03285
-- Chen et al. *Punica: Multi-Tenant LoRA Serving*. MLSys 2024. arXiv:2310.18547
-- Biderman et al. *LoRA Learns Less and Forgets Less*. TMLR 2024. arXiv:2405.09673
-- Anyscale. *Fine-Tuning Llama-2: A Comprehensive Case Study for Tailoring Models to Unique Applications*. 2023 (blog)
-- Anyscale. *Fine-Tuning LLMs: LoRA or Full-Parameter? An in-depth Analysis with Llama 2*. 2023 (blog)
+- Hu et al. *LoRA: Low-Rank Adaptation of Large Language Models*. ICLR 2022. [arXiv:2106.09685](https://arxiv.org/abs/2106.09685)
+- Dettmers et al. *QLoRA: Efficient Finetuning of Quantized LLMs*. NeurIPS 2023. [arXiv:2305.14314](https://arxiv.org/abs/2305.14314)
+- Houlsby et al. *Parameter-Efficient Transfer Learning for NLP*. ICML 2019. [arXiv:1902.00751](https://arxiv.org/abs/1902.00751) (bottleneck adapters)
+- Li, Liang. *Prefix-Tuning: Optimizing Continuous Prompts for Generation*. ACL 2021. [arXiv:2101.00190](https://arxiv.org/abs/2101.00190)
+- Lester, Al-Rfou, Constant. *The Power of Scale for Parameter-Efficient Prompt Tuning*. EMNLP 2021. [arXiv:2104.08691](https://arxiv.org/abs/2104.08691)
+- Liu et al. *DoRA: Weight-Decomposed Low-Rank Adaptation*. ICML 2024. [arXiv:2402.09353](https://arxiv.org/abs/2402.09353)
+- Sheng et al. *S-LoRA: Serving Thousands of Concurrent LoRA Adapters*. 2023. [arXiv:2311.03285](https://arxiv.org/abs/2311.03285)
+- Chen et al. *Punica: Multi-Tenant LoRA Serving*. MLSys 2024. [arXiv:2310.18547](https://arxiv.org/abs/2310.18547)
+- Biderman et al. *LoRA Learns Less and Forgets Less*. TMLR 2024. [arXiv:2405.09673](https://arxiv.org/abs/2405.09673)
+- Anyscale. *Fine-Tuning Llama-2: A Comprehensive Case Study for Tailoring Models to Unique Applications*. 2023. [anyscale.com](https://www.anyscale.com/blog/fine-tuning-llama-2-a-comprehensive-case-study-for-tailoring-models-to-unique-applications)
+- Anyscale. *Fine-Tuning LLMs: LoRA or Full-Parameter? An in-depth Analysis with Llama 2*. 2023. [anyscale.com](https://www.anyscale.com/blog/fine-tuning-llms-lora-or-full-parameter-an-in-depth-analysis-with-llama-2)

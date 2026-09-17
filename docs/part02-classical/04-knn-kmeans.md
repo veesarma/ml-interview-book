@@ -337,10 +337,11 @@ overlapping or elongated clusters: GMM; unknown $k$ and noise: DBSCAN/HDBSCAN.
     tuned by `nlist`, `nprobe`, $m$ and re-ranking. The FAISS wiki states
     `IndexIVFPQ` is "probably the most useful indexing structure for large-scale
     search". Johnson, Douze, Jégou, "Billion-scale similarity search with GPUs",
-    2017, [arXiv:1702.08734](https://arxiv.org/pdf/1702.08734); FAISS wiki
+    2017, [arXiv:1702.08734](https://arxiv.org/abs/1702.08734); FAISS wiki
     "[Faiss indexes](https://github.com/facebookresearch/faiss/wiki/Faiss-indexes)" and
     "[Guidelines to choose an index](https://github.com/facebookresearch/faiss/wiki/Guidelines-to-choose-an-index)";
-    Jégou, Douze, Schmid, "Product Quantization for Nearest Neighbor Search", TPAMI 2011.
+    Jégou, Douze, Schmid, "[Product Quantization for Nearest Neighbor Search](https://dl.acm.org/doi/10.1109/TPAMI.2010.57)",
+    TPAMI 33(1), 2011.
 
 !!! production "Meta AI (SemDeDup): k-means over embeddings to deduplicate LAION"
     *Problem:* web-scale datasets are full of near-duplicates that waste compute.
@@ -495,9 +496,9 @@ modification still yields a non-increasing objective.
 - Arthur, D., Vassilvitskii, S. "k-means++: The Advantages of Careful Seeding." SODA 2007. [PDF](https://theory.stanford.edu/~sergei/papers/kMeansPP-soda.pdf)
 - Lloyd, S. "Least Squares Quantization in PCM." *IEEE Trans. Information Theory* 28(2), 1982. [DOI](https://dl.acm.org/doi/10.1109/TIT.1982.1056489)
 - Sculley, D. "Web-scale k-means clustering." WWW 2010. [ACM DL](https://dl.acm.org/doi/10.1145/1772690.1772862)
-- Beyer, K., Goldstein, J., Ramakrishnan, R., Shaft, U. "When Is 'Nearest Neighbor' Meaningful?" ICDT 1999. [minds.wisconsin.edu](https://minds.wisconsin.edu/handle/1793/60174)
-- Johnson, J., Douze, M., Jégou, H. "Billion-scale similarity search with GPUs." 2017. [arXiv:1702.08734](https://arxiv.org/pdf/1702.08734)
-- Jégou, H., Douze, M., Schmid, C. "Product Quantization for Nearest Neighbor Search." *IEEE TPAMI* 33(1), 2011.
+- Beyer, K., Goldstein, J., Ramakrishnan, R., Shaft, U. "When Is 'Nearest Neighbor' Meaningful?" ICDT 1999. [Springer](https://link.springer.com/chapter/10.1007/3-540-49257-7_15); [minds.wisconsin.edu](https://minds.wisconsin.edu/handle/1793/60174)
+- Johnson, J., Douze, M., Jégou, H. "Billion-scale similarity search with GPUs." 2017. [arXiv:1702.08734](https://arxiv.org/abs/1702.08734)
+- Jégou, H., Douze, M., Schmid, C. "Product Quantization for Nearest Neighbor Search." *IEEE TPAMI* 33(1), 2011. [ACM DL](https://dl.acm.org/doi/10.1109/TPAMI.2010.57)
 - FAISS wiki: [Faiss indexes](https://github.com/facebookresearch/faiss/wiki/Faiss-indexes), [Guidelines to choose an index](https://github.com/facebookresearch/faiss/wiki/Guidelines-to-choose-an-index)
 - Malkov, Y., Yashunin, D. "Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs." 2016. [arXiv:1603.09320](https://arxiv.org/abs/1603.09320)
 - Abbas, A. et al. "SemDeDup: Data-efficient learning at web-scale through semantic deduplication." 2023. [arXiv:2303.09540](https://arxiv.org/abs/2303.09540)

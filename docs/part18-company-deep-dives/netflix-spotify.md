@@ -14,7 +14,7 @@ Netflix sells a subscription to a catalogue; its recommender's job is to make ea
 | Problem | Why it is hard | Public evidence |
 |---|---|---|
 | Netflix homepage ranking | Rows and titles must be chosen jointly; surrogate metrics (plays) vs retention; catalogue is small but member states are rich | Gomez-Uribe & Hunt (ACM TMIS 2016); "Deep Learning for Recommender Systems: A Netflix Case Study" (AI Magazine 2021); "Netflix's Foundation Model for Personalized Recommendation" (Netflix Tech Blog, 2025) |
-| Artwork personalisation | Choose an image per member per title under a bandit feedback loop with no offline ground truth | "Artwork Personalization at Netflix" (Netflix Tech Blog, 2017) |
+| Artwork personalisation | Choose an image per member per title under a bandit feedback loop with no offline ground truth | ["Artwork Personalization at Netflix"](https://netflixtechblog.com/artwork-personalization-c589f074ad76) (Netflix Tech Blog, 2017) |
 | Experiment sensitivity | A/B on retention needs huge samples; ranking changes are subtle | "Innovating Faster on Personalization Algorithms at Netflix Using Interleaving" (2017); Netflix experimentation blog series (2021) |
 | Calibration and diversity | Recommendations drift to a member's majority interest | "Calibrated Recommendations" (Steck, RecSys 2018) |
 | Video encoding | Bits vs perceptual quality per title, per shot | "Per-Title Encode Optimization" (2015); "Dynamic optimizer" (2018); "Toward A Practical Perceptual Video Quality Metric" (VMAF, 2016) |
@@ -59,7 +59,7 @@ flowchart LR
 
 **The problem.** Ranking changes are small effects on noisy retention-adjacent metrics; a member-level A/B needs enormous samples and weeks. Netflix wanted to test more ranker variants per quarter.
 
-**The approach.** The 2017 post describes a two-stage process: first, an interleaving experiment where each member sees a *blended* list mixing the outputs of rankers A and B (team-draft style, alternating picks) and the winner is decided by which ranker's items the member played more; second, a traditional A/B on the surviving candidate to measure member-level metrics. Interleaving is a paired, within-member comparison, so the between-member variance that dominates A/B tests cancels; the post reports that interleaving identified the better algorithm with far fewer members than the A/B test needed (the post quantifies this; treat it as their number, not a universal law).
+**The approach.** The [2017 post on interleaving](https://netflixtechblog.com/interleaving-in-online-experiments-at-netflix-a04ee392ec55) describes a two-stage process: first, an interleaving experiment where each member sees a *blended* list mixing the outputs of rankers A and B (team-draft style, alternating picks) and the winner is decided by which ranker's items the member played more; second, a traditional A/B on the surviving candidate to measure member-level metrics. Interleaving is a paired, within-member comparison, so the between-member variance that dominates A/B tests cancels; the post reports that interleaving identified the better algorithm with far fewer members than the A/B test needed (the post quantifies this; treat it as their number, not a universal law).
 
 ![A/B vs interleaving power](../assets/figures/part18_consumer_interleaving_power.png){ width="640" }
 
@@ -192,8 +192,8 @@ flowchart LR
 **Netflix**
 
 * Gomez-Uribe & Hunt, "The Netflix Recommender System: Algorithms, Business Value, and Innovation", ACM Transactions on Management Information Systems, 2016.
-* Netflix Tech Blog, "Artwork Personalization at Netflix", December 2017.
-* Netflix Tech Blog, "Innovating Faster on Personalization Algorithms at Netflix Using Interleaving", 2017.
+* Netflix Tech Blog, "Artwork Personalization at Netflix", December 2017. [netflixtechblog.com](https://netflixtechblog.com/artwork-personalization-c589f074ad76)
+* Netflix Tech Blog, "Innovating Faster on Personalization Algorithms at Netflix Using Interleaving", November 2017. [netflixtechblog.com](https://netflixtechblog.com/interleaving-in-online-experiments-at-netflix-a04ee392ec55)
 * Steck et al., "Deep Learning for Recommender Systems: A Netflix Case Study", AI Magazine, 2021.
 * Steck, "Calibrated Recommendations", RecSys 2018.
 * Netflix Tech Blog, "Netflix's Foundation Model for Personalized Recommendation", 2025.

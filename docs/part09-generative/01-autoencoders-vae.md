@@ -198,7 +198,7 @@ $x$ and $z$ under the encoder, measured in nats. The distortion for a Gaussian d
 $\sigma_{dec}$ is $\lVert x - \hat x\rVert^2 / (2\sigma_{dec}^2)$ plus a constant, so $\sigma_{dec}$
 scales the distortion term against the rate exactly as $1/\beta$ would.
 
-Posterior collapse follows directly. If the decoder is powerful enough to model the data marginal
+Now read off posterior collapse. If the decoder is powerful enough to model the data marginal
 on its own (an autoregressive decoder on images or text is), or if $\sigma_{dec}$ is large
 relative to the data scale, then paying $R$ nats buys less distortion reduction than it costs,
 and the optimum is $q_\phi(z\mid x) = p(z)$ for every $x$. The KL goes to zero, the latent carries

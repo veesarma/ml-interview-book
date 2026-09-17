@@ -352,22 +352,23 @@ are probing when they ask how you would run a two-month job.
     detection and recovery. They also describe reducing checkpoint and recovery cost and tuning
     collectives for their fabric. This is the single best public data point for "how often do
     things break at scale", quote the shape of it, not invented numbers.
-    *Source: Grattafiori et al., "The Llama 3 Herd of Models", 2024, arXiv:2407.21783, §3.3.*
+    *Source: Grattafiori et al., "The Llama 3 Herd of Models", 2024, [arXiv:2407.21783](https://arxiv.org/abs/2407.21783), §3.3.*
 
 !!! production "Meta: OPT-175B training chronicles (2022)"
     The `metaseq` repository publishes the daily logbook of the 175B run: hardware failures and
     node swaps, loss divergences, LR changes, restarts from checkpoints, and the reasoning at
     the time. It is the most detailed public account of the *operational* reality of a large run
     and the reason "keep a logbook" is standard advice.
-    *Source: Zhang et al., "OPT: Open Pre-trained Transformer Language Models", arXiv:2205.01068,
-    plus the chronicles directory in the metaseq GitHub repository.*
+    *Source: Zhang et al., "OPT: Open Pre-trained Transformer Language Models", [arXiv:2205.01068](https://arxiv.org/abs/2205.01068),
+    plus the [chronicles directory](https://github.com/facebookresearch/metaseq/tree/main/projects/OPT/chronicles)
+    in the metaseq GitHub repository.*
 
 !!! production "Google: PaLM: loss spikes and the mitigation that worked"
     PaLM's report documents ~20 loss spikes during training. Restarting from a checkpoint ~100
     steps before the spike and skipping 200–500 data batches avoided the spike, while replaying
     the same batches did not reproduce it, evidence that the spike arose from a specific
     interaction of model state and batch, not from corrupt data alone.
-    *Source: Chowdhery et al., "PaLM: Scaling Language Modeling with Pathways", arXiv:2204.02311.*
+    *Source: Chowdhery et al., "PaLM: Scaling Language Modeling with Pathways", [arXiv:2204.02311](https://arxiv.org/abs/2204.02311).*
 
 !!! production "NVIDIA: selective activation recomputation in Megatron-LM"
     Rather than recomputing whole layers, Megatron recomputes only the attention
@@ -375,14 +376,14 @@ are probing when they ask how you would run a two-month job.
     is a small share of FLOPs. Reported results cut activation memory ~5× while adding only a
     few percent of compute, versus ~33 % for full recomputation.
     *Source: Korthikanti et al., "Reducing Activation Recomputation in Large Transformer Models",
-    MLSys 2023, arXiv:2205.05198.*
+    MLSys 2023, [arXiv:2205.05198](https://arxiv.org/abs/2205.05198).*
 
 !!! production "Microsoft: DeepSpeed/ZeRO checkpointing and offload"
     DeepSpeed popularised sharded (per-rank) checkpoints so that write time and file size scale
     with $1/N$, plus optimizer-state offload to CPU/NVMe for memory-bound runs. The engineering
     point for an interview: the checkpoint's cost is what sets the optimal cadence
     $\sqrt{2CT}$, so shrinking $C$ is as valuable as extending $T$.
-    *Source: Rajbhandari et al., "ZeRO", SC 2020, arXiv:1910.02054, and the DeepSpeed documentation.*
+    *Source: Rajbhandari et al., "ZeRO", SC 2020, [arXiv:1910.02054](https://arxiv.org/abs/1910.02054), and the DeepSpeed documentation.*
 
 ## 6. Interview questions and strong answers
 
@@ -507,22 +508,20 @@ are probing when they ask how you would run a two-month job.
 
 ## References
 
-Links are omitted where they could not be verified from this environment; search the exact
-title and venue.
-
 * Korthikanti, V. et al. *Reducing Activation Recomputation in Large Transformer Models.*
-  MLSys 2023. arXiv:2205.05198.
-* Chen, T. et al. *Training Deep Nets with Sublinear Memory Cost.* 2016. arXiv:1604.06174.
-* Micikevicius, P. et al. *Mixed Precision Training.* ICLR 2018. arXiv:1710.03740.
-* Micikevicius, P. et al. *FP8 Formats for Deep Learning.* 2022. arXiv:2209.05433.
-* Chowdhery, A. et al. *PaLM: Scaling Language Modeling with Pathways.* 2022. arXiv:2204.02311
+  MLSys 2023. [arXiv:2205.05198](https://arxiv.org/abs/2205.05198).
+* Chen, T. et al. *Training Deep Nets with Sublinear Memory Cost.* 2016. [arXiv:1604.06174](https://arxiv.org/abs/1604.06174).
+* Micikevicius, P. et al. *Mixed Precision Training.* ICLR 2018. [arXiv:1710.03740](https://arxiv.org/abs/1710.03740).
+* Micikevicius, P. et al. *FP8 Formats for Deep Learning.* 2022. [arXiv:2209.05433](https://arxiv.org/abs/2209.05433).
+* Chowdhery, A. et al. *PaLM: Scaling Language Modeling with Pathways.* 2022. [arXiv:2204.02311](https://arxiv.org/abs/2204.02311)
   (loss spikes, §5.1; MFU definition, §4).
-* Grattafiori, A. et al. *The Llama 3 Herd of Models.* 2024. arXiv:2407.21783 (§3.3
+* Grattafiori, A. et al. *The Llama 3 Herd of Models.* 2024. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783) (§3.3
   infrastructure, reliability and interruption statistics).
-* Zhang, S. et al. *OPT: Open Pre-trained Transformer Language Models.* 2022. arXiv:2205.01068,
-  and the OPT-175B training chronicles in the `metaseq` repository.
+* Zhang, S. et al. *OPT: Open Pre-trained Transformer Language Models.* 2022. [arXiv:2205.01068](https://arxiv.org/abs/2205.01068),
+  and the [OPT-175B training chronicles](https://github.com/facebookresearch/metaseq/tree/main/projects/OPT/chronicles)
+  in the `metaseq` repository.
 * Rajbhandari, S. et al. *ZeRO: Memory Optimizations Toward Training Trillion Parameter Models.*
-  SC 2020. arXiv:1910.02054.
-* Daly, J. T. *A higher order estimate of the optimum checkpoint interval for restart dumps.*
+  SC 2020. [arXiv:1910.02054](https://arxiv.org/abs/1910.02054).
+* Daly, J. T. [*A higher order estimate of the optimum checkpoint interval for restart dumps.*](https://www.sciencedirect.com/science/article/abs/pii/S0167739X04002213)
   Future Generation Computer Systems, 2006 (the $\sqrt{2CT}$ result; Young, J. W., CACM 1974).
-* Shoeybi, M. et al. *Megatron-LM.* 2019. arXiv:1909.08053.
+* Shoeybi, M. et al. *Megatron-LM.* 2019. [arXiv:1909.08053](https://arxiv.org/abs/1909.08053).

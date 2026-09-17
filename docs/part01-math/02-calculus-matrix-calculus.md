@@ -358,7 +358,7 @@ $O(\sqrt{L})$ stored layers ([Part XIV](../part14-systems/02-training-systems.md
 
 !!! production "Stanford / Together: FlashAttention's backward pass"
     Dao et al., "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness", NeurIPS 2022
-    (arXiv:2205.14135); Dao, "FlashAttention-2", 2023 (arXiv:2307.08691). The forward stores only $Y$ and the
+    ([arXiv:2205.14135](https://arxiv.org/abs/2205.14135)); Dao, "FlashAttention-2", 2023 ([arXiv:2307.08691](https://arxiv.org/abs/2307.08691)). The forward stores only $Y$ and the
     per-row log-sum-exp $m_i + \log\ell_i$; the backward recomputes each $T_b\times T_b$ block of $A$ in SRAM
     and uses $D_i = \mathrm{rowsum}(dY\odot Y)_i$ (the identity derived in §2.6), so $dS = A\odot(dA - D)$ never
     needs the stored $A$. *Why:* HBM bandwidth, not FLOPs, bounds attention; recomputation costs extra FLOPs
@@ -367,7 +367,7 @@ $O(\sqrt{L})$ stored layers ([Part XIV](../part14-systems/02-training-systems.md
     LLM training stack.
 
 !!! production "NVIDIA / Baidu: mixed-precision training with loss scaling"
-    Micikevicius et al., "Mixed Precision Training", ICLR 2018 (arXiv:1710.03740). Keep an fp32 master copy of
+    Micikevicius et al., "Mixed Precision Training", ICLR 2018 ([arXiv:1710.03740](https://arxiv.org/abs/1710.03740)). Keep an fp32 master copy of
     weights, run forward/backward in fp16, and scale the loss so that gradient magnitudes stay above fp16's
     representable range. The paper shows a histogram of activation-gradient magnitudes with a large fraction
     below $2^{-24}$ that would otherwise be lost. *Why:* $2$–$8\times$ tensor-core throughput and half the
@@ -376,7 +376,7 @@ $O(\sqrt{L})$ stored layers ([Part XIV](../part14-systems/02-training-systems.md
 
 !!! production "Meta: PyTorch autograd and `torch.autograd.gradcheck`"
     Paszke et al., "Automatic differentiation in PyTorch", NeurIPS Autodiff Workshop 2017; Paszke et al.,
-    "PyTorch: An Imperative Style, High-Performance Deep Learning Library", NeurIPS 2019 (arXiv:1912.01703).
+    "PyTorch: An Imperative Style, High-Performance Deep Learning Library", NeurIPS 2019 ([arXiv:1912.01703](https://arxiv.org/abs/1912.01703)).
     PyTorch records a dynamic tape of VJP closures; every custom `autograd.Function` in the codebase and in
     downstream libraries ships with a `gradcheck` test that runs exactly the float64 central-difference
     comparison of §2.7 (`torch.autograd.gradcheck`, `gradgradcheck` for second derivatives). *Why dynamic tape
@@ -420,7 +420,7 @@ $O(\sqrt{L})$ stored layers ([Part XIV](../part14-systems/02-training-systems.md
     with very different curvature). You never form it: use Hessian–vector products (double backward) with power
     iteration or Lanczos, $\sim$ 20 HVPs for the top eigenvalue. **Staff follow-up:** *what happens to $\lambda_{\max}$
     over training with a constant LR?* It rises until $\approx 2/\eta$ and hovers there, the "edge of stability"
-    regime (Cohen et al., ICLR 2021, arXiv:2103.00065).
+    regime (Cohen et al., ICLR 2021, [arXiv:2103.00065](https://arxiv.org/abs/2103.00065)).
 
 !!! interview "Explain Lagrange multipliers with an ML example that is not PCA."
     Maximum entropy under a mean constraint gives the softmax/Boltzmann distribution, where the multiplier is the
@@ -509,11 +509,11 @@ $O(\sqrt{L})$ stored layers ([Part XIV](../part14-systems/02-training-systems.md
 
 * K. Petersen & M. Pedersen, *The Matrix Cookbook*, Technical University of Denmark, 2012.
 * D. Rumelhart, G. Hinton & R. Williams, "Learning representations by back-propagating errors", *Nature* 323, 1986.
-* A. G. Baydin, B. Pearlmutter, A. Radul & J. Siskind, "Automatic Differentiation in Machine Learning: a Survey", *JMLR* 18, 2018 (arXiv:1502.05767).
-* T. Dao, D. Fu, S. Ermon, A. Rudra & C. Ré, "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness", NeurIPS 2022 (arXiv:2205.14135).
-* T. Dao, "FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning", 2023 (arXiv:2307.08691).
-* P. Micikevicius et al., "Mixed Precision Training", ICLR 2018 (arXiv:1710.03740).
-* A. Paszke et al., "PyTorch: An Imperative Style, High-Performance Deep Learning Library", NeurIPS 2019 (arXiv:1912.01703).
-* J. Cohen et al., "Gradient Descent on Neural Networks Typically Occurs at the Edge of Stability", ICLR 2021 (arXiv:2103.00065).
+* A. G. Baydin, B. Pearlmutter, A. Radul & J. Siskind, "Automatic Differentiation in Machine Learning: a Survey", *JMLR* 18, 2018 ([arXiv:1502.05767](https://arxiv.org/abs/1502.05767)).
+* T. Dao, D. Fu, S. Ermon, A. Rudra & C. Ré, "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness", NeurIPS 2022 ([arXiv:2205.14135](https://arxiv.org/abs/2205.14135)).
+* T. Dao, "FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning", 2023 ([arXiv:2307.08691](https://arxiv.org/abs/2307.08691)).
+* P. Micikevicius et al., "Mixed Precision Training", ICLR 2018 ([arXiv:1710.03740](https://arxiv.org/abs/1710.03740)).
+* A. Paszke et al., "PyTorch: An Imperative Style, High-Performance Deep Learning Library", NeurIPS 2019 ([arXiv:1912.01703](https://arxiv.org/abs/1912.01703)).
+* J. Cohen et al., "Gradient Descent on Neural Networks Typically Occurs at the Edge of Stability", ICLR 2021 ([arXiv:2103.00065](https://arxiv.org/abs/2103.00065)).
 * Stanford CS231n course notes, "Neural Networks Part 3: Learning and Evaluation" (gradient checks section).
 * S. Boyd & L. Vandenberghe, *Convex Optimization*, Cambridge University Press, 2004 (chapter 5 on duality and KKT).

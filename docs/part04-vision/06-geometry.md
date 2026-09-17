@@ -203,7 +203,7 @@ $G$ is invertible exactly when the window's gradients span both directions. Its 
 
 Two extensions make it work in practice. The linearisation is valid only for sub-pixel motion, so iterate: warp the second image by the current estimate, recompute $I_t = I_2(x + d) - I_1(x)$, solve for an update, and repeat, which is a Gauss-Newton scheme. For large motion, run the iteration coarse-to-fine on an image pyramid from [chapter 1](01-image-representation.md), so a 16-pixel displacement at full resolution is a 1-pixel displacement four levels up.
 
-RAFT (Teed and Deng, ECCV 2020, arXiv:2003.12039) is the learned counterpart worth knowing for literacy. It builds an all-pairs correlation volume between the two frames' features, then runs a recurrent GRU update operator that repeatedly looks up correlation values around the current flow estimate and refines it. The structure mirrors the classical scheme, with a learned update in place of Gauss-Newton and a precomputed correlation volume in place of per-iteration warping.
+RAFT (Teed and Deng, ECCV 2020, [arXiv:2003.12039](https://arxiv.org/abs/2003.12039)) is the learned counterpart worth knowing for literacy. It builds an all-pairs correlation volume between the two frames' features, then runs a recurrent GRU update operator that repeatedly looks up correlation values around the current flow estimate and refines it. The structure mirrors the classical scheme, with a learned update in place of Gauss-Newton and a precomputed correlation volume in place of per-iteration warping.
 
 ### 2.9 Bundle adjustment
 
@@ -384,6 +384,7 @@ Returning `min_eig` alongside the flow gives the caller the trackability score f
 | `unproject` | `src/mlbook/geometry/camera.py` | Yes | `test_project_unproject_roundtrip_with_distortion` |
 | `look_at`, `projection_matrix` | `src/mlbook/geometry/camera.py` | Read `look_at`, reproduce `projection_matrix` | `test_look_at_is_valid_extrinsic`, `test_projection_matrix_homogeneous` |
 | `distort`, `undistort` | `src/mlbook/geometry/camera.py` | Know the radial and tangential form, read the iteration | `test_distort_undistort_inverse` |
+| `to_homogeneous`, `from_homogeneous` | `src/mlbook/geometry/camera.py` | Yes, two lines each, used throughout this chapter | `test_projection_matrix_homogeneous` |
 | `essential_from_pose`, `fundamental_from_essential` | `src/mlbook/geometry/epipolar.py` | Yes. $E = [t]_\times R$ and $F = K_2^{-\top}EK_1^{-1}$ | `test_essential_from_pose_satisfies_constraint` |
 | `normalise_points` | `src/mlbook/geometry/epipolar.py` | Yes, and know why it matters | `test_normalise_points_statistics` |
 | `eight_point` | `src/mlbook/geometry/epipolar.py` | Yes. Row construction, SVD, rank-2 projection, denormalisation | `test_eight_point_recovers_fundamental_matrix` |
@@ -427,7 +428,7 @@ When to use which estimator:
 ## 5. In production
 
 !!! production "Waymo: calibration and multi-sensor geometry as a first-order concern"
-    The Waymo Open Dataset (Sun et al., CVPR 2020, arXiv:1912.04838) publishes synchronised LiDAR and camera data with per-sensor intrinsics, extrinsics and rolling-shutter timing, and its documentation is explicit that the vehicle, sensor and global frames must be composed correctly for the labels to line up. Rolling shutter matters because each image row is exposed at a different instant, so a moving object's projection depends on its velocity and the row readout time. Treating a rolling-shutter camera as a global-shutter pinhole introduces errors that grow with object speed and are worst at the image edges. The dataset's design pushes the point that geometry bookkeeping, not model architecture, is what makes multi-sensor labels usable.
+    The Waymo Open Dataset (Sun et al., CVPR 2020, [arXiv:1912.04838](https://arxiv.org/abs/1912.04838)) publishes synchronised LiDAR and camera data with per-sensor intrinsics, extrinsics and rolling-shutter timing, and its documentation is explicit that the vehicle, sensor and global frames must be composed correctly for the labels to line up. Rolling shutter matters because each image row is exposed at a different instant, so a moving object's projection depends on its velocity and the row readout time. Treating a rolling-shutter camera as a global-shutter pinhole introduces errors that grow with object speed and are worst at the image edges. The dataset's design pushes the point that geometry bookkeeping, not model architecture, is what makes multi-sensor labels usable.
 
 !!! production "Google: Street View, structure from motion at planet scale"
     Google's Street View and Photo Tours work applied structure from motion and bundle adjustment across enormous unordered image collections, building on the line of research from Snavely, Seitz and Szeliski's "Photo Tourism" (SIGGRAPH 2006) and Agarwal et al.'s "Building Rome in a Day" (ICCV 2009). The engineering problem was that a naive bundle adjustment over a hundred thousand cameras is intractable, and the solutions are the ones in §2.9: exploit the block sparsity, eliminate points with the Schur complement, and use preconditioned conjugate gradients when the reduced camera system is itself too large for a direct solve. Google's Ceres Solver was built for these problems and is the standard open implementation.
@@ -523,11 +524,11 @@ Links could not be verified from this build environment, so titles, venues and a
 - M. Fischler and R. Bolles, "Random Sample Consensus", Communications of the ACM 24(6), 1981.
 - B. Lucas and T. Kanade, "An Iterative Image Registration Technique with an Application to Stereo Vision", IJCAI 1981.
 - J. Shi and C. Tomasi, "Good Features to Track", CVPR 1994.
-- Z. Teed and J. Deng, "RAFT: Recurrent All-Pairs Field Transforms for Optical Flow", ECCV 2020, arXiv:2003.12039.
+- Z. Teed and J. Deng, "RAFT: Recurrent All-Pairs Field Transforms for Optical Flow", ECCV 2020, [arXiv:2003.12039](https://arxiv.org/abs/2003.12039).
 - B. Triggs et al., "Bundle Adjustment: A Modern Synthesis", Vision Algorithms workshop, 1999.
 - S. Agarwal et al., "Bundle Adjustment in the Large", ECCV 2010, and the Ceres Solver documentation.
 - N. Snavely, S. Seitz, R. Szeliski, "Photo Tourism: Exploring Photo Collections in 3D", SIGGRAPH 2006.
-- P. Sun et al., "Scalability in Perception for Autonomous Driving: Waymo Open Dataset", CVPR 2020, arXiv:1912.04838.
+- P. Sun et al., "Scalability in Perception for Autonomous Driving: Waymo Open Dataset", CVPR 2020, [arXiv:1912.04838](https://arxiv.org/abs/1912.04838).
 - Z. Zhang, "A Flexible New Technique for Camera Calibration", IEEE TPAMI 22(11), 2000.
 - Apple, *ARKit developer documentation*, on world tracking and its quality states.
 - NVIDIA, *VPI (Vision Programming Interface) documentation*, on hardware-accelerated optical flow and lens distortion correction.

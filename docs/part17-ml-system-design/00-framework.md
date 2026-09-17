@@ -538,7 +538,7 @@ Prepare four evolutions and run them for each chapter:
 - Sculley, D. et al. "Hidden Technical Debt in Machine Learning Systems." NeurIPS 2015.
 - Breck, E. et al. "The ML Test Score: A Rubric for ML Production Readiness and Technical Debt Reduction." IEEE Big Data 2017.
 - Covington, P., Adams, J., Sargin, E. "Deep Neural Networks for YouTube Recommendations." RecSys 2016 (offline metrics used for triage, live A/B as the final arbiter).
-- Huang, J.-T. et al. "Embedding-based Retrieval in Facebook Search." KDD 2020 (arXiv:2006.11632).
-- Joachims, T., Swaminathan, A., Schnabel, T. "Unbiased Learning-to-Rank with Biased Feedback." WSDM 2017 (arXiv:1608.04468).
+- Huang, J.-T. et al. "Embedding-based Retrieval in Facebook Search." KDD 2020 ([arXiv:2006.11632](https://arxiv.org/abs/2006.11632)).
+- Joachims, T., Swaminathan, A., Schnabel, T. "Unbiased Learning-to-Rank with Biased Feedback." WSDM 2017 ([arXiv:1608.04468](https://arxiv.org/abs/1608.04468)).
 - Hello Interview, "ML System Design" interview guides (the structure this part extends).
 - Book cross-references: [Part XIII evaluation](../part13-retrieval-eval-reliability/02-evaluation.md), [Part XIV inference systems](../part14-systems/03-inference-systems.md), [Part XIV roofline](../part14-systems/04-hardware-memory-roofline.md).

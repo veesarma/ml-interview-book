@@ -602,33 +602,31 @@ global batch sizes are large.
 
 ## References
 
-Links are omitted where they could not be verified from this environment; search the exact
-title.
-
 * Shoeybi, M. et al. *Megatron-LM: Training Multi-Billion Parameter Language Models Using
-  Model Parallelism.* 2019. arXiv:1909.08053.
+  Model Parallelism.* 2019. [arXiv:1909.08053](https://arxiv.org/abs/1909.08053).
 * Narayanan, D. et al. *Efficient Large-Scale Language Model Training on GPU Clusters Using
-  Megatron-LM.* SC 2021. arXiv:2104.04473.
+  Megatron-LM.* SC 2021. [arXiv:2104.04473](https://arxiv.org/abs/2104.04473).
 * Korthikanti, V. et al. *Reducing Activation Recomputation in Large Transformer Models.*
-  MLSys 2023. arXiv:2205.05198.
+  MLSys 2023. [arXiv:2205.05198](https://arxiv.org/abs/2205.05198).
 * Rajbhandari, S. et al. *ZeRO: Memory Optimizations Toward Training Trillion Parameter
-  Models.* SC 2020. arXiv:1910.02054.
+  Models.* SC 2020. [arXiv:1910.02054](https://arxiv.org/abs/1910.02054).
 * Zhao, Y. et al. *PyTorch FSDP: Experiences on Scaling Fully Sharded Data Parallel.* VLDB
-  2023. arXiv:2304.11277.
+  2023. [arXiv:2304.11277](https://arxiv.org/abs/2304.11277).
 * Li, S. et al. *PyTorch Distributed: Experiences on Accelerating Data Parallel Training.*
-  VLDB 2020. arXiv:2006.15704.
+  VLDB 2020. [arXiv:2006.15704](https://arxiv.org/abs/2006.15704).
 * Huang, Y. et al. *GPipe: Efficient Training of Giant Neural Networks using Pipeline
-  Parallelism.* NeurIPS 2019. arXiv:1811.06965.
-* Qi, P. et al. *Zero Bubble Pipeline Parallelism.* ICLR 2024. arXiv:2401.10241.
+  Parallelism.* NeurIPS 2019. [arXiv:1811.06965](https://arxiv.org/abs/1811.06965).
+* Qi, P. et al. *Zero Bubble Pipeline Parallelism.* ICLR 2024. [arXiv:2401.10241](https://arxiv.org/abs/2401.10241).
 * Liu, H., Zaharia, M., Abbeel, P. *Ring Attention with Blockwise Transformers for
-  Near-Infinite Context.* 2023. arXiv:2310.01889.
+  Near-Infinite Context.* 2023. [arXiv:2310.01889](https://arxiv.org/abs/2310.01889).
 * Jacobs, S. A. et al. *DeepSpeed Ulysses: System Optimizations for Enabling Training of
-  Extreme Long Sequence Transformer Models.* 2023. arXiv:2309.14509.
+  Extreme Long Sequence Transformer Models.* 2023. [arXiv:2309.14509](https://arxiv.org/abs/2309.14509).
 * Grattafiori, A. et al. (Llama Team, Meta). *The Llama 3 Herd of Models.* 2024.
- arXiv:2407.21783, §3.3 "Infrastructure, Scaling, and Efficiency".
-* Chowdhery, A. et al. *PaLM: Scaling Language Modeling with Pathways.* 2022. arXiv:2204.02311.
-* Zhang, S. et al. *OPT: Open Pre-trained Transformer Language Models.* 2022. arXiv:2205.01068,
-  and the OPT-175B training chronicles in the `metaseq` GitHub repository.
+ [arXiv:2407.21783](https://arxiv.org/abs/2407.21783), §3.3 "Infrastructure, Scaling, and Efficiency".
+* Chowdhery, A. et al. *PaLM: Scaling Language Modeling with Pathways.* 2022. [arXiv:2204.02311](https://arxiv.org/abs/2204.02311).
+* Zhang, S. et al. *OPT: Open Pre-trained Transformer Language Models.* 2022. [arXiv:2205.01068](https://arxiv.org/abs/2205.01068),
+  and the [OPT-175B training chronicles](https://github.com/facebookresearch/metaseq/tree/main/projects/OPT/chronicles)
+  in the `metaseq` GitHub repository.
 * Sergeev, A., Del Balso, M. *Horovod: fast and easy distributed deep learning in TensorFlow.*
-  2018. arXiv:1802.05799 (ring all-reduce for deep learning; the derivation follows Patarasuk &
+  2018. [arXiv:1802.05799](https://arxiv.org/abs/1802.05799) (ring all-reduce for deep learning; the derivation follows Patarasuk &
   Yuan, *Bandwidth optimal all-reduce algorithms for clusters of workstations*, JPDC 2009).

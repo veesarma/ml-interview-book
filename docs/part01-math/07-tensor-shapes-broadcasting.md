@@ -396,7 +396,7 @@ $O(T^2)$ attention memory that FlashAttention exists to avoid ([Part VI](../part
 
 !!! production "Meta: PyTorch's `scaled_dot_product_attention` and the shape contract"
     A. Paszke et al., "PyTorch: An Imperative Style, High-Performance Deep Learning Library", NeurIPS 2019
-    (arXiv:1912.01703). PyTorch's fused attention takes $(N, \dots, L, E)$ tensors with the head axis already
+    ([arXiv:1912.01703](https://arxiv.org/abs/1912.01703)). PyTorch's fused attention takes $(N, \dots, L, E)$ tensors with the head axis already
     batched (i.e. it requires you to have done the `view → transpose` of §2.5) and accepts an `attn_mask`
     that must be *broadcastable* to $(N, \text{heads}, L, S)$, or the `is_causal` flag instead. That API is a
     direct encoding of this chapter's rules, and the reason the tests here compare against it: if your shapes
@@ -405,7 +405,7 @@ $O(T^2)$ attention memory that FlashAttention exists to avoid ([Part VI](../part
 
 !!! production "Stanford / Together: FlashAttention: the $O(T^2)$ intermediate is the enemy"
     T. Dao et al., "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness", NeurIPS 2022
-    (arXiv:2205.14135); T. Dao, "FlashAttention-2", 2023 (arXiv:2307.08691). The entire contribution is a shape
+    ([arXiv:2205.14135](https://arxiv.org/abs/2205.14135)); T. Dao, "FlashAttention-2", 2023 ([arXiv:2307.08691](https://arxiv.org/abs/2307.08691)). The entire contribution is a shape
     and memory-traffic argument: the mathematically identical computation, tiled so that the $(B,H,T,T)$ score
     matrix never leaves SRAM, turning attention from HBM-bandwidth-bound to compute-bound and reducing memory
     from $O(T^2)$ to $O(T)$. *Why it belongs in a shapes chapter:* the broadcasting that makes
@@ -416,7 +416,7 @@ $O(T^2)$ attention memory that FlashAttention exists to avoid ([Part VI](../part
     The XLA/JAX stack (`jax.numpy.einsum`, `einsum_v2` in TensorFlow) expresses model layers as einsum equations
     precisely so that a compiler can reason about which index is sharded across which device mesh axis, the
     `GSPMD`/`jax.sharding` approach described in Y. Xu et al., "GSPMD: General and Scalable Parallelization for
-    ML Computation Graphs", 2021 (arXiv:2105.04663), and used for PaLM (arXiv:2204.02311). *Why einsum and not
+    ML Computation Graphs", 2021 ([arXiv:2105.04663](https://arxiv.org/abs/2105.04663)), and used for PaLM ([arXiv:2204.02311](https://arxiv.org/abs/2204.02311)). *Why einsum and not
     `@`:* an einsum string names every axis, so a partitioning annotation like "shard the `h` axis across the
     model-parallel mesh dimension" is unambiguous. *Trade-off:* readability for humans versus analysability for
     compilers. That is why this book writes `@` in teaching code while frontier training stacks write einsum.
@@ -619,10 +619,10 @@ changed their throughput by 20% with identical outputs. Give two plausible mecha
 
 * NumPy documentation, "Broadcasting" and "Internal memory layout of an ndarray", NumPy User Guide.
 * PyTorch documentation, "Broadcasting semantics", "Tensor Views", and `torch.nn.functional.scaled_dot_product_attention`.
-* A. Paszke et al., "PyTorch: An Imperative Style, High-Performance Deep Learning Library", NeurIPS 2019 (arXiv:1912.01703).
+* A. Paszke et al., "PyTorch: An Imperative Style, High-Performance Deep Learning Library", NeurIPS 2019 ([arXiv:1912.01703](https://arxiv.org/abs/1912.01703)).
 * A. Rogozhnikov, "Einops: Clear and Reliable Tensor Manipulations with Einstein-like Notation", ICLR 2022.
-* T. Dao, D. Fu, S. Ermon, A. Rudra & C. Ré, "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness", NeurIPS 2022 (arXiv:2205.14135); T. Dao, "FlashAttention-2", 2023 (arXiv:2307.08691).
-* Y. Xu et al., "GSPMD: General and Scalable Parallelization for ML Computation Graphs", 2021 (arXiv:2105.04663).
-* A. Chowdhery et al., "PaLM: Scaling Language Modeling with Pathways", 2022 (arXiv:2204.02311).
-* A. Vaswani et al., "Attention Is All You Need", NeurIPS 2017 (arXiv:1706.03762).
-* J. Ainslie et al., "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints", EMNLP 2023 (arXiv:2305.13245).
+* T. Dao, D. Fu, S. Ermon, A. Rudra & C. Ré, "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness", NeurIPS 2022 ([arXiv:2205.14135](https://arxiv.org/abs/2205.14135)); T. Dao, "FlashAttention-2", 2023 ([arXiv:2307.08691](https://arxiv.org/abs/2307.08691)).
+* Y. Xu et al., "GSPMD: General and Scalable Parallelization for ML Computation Graphs", 2021 ([arXiv:2105.04663](https://arxiv.org/abs/2105.04663)).
+* A. Chowdhery et al., "PaLM: Scaling Language Modeling with Pathways", 2022 ([arXiv:2204.02311](https://arxiv.org/abs/2204.02311)).
+* A. Vaswani et al., "Attention Is All You Need", NeurIPS 2017 ([arXiv:1706.03762](https://arxiv.org/abs/1706.03762)).
+* J. Ainslie et al., "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints", EMNLP 2023 ([arXiv:2305.13245](https://arxiv.org/abs/2305.13245)).

@@ -274,8 +274,8 @@ GPU, dominated by matmuls, where FlashAttention's tiling and tensor-core utilisa
     because it did not address memory traffic. Follow-ups (FA-2, FA-3) are engineering of the
     same idea for newer hardware.
     Source: *FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness*
-    (NeurIPS 2022, arXiv:2205.14135); *FlashAttention-2* (arXiv:2307.08691);
-    *FlashAttention-3* (arXiv:2407.08608).
+    (NeurIPS 2022, [arXiv:2205.14135](https://arxiv.org/abs/2205.14135)); *FlashAttention-2* ([arXiv:2307.08691](https://arxiv.org/abs/2307.08691));
+    *FlashAttention-3* ([arXiv:2407.08608](https://arxiv.org/abs/2407.08608)).
 
 !!! production "UC Berkeley: vLLM and PagedAttention"
     Problem: serving systems reserved contiguous cache for `max_len` and lost 60–80% of KV
@@ -388,17 +388,14 @@ GPU, dominated by matmuls, where FlashAttention's tiling and tensor-core utilisa
 
 ## References
 
-Hyperlinked entries were verified at build time; entries without a link are given by title
-and arXiv id.
-
 - Kwon et al. *Efficient Memory Management for Large Language Model Serving with PagedAttention*. SOSP 2023. [arXiv:2309.06180](https://arxiv.org/abs/2309.06180)
 - DeepSeek-AI. *DeepSeek-V2*. 2024. [arXiv:2405.04434](https://arxiv.org/abs/2405.04434)
 - DeepSeek-AI. *DeepSeek-V3 Technical Report*. 2024. [arXiv:2412.19437](https://arxiv.org/abs/2412.19437)
 - Meta AI. *The Llama 3 Herd of Models*. 2024. [arXiv:2407.21783](https://arxiv.org/abs/2407.21783)
-- Dao et al. *FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness*. NeurIPS 2022. arXiv:2205.14135
-- Dao. *FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning*. 2023. arXiv:2307.08691
-- Shah et al. *FlashAttention-3: Fast and Accurate Attention with Asynchrony and Low-precision*. 2024. arXiv:2407.08608
-- Milakov, Gimelshein. *Online normalizer calculation for softmax*. 2018. arXiv:1805.02867
-- Zheng et al. *SGLang: Efficient Execution of Structured Language Model Programs*. 2023. arXiv:2312.07104 (RadixAttention prefix caching)
-- Agrawal et al. *Taming Throughput-Latency Tradeoff in LLM Inference with Sarathi-Serve*. OSDI 2024. arXiv:2403.02310 (chunked prefill)
-- Pope et al. *Efficiently Scaling Transformer Inference*. MLSys 2023. arXiv:2211.05102 (decode memory-boundedness analysis)
+- Dao et al. *FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness*. NeurIPS 2022. [arXiv:2205.14135](https://arxiv.org/abs/2205.14135)
+- Dao. *FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning*. 2023. [arXiv:2307.08691](https://arxiv.org/abs/2307.08691)
+- Shah et al. *FlashAttention-3: Fast and Accurate Attention with Asynchrony and Low-precision*. 2024. [arXiv:2407.08608](https://arxiv.org/abs/2407.08608)
+- Milakov, Gimelshein. *Online normalizer calculation for softmax*. 2018. [arXiv:1805.02867](https://arxiv.org/abs/1805.02867)
+- Zheng et al. *SGLang: Efficient Execution of Structured Language Model Programs*. 2023. [arXiv:2312.07104](https://arxiv.org/abs/2312.07104) (RadixAttention prefix caching)
+- Agrawal et al. *Taming Throughput-Latency Tradeoff in LLM Inference with Sarathi-Serve*. OSDI 2024. [arXiv:2403.02310](https://arxiv.org/abs/2403.02310) (chunked prefill)
+- Pope et al. *Efficiently Scaling Transformer Inference*. MLSys 2023. [arXiv:2211.05102](https://arxiv.org/abs/2211.05102) (decode memory-boundedness analysis)

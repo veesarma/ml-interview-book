@@ -715,7 +715,7 @@ queries.
     retrained to consume embedding features. **Why.** Embedding retrieval alone lost the
     precision of exact term constraints; hybrid inside one engine kept both. Paper:
     ["Embedding-based Retrieval in Facebook Search"](https://arxiv.org/abs/2006.11632),
-    KDD 2020, arXiv:2006.11632.
+    KDD 2020, [arXiv:2006.11632](https://arxiv.org/abs/2006.11632).
 
 !!! production "Google / YouTube: two-tower retrieval with sampling-bias correction (Yi et al., RecSys 2019)"
     **Problem.** Training a softmax over hundreds of millions of items is impossible;
@@ -739,8 +739,8 @@ queries.
     exposes the knobs explicitly. **Why.** No single index wins; a library that makes the
     trade-off explicit lets each product pick its point. Papers:
     ["Billion-scale similarity search with GPUs"](https://arxiv.org/abs/1702.08734),
-    arXiv:1702.08734, and ["The Faiss library"](https://arxiv.org/abs/2401.08281),
-    arXiv:2401.08281; release post:
+    [arXiv:1702.08734](https://arxiv.org/abs/1702.08734), and ["The Faiss library"](https://arxiv.org/abs/2401.08281),
+    [arXiv:2401.08281](https://arxiv.org/abs/2401.08281); release post:
     ["Faiss: A library for efficient similarity search"](https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/),
     Engineering at Meta, March 2017.
 
@@ -753,7 +753,7 @@ queries.
     reconstruction error is the wrong objective; minimising the error that affects the
     ranking gives better recall at the same bits. Paper:
     ["Accelerating Large-Scale Inference with Anisotropic Vector Quantization"](https://arxiv.org/abs/1908.10396),
-    ICML 2020, arXiv:1908.10396; Google Research blog post
+    ICML 2020, [arXiv:1908.10396](https://arxiv.org/abs/1908.10396); Google Research blog post
     ["Announcing ScaNN: Efficient Vector Similarity Search"](https://research.google/blog/announcing-scann-efficient-vector-similarity-search/)
     (July 2020).
 
@@ -964,18 +964,18 @@ each one moves.
 * Khattab & Zaharia, ["ColBERT: Efficient and Effective Passage Search via Contextualized
   Late Interaction over BERT"](https://arxiv.org/abs/2004.12832), SIGIR 2020, arXiv:2004.12832.
 * Kusupati et al., ["Matryoshka Representation Learning"](https://arxiv.org/abs/2205.13147),
-  NeurIPS 2022, arXiv:2205.13147.
+  NeurIPS 2022, [arXiv:2205.13147](https://arxiv.org/abs/2205.13147).
 * Jégou, Douze & Schmid, ["Product Quantization for Nearest Neighbor
   Search"](https://dl.acm.org/doi/10.1109/TPAMI.2010.57), IEEE TPAMI 33(1), 2011.
 * Ge, He, Ke & Sun, ["Optimized Product Quantization for Approximate Nearest Neighbor
   Search"](https://www.cv-foundation.org/openaccess/content_cvpr_2013/html/Ge_Optimized_Product_Quantization_2013_CVPR_paper.html), CVPR 2013.
 * Malkov & Yashunin, ["Efficient and robust approximate nearest neighbor search using
   Hierarchical Navigable Small World graphs"](https://arxiv.org/abs/1603.09320), IEEE
-  TPAMI 2018, arXiv:1603.09320.
+  TPAMI 2018, [arXiv:1603.09320](https://arxiv.org/abs/1603.09320).
 * Johnson, Douze & Jégou, ["Billion-scale similarity search with
   GPUs"](https://arxiv.org/abs/1702.08734), 2017, arXiv:1702.08734; Engineering at Meta,
   ["Faiss: A library for efficient similarity search"](https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/), 2017.
-* Douze et al., ["The Faiss library"](https://arxiv.org/abs/2401.08281), 2024, arXiv:2401.08281.
+* Douze et al., ["The Faiss library"](https://arxiv.org/abs/2401.08281), 2024, [arXiv:2401.08281](https://arxiv.org/abs/2401.08281).
 * Guo et al., ["Accelerating Large-Scale Inference with Anisotropic Vector
   Quantization"](https://arxiv.org/abs/1908.10396), ICML 2020, arXiv:1908.10396; Google
   Research blog, ["Announcing ScaNN: Efficient Vector Similarity

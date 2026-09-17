@@ -95,6 +95,13 @@ you get control; take an expectation under $\pi$ and you get prediction.
 
 ## 2. The math
 
+![The agent-environment loop: the agent emits an action, the environment returns the next state and reward, with the two Bellman equations written underneath.](../assets/figures/part12_agent_env_loop_manim.png){ width="700" }
+
+The loop above is the whole formalism on one page. The agent emits $a_t$, the environment
+answers with $s_{t+1}$ and $r_{t+1}$ according to $P$ and $R$, and the two equations at the
+bottom are the ones derived next. Everything after this chapter changes only how those two
+equations are approximated.
+
 ### 2.1 The MDP
 
 A finite Markov decision process is a tuple $(\mathcal{S}, \mathcal{A}, P, R, \gamma)$:
