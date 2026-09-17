@@ -296,7 +296,7 @@ Check with `python -m pytest tests/test_quant_quantize.py tests/test_quant_qline
 
 | Method | Weights | Activations | KV cache | Speed-up regime | Accuracy risk |
 |---|---|---|---|---|---|
-| BF16 (baseline) | 2 B | 2 B | 2 B | – | – |
+| BF16 (baseline) | 2 B | 2 B | 2 B | baseline | none |
 | Weight-only INT8 (per-channel RTN) | 1 B | 2 B | 2 B | decode, batch ≤ ~16 | negligible |
 | Weight-only INT4 (GPTQ/AWQ, g=128) | 0.5 B + scales | 2 B | 2 B | decode, memory-bound | small; worse on small models and on math/code |
 | NF4 (bitsandbytes / QLoRA) | ~0.5 B | 2 B | 2 B | fine-tuning memory | small |

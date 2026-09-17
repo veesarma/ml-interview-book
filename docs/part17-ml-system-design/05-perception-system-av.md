@@ -2,10 +2,10 @@
 
 > **Why this matters / who asks it.** Tesla, Waymo, Zoox, Nuro, Aurora, Wayve,
 > Motional, NVIDIA DRIVE and every robotics company with a camera ask a version of
-> "design the perception system." The business problem is not "detect objects", it is
-> "produce, at 10 Hz on a fixed power budget in a moving vehicle, a representation of
-> the world that a planner can act on safely, and keep improving it on a fleet that
-> generates more data in a day than you can ever label." That reframing is most of the
+> "design the perception system." The business problem is to produce, at 10 Hz on a
+> fixed power budget in a moving vehicle, a representation of the world that a planner
+> can act on safely, and to keep improving it on a fleet that generates more data in a
+> day than you can ever label. Detecting objects is a part of that, not the whole of it. That reframing is most of the
 > signal: the candidate who designs a detector fails; the candidate who designs a
 > *data engine plus an onboard stack plus an evaluation regime that can justify a
 > release* passes. This chapter is the deepest in the part, and it leans on
@@ -127,7 +127,7 @@ toward recall.
    to the planner's interface than to a benchmark."
 2. "Is lidar in the production vehicle, or only on a data-collection subset? If
    it is only on a data fleet, it becomes an auto-labelling sensor rather than a
-   runtime sensor, and that changes everything."
+   runtime sensor, which changes the whole design."
 3. "What is the intervention data rate? Interventions are my highest-value labels."
 4. "What is the worst-case latency I must guarantee, not the average? A safety case
    is written against the worst case."
@@ -153,7 +153,7 @@ company, that closes that gap. Therefore:
 the *offline* problem is far easier than the online one:
 
 - You have the **entire future** of the clip, so an object briefly occluded at
-  $t$ can be labelled from its trajectory at $t \pm 5\,\text{s}$, offline tracking
+  $t$ can be labelled from its trajectory at $t \pm 5\,\text{s}$. Offline tracking
   runs bidirectionally.
 - You have **all sensors**, including ones not on the production vehicle (a lidar-
   equipped data-collection subset labels camera-only production data).
@@ -174,8 +174,8 @@ sensors, is standard across the industry.
 **Label biases you must name.**
 
 - *Trigger-selection bias*: the fleet only uploads what the triggers ask for, so the
-  dataset is a biased sample of the world, deliberately, but you must remember it
-  when computing anything that claims to be a rate. Keep a small **uniformly random
+  dataset is a biased sample of the world. That is deliberate, but you have to
+  remember it when computing anything that claims to be a rate. Keep a small **uniformly random
   upload stream** alongside the triggered one, purely so you can estimate true
   prevalence and calibrate the triggered data's weighting.
 - *Teacher bias*: the auto-labeller's systematic errors (say, under-detecting
@@ -230,7 +230,7 @@ data-residency constraints that can determine where training clusters are locate
 
 Per-camera 2D detection with a standard detector, monocular depth or a flat-ground
 assumption to lift boxes to 3D, per-camera tracking, and hand-written fusion across
-cameras in the vehicle frame. It works, it is what everyone shipped first, and its
+cameras in the vehicle frame. It works, and it is what everyone shipped first. Its
 failure modes are the argument for everything that follows: objects spanning two
 cameras get two identities, depth from a single camera is ill-conditioned, and the
 hand-written fusion has no way to combine weak evidence.
@@ -316,7 +316,7 @@ and cost:
   a compute cost that has to be earned.
 
 The systems consequence: temporal models carry **state**, and state means the
-inference engine is no longer a pure function, you must handle initialisation,
+inference engine is no longer a pure function. You have to handle initialisation,
 recovery after a dropped frame, and the fact that a bug can persist across frames.
 Your validation must include state-corruption scenarios.
 
@@ -380,7 +380,7 @@ growing. Techniques, in the order you would apply them:
    benchmark but uses an unsupported attention pattern is worthless.
 2. **Distillation** from the large offline teacher (or the auto-labeller ensemble)
    into the onboard student, using soft targets and intermediate features. The
-   teacher is also the auto-labeller, so this falls out of the data engine.
+   teacher is also the auto-labeller, so the data engine already produces it.
 3. **Quantisation** to INT8 (or lower) with quantisation-aware training; the
    accuracy delta must be measured per class per range, not in aggregate, because
    quantisation hurts small distant objects first.
@@ -583,13 +583,13 @@ trigger → collect → label → retrain → verify via shadow mode.
     "I'd fuse camera features into a shared bird's-eye-view representation rather
     than run per-camera detectors and fuse their outputs. Tesla's AI Day
     presentations describe exactly this transition, a transformer that maps image
-    features into a vector space shared across cameras, and the motivation they
-    gave is the one I'd give: an object spanning two cameras gets one consistent
+    features into a vector space shared across cameras. The motivation they gave is
+    the one I'd give: an object spanning two cameras gets one consistent
     identity and one position, and weak evidence from several views can be combined
     before anything is thresholded, which per-camera detection makes impossible. The
     alternative, per-camera detection with geometric fusion, is simpler, and it has
     a real advantage I'd name: each camera path can be validated independently,
-    which matters for a redundancy argument. The trade-off is compute and the fact
+    which is what a redundancy argument needs. The trade-off is compute and the fact
     that calibration errors now corrupt a shared representation rather than one
     camera's output, so I'd add online calibration monitoring as a production
     subsystem. I'd keep a simple per-camera path anyway as the independent fallback
@@ -726,9 +726,9 @@ unified camera and lidar features in the shared BEV space. Lang et al.,
 baseline these are compared against.
 
 !!! tip "How to say it in the interview: pick the BEV mechanism on evidence"
-    "I'd start from lift-splat, Philion and Fidler's ECCV 2020 formulation, where
-    each pixel predicts a depth distribution and features are splatted into BEV,
-    because it is cheap and its failure mode is understandable: accuracy is bounded
+    "I'd start from lift-splat, the Philion and Fidler formulation from ECCV 2020,
+    where each pixel predicts a depth distribution and features are splatted into
+    BEV. It is cheap and its failure mode is understandable: accuracy is bounded
     by the depth distribution. I'd move to attention-based BEV queries, as in
     BEVFormer at ECCV 2022, when I need temporal fusion, since their temporal
     self-attention over previous BEV features gives velocity and occlusion
@@ -785,7 +785,7 @@ simulation-based scenario generation for rare events in their technical material
 !!! interview "Your new model is 3 points better on mAP. Should we ship it?"
     Not on that evidence. mAP averages over classes, ranges and conditions, and the
     gain could be entirely in easy near-range vehicles while pedestrian AP beyond
-    50 m regressed, which is the only number that matters for the safety case. I'd
+    50 m regressed, and that number is what the safety case rests on. I'd
     want: per-class per-range per-condition deltas on the human-labelled golden set;
     scenario-bank results with zero regressions; closed-loop simulation showing no
     increase in collision or rule-violation rate; shadow-mode disagreement analysis
@@ -807,7 +807,7 @@ simulation-based scenario generation for rare events in their technical material
     decides who was right.
 
 !!! interview "Why can't you just A/B test the new perception model on the road?"
-    Three reasons. First, the outcome you care about (collisions) is far too rare
+    Three reasons. First, collisions are far too rare
     to power an experiment; you would need billions of kilometres to detect a
     meaningful change. Second, a perception change alters the vehicle's trajectory,
     so the two arms do not see the same world, and the treatment's data is not
@@ -820,7 +820,8 @@ simulation-based scenario generation for rare events in their technical material
     acquired slowly and with a rollback path).
 
 !!! interview "Your onboard budget just shrank by 30 % because another team needs the compute. What do you cut?"
-    Not accuracy uniformly, I'd re-derive the budget from the requirement. First,
+    I would not cut accuracy uniformly. I'd re-derive the budget from the
+    requirement. First,
     multi-rate scheduling: sign classification and semantic occupancy do not need to
     run at the full cycle rate, while geometric occupancy and dynamic-object
     detection do. Second, quantisation to a lower precision with
@@ -835,9 +836,9 @@ simulation-based scenario generation for rare events in their technical material
     should make, not the perception team alone.
 
 !!! interview "How do you handle a sensor failing mid-drive?"
-    Detect, declare, degrade. Detection is its own model and its own metrics,
-    lens occlusion, blur, saturation, radar blindness, lidar return collapse,
-    because a silently degraded sensor is far more dangerous than a failed one.
+    Detect, declare, degrade. Detection is its own model with its own metrics for
+    lens occlusion, blur, saturation, radar blindness and lidar return collapse. A
+    silently degraded sensor is far more dangerous than a failed one.
     Declaration means the perception outputs carry the degraded state so the planner
     can be conservative rather than the perception stack silently doing its best.
     Degradation means a defined behaviour: reduce the ODD (no lane changes toward
@@ -851,8 +852,8 @@ simulation-based scenario generation for rare events in their technical material
     Two arguments. First, the offline problem is genuinely easier: the auto-labeller
     has the whole future of the clip, all sensors including ones the production
     vehicle lacks, multiple passes over the same location, and unbounded compute,
-    so it is solving a fundamentally better-posed problem than the onboard model,
-    it is not the same model grading itself. Second, and non-negotiable, you measure
+    so it is solving a much better-posed problem than the onboard model. The teacher
+    is not the student marking its own work. Second, and non-negotiable, you measure
     it: a human-labelled golden set, sampled independently of the triggers, never
     touched by the auto-labeller, on which both the teacher and the student are
     evaluated. The number I'd track is teacher error by class and range, because a
@@ -874,7 +875,7 @@ simulation-based scenario generation for rare events in their technical material
 !!! interview "The fleet uploads too much data and the bill is enormous. What do you do?"
     Tighten the triggers with measurement rather than intuition: for each trigger,
     compute the *yield*, what fraction of its uploads produced a training example
-    that changed a metric, and kill or retune the low-yield ones. Add onboard
+    that changed a metric. Kill or retune the low-yield ones. Add onboard
     deduplication (the same intersection, the same vehicle, a hundred times a week
     is one example, not a hundred) and onboard pre-filtering so the vehicle uploads
     a few seconds around the trigger rather than the whole clip, plus a compact
@@ -913,7 +914,7 @@ simulation-based scenario generation for rare events in their technical material
     bridge.
 
 !!! interview "You have one metric to show the board. What is it?"
-    Interventions per 1,000 km, segmented by scenario tag, plotted over releases,
+    Interventions per 1,000 km, segmented by scenario tag and plotted over releases,
     with phantom-braking events shown separately so a fall in one is not hidden by a
     rise in the other. It is closed-loop, it is what the customer experiences, and
     its segmentation tells you *where* the system is improving. I'd bring the
@@ -943,7 +944,7 @@ simulation-based scenario generation for rare events in their technical material
   accuracy and costs testability, and the gate is whether your closed-loop
   evaluation is strong enough to validate a component you cannot unit-test. State
   the order you would do it in, perception→prediction first, because their
-    interface is the leakiest, and what evidence you would require before each step.
+    interface is the leakiest, and say what evidence you would require before each step.
 - **Batch → real-time everything.** Onboard, the shift is to stateful temporal
   models and multi-rate scheduling; offline, it is to a data engine where a trigger
   deployed on Monday yields a curated dataset on Wednesday and a shadow-mode result

@@ -34,12 +34,12 @@ unit $k$; $b$ is added to *every row* by broadcasting. Applying ReLU gives
 $H = \begin{pmatrix} 3 & 1 \\ 0 & 0 \end{pmatrix}$, example 2 has switched both units off.
 
 This is the whole mental model: a layer is a bank of $d_{out}$ linear "detectors"
-(the columns of $W$), each producing one number per example; the activation decides
-which detectors fire and how strongly. Stacking layers lets detectors in layer 2 be
+(the columns of $W$), each producing one number per example. The activation then
+decides which of them fire, and how strongly. Stacking layers lets detectors in layer 2 be
 built from *combinations of fired detectors* in layer 1, which is why depth buys
 compositional features.
 
-**Why a nonlinearity is not optional.** Two affine layers compose to one:
+**What the nonlinearity buys.** Two affine layers compose to one:
 $(XW_1 + b_1)W_2 + b_2 = X(W_1W_2) + (b_1W_2 + b_2)$. Any depth of purely linear
 layers is one linear map; the model class does not grow. A ReLU between them breaks
 this because $\max(\cdot, 0)$ is not linear, and now the network can represent
@@ -241,7 +241,7 @@ class Sigmoid(Layer):
 ```
 
 ReLU caches a boolean mask, the cheapest possible state. Sigmoid caches its *output*
-because the derivative is expressed in terms of $\sigma$, not $z$; the two-branch
+because the derivative is expressed in terms of $\sigma$, not $z$. The two-branch
 formula avoids `exp(1000)` overflow, which matters once you feed unnormalised logits in.
 
 ```python
@@ -270,7 +270,7 @@ class Softmax(Layer):
 ```
 
 `Softmax.backward` is the vector-Jacobian product of §2.3, never the $K\times K$
-Jacobian. GELU uses the exact normal CDF through `math.erf`; the tanh approximation
+Jacobian. GELU uses the exact normal CDF through `math.erf`. The tanh approximation
 PyTorch offers as `approximate="tanh"` is a speed trade that matters on accelerators,
 not in NumPy.
 
@@ -413,7 +413,7 @@ wrong `axis` in softmax (normalising over the batch instead of over classes) tra
 ## 6. Interview questions and strong answers
 
 !!! interview "Why $XW + b$ and not $Wx + b$? Does it matter?"
-    It is a convention, and it matters for two reasons. Practically, row-major data
+    It is a convention with two consequences. Practically, row-major data
     ($N$ examples as rows) is what NumPy and PyTorch operate on, so $XW$ is the code
     you will write and the shapes you will debug: $(N, d_{in})(d_{in}, d_{out})$.
     Mathematically the gradients transpose: in row convention $dW = X^\top dZ$; in

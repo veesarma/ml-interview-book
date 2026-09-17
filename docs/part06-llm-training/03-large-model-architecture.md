@@ -109,8 +109,8 @@ In practice it is multiplied by a small coefficient ($10^{-2}$) and added to the
 **Capacity and dropping.** With $N$ tokens, $E$ experts and $k$ slots each, the balanced load
 is $Nk/E$ per expert; capacity $= c\cdot Nk/E$ with $c \in [1, 2]$. Tokens beyond capacity
 are dropped for that expert (their contribution is 0 and the residual stream still carries
-$x$). Dropping keeps per-expert tensors static-shaped for the all-to-all; the cost is
-wasted tokens, which the balance loss keeps rare. Dropless MoEs (Mixtral's implementation,
+$x$). Dropping keeps per-expert tensors static-shaped for the all-to-all, at the cost of
+the wasted tokens that the balance loss is there to keep rare. Dropless MoEs (Mixtral's implementation,
 DeepSeek-V3's training) use variable-size grouped GEMMs instead.
 
 **Aux-loss-free balancing (DeepSeek-V3).** Add a per-expert bias $b_i$ to the *selection*
@@ -232,8 +232,8 @@ def load_balancing_loss(probs, indices):
     return E * torch.sum(f * P)
 ```
 
-`f` is built from the hard assignments and carries no gradient; `P` is the differentiable
-router statistic. The layer itself loops over experts explicitly: for each expert,
+`f` is built from the hard assignments and carries no gradient. The differentiable part of
+the loss comes entirely through `P`. The layer itself loops over experts explicitly: for each expert,
 `torch.where(indices == e)` gives the tokens that chose it (and in which of their $k$
 slots), an optional capacity truncates that list, the expert runs on the gathered rows, and
 `index_add_` scatters the gated outputs back. Shared experts run on all tokens and are added
@@ -354,7 +354,7 @@ projections. Trade-off table:
 
 | Method | KV per token per layer | Quality | Retrofit | Used by |
 |---|---|---|---|---|
-| MHA | $2Hd_h$ | reference | – | GPT-3, Llama 1, Llama 2 ≤13B |
+| MHA | $2Hd_h$ | reference | n/a | GPT-3, Llama 1, Llama 2 ≤13B |
 | GQA ($H_{kv}=8$) | $2\cdot 8 d_h$ | ≈MHA | yes (uptrain) | Llama 2 70B, Llama 3, Mistral, Qwen2, Gemma 2 |
 | MQA | $2d_h$ | small loss | yes | PaLM, Falcon, StarCoder |
 | MLA | $d_c + d^R_h$ | ≈MHA (reported better) | no | DeepSeek-V2/V3 |
@@ -405,8 +405,9 @@ in-context retrieval and copying, which hybrids fix by keeping ~1 in 8 layers as
     [DeepSeek-V3 Technical Report](https://arxiv.org/abs/2412.19437).
 
 !!! production "Meta: GQA in Llama 2 70B and Llama 3"
-    Llama 2 used MHA up to 13B and GQA with 8 KV heads at 70B; Llama 3 uses GQA with 8 KV
-    heads at all sizes, including 405B (128 query heads, so a 16× cache reduction). The
+    Llama 2 used MHA up to 13B and switched to GQA with 8 KV heads at 70B. Llama 3 applies
+    GQA with 8 KV heads at every size, including 405B, where 128 query heads give a 16×
+    cache reduction. The
     stated reason is inference scalability: decode batch size at 8k–128k context is set by
     the cache. The Llama 3 paper also masks attention across documents within packed
     sequences (chapter 1).

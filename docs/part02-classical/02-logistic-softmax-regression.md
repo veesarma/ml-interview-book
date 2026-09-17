@@ -68,8 +68,8 @@ $$
 \boxed{\;L(w) = -\frac{1}{N}\sum_{i=1}^{N}\Big[y_i\log\sigma(z_i) + (1-y_i)\log(1-\sigma(z_i))\Big],\quad z = Xw\;}
 $$
 
-*Meaning:* cross-entropy is not a design choice; it is what maximum likelihood gives
-you once you decide the output is a Bernoulli probability. The choice of $\sigma$
+*Meaning:* maximum likelihood hands you cross-entropy as soon as you decide the
+output is a Bernoulli probability. Nobody picked it for aesthetic reasons. The choice of $\sigma$
 follows from asking the log-odds to be linear: $\log\frac{p}{1-p} = z \Leftrightarrow p = \sigma(z)$.
 
 Useful identities: $1 - \sigma(z) = \sigma(-z)$, $\log\sigma(z) = -\log(1+e^{-z}) = -\text{softplus}(-z)$,

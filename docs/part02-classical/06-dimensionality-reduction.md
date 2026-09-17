@@ -217,8 +217,8 @@ def randomized_svd(A, rank, n_oversample=10, n_power_iters=2, seed=0):
     return U[:, :rank], s[:rank], Vt[:rank]
 ```
 
-The QR inside the power loop is not optional: without it $Y$'s columns converge to
-the same top singular vector and lose rank in floating point.
+Keep the QR inside the power loop. Without it, $Y$'s columns all converge to the
+top singular vector and the sketch loses rank in floating point.
 
 **How you'd test it.** `tests/test_classical_pca.py`: `pca_eig` and `pca_svd` agree
 with each other and with `np.linalg.svd` of the centred data (up to sign) to
@@ -349,7 +349,7 @@ classifier.
     and hurts recall; FAISS uses PCA + rotation, sometimes a partial whitening.
 
 !!! interview "What does this t-SNE plot tell us?"
-    Which points are near each other in the original space, and nothing else.
+    Which points are near each other in the original space. That is the whole of it.
     Cluster sizes, gaps and shapes depend on perplexity and initialisation; noise
     can look clustered. Ask what perplexity, whether it was run several times, and
     whether the same structure appears in UMAP with different `n_neighbors`.

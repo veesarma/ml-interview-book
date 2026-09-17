@@ -138,7 +138,7 @@ $$
 with $W_q\in\R^{d_{dec}\times d_a}$, $W_k\in\R^{d_{enc}\times d_a}$, $v\in\R^{d_a}$. This is a
 one-hidden-layer MLP scoring each (query, key) pair. Properties:
 
-* Handles $d_{dec}\neq d_{enc}$ naturally (each side gets its own projection), which matters because
+* Handles $d_{dec}\neq d_{enc}$ naturally (each side gets its own projection). This comes up because
   the encoder is bidirectional ($2d$) and the decoder is not ($d$).
 * Cost $O(T_{src}\,d_a(d_{enc}+d_{dec}))$ per decoder step, and (the practical drawback) the
   $\tanh$ is applied to a $(T_{src}, d_a)$ tensor per step, so it is a sum-then-nonlinearity rather
@@ -514,7 +514,7 @@ caches, which is why beam search is expensive to serve and why chat products use
     manageable number of positions), and an attention decoder spells out characters with no
  independence assumption between them, the key advance over CTC. Reported 14.1% WER on a Google
     voice-search subset without a language model, 10.3% with LM rescoring over the top 32 beams. The
-    trade-off that matters for production: LAS must encode the whole utterance before decoding, so
+    production trade-off: LAS must encode the whole utterance before decoding, so
     it cannot stream, which is why the on-device system in [chapter 1](01-rnn-lstm-gru.md) uses
     RNN-T instead. Source: [Listen, Attend and Spell](https://arxiv.org/abs/1508.01211).
 

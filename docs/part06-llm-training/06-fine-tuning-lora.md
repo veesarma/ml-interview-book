@@ -374,7 +374,7 @@ Check with `python -m pytest tests/test_finetune_lora.py tests/test_finetune_ada
 
 | Method | Frozen base | Trainable | Optimiser+grad | Total state | Fits on |
 |---|---|---|---|---|---|
-| Full FT | – | 7B | ~112 GB | ~126 GB | 2–4×80 GB + ZeRO |
+| Full FT | none | 7B | ~112 GB | ~126 GB | 2–4×80 GB + ZeRO |
 | LoRA | 14 GB | 17M | 0.27 GB | ~14.3 GB | 1×24 GB (with checkpointing) |
 | QLoRA (NF4) | ~3.6 GB | 17M | 0.27 GB | ~3.9 GB | 1×16 GB |
 | Prompt tuning | 14 GB | 0.4M | 0.007 GB | ~14 GB | 1×24 GB |

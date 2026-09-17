@@ -51,7 +51,7 @@ flowchart LR
 - **Personalisation** is a feature set in the stage-2 ranker, gated by query intent:
   a navigational query should not be personalised.
 - **Freshness** is a query property (some queries want the newest) and a document
-  feature; both are learned, not hard-coded.
+  feature. The ranker learns how much weight each one gets.
 - **Evaluation**: NDCG on human-judged sets, offline click metrics with propensity
   correction, then interleaving and A/B on conversions with relevance guardrails.
 - **Evidence**: Airbnb (KDD 2019, KDD 2020, CIKM 2023), Facebook EBR (KDD 2020),
@@ -132,7 +132,8 @@ counters over windows, freshness, price, availability. *Query–document match*:
 per field, exact/partial title match, embedding cosine, learned cross-encoder score
 on the top-k, historical query–document CTR (a very strong and very biased feature).
 *User–document*: personal history matches (previously viewed sellers, price band),
-location distance. Stage-1 gets the cheap ones; stage-2 gets everything.
+location distance. Stage-1 gets the cheap ones. Stage-2 gets everything it can
+afford in its budget.
 
 **Freshness and privacy.** Documents and popularity counters must reach the index
 and the feature store within minutes; query logs are personal data with retention
@@ -306,7 +307,7 @@ WSDM 2017) or use the position-as-feature trick with dropout (Airbnb, KDD 2020):
 position is an input during training, randomly dropped so the model does not lean
 on it, and set to a constant at inference. The
 [feed chapter's figure](01-recommendation-feed-ranking.md#35-position-bias) shows
-the correction; the maths is identical.
+the correction, and the maths is identical.
 
 ### 3.8 Personalisation and freshness
 
@@ -322,8 +323,9 @@ rules, so that A/B tests decide their weight.
 A top-10 of ten near-identical listings loses bookings even if each is individually
 relevant. Airbnb's "Learning To Rank Diversely At Airbnb" (CIKM 2023, arXiv:2210.07774)
 reports moving from scoring listings independently to a formulation that accounts
-for the other listings in the result set, with online booking gains; the cheaper
-version is a greedy re-ranker with a similarity penalty (MMR) or per-attribute caps.
+for the other listings in the result set, with online booking gains. A cheaper
+version of the same idea is a greedy re-ranker with a similarity penalty (MMR) or
+per-attribute caps.
 
 ## 4. Training & serving
 
@@ -618,7 +620,7 @@ representations, and reports online improvements in Etsy search.
     but small). Ranker-as-judge: run the final ranker over the union of old and new
     candidates on a sample and measure what fraction of the top-10 came from the new
     source. Online: A/B the union, and retrain the ranker on the new candidate
-    distribution first, as Facebook's EBR paper recommends, otherwise the ranker
+    distribution first, as Facebook's EBR paper recommends. Otherwise the ranker
     has never seen semantic matches and buries them.
 
 !!! interview "The interviewer says: make it work for a query language you have no labels for."
@@ -638,8 +640,8 @@ representations, and reports online improvements in Etsy search.
 
 !!! interview "Why not one model for retrieval and ranking?"
     Retrieval needs a factorised score to index; ranking needs cross features and
-    interaction. A single cross-encoder cannot index; a single two-tower cannot
-    model "this user, this listing, these dates". The stages also have different
+    interaction. A cross-encoder has no index to build. A two-tower score cannot
+    represent "this user, this listing, these dates". The stages also have different
     label distributions: the retriever sees random negatives, the ranker sees
     impressed negatives, and Facebook's EBR paper shows that mixing them up hurts.
     Where the corpus is small (thousands of documents), I would collapse to one
@@ -679,8 +681,9 @@ representations, and reports online improvements in Etsy search.
 - **Web scale**: sharded inverted indexes with tiered retrieval, learned sparse
   retrieval, distilled cross-encoders on a subset of queries, and query
   understanding as its own large system.
-- **Batch → real-time**: streaming index updates for both lexical and ANN; real-time
-  popularity counters with decay; session-level personalisation features.
+- **Batch → real-time**: streaming index updates for both lexical and ANN, then
+  real-time popularity counters with decay, then session-level personalisation
+  features.
 - **LLM-augmented**: query rewriting and expansion for the tail (offline-cached for
   head queries), synthetic relevance labels validated against raters, LLM judges
   for side-by-side evaluation, generative snippets and answers over retrieved

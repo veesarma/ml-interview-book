@@ -35,14 +35,14 @@
 * **Split conformal:** with exchangeable data, score $s(x,y)$, calibration scores
   $s_1..s_n$ and $\hat q$ the $\lceil (n+1)(1-\alpha)\rceil$-th smallest,
   $C(x) = \{y : s(x,y) \le \hat q\}$ satisfies
- $1-\alpha \le P(Y \in C(X)) \le 1-\alpha+\frac{1}{n+1}$, distribution-free, finite-sample,
+  $1-\alpha \le P(Y \in C(X)) \le 1-\alpha+\frac{1}{n+1}$, distribution-free, finite-sample,
   marginal (not conditional) coverage.
 * OOD scores, larger = more in-distribution: max-softmax (weak), energy
   $T\log\sum_k e^{z_k/T}$ (uses logit magnitude, which softmax throws away), Mahalanobis
   on penultimate features (uses the feature geometry).
 * Shift taxonomy: covariate shift $p(x)$ changes, $p(y|x)$ fixed (fix: importance
   weighting); label shift $p(y)$ changes, $p(x|y)$ fixed (fix: prior correction);
- concept drift $p(y|x)$ changes (fix: retrain, no reweighting can save you).
+  concept drift $p(y|x)$ changes (fix: retrain, no reweighting can save you).
 * FGSM: $x + \epsilon\,\text{sign}(\nabla_x L)$. PGD: iterate with step $\alpha$ and
   project onto the $\epsilon$-ball. Adversarial training solves
   $\min_\theta \E \max_{\delta} L$, costs $k{+}1$ passes per step, and trades clean
@@ -77,7 +77,7 @@ data, do not act on it". (Entropies in nats.)
 disc. Walk away from the data in any direction: the logits grow linearly (ReLU nets are
 piecewise linear, so far away the largest logit dominates), and the softmax saturates to
 1.0. The model is *maximally confident* in regions it has never seen. This is not a bug
-you can prompt away, it is the geometry of the function class, and it is why OOD
+you can prompt away. It is the geometry of the function class, and it is why OOD
 detection needs something other than the softmax.
 
 ![Reliability diagram before and after temperature scaling](../assets/figures/part13_reliability_diagram.png){ width="760" }
@@ -198,11 +198,11 @@ and MCE replaces the weighted sum with a max. **Five pitfalls to name:**
    count, which is why the implementation provides `adaptive_ece`.
 3. **Not a proper scoring rule.** ECE can be gamed: a model that always predicts the base
    rate is perfectly calibrated and completely uninformative (ECE 0, accuracy = majority
- class). Always pair ECE with a proper score, Brier
- $\frac1N\sum(\hat p_i - y_i)^2$ or NLL, which decomposes (Murphy) into
+   class). Always pair ECE with a proper score, Brier
+   $\frac1N\sum(\hat p_i - y_i)^2$ or NLL, which decomposes (Murphy) into
    *calibration* + *refinement*: you want good calibration **and** high refinement.
 4. **Top-label only.** Standard ECE looks at the max probability. A model can have ECE 0
- at the top label and be badly wrong about the runner-up, which is what matters if you
+   at the top label and be badly wrong about the runner-up, which is what matters if you
    are building a prediction *set*.
 5. **Sample size.** ECE has a positive bias that shrinks as $1/\sqrt{N}$ per bin; with
    $N = 1000$ and $B = 15$, a "0.02 ECE" is within noise of 0. Bootstrap it
@@ -238,7 +238,7 @@ random initialisations (and independent data shuffling), average the predictive
 distributions. Why they work, in the order an interviewer wants to hear it:
 
 1. Different inits land in **different loss basins** with genuinely different functions
- off the data manifold, they disagree where there was no data, which is exactly where
+   off the data manifold, they disagree where there was no data, which is exactly where
    you want disagreement. (Random-seed diversity dominates; bagging the data is not
    needed and usually hurts because each member sees less data.)
 2. Averaging probabilities is a **mixture**, not a product: it can only increase entropy
@@ -321,7 +321,7 @@ Read the three consequences out loud in an interview:
   90 %. Fixes: Mondrian/group-conditional conformal (calibrate per group, which restores
   the guarantee within each group at the cost of $n$ per group) and adaptive scores.
 * **The model quality shows up in the set *size*, not the coverage.** A useless model
- still gets 90 % coverage, by returning nearly all classes. So report average set size
+  still gets 90 % coverage, by returning nearly all classes. So report average set size
   (or interval width) next to coverage; that is the metric that improves when the model
   improves.
 * **$\hat q$ can be $+\infty$.** If $\lceil (n+1)(1-\alpha)\rceil > n$, i.e.
@@ -815,8 +815,8 @@ Without labels you can still monitor a lot. Layer them by latency of signal:
 | Delayed labels (chargebacks, human review) | days–weeks | the truth |
 
 **Deployment mechanics.** *Shadow mode*: run the new model on live traffic, serve the old
-one, compare distributions and disagreements, catches integration bugs and drift with
-zero user risk but gives no outcome data. *Canary*: serve 1 % of traffic, watch guardrails
+one, compare distributions and disagreements. It catches integration bugs and drift with
+zero user risk and gives no outcome data. *Canary*: serve 1 % of traffic, watch guardrails
 (latency p99, error rate, safety-flag rate), ramp on a schedule with automatic rollback.
 *A/B*: the decision (see [Evaluation §4.5](02-evaluation.md#45-the-online-bridge-ab-tests-guardrails-interleaving)).
 Alert on **rates of change** and on slice-level drift, not just global means; a global mean
@@ -841,7 +841,7 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
 * **Operational design domain (ODD)**: define where the system is allowed to operate,
   detect leaving it (OOD on the *scene*, not just the object), and degrade.
 * **Triggers and data engine**: log uncertainty-triggered snippets, mine them, label them,
- retrain, the loop that converts field failures into training data.
+  retrain. That loop is what converts field failures into training data.
 * **Validation**: scenario-based testing plus corruption benchmarks plus per-slice metrics
   plus a residual-risk argument. A single mAP number is not a safety case.
 
@@ -849,11 +849,11 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
 
 * **Corruption benchmarks.** ImageNet-C/-P apply 15 corruption types at 5 severities
   (noise, blur, weather, digital) and report mean corruption error normalised to a
- baseline model. The point is that the corruptions are *not* seen in training, 
+  baseline model. The point is that the corruptions are *not* seen in training, 
   training on them turns the benchmark into a training set and voids the measurement.
 * **Natural distribution shift.** ImageNet-R (renditions), ObjectNet (unusual poses and
- backgrounds), ImageNet-A (naturally adversarial), harder and more honest than synthetic
-  noise.
+  backgrounds), ImageNet-A (naturally adversarial). These are harder and more honest than
+  synthetic noise.
 * **Metamorphic / invariance tests.** The prediction should not change under
   transformations that preserve the label (paraphrase, crop, brightness); assert it.
 * **Slice-based evaluation.** Pre-declare slices; fail the build if any critical slice
@@ -893,7 +893,7 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
     **Problem.** Practitioners needed distribution-free uncertainty for already-trained
     black-box models without retraining or Bayesian machinery. **Built/explained.** Split
     conformal: a calibration set, a conformity score, one quantile, and a set-valued
- prediction with a finite-sample marginal coverage guarantee, plus the practical
+    prediction with a finite-sample marginal coverage guarantee, plus the practical
     scores (APS, RAPS for classification, CQR for regression) and the honest caveats
     (marginal not conditional; exchangeability breaks under shift). **Why it matters
     operationally.** It converts "the model is 90 % confident" into "this set contains the
@@ -904,8 +904,8 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
 !!! production "Berkeley: ImageNet-C and the OOD baselines (Hendrycks et al.)"
     **Problem.** Robustness and OOD claims were evaluated ad hoc, so progress was not
     measurable. **Built.** (a) A baseline and benchmark for OOD detection using maximum
- softmax probability with AUROC/AUPR protocols, establishing that softmax is a
-    non-trivial baseline *and* that it is far from sufficient. (b) ImageNet-C/-P: fixed
+    softmax probability with AUROC/AUPR protocols. The paper establishes that softmax is a
+    non-trivial baseline and that it is far from sufficient. (b) ImageNet-C/-P: fixed
     corruption and perturbation suites at controlled severities with a normalised metric,
     explicitly not to be trained on. **Why.** Shared benchmarks turned "our model is
     robust" into a number others can reproduce. Papers: "A Baseline for Detecting
@@ -944,7 +944,7 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
 
 !!! interview "Q1. Your classifier outputs 0.99 for an input from a class it was never trained on. Why, and what do you do?"
     **Answer.** Softmax is shift-invariant, so it discards logit magnitude and only reports
- a *relative* score among known classes, "none of the above" is not in the output
+    a *relative* score among the known classes; "none of the above" is not in the output
     space. For ReLU networks the logits grow linearly far from the data, so confidence
     provably approaches 1 in the far field (Hein et al. 2019). Fixes in order of cost:
     energy score (free, uses the magnitude the softmax threw away), Mahalanobis on
@@ -953,8 +953,8 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
     explicit background/unknown class if you can collect the data. Then wire the score to
     a gate with a measured FPR@95%TPR.
     **Staff follow-up.** "How do you set the threshold without OOD data?" Choose it from
- the in-distribution score distribution, e.g. the 5th percentile on validation, giving
- 95 % in-distribution throughput, and then measure the realised abstention rate in
+    the in-distribution score distribution (say the 5th percentile on validation, which keeps
+    95 % of in-distribution throughput), then measure the realised abstention rate in
     shadow mode. You are budgeting the cost of abstention, which you know, rather than the
     OOD rate, which you do not.
 
@@ -962,12 +962,12 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
     **Answer.** Assume $y \sim \mathcal N(\mu_\theta(x), \sigma^2_\theta(x))$; the negative
     log-likelihood is $\frac12\log\sigma^2 + \frac{(y-\mu)^2}{2\sigma^2}$ plus a constant.
     Predict $s = \log\sigma^2$ for positivity and stability. The gradient with respect to
- $\mu$ is $-(y-\mu)/\sigma^2$, so high-noise examples are down-weighted automatically, 
+    $\mu$ is $-(y-\mu)/\sigma^2$, so high-noise examples are down-weighted automatically, 
     learned loss attenuation. Setting the $s$-gradient to zero gives $\sigma^2 = (y-\mu)^2$,
     so the head learns the local noise; the $\frac12\log\sigma^2$ term prevents the trivial
     solution of infinite variance. It buys robustness to label noise and a per-input
- aleatoric estimate, but *not* epistemic uncertainty, which needs multiple models.
- **Staff follow-up.** "It collapses in training, $\sigma^2$ explodes and $\mu$ stops
+    aleatoric estimate. It gives you no epistemic uncertainty, which needs multiple models.
+    **Staff follow-up.** "It collapses in training, $\sigma^2$ explodes and $\mu$ stops
     learning." Standard fix: warm up with plain MSE for a few epochs, or predict $s$ with a
     clamped range, or use the $\beta$-NLL variant that multiplies the loss by
     $\text{stopgrad}(\sigma^{2\beta})$ to restore gradient scale. The failure is that the
@@ -981,7 +981,7 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
     No assumption on the model or the data distribution. Three caveats: the coverage is
     marginal, not conditional; the model's quality shows up as set *size*, not coverage;
     and you need $n \gtrsim 1/\alpha$ calibration points for the quantile to exist at all.
- **Staff follow-up.** "Deployment data drifts. Does the guarantee survive?" No, 
+    **Staff follow-up.** "Deployment data drifts. Does the guarantee survive?" No, 
     exchangeability breaks. Options: weighted conformal with importance weights if the
     shift is covariate-only and the weights are estimable, adaptive conformal inference
     that updates $\alpha$ online from realised coverage, or periodic recalibration with a
@@ -995,9 +995,9 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
     uncertainty is sensitive to a dropout rate that was tuned for regularisation. The
     counter-argument is cost: $M\times$ training and $M\times$ inference is often impossible
     on an embedded budget. In that case I would use one model with temperature scaling plus
- an OOD score for gating, and get diversity cheaply where I can, test-time
+    an OOD score for gating, and get diversity cheaply where I can: test-time
     augmentation, multi-head or BatchEnsemble-style rank-1 factors, or a snapshot ensemble
- from a cyclic schedule, and I would validate the choice by measuring calibration and
+    from a cyclic schedule. I would validate the choice by measuring calibration and
     AUROC under the shifts I actually expect, not on clean data.
     **Staff follow-up.** "How many members?" Empirically most of the gain arrives by
     $M = 5$ with diminishing returns after; I would measure NLL and ECE under shift as a
@@ -1005,14 +1005,14 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
     actually diverse (pairwise disagreement rate) rather than assuming it.
 
 !!! interview "Q5. ECE dropped from 0.08 to 0.01 after temperature scaling. Is the model better?"
- **Answer.** It is better *calibrated*; it is not more accurate, temperature scaling is
+    **Answer.** It is better *calibrated* and no more accurate. Temperature scaling is
     monotone, so the argmax and every rank-based metric (accuracy, AUC, mAP) are unchanged
     by construction. And ECE alone is a weak claim: it is binning-dependent, biased, and
     not a proper scoring rule, so a model that always predicts the base rate scores 0. I
     would report ECE with the binning scheme and a bootstrap CI, an equal-mass (adaptive)
     ECE as a robustness check, a reliability diagram, and a proper score (Brier or NLL)
     which decomposes into calibration plus refinement. The improvement is real and valuable
- (it makes downstream thresholding and expected-cost decisions correct) but it is a
+    (it makes downstream thresholding and expected-cost decisions correct) but it is a
     different axis from capability.
     **Staff follow-up.** "The model is calibrated on validation and miscalibrated in
     production." Distribution shift: temperature was fitted on a distribution that no
@@ -1022,8 +1022,8 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
 
 !!! interview "Q6. How would you detect that a deployed model has degraded, before labels arrive?"
     **Answer.** Layer the signals by how fast they arrive. First, input validation: schema,
- ranges, null rates, cardinality, most "model degradation" is a broken upstream
-    pipeline. Second, covariate drift: KS or PSI per feature with a multiplicity
+    ranges, null rates, cardinality. Most "model degradation" turns out to be a broken
+    upstream pipeline. Second, covariate drift: KS or PSI per feature with a multiplicity
     correction, plus a classifier two-sample test on embeddings, which catches multivariate
     shifts no marginal shows. Third, output drift: the predicted-label distribution, mean
     confidence, and abstention rate; a label-shift estimator (BBSE) can turn output drift
@@ -1049,8 +1049,8 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
     accuracy is not a safety case.
     **Staff follow-up.** "What would change your mind?" Evidence that the errors are
     independent across time and sensors, a measured and monitored fallback rate, and
- validation on a held-out set that includes the rare conditions, plus a shadow-mode
-    deployment showing the disagreement rate with the incumbent system and what those
+    validation on a held-out set that includes the rare conditions. I would also want a
+    shadow-mode deployment showing the disagreement rate with the incumbent system and what those
     disagreements look like on inspection.
 
 !!! interview "Q8. Is adversarial training worth it for a production vision system?"
@@ -1058,11 +1058,11 @@ For an autonomy stack, the relevant statement is not "the model is 99.9 % accura
     point. It costs $k{+}1$ passes per step (roughly $8$–$10\times$ training) and gives up
     clean accuracy, and the trade-off is fundamental, not an artefact (Tsipras et al.
     2019): robustness discards weakly-predictive features that genuinely carry signal. The
- realistic threat for a perception stack is physical, printed patches, stickers,
- projections, unusual but natural conditions, which an $\ell_\infty$ ball does not
+    realistic threat for a perception stack is physical (printed patches, stickers,
+    projections, unusual but natural conditions), which an $\ell_\infty$ ball does not
     model. I would spend the budget on data diversity, augmentation, corruption
     robustness (ImageNet-C-style), sensor redundancy and OOD gating. Adversarial training
- becomes worth it when there is a real adversary with digital input access, content
+    becomes worth it when there is a real adversary with digital input access, content
     moderation, fraud, malware, watermark evasion.
     **Staff follow-up.** "How would you evaluate robustness if not with PGD?" Corruption
     benchmarks at controlled severities, natural distribution-shift sets, metamorphic
@@ -1082,7 +1082,7 @@ would escalate.
     Member entropies: $0.611, 0.673, 0.647$; mean $= 0.644$. MI $= 0.003 \approx 0$.
     Input B: $\bar p = (0.667, 0.333)$, $H[\bar p] = 0.637$; each member has $H = 0$, so
     mean $= 0$ and MI $= 0.637$. Escalate B: the members disagree *confidently*, which is
- epistemic uncertainty, the model is out of its depth. A is aleatoric: all members
+    epistemic uncertainty, so the model is out of its depth. A is aleatoric: all members
     agree the input is genuinely ambiguous, and escalating it will not help unless a human
     has more information than the sensor.
 
@@ -1134,20 +1134,20 @@ the same predictions, and explain the ordering.
     ECE generally rises with $B$: with few bins, over- and under-confidence inside a wide
     bin cancel; with many bins each estimate is noisy and $|{\cdot}|$ turns noise into
     positive bias. Equal-mass (adaptive) binning puts the same number of points in every
- bin, so no bin is estimated from three examples and the high-confidence region, where
- almost all the mass lives, is resolved properly. Always report $B$ and the scheme.
+    bin, so no bin is estimated from three examples and the high-confidence region (where
+    almost all the mass lives) is resolved properly. Always report $B$ and the scheme.
 
 **★★ Exercise 4.** Your model's training set is 60 % daytime; production traffic is 30 %
 daytime. Labels are unavailable. Classify the shift, propose a correction, and state when
 the correction would make things worse.
 
 ??? success "Solution"
- If $p(y \mid x)$ is genuinely unchanged, a pedestrian looks like a pedestrian given
- the pixels, day or night, this is covariate shift, and importance weighting with
+    If $p(y \mid x)$ is genuinely unchanged (a pedestrian looks like a pedestrian given
+    the pixels, day or night) then this is covariate shift, and importance weighting with
     $w(x) = p_{\text{te}}(x)/p_{\text{tr}}(x)$ (estimated by a day/night domain classifier,
     $\hat d/(1-\hat d)\cdot n_{\text{tr}}/n_{\text{te}}$) gives an unbiased estimate of the
     target risk. It makes things worse when (a) the supports barely overlap, so weights
- explode and the effective sample size $(\sum w)^2/\sum w^2$ collapses, check it, and
+    explode and the effective sample size $(\sum w)^2/\sum w^2$ collapses. Check it, and
     clip; (b) the shift is actually *concept* drift, because night images have different
     label semantics (motion blur, headlight glare change what is recoverable), in which
     case no reweighting of source data recovers the target function and you must collect
@@ -1176,7 +1176,7 @@ that temperature scaling changes the set *sizes* but not the coverage.
         sets = cp.predict_sets(p[c])
         print(name, round(empirical_coverage_sets(sets, y[c].numpy()), 3), round(sets.sum(1).mean(), 2))
     ```
- Coverage is ~0.9 in both cases, that is the guarantee, and it does not care whether
+    Coverage is ~0.9 in both cases. That is the guarantee, and it does not care whether
     the underlying probabilities are calibrated. Set sizes differ, because the conformity
     score $1-\hat p_y$ orders examples differently once the softmax is re-sharpened; a
     better-calibrated score generally yields smaller (more efficient) sets and better
@@ -1197,14 +1197,14 @@ the fallback.
     *Thresholds.* Route to human review when the conformal set has more than one value, or
     when the structural check fails, or when the OOD score falls below its validation 1st
     percentile. Choose the operating point from cost: the cost of a wrong total (financial
- plus trust) against the cost of a review, which sets the target review rate, then
+    plus trust) against the cost of a review, which sets the target review rate, then
     verify the realised review rate in shadow mode before enabling automation.
     *Fallback.* Never guess: return "needs review" with the extracted candidates and the
     cropped image region as evidence. Log every escalation as training data.
     *Monitoring.* Track review rate, post-review correction rate (the proxy for silent
     errors), per-vendor and per-template slices, and realised conformal coverage on the
- reviewed subset, which is a labelled sample you get for free and which will tell you
-    when exchangeability has broken.
+    reviewed subset, a labelled sample you get for free that will tell you when
+    exchangeability has broken.
 
 ## References
 

@@ -43,25 +43,40 @@ def fix_line(line: str) -> tuple[str, bool]:
 
     # 1. headings and admonition titles: the dash introduces a gloss -> colon
     if HEADING.match(line) or ADMONITION.match(line):
-        return re.sub(rf"\s*{DASH}\s*", ": ", line, count=1).replace("::", ":"), False
+        out = re.sub(rf"\s*{DASH}\s*", ": ", line, count=1)
+        out = re.sub(rf"\s*{DASH}\s*", ", ", out)          # any further dashes
+        return re.sub(r"::+", ":", out), False
 
     # 2. table cells: gloss after a verdict -> colon
     if TABLE_ROW.match(line):
-        return re.sub(rf"\s*{DASH}\s*", ": ", line), False
+        out = re.sub(rf"\s*{DASH}\s*", ": ", line)
+        return re.sub(r"::+", ":", out), False
 
     # 3. reference entries: "Title" (year) — [link]  -> "Title" (year). [link]
     if LIST_ITEM.match(line) and "](" in line:
-        return re.sub(rf"\s*{DASH}\s*", ". ", line), False
+        indent = line[: len(line) - len(line.lstrip())]
+        out = re.sub(rf"\s*{DASH}\s*", ". ", line.lstrip())
+        return indent + re.sub(r"\.\s*\.", ".", out).rstrip(), False
 
-    # 4. prose: paired dashes become parentheses, a single dash becomes a comma
-    n = line.count(DASH)
+    # 4. prose: paired dashes become parentheses, a single dash becomes a comma.
+    #    Leading whitespace is preserved verbatim: admonition bodies, list
+    #    continuations and indented blocks all depend on their exact indent.
+    indent = line[: len(line) - len(line.lstrip())]
+    body = line[len(indent) :]
+
+    n = body.count(DASH)
     if n >= 2:
-        out = re.sub(rf"\s*{DASH}\s*(.*?)\s*{DASH}\s*", r" (\1) ", line, count=n // 2)
+        out = re.sub(rf"\s*{DASH}\s*(.*?)\s*{DASH}\s*", r" (\1) ", body, count=n // 2)
     else:
-        out = re.sub(rf"\s*{DASH}\s*", ", ", line, count=1)
+        out = re.sub(rf"\s*{DASH}\s*", ", ", body, count=1)
+
     out = re.sub(r"\s+([,.;:])", r"\1", out)
     out = re.sub(r"[ ]{2,}", " ", out)
-    return out, True
+    # a dash that introduced a link or ended the line leaves a dangling joint
+    out = re.sub(r",\s*$", "", out)
+    out = re.sub(r",\s*(?=\[)", ". ", out)
+    out = re.sub(r"::+", ":", out)
+    return indent + out.rstrip(), True
 
 
 def _rel(p: Path) -> str:

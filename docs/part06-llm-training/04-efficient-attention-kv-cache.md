@@ -124,7 +124,7 @@ Numbers (bf16, $b = 2$):
 | Llama-3-70B (GQA) | 80 | 64 | 8 | 128 | 320 KiB | 1.25 GiB | 40 GiB | 160 GiB |
 | Llama-3-70B if MHA | 80 | 64 | 64 | 128 | 2.5 MiB | 10 GiB | 320 GiB | 1.25 TiB |
 | Llama-3-405B (GQA) | 126 | 128 | 8 | 128 | 504 KiB | ≈2 GiB | 63 GiB | 252 GiB |
-| DeepSeek-V2 (MLA) | 60 | 128 | – | – | 67.5 KiB | 270 MiB | 8.4 GiB | 34 GiB |
+| DeepSeek-V2 (MLA) | 60 | 128 | n/a | n/a | 67.5 KiB | 270 MiB | 8.4 GiB | 34 GiB |
 
 For MLA the per-token cost is $L(d_c + d^R_h)b = 60\cdot 576\cdot 2$ bytes. The
 64-sequence × 8k-token column is the one to remember: a 70B GQA model needs two 80 GB GPUs

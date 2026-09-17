@@ -17,9 +17,9 @@ descent, EM, alternating minimisation, SMO) reappear unchanged in Parts III–VI
 | Chapter | The one thing to be able to derive cold | Code you should be able to write in 20 minutes |
 |---|---|---|
 | [Linear regression](01-linear-regression.md) | Normal equations; ridge shrinkage $s_i^2/(s_i^2+\lambda)$ via SVD; lasso soft-thresholding | OLS, ridge, lasso coordinate descent |
-| [Logistic & softmax regression](02-logistic-softmax-regression.md) | $\nabla_w L = X^T(p - y)$; softmax Jacobian $\to$ $\partial L/\partial z = p - y$ | Stable sigmoid/softmax, GD and Newton fits |
+| [Logistic & softmax regression](02-logistic-softmax-regression.md) | $\nabla_w L = X^T(p - y)$; the Jacobian route to $\partial L/\partial z = p - y$ | Stable sigmoid/softmax, GD and Newton fits |
 | [Trees & ensembles](03-trees-and-ensembles.md) | Newton boosting leaf weight $w^* = -G/(H+\lambda)$; RF variance $\rho\sigma^2 + (1-\rho)\sigma^2/M$ | CART tree, random forest, gradient boosting |
-| [KNN & K-means](04-knn-kmeans.md) | Lloyd as coordinate descent; k-means++ $O(\log k)$ guarantee | Brute-force KNN, kd-tree, k-means++ |
+| [KNN & K-means](04-knn-kmeans.md) | Lloyd as coordinate descent; the $O(\log k)$ seeding guarantee | Brute-force KNN, kd-tree, k-means++ |
 | [Probabilistic models & EM](05-probabilistic-models-em.md) | ELBO / Jensen derivation of EM; GDA $\Rightarrow$ logistic posterior | Naive Bayes, GDA, GMM-EM |
 | [Dimensionality reduction](06-dimensionality-reduction.md) | PCA from variance maximisation *and* reconstruction error; randomized SVD | PCA via eig and SVD, whitening |
 | [Kernel methods & SVMs](07-kernel-methods-svm.md) | Primal $\to$ Lagrangian $\to$ KKT $\to$ dual; kernel ridge $\alpha = (K+\lambda I)^{-1}y$ | Kernel ridge, SMO-lite SVM, Nadaraya–Watson |

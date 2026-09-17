@@ -132,7 +132,7 @@ downward.
 **Biases.**
 
 - *Selection bias in CVR*: conversions are observed only for clicked impressions,
-  which are a biased sample; a CVR model trained on clicks and applied to all
+  which are a biased sample. A CVR model trained on clicks and applied to all
   impressions is miscalibrated on the unclicked majority.
 - *Position and format bias*: the same ad in position 1 vs 5 or as video vs static.
 - *Auction feedback loop*: the model's scores decide which ads get impressions, so
@@ -324,7 +324,7 @@ still does not fit on one host. Options, in the order to mention them:
 - *Hashing* ids into a fixed table ($2^{30}$ rows) with collisions; the collisions
   are noise the model tolerates, and the table size is a knob.
 - *Compositional embeddings* (Shi et al., KDD 2020, arXiv:1909.02107, Facebook):
-  quotient–remainder trick, two small tables indexed by $\lfloor id / m \rfloor$ and
+  quotient-remainder trick: two small tables indexed by $\lfloor id / m \rfloor$ and
   $id \bmod m$, combined by element-wise product, giving unique vectors with
   $O(\sqrt{N})$ memory.
 - *Mixed dimensions*: popular ids get 64 dims, rare ids 8.
@@ -377,8 +377,8 @@ within tolerance) → shadow → canary by traffic slice → full.
 **Serving.** Two-stage within the ads stack: targeting/retrieval (audience
 eligibility, budget availability, policy) yields thousands of ads; a light pre-ranker
 (two-tower or small MLP) cuts to hundreds; the full model scores those in one
-batched GPU (or large-CPU) call; the calibration layer is a lookup; the auction runs
-on the calibrated scores. Budget: ~5 ms retrieval, ~5 ms pre-rank, ~20 ms full model,
+batched GPU (or large-CPU) call. The calibration layer is a table lookup, and the
+auction runs on the calibrated scores. Budget: ~5 ms retrieval, ~5 ms pre-rank, ~20 ms full model,
 ~2 ms calibration + auction, inside a 50 ms slot.
 
 **Hardware and cost.** $5 \times 10^7$ scores/s at peak with a 50M-parameter dense
@@ -482,9 +482,9 @@ did *not* help in their setting.
     Trenches' (KDD 2013) that systematic miscalibration arises from training
     choices and that they added a dedicated calibration stage; the auction
     consumes probabilities, so a 10 % over-prediction on one format silently
-    reprices that format. The alternative is to rely on the loss; the trade-off of
-    a separate layer is one more thing to refit when the model changes, so I'd
-    refit it automatically on the latest matured window with every model push."
+    reprices that format. The alternative is to rely on the loss alone. A separate
+    layer costs one more thing to refit when the model changes, so I'd refit it
+    automatically on the latest matured window with every model push."
 
 ### 7.2 Facebook: "GBDT features, LR on top, and freshness"
 
@@ -543,8 +543,9 @@ arXiv:1909.02107) describes the quotient-remainder trick for shrinking tables.
     shard the tables model-parallel and keep the dense network data-parallel, which
     is the DLRM design Meta published in 2019, and reduce the tables with hashing
     and the quotient-remainder compositional embeddings from their KDD 2020 paper.
-    The alternative is one hashed table that fits; the trade-off is collision noise
-    on the rare ids that carry the most advertiser-specific signal. I'd flip back to
+    The alternative is one hashed table that fits. That buys simplicity and pays
+    for it in collision noise on the rare ids that carry the most
+    advertiser-specific signal. I'd flip back to
     a single hashed table only for a pre-ranker, where the accuracy loss is
     acceptable."
 

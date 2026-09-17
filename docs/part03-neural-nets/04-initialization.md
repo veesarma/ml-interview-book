@@ -401,7 +401,7 @@ are coupled the other way. See [Part I, optimization](../part01-math/06-optimiza
     Init controls *where you start*, not where you end.
 
 !!! interview "Why does GPT-2 scale some weights by $1/\sqrt{2L}$ and not others?"
-Only the matrices that write into the residual stream, attention output
+    Only the matrices that write into the residual stream, attention output
     projection and the MLP down-projection. Each of the $2L$ branches adds an
     (approximately independent, LN-normalised) contribution of variance $\sigma_f^2$, so
     the stream's variance grows as $2L\sigma_f^2$. Scaling those writers by $1/\sqrt{2L}$

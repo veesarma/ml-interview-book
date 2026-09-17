@@ -339,7 +339,7 @@ Retrieval and generation must be scored separately, because they fail separately
 
 RAGAS (Es et al. 2023) formalised faithfulness as: decompose the answer into atomic
 statements, ask a judge whether each is entailed by the context, report the supported
-fraction. Everything in [Evaluation §2.7](02-evaluation.md#27-llm-as-judge-validating-the-judge)
+fraction. Everything in [Evaluation §2.7](02-evaluation.md#27-llm-evaluation)
 about validating judges applies.
 
 ## 3. Implementation
@@ -751,7 +751,7 @@ queries.
 
 !!! production "Anthropic: contextual retrieval (September 2024)"
     **Problem.** Chunks lose their context when embedded in isolation ("revenue grew
- 3 %", whose revenue, which quarter?). **Built.** For each chunk, an LLM (with prompt
+    3 %", whose revenue, which quarter?). **Built.** For each chunk, an LLM (with prompt
     caching to make it affordable) writes a short chunk-specific context using the whole
     document; the context is prepended before computing *both* the embedding and the
     BM25 representation. Results are fused, and a reranker is applied on the top
@@ -825,7 +825,7 @@ queries.
     passages; ANN recall against exact search), generation (faithfulness and answer
     relevance from a judge validated against human labels; citation precision), product
     (task success, escalation rate). When faithfulness drops, first check retrieval
- recall on the same queries, most "hallucinations" are missing context. If retrieval
+    recall on the same queries, most "hallucinations" are missing context. If retrieval
     is fine, check context assembly (truncation, ordering; put the best chunk first and
     last), then the prompt (instruction to abstain), then the model version. Add
     unanswerable queries to the eval so you measure abstention.
@@ -929,7 +929,7 @@ $s$) in place of "$M$ closest" in `HNSW._connect`, and measure recall@10 at `ef 
 each one moves.
 
 ??? success "Solution"
- (1) Recall@5 on the *failing* queries only, if it is far below 0.92 the average
+    (1) Recall@5 on the *failing* queries only. If it is far below 0.92 the average
     hides a slice. (2) Oracle-context experiment: feed the gold passage directly; if
     faithfulness stays at 0.70 the problem is generation, not retrieval. (3) Context
     ordering/truncation: put the top chunk first and check the prompt token budget.

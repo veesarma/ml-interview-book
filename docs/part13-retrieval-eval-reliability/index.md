@@ -38,7 +38,7 @@ Read in this order; the times are for a first careful pass including running the
 3. **Retrieval §2** (similarities, MIPS reduction, BM25, IVF/HNSW/PQ cost models), 90 min.
 4. **Retrieval §4** (the recall / latency / memory table, filtering, long-context vs RAG), 30 min.
 5. **Reliability §2.1–2.4** (heteroscedastic loss, entropy/MI, ECE, temperature scaling,
- split conformal), 75 min.
+   split conformal), 75 min.
 6. **Reliability §2.5–2.7** (OOD scores, shift taxonomy, FGSM/PGD), 45 min.
 7. Run all three test suites and re-derive every boxed equation with the book closed, 60 min.
 

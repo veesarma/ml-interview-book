@@ -230,7 +230,7 @@ Three levels of sophistication, and you should offer them as a ladder:
    fraudulent, age of the oldest account in the component. Cheap, explainable, and
    they capture most of the value. The engineering problem is computing them in
    under ~20 ms, which means a graph store with pre-materialised neighbourhood
-   aggregates rather than an online traversal.
+   aggregates instead of an online traversal.
 2. **Community detection / connected components** run in batch to label rings, with
    the ring label fed back as a feature and as a bulk-action target.
 3. **GNNs** (GraphSAGE-style inductive aggregation over the $k$-hop neighbourhood)
@@ -257,13 +257,13 @@ no labels for days. An unsupervised layer buys time:
   reconstruction error signals "unlike normal". Sensitive to the definition of
   "normal" and prone to flagging rare-but-legitimate behaviour.
 - **Clustering on velocity space**: card-testing attacks appear as tight clusters in
-  (merchant, amount, time) space, often the single most effective novelty detector
+  (merchant, amount, time) space. This is often the most effective novelty detector
   in payments, because attacks are *bursty and repetitive*, not merely rare.
 
 The honest framing: unsupervised detectors have terrible precision at the operating
 points a blocking system needs; their job is to **route to analysts and to trigger
-rules**, not to block. Say that explicitly, it is a common interview trap to propose
-an autoencoder as the primary detector.
+rules**, not to block. Say that explicitly. Proposing an autoencoder as the primary
+detector is a common interview trap.
 
 ### 3.6 The decision policy
 
@@ -364,7 +364,7 @@ first-class design parameter.
 
 - Time-forward backtests only: train on $[t_0, t_1]$, test on $[t_1, t_1 + \Delta]$,
   and report metric decay across $\Delta$ = 1, 2, 4, 8 weeks. A random split in fraud
-  is not a mistake of degree, it is a different (and much easier) problem.
+  is a different problem, and a much easier one.
 - AUPRC, recall at fixed low FPR, precision at the capacity point, dollar-weighted
   recall, and calibration in the decision band.
 - **Counterfactual policy evaluation** on the bleed-through population: estimate the
@@ -379,8 +379,8 @@ first-class design parameter.
 **Online.**
 
 - A/B at the *entity* level (customer or merchant, never transaction) to avoid
-  contamination from velocity features shared across arms, this is a real
-  interference problem: a treatment that blocks the first attempt changes the
+  contamination from velocity features shared across arms. The interference is
+  real: a treatment that blocks the first attempt changes the
   features of the control's second attempt.
 - Guardrails: approval rate, false-decline complaints, review backlog, and the
   dollar-cost metric. Ramp slowly by merchant vertical; fraud effects are
@@ -455,14 +455,13 @@ around them.
 
 !!! tip "How to say it in the interview: network signals beat per-merchant models"
     "I would train one network-wide model rather than a model per merchant, and give
-    merchants control through thresholds and rules rather than through separate
-    models. Stripe describes Radar exactly this way: signals from across the network
+    merchants control through thresholds and rules instead of separate models. Stripe describes Radar exactly this way: signals from across the network
     of businesses feed a single risk model, so a card that just committed fraud at
     another business is already risky at yours, which is the only way a brand-new
-    merchant with no history gets protection on day one. The alternative, a model
-    per large merchant, fits merchant-specific patterns better and is what I would
-    add as a *second* model for the largest accounts, but it cannot see the network
-    and it starves on data for the long tail. The trade-off is that one global model
+    merchant with no history gets protection on day one. The alternative is a model
+    per large merchant. That fits merchant-specific patterns better, and I would add
+    it as a second model for the largest accounts, but it cannot see the network and
+    it starves on data for the long tail. The trade-off is that one global model
     must be calibrated per segment, because a marketplace's normal looks like a
     subscription business's fraud, so I'd fit per-vertical calibration and let
     merchants set their own operating point on the calibrated score."
@@ -493,19 +492,19 @@ industry venues).
 
 !!! tip "How to say it in the interview: graph features before GNNs"
     "I'd add graph signal in two steps rather than going straight to a GNN. Step one
-    is hand-built neighbourhood aggregates, how many distinct cards on this device
-    in 24 hours, what share of this connected component is already labelled fraud,
-    which are cheap, explainable and capture most of the ring signal; step two is
+    is hand-built neighbourhood aggregates: how many distinct cards on this device
+    in 24 hours, what share of this connected component is already labelled fraud.
+    Those are cheap, explainable, and they capture most of the ring signal. step two is
     inductive GNN embeddings computed near-line and cached per entity. The reason
     the GNN goes near-line rather than in the auth path is the 40 ms feature budget:
     a two-hop neighbourhood sample over a graph that changes every second will not
     fit. PayPal and other payment networks have published on graph learning for
-    exactly this problem, linking accounts, devices and funding instruments to
+    exactly this problem: linking accounts, devices and funding instruments to
     catch coordinated rings that look normal per transaction. The trade-off I'd flag
     is the point-in-time trap: if the graph snapshot includes edges created after the
     event, the model trains on the future and the backtest looks spectacular. I'd
-    build the graph snapshot into the feature store rather than reconstructing it in
-    the training job."
+    build the graph snapshot into the feature store, so the training job never has
+    to reconstruct it."
 
 ### 7.3 Uber: "risk across payments, accounts and promotions"
 
@@ -530,14 +529,14 @@ on real-time streaming aggregation for such features.
 !!! tip "How to say it in the interview: one platform, many heads"
     "I'd build one risk platform with shared entity features and a graph, then
     per-vertical models and policies on top, rather than three vertical stacks.
-    Uber's Michelangelo posts describe exactly this shape, one feature platform
-    with consistent offline/online definitions serving many real-time use cases
-    including fraud, and the reason it matters here is that the entities overlap: a
+    Uber's Michelangelo posts describe this shape: one feature platform with
+    consistent offline and online definitions serving many real-time use cases,
+    fraud among them. The entities overlap here. A
     device that farms promo codes today is the device that runs a stolen card
     tomorrow, and separate stacks would never join those. The alternative is
     independent systems per vertical, which ships faster for the first vertical and
-    then duplicates the hardest component, real-time velocity counters with
-    point-in-time correctness, three times. The trade-off is coupling: a shared
+    then duplicates the hardest component three times, namely real-time velocity
+    counters with point-in-time correctness. The trade-off is coupling: a shared
     feature pipeline failure hits all three verticals, so I'd want per-vertical
     graceful degradation and separate on-call ownership of the policies."
 
@@ -553,7 +552,7 @@ trust incidents per million bookings alongside financial loss; appeal overturn r
 as a first-class metric. *Data*: listing content (images, text), host and guest
 history, payment signals, messaging behaviour. *Model*: multimodal risk scoring
 (image and text anomalies for fake listings, payment and graph signals for card
-fraud), feeding a review queue with rich case context rather than auto-blocking.
+fraud), feeding a review queue with rich case context instead of auto-blocking.
 *Serve*: mostly near-line, listings can be scored at creation, bookings at
 authorisation. *Evaluate*: precision at the review capacity, plus overturn rate.
 
@@ -602,9 +601,8 @@ online payment fraud.
     customer's own fraud labels with patterns learned from Amazon's experience,
     which is the transfer-learning argument for buying rather than building at the
     start. What I would still build myself on day one is the *decision layer* and
-    the *label pipeline*, the cost matrix, the review queue, the bleed-through
-    sample and the chargeback join, because those encode business economics no
-    vendor knows, and because they are what makes a later in-house model possible.
+    the *label pipeline*: the cost matrix, the review queue, the bleed-through
+    sample and the chargeback join. Those encode business economics no vendor knows, and because they are what makes a later in-house model possible.
     The flip condition is volume and specificity: once fraud losses exceed roughly
     the cost of a small team and the patterns are domain-specific, an in-house model
     on your own feature platform wins, and the vendor score becomes one feature."
@@ -636,7 +634,7 @@ for why PR curves, not ROC, belong in imbalanced evaluation.
     team can tolerate, dollar-weighted recall, and the total cost curve. I'd also
     report metric decay over weeks since training, because Dal Pozzolo and
     colleagues showed in their 2018 TNNLS work on card fraud that verification
-    latency and concept drift dominate realistic performance, the model that wins a
+    latency and concept drift dominate realistic performance. The model that wins a
     static backtest is often not the one that survives a month in production."
 
 ## 8. Staff-level follow-ups
@@ -644,14 +642,14 @@ for why PR curves, not ROC, belong in imbalanced evaluation.
 !!! interview "Your model blocks a transaction. How do you ever find out it was wrong?"
     Usually you don't, and that is the central design problem. Four sources of
     signal: (1) customer complaints and retries, which are a biased but real
-    indicator of false declines; (2) challenge outcomes, if you step up instead of
-    block, a passed challenge is a label; (3) a deliberately randomised
+    indicator of false declines; (2) challenge outcomes, since a passed step-up is a
+    label; (3) a deliberately randomised
     bleed-through population with a hard dollar cap, which is the only unbiased
     estimate of what the block region contains and which also gives you the
     propensities for counterfactual policy evaluation; (4) analyst adjudication on
     a sample of blocks. I'd spend the bleed-through budget as an *explicit line item*
-    (typically a tiny fraction of volume with a per-transaction amount cap) and
-    argue for it the way you argue for exploration traffic in ranking: without it,
+    (typically a tiny fraction of volume with a per-transaction amount cap) and I
+    would argue for it the way you argue for exploration traffic in ranking: without it,
     the system's recall is unmeasurable and it degrades silently.
 
 !!! interview "How do you set the threshold?"
@@ -703,7 +701,7 @@ for why PR curves, not ROC, belong in imbalanced evaluation.
     scorecard-style model, SHAP-derived reason codes mapped to a fixed, reviewed
     vocabulary, documented performance by segment, and a model card with the
     validation evidence. The unconstrained models, GNN embeddings, sequence
-    encoders, move to the *review-routing* path, where the action is "a human looks
+    encoders. Those move to the *review-routing* path, where the action is "a human looks
     at this", which is not an adverse action. I'd also add a monitored appeals
     channel with overturn rate as a model-quality metric, because regulators look at
     outcomes, not architectures.
@@ -737,8 +735,8 @@ for why PR curves, not ROC, belong in imbalanced evaluation.
     raises cases to analysts and triggers rule investigation, which is how new attack
     signatures get labelled quickly. Once labelled, the supervised model absorbs
     them. The exception is a domain with genuinely no labels at all, a brand-new
-    product, where an unsupervised layer plus analyst review is the bootstrap for
-    building the labelled set.
+    product. There, an unsupervised layer plus analyst review is how you bootstrap
+    the labelled set.
 
 !!! interview "What breaks first at 10× volume?"
     The streaming aggregation layer: velocity counters over many entity keys with
@@ -753,7 +751,7 @@ for why PR curves, not ROC, belong in imbalanced evaluation.
     Three places, none of them in the auth path: summarising a case for an analyst
     (entity history, linked accounts, prior decisions) to cut review time; reading
     unstructured evidence, chat logs, dispute narratives, KYC documents (which is
-    the [OCR chapter](09-ocr-document-understanding.md)), into structured features;
+    the [OCR chapter](09-ocr-document-understanding.md)) into structured features;
     and generating candidate rules or hypotheses from a cluster of new fraud for a
     human to approve. I would not put an LLM in a 100 ms authorisation decision, and
     I would be careful about prompt injection from attacker-controlled text fields

@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 import torch
 
 from mlbook.perception import world_model as wm
@@ -22,25 +23,33 @@ def test_latent_world_model_shapes():
     assert m.decode(z).shape == (3, 4)
 
 
-def _train(seed=0, steps=300):
+@pytest.fixture(scope="module")
+def trained(seed=0, steps=200):
+    """Train the world model once and share it: both tests below only read from it.
+
+    A fixed dataset of 512 trajectories is sampled up front so the training loop is pure
+    torch (no per-step NumPy rollout), which keeps the fixture around a second on CPU.
+    """
     torch.manual_seed(seed)
     np.random.seed(seed)
     env = wm.PointMassDynamics(dt=0.2)
+    s0 = np.random.uniform(-1, 1, size=(512, 4))
+    a_np = np.random.uniform(-1, 1, size=(512, 5, 2))
+    obs_all = torch.tensor(env.rollout(s0, a_np), dtype=torch.float32)  # (512, 6, 4)
+    act_all = torch.tensor(a_np, dtype=torch.float32)  # (512, 5, 2)
     model = wm.LatentWorldModel(4, 2, latent_dim=8, hidden=64)
-    opt = torch.optim.Adam(model.parameters(), lr=3e-3)
-    for _ in range(steps):
-        s0 = np.random.uniform(-1, 1, size=(128, 4))
-        a = np.random.uniform(-1, 1, size=(128, 5, 2))
-        obs = torch.tensor(env.rollout(s0, a), dtype=torch.float32)
-        loss = wm.world_model_loss(model, obs, torch.tensor(a, dtype=torch.float32))
+    opt = torch.optim.Adam(model.parameters(), lr=5e-3)
+    for step in range(steps):
+        idx = torch.randint(0, 512, (128,))
+        loss = wm.world_model_loss(model, obs_all[idx], act_all[idx])
         opt.zero_grad()
         loss.backward()
         opt.step()
     return env, model
 
 
-def test_world_model_loss_trains_to_predict_multi_step_future():
-    env, model = _train()
+def test_world_model_loss_trains_to_predict_multi_step_future(trained):
+    env, model = trained
     s0 = np.random.uniform(-1, 1, size=(64, 4))
     a = np.random.uniform(-1, 1, size=(64, 5, 2))
     obs = torch.tensor(env.rollout(s0, a), dtype=torch.float32)
@@ -51,8 +60,8 @@ def test_world_model_loss_trains_to_predict_multi_step_future():
     assert err < 0.3 * naive
 
 
-def test_cem_planning_reaches_goal_better_than_random_shooting_with_few_samples():
-    env, model = _train()
+def test_cem_planning_reaches_goal_better_than_random_shooting_with_few_samples(trained):
+    env, model = trained
     goal = torch.tensor([1.0, 1.0])
     start = np.array([[0.0, 0.0, 0.0, 0.0]])
 

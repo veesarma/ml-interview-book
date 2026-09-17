@@ -11,7 +11,7 @@
 ## TL;DR: the interview card
 
 * ROC-AUC $= P(s^+ > s^-) + \tfrac12 P(s^+ = s^-)$: a **rank statistic**, invariant to
- class prevalence. That invariance is the bug under heavy imbalance, PR-AUC moves when
+  class prevalence. That invariance is the bug under heavy imbalance, PR-AUC moves when
   your false positives flood the positives, ROC-AUC barely does. Baseline PR-AUC is the
   positive rate $\pi$; baseline ROC-AUC is always 0.5.
 * Choose the threshold from costs, not from 0.5: for a calibrated $p$, predict positive
@@ -873,7 +873,7 @@ preference, not absolute engagement.
     reporting "did the single sample pass" wastes information and under-states capability
     for sampling-based use. **Built.** HumanEval, a hand-written benchmark with hidden
     unit tests, plus the unbiased pass@k estimator computed from $n \gg k$ samples per
- problem, and the explicit note that the naive $1-(1-\hat p)^k$ plug-in is biased.
+    problem, and the explicit note that the naive $1-(1-\hat p)^k$ plug-in is biased.
     **Why.** Unit tests are objective and hard to game; the estimator makes pass@1 and
     pass@100 comparable from one sampling run. Paper: "Evaluating Large Language Models
     Trained on Code", arXiv:2107.03374.
@@ -914,7 +914,7 @@ preference, not absolute engagement.
 ## 6. Interview questions and strong answers
 
 !!! interview "Q1. Your fraud model has ROC-AUC 0.98 and the business says it is unusable. Explain."
- **Answer.** ROC-AUC is $P(\text{score}^+ > \text{score}^-)$, a ranking statistic that
+    **Answer.** ROC-AUC is $P(\text{score}^+ > \text{score}^-)$, a ranking statistic that
     conditions on the true class and is therefore blind to prevalence. At $\pi = 10^{-3}$,
     an FPR of 1 % at TPR 0.9 means 10 false positives for every true positive, so precision
     is about 8 %. I would re-report the PR curve with $\pi$ stated, pick the operating
@@ -958,7 +958,7 @@ preference, not absolute engagement.
 !!! interview "Q4. You want to use an LLM as a judge. How do you know it is any good?"
     **Answer.** Treat it as a classifier and validate it. Collect a stratified human-labelled
     sample (including hard and near-tie cases), compute raw agreement *and* Cohen's
- $\kappa$, and compare against human–human agreement, that is your ceiling. Measure
+    $\kappa$, and compare against human–human agreement, which is your ceiling. Measure
     the known biases explicitly: swap the presentation order and report swap-consistency;
     regress the verdict on response length to quantify verbosity bias; check whether the
     judge prefers its own family. Mitigate with two-order evaluation, a reference answer
@@ -974,7 +974,7 @@ preference, not absolute engagement.
     **Answer.** Not without an interval. The per-model SE is about 2 points, but the right
     analysis is paired: compute per-question differences $d_i$ and bootstrap $\bar d$ using
     the same resampled indices for both models. The covariance between models is high, so
- the paired CI is much narrower than the two marginal CIs suggest, overlapping marginal
+    the paired CI is much narrower than the two marginal CIs suggest, overlapping marginal
     CIs do **not** imply no difference. If the questions come from 50 source documents,
     cluster the bootstrap by document, which will widen the interval. Then check slices and
     guardrails, and if the decision is a product decision, run an online test.
@@ -982,7 +982,7 @@ preference, not absolute engagement.
     benchmark cannot resolve it: either collect more items (variance scales as $1/n$, so
     resolving a 1.3-point difference needs roughly 4× the data if the current half-width
     is 1.5), reduce response sampling noise by averaging $k$ samples per question, or pick
- on a different axis, cost, latency, calibration, worst-slice performance.
+    on a different axis, cost, latency, calibration, worst-slice performance.
 
 !!! interview "Q6. Design the evaluation for an OCR + document-understanding product."
     **Answer.** Three layers. *Component*: detection (precision/recall at IoU 0.5 on text
@@ -1070,7 +1070,7 @@ duplication while AP is not.
     The envelope is $\max$ from the right: 1.0 for $r \le 0.5$, 0.667 for $0.5 < r \le 1$.
     All-point AP $= 0.5\cdot 1 + 0.5 \cdot 0.667 = 0.833$. VOC07: recall points
     $\{0,\dots,0.5\}$ take precision 1 (6 points), $\{0.6,\dots,1.0\}$ take 0.667 (5
- points), giving $(6 + 5\cdot 0.667)/11 = 0.848$, note the 11-point rule is *higher*
+    points), giving $(6 + 5\cdot 0.667)/11 = 0.848$, note the 11-point rule is *higher*
     here because coarse sampling lands favourably. Build the `Detection`/`GroundTruth`
     objects and call `ap_all_points`/`ap_voc07` on the output of
     `precision_recall_from_matches` to confirm.
@@ -1081,7 +1081,7 @@ what would you measure next?
 
 ??? success "Solution"
     Same CER, very different failure modes. B deletes: it is dropping whole regions (a
- detection problem, missed lines, cropped columns), which is catastrophic for field
+    detection problem, missed lines, cropped columns), which is catastrophic for field
     extraction because an absent field cannot be corrected by a reviewer who does not know
     it is missing. A substitutes: characters are wrong but present, so a downstream
     validator (checksum, field format, dictionary) can flag them and a human can fix them
@@ -1113,7 +1113,7 @@ and compare it with `paired_bootstrap_test` on the same data.
     The permutation test assumes exchangeability of the sign of $d_i$ under the null and
     gives an exact p-value; the bootstrap gives a CI for the effect size as well. Report
     the bootstrap CI (effect size is what a decision needs) and use the permutation p-value
- as a cross-check, they should agree closely when $n$ is a few hundred.
+    as a cross-check; the two should agree closely when $n$ is a few hundred.
 
 **★★★ Exercise 6.** You are asked to evaluate a coding agent. Write the eval plan: the
 metrics, the sample size for a 5-point detectable difference, and three ways the plan
@@ -1127,14 +1127,14 @@ could mislead you.
     *Sample size.* For a paired binary comparison with success around 0.4 and a 5-point
     target, the paired SD of $d_i$ is roughly $\sqrt{2p(1-p)(1-\rho)}$; with $\rho \approx 0.5$
     that is $\approx 0.49$, so $n \approx (1.96+0.84)^2(0.49)^2/0.05^2 \approx 750$
- instances, or fewer if you reduce sampling noise by averaging $k$ runs per instance.
+    instances, or fewer if you reduce sampling noise by averaging $k$ runs per instance.
     Say the number *and* the assumption.
     *Three ways it misleads.* (1) Contamination: the fix may be in the model's training
     data (check the repository's commit date against the training cutoff, and test on
     freshly created instances). (2) Environment leakage: the agent may read the test files
     and special-case them; sandbox and check the diff. (3) Success without reliability:
     a 40 % pass@1 agent that succeeds on a different 40 % each run is useless in a
- workflow, which is what pass^k exposes.
+    workflow, which is what pass^k exposes.
 
 ## References
 

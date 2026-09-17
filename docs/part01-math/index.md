@@ -41,7 +41,7 @@ flowchart LR
 | [02 Calculus & matrix calculus](02-calculus-matrix-calculus.md) | Gradients, Jacobians, chain rule, layout conventions | $\nabla_x x^\top A x$; $\nabla_W \|XW-Y\|^2$; full $dQ, dK, dV$ through softmax attention |
 | [03 Probability](03-probability.md) | Distributions, Bayes, Gaussians, conditioning | Gaussian conditioning (the Kalman update); why $p(x)$ is the hard part of Bayes |
 | [04 Statistics](04-statistics.md) | MLE/MAP, bias–variance, A/B tests, bootstrap | L2 = Gaussian prior, L1 = Laplace prior; bias–variance decomposition; power and sample size |
-| [05 Information theory](05-information-theory.md) | Entropy, KL, MI, perplexity | Cross-entropy minimisation = MLE; KL $\ge 0$ by Jensen; forward vs reverse KL |
+| [05 Information theory](05-information-theory.md) | Entropy, KL, MI, perplexity | Cross-entropy minimisation = MLE, KL $\ge 0$ by Jensen, forward vs reverse KL |
 | [06 Optimization](06-optimization.md) | SGD → AdamW, schedules, clipping, conditioning | Adam bias correction; why decoupled weight decay differs from L2; condition number |
 | [07 Tensors, shapes & broadcasting](07-tensor-shapes-broadcasting.md) | The mechanics every coding round tests | Broadcasting rule; einsum term-by-term; heads split/merge; masks; gather |
 
@@ -49,12 +49,12 @@ flowchart LR
 
 Read in this order; each item is 45–60 minutes.
 
-1. **[01 §2](01-linear-algebra.md#2-the-math)**. normal equations, PCA both ways, attention as matrices. Redo the three boxed derivations on paper.
-2. **[02 §2.5–2.6](02-calculus-matrix-calculus.md#2-the-math)**. the attention backward pass. Then run `pytest tests/test_math_calculus.py -k attention_backward -q` and read the test.
-3. **[05 §2](05-information-theory.md#2-the-math)**. cross-entropy = MLE, KL non-negativity, forward vs reverse KL (look at the figure until it is obvious).
-4. **[06 §2–3](06-optimization.md#2-the-math)**. Adam with bias correction, AdamW vs L2, the schedule zoo. Retype `Adam` and `AdamW` from memory.
-5. **[07 shape drill](07-tensor-shapes-broadcasting.md#7-exercises)**. do all drills without running code, then check.
-6. **[04 §5](04-statistics.md#5-in-production)**. how Netflix, Airbnb and Microsoft actually run A/B tests; know CUPED and sequential testing by name.
+1. **[01 §2](01-linear-algebra.md#2-the-math)**: normal equations, PCA both ways, attention as matrices. Redo the three boxed derivations on paper.
+2. **[02 §2.5–2.6](02-calculus-matrix-calculus.md#2-the-math)**: the attention backward pass. Then run `pytest tests/test_math_calculus.py -k attention_backward -q` and read the test.
+3. **[05 §2](05-information-theory.md#2-the-math)**: cross-entropy = MLE, KL non-negativity, forward vs reverse KL. Look at the figure until the asymmetry is obvious.
+4. **[06 §2–3](06-optimization.md#2-the-math)**: Adam with bias correction, AdamW vs L2, the schedule zoo. Retype `Adam` and `AdamW` from memory.
+5. **[07 shape drill](07-tensor-shapes-broadcasting.md#7-exercises-the-shape-drill-set)**: do all drills without running code, then check.
+6. **[04 §5](04-statistics.md#5-in-production)**: how Netflix, Airbnb and Microsoft actually run A/B tests. Know CUPED and sequential testing by name.
 7. Every chapter's **TL;DR card** the morning of the interview.
 
 ## Retype-by-hand targets across Part I

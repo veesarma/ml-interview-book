@@ -1,7 +1,7 @@
 # Information theory
 
 > **Why this matters at staff level.** The loss you minimise is a cross-entropy; the number you
-> report is a perplexity; the penalty that keeps an RLHF policy sane is a KL; the objective that
+> report is a perplexity. A KL penalty is what keeps an RLHF policy near its reference, and the objective that
 > trains CLIP is a mutual-information bound; the argument for why a 7B model "knows" what it knows
 > is a bits-per-parameter count. Interviewers use information theory to check whether you
 > understand *what the numbers mean*, why cross-entropy is maximum likelihood, why KL is
@@ -436,7 +436,7 @@ training shards the similarity matrix across devices.
 ??? success "Solution"
     $H(p) = -(0.7\log_2 0.7 + 3\times0.1\log_2 0.1) = 0.360 + 0.997 = 1.357$ bits. $H(p, q) = \log_2 4 = 2$. $\KL(p\|q) = 2 - 1.357 = 0.643$. $\KL(q\|p) = \tfrac14[\log_2\frac{0.25}{0.7} + 3\log_2\frac{0.25}{0.1}] = \tfrac14[-1.485 + 3.966] = 0.620$ bits. (The intuition section's rounded values differ slightly; these are exact to three decimals.)
 
-**★ 2.** Show that $I(X; Y) = H(X) + H(Y) - H(X, Y)$ and that $I(X; X) = H(X)$.
+**★ 2.** Show that $I(X;Y) = H(X) + H(Y) - H(X, Y)$ and that $I(X;X) = H(X)$.
 
 ??? success "Solution"
     $I = \sum p(x,y)\log\frac{p(x,y)}{p(x)p(y)} = \sum p(x,y)[\log p(x,y) - \log p(x) - \log p(y)] = -H(X,Y) + H(X) + H(Y)$. With $Y = X$: $H(X, X) = H(X)$, so $I = H(X)$, a variable carries all of its own entropy as information about itself.
@@ -468,7 +468,7 @@ training shards the similarity matrix across devices.
 **★★★ 6.** Prove that InfoNCE's optimal critic is $f^\star(a, b) = \log\frac{p(b|a)}{p(b)} + c(a)$, and explain why the bound cannot exceed $\log N$.
 
 ??? success "Solution"
-    For fixed $a$ the InfoNCE loss is a categorical cross-entropy over which of the $N$ candidates is the positive; the posterior probability that candidate $i$ is the positive is $\frac{p(b_i|a)/p(b_i)}{\sum_j p(b_j|a)/p(b_j)}$ (Bayes: the positive is drawn from $p(b|a)$, negatives from $p(b)$). The cross-entropy is minimised when the softmax of $f$ equals this posterior, i.e. $e^{f(a,b)} \propto p(b|a)/p(b)$, so $f^\star = \log\frac{p(b|a)}{p(b)} + c(a)$. The loss can never be below 0, so $\log N - \mathcal L \le \log N$: with $N$ candidates, correctly identifying the positive conveys at most $\log N$ nats regardless of how much information $a$ and $b$ actually share.
+    For fixed $a$ the InfoNCE loss is a categorical cross-entropy over which of the $N$ candidates is the positive. By Bayes, the posterior probability that candidate $i$ is the positive is $\frac{p(b_i|a)/p(b_i)}{\sum_j p(b_j|a)/p(b_j)}$ (the positive is drawn from $p(b|a)$, negatives from $p(b)$). The cross-entropy is minimised when the softmax of $f$ equals this posterior, i.e. $e^{f(a,b)} \propto p(b|a)/p(b)$, so $f^\star = \log\frac{p(b|a)}{p(b)} + c(a)$. The loss can never be below 0, so $\log N - \mathcal L \le \log N$: with $N$ candidates, correctly identifying the positive conveys at most $\log N$ nats regardless of how much information $a$ and $b$ actually share.
 
 **★★★ 7 (coding).** Implement `reverse_kl_estimators(logp_theta, logp_ref)` returning both the naive per-sample estimate $\log\pi_\theta - \log\pi_{\text{ref}}$ and the estimator $r - \log r - 1$ with $r = \pi_{\text{ref}}/\pi_\theta$, on samples from $\pi_\theta$. Simulate two categorical distributions, draw 10,000 samples, and compare each estimator's mean and standard deviation to the exact `kl_divergence(pi_theta, pi_ref)`.
 

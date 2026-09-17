@@ -15,11 +15,11 @@
 - **Matmul batching:** `A @ B` treats all but the last two dims as batch and broadcasts them. `(B,H,T,d) @ (B,H,d,T) → (B,H,T,T)`. `(1,H,d,d)` weights broadcast over the batch for free.
 - **Reshape vs transpose:** `reshape/view` reinterpret the *linear buffer* (row-major order preserved); `transpose/permute` change strides without moving data. `view` requires contiguity; `reshape` copies if needed. After a transpose you need `.contiguous()` before `.view()`.
 - **Heads:** `(B,T,d_model) → view(B,T,H,d_head) → transpose(1,2) → (B,H,T,d_head)`; back: `transpose(1,2) → contiguous → view(B,T,d_model)`. Never `view(B,H,T,d_head)` directly, that interleaves tokens and heads.
-- **einsum:** repeated index = contract (sum over it); index in output = keep. `"bhtd,bhsd->bhts"` = for each batch and head, dot query $t$ with key $s$ over $d$.
+- **einsum:** a repeated index is contracted (summed over), and any index kept in the output survives. `"bhtd,bhsd->bhts"` = for each batch and head, dot query $t$ with key $s$ over $d$.
 - **Gather:** `take_along_axis(log_probs, targets[:,:,None], axis=-1)[:,:,0]` → `(B,T)` token log-probs. The index tensor must have the same rank as the source.
 - **One-hot:** `(targets[:,None] == arange(K)[None,:])` → `(N,K)`. In practice never materialise it for cross-entropy, index instead.
 - Cost of a copy: a `(B,H,T,d)` `.contiguous()` at $B{=}8, H{=}32, T{=}4096, d{=}128$ in bf16 moves 8 GB through HBM. Shape bugs are correctness problems; shape *copies* are performance problems.
-- Cross-link: the drills here feed [Part XVI. shape & broadcasting drills](../part16-coding-canon/02-shape-drills.md) and the [NumPy ↔ PyTorch cheat sheet](../part16-coding-canon/01-numpy-torch-cheatsheet.md).
+- Cross-link: the drills here feed [Part XVI: shape & broadcasting drills](../part16-coding-canon/02-shape-drills.md) and the [NumPy ↔ PyTorch cheat sheet](../part16-coding-canon/01-numpy-torch-cheatsheet.md).
 
 ## 1. Intuition first
 
@@ -385,7 +385,7 @@ $O(T^2)$ attention memory that FlashAttention exists to avoid ([Part VI](../part
 | Situation | Choice | Rule |
 |---|---|---|
 | Reordering axes for a matmul | `transpose`/`permute` | Free; do not `contiguous` unless a `view` follows |
-| Splitting/merging the feature axis | `reshape`/`view` | Free when contiguous; the head-split direction always is |
+| Splitting/merging the feature axis | `reshape`/`view` | Free when contiguous, which the head-split direction always is |
 | A contraction with three or more index groups | `einsum` (with the string explained) | Clearer than a transpose chain |
 | A plain batched matmul | `@` | Do not reach for einsum to write a matmul |
 | Picking one logit per position | `gather`/`take_along_axis` | Never one-hot at vocab scale |
@@ -613,7 +613,7 @@ time. Verify against `cross_entropy_from_logits` and report the peak extra memor
 changed their throughput by 20% with identical outputs. Give two plausible mechanisms and how you would confirm.
 
 ??? success "Solution"
-    (1) **Layout/kernel selection**: `einsum` may lower to a different contraction path or insert a transpose/copy to reach a BLAS-friendly layout, whereas `@` on a strided view may hit a batched-GEMM kernel directly (or vice versa, which direction wins depends on the backend and dtype). (2) **Fusion boundaries**: under `torch.compile`/XLA, one form may fuse with the neighbouring scale and mask while the other creates a materialised intermediate, changing HBM traffic rather than FLOPs. Confirm by profiling (`torch.profiler`, Nsight) and looking at the kernel names and the bytes moved, not the FLOPs; check `.is_contiguous()` and strides on the inputs; and test both at several shapes, since the winner typically flips with $T$ and $d_{\text{head}}$.
+    (1) **Layout/kernel selection**: `einsum` may lower to a different contraction path or insert a transpose/copy to reach a BLAS-friendly layout, whereas `@` on a strided view may hit a batched-GEMM kernel directly (or vice versa, which direction wins depends on the backend and dtype). (2) **Fusion boundaries**: under `torch.compile`/XLA, one form may fuse with the neighbouring scale and mask while the other creates a materialised intermediate, changing HBM traffic rather than FLOPs. Confirm by profiling (`torch.profiler`, Nsight) and looking at the kernel names and the bytes moved, not the FLOPs; check `.is_contiguous()` and the strides on both inputs, then measure at several shapes, since the winner typically flips with $T$ and $d_{\text{head}}$.
 
 ## References
 

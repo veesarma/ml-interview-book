@@ -299,7 +299,7 @@ top-$k$/top-$p$ filtering first is both a quality and a cost decision. Monte Car
 
 | Question | Reach for | Rule |
 |---|---|---|
-| Model a binary outcome / rate | Bernoulli, Beta posterior | Conjugate; posterior mean $\frac{a+s}{a+b+n}$ |
+| Model a binary outcome / rate | Bernoulli, Beta posterior | Conjugate, with posterior mean $\frac{a+s}{a+b+n}$ |
 | Counts per unit time/space | Poisson (or negative binomial if variance $>$ mean) | Check overdispersion first |
 | Continuous target with symmetric noise | Gaussian (MSE) | Heavy tails → Laplace (L1) or Student-t |
 | Tracking / fusing noisy sensors | Gaussian conditioning (Kalman) | Linear-Gaussian assumptions; else EKF/UKF/particles |
@@ -323,7 +323,7 @@ top-$k$/top-$p$ filtering first is both a quality and a cost decision. Monte Car
     logged data only contains the artwork that was shown (selection bias), so offline supervised training is
     confounded; a bandit that randomises with propensities makes unbiased offline evaluation (replay / IPS)
     possible. *Cost:* deliberate exploration on live traffic, mitigated by contextual models that explore mostly
-    where uncertainty is high. Thompson sampling is one of the policies discussed; the exact policy per surface
+    where uncertainty is high. Thompson sampling is one of the policies discussed, though the exact policy per surface
     is not disclosed.
 
 !!! production "Kalman filters in multi-object tracking (SORT / DeepSORT / AB3DMOT)"
@@ -346,7 +346,7 @@ top-$k$/top-$p$ filtering first is both a quality and a cost decision. Monte Car
 !!! production "VAEs: the ELBO as a training objective"
     D. Kingma & M. Welling, "Auto-Encoding Variational Bayes", ICLR 2014 (arXiv:1312.6114). The encoder outputs
     $(\mu, \log\sigma^2)$ of a diagonal Gaussian $q(z\mid x)$; the reparameterisation $z = \mu + \sigma\odot\epsilon$ makes
-    the Monte Carlo ELBO estimate differentiable; the KL to the $\mathcal N(0, I)$ prior has the closed form
+    the Monte Carlo ELBO estimate differentiable. Its KL to the $\mathcal N(0, I)$ prior has the closed form
     implemented in [chapter 05](05-information-theory.md) (`gaussian_kl`). Stable Diffusion's latent space is a
     VAE trained this way (with a tiny KL weight). Details in [Part IX](../part09-generative/01-autoencoders-vae.md).
 

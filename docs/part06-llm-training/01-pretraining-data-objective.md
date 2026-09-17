@@ -142,6 +142,14 @@ $k=128$, $b=16$, $r=8$ the threshold is $\approx 0.71$. Everything below is almo
 candidate, everything above almost always is, and the number of comparisons is the number of
 band collisions, not $\binom{n}{2}$.
 
+![LSH banding S-curve and MinHash estimation error](../assets/figures/part06_dedup_lsh.png){ width="720" }
+
+*Left: the candidate probability for four banding choices, with the 0.5 crossing marked.
+Fewer bands of more rows shifts the threshold up and sharpens the curve, so you tune
+$(b, r)$ to the similarity you call a duplicate. Right: the Jaccard estimate's error against
+the $1/\sqrt{k}$ prediction, measured with the `MinHash` class in this chapter; 128
+permutations put the typical error near 0.02.*
+
 ### 2.4 Decontamination
 
 An evaluation example is contaminated if it shares a sufficiently long $n$-gram with the
@@ -296,8 +304,8 @@ Check with `python -m pytest tests/test_llm_data.py -q` (each symbol above has i
 15T-token dataset is ~45 TB of text. Dedup is a distributed shuffle keyed on band hashes;
 FineWeb reports that deduplicating each snapshot *independently* beat global dedup across
 snapshots, because global dedup preferentially removed the well-formed pages that appear in
-many crawls and kept the long tail of junk. That is a good example of a pipeline stage whose
-"obviously correct" version made the model worse until ablated.
+many crawls and kept the long tail of junk. The version everyone expects to be better made
+the model worse, and only the ablation revealed it.
 
 **Token accounting.** English web text is roughly 4 characters per token with a 32k–128k BPE
 vocabulary; code and non-Latin scripts are worse. "15T tokens" therefore depends on the
@@ -415,8 +423,8 @@ cost but makes the output softmax and embedding matrices larger.
 !!! interview "Why mask attention across packed documents if GPT-2 didn't?"
     Attention to an unrelated previous document is noise the model must learn to ignore;
     it costs attention FLOPs and slows long-context learning because the effective context
-    statistics are wrong. Llama 3 reports it matters for long sequences. The cost of masking
-    is a block-diagonal mask in the kernel, which FlashAttention-style kernels support.
+    statistics are wrong, which Llama 3 reports costs them on long sequences. The price of
+    masking is a block-diagonal mask in the kernel, which FlashAttention-style kernels support.
     **Staff follow-up:** *Position ids?* Restart per document, otherwise RoPE distances
     between a document's tokens depend on where it was packed.
 

@@ -133,8 +133,8 @@ falls by roughly the average drop rate, the paper's twin claims are shorter trai
 *and* better test error.
 
 The standard schedule is linear decay with depth, $p_\ell = \frac{\ell}{L}p_L$: early
-blocks build features everything depends on and are rarely dropped, late blocks are
-increasingly redundant. Modern vision recipes set $p_L$ by model size, because deeper
+blocks build the features later blocks read, so they are rarely dropped; late blocks
+are more redundant and can take a higher rate. Modern vision recipes set $p_L$ by model size, because deeper
 and wider models need more of it.
 
 ### 2.3 Label smoothing: the derivation that matters
@@ -638,7 +638,7 @@ utilisation" cause.
     you ship on.
 
 !!! interview "Why do L2 and weight decay differ for Adam but not for SGD?"
-For SGD, $w - \eta(g + \lambda w) = (1-\eta\lambda)w - \eta g$, the same update. For
+    For SGD, $w - \eta(g + \lambda w) = (1-\eta\lambda)w - \eta g$, the same update. For
     Adam, folding $\lambda w$ into the gradient means the penalty is passed through the
     moment estimates and then divided by $\sqrt{\hat v}$, so a parameter with large
     historical gradients is decayed *less* and one with tiny gradients is decayed
@@ -701,8 +701,8 @@ For SGD, $w - \eta(g + \lambda w) = (1-\eta\lambda)w - \eta g$, the same update.
     $y = x + f(x)$ at eval. In effect it regularises *depth*: the network is trained as
     an ensemble of shallower networks, which both shortens training (dropped blocks do
     no work) and improves test error, per Huang et al. The rate is usually scheduled
-    linearly with depth, $p_\ell = \frac{\ell}{L}p_L$, because early blocks carry
-    features everything depends on. **Staff follow-up:** why is it preferred over
+    linearly with depth, $p_\ell = \frac{\ell}{L}p_L$, because early blocks carry the
+    features every later block reads. **Staff follow-up:** why is it preferred over
     dropout in modern vision transformers? It targets the thing that is actually
     over-parameterised (depth), it interacts cleanly with LayerNorm (unlike dropout
     before BatchNorm), and it reduces rather than increases training cost.
@@ -714,8 +714,8 @@ For SGD, $w - \eta(g + \lambda w) = (1-\eta\lambda)w - \eta g$, the same update.
 expected activations, and explain why every framework chose inverted.
 
 ??? success "Solution"
-Naive: $\E[y_{\text{train}}] = (1-p)x$, and test uses $(1-p)x$, matched. Inverted:
-$\E[y_{\text{train}}] = x$, and test uses $x$, also matched. Inverted is preferred
+    Naive: $\E[y_{\text{train}}] = (1-p)x$, and test uses $(1-p)x$, matched. Inverted:
+    $\E[y_{\text{train}}] = x$, and test uses $x$, also matched. Inverted is preferred
     because the *inference* path is then independent of $p$: no per-layer rescale to
     apply or export, nothing to change when $p$ is annealed or set per layer, and
     toggling train/eval cannot silently change the activation scale.

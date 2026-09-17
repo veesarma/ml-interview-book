@@ -74,7 +74,8 @@ def main() -> None:
     axes[2].set_ylabel("distortion: mean squared error (log scale)")
     axes[2].set_title("Rate-distortion: the decoder variance picks the point", fontsize=10)
     axes[2].axvline(1.7918, color="#888888", linestyle=":", linewidth=1.0)
-    axes[2].text(1.85, mses[0], "log 6 nats:\nenough to name\nthe mode", fontsize=7.5, color="#555555")
+    axes[2].text(0.30, 0.45, "log 6 = 1.79 nats:\nenough to name the mode", transform=axes[2].transAxes,
+                 fontsize=7.5, color="#555555")
 
     for ax in axes:
         ax.grid(alpha=0.25, linewidth=0.5)

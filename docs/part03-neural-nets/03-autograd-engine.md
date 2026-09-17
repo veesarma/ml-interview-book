@@ -24,8 +24,8 @@
 
 Chapter 2 wrote a `backward` per *layer* and a hand-ordered loop. An autograd engine
 pushes that one level down: a `backward` per *primitive op* (add, mul, matmul, exp,
-…) and an *automatic* ordering. The user writes only the forward expression; the
-engine records the graph as a side effect of evaluating it.
+…) and an *automatic* ordering. The user writes only the forward expression. Evaluating it
+builds the graph as a side effect.
 
 Take $L = \sum \big(\mathrm{relu}(XW + b)\big)$. Evaluating this with our `Tensor` produces
 four nodes in order: `t1 = X @ W`, `t2 = t1 + b`, `t3 = t2.relu()`, `L = t3.sum()`.
@@ -91,8 +91,8 @@ axis that is 1 in $s$ but not in $s'$.
 **`log_softmax` VJP.** $\ell_k = a_k - \log\sum_j e^{a_j}$, so
 $\partial \ell_k/\partial a_i = 1[i=k] - p_i$. For upstream $\bar\ell$:
 $\bar a_i = \sum_k \bar\ell_k(1[i=k] - p_i) = \bar\ell_i - p_i\sum_k \bar\ell_k$. With
-$\bar\ell = -\mathrm{onehot}(y)/N$ this gives $(p - y)/N$, the fused cross-entropy
-gradient falls out of two primitives.
+$\bar\ell = -\mathrm{onehot}(y)/N$ this evaluates to $(p - y)/N$, so two primitives are
+enough to express the fused cross-entropy gradient.
 
 **Correctness of the traversal.** Let $v_1, \dots, v_n$ be a topological order of the
 DAG with $v_n$ the root. Claim: after processing $v_n, v_{n-1}, \dots, v_{k+1}$, the
@@ -404,7 +404,7 @@ faster, more predictable programs on TPUs/GPUs, at the cost of purity constraint
     (scatter-add), and weight tying in language models.
 
 !!! interview "What breaks if you forget the topological sort and just run closures in reverse creation order?"
-Nothing, *if* creation order was topological, which eager execution guarantees,
+    Nothing, *if* creation order was topological, which eager execution guarantees,
     since an op cannot run before its inputs exist. It breaks when nodes are
     created but wired out of order (graph rewriting, lazy construction), or when you
     want to start backward from a node that is not the last created. The sort also

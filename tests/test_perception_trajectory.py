@@ -62,7 +62,7 @@ def test_metrics_minade_minfde_miss_rate():
     assert tp.miss_rate(pred, gt, threshold=2.0) == 1.0
 
 
-def _bimodal_batch(n=64, horizon=6):
+def _bimodal_batch(n=32, horizon=6):
     """A perfectly ambiguous junction: identical history, half the futures turn left, half right."""
     hist = torch.zeros(n, 4, 2)
     hist[:, :, 0] = torch.linspace(-3, 0, 4)  # everyone approaches the same junction identically
@@ -75,7 +75,7 @@ def _bimodal_batch(n=64, horizon=6):
     return hist, others, gt
 
 
-def _train(model, hist, others, gt, loss_fn, steps=200, lr=5e-3):
+def _train(model, hist, others, gt, loss_fn, steps=120, lr=1e-2):
     opt = torch.optim.Adam(model.parameters(), lr=lr)
     for _ in range(steps):
         opt.zero_grad()

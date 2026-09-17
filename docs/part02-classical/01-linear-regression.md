@@ -366,9 +366,8 @@ interpretability, monotonicity guarantees, or a regulator-friendly model → lin
     per-coordinate adaptive learning rates with the sparsity of L1 regularisation so
     that most of the billions of weights are exactly zero and need not be stored.
     *Rejected alternative:* plain online gradient descent with L1, which produces far
-    fewer exact zeros for the same accuracy. *Why it matters here:* it is the
-    coordinate-wise soft-thresholding of §2.6 applied one example at a time at
-    planetary scale. Source: McMahan et al., "Ad Click Prediction: a View from the
+    fewer exact zeros for the same accuracy. The update rule is the coordinate-wise
+    soft-thresholding of §2.6, applied one example at a time at planetary scale. Source: McMahan et al., "Ad Click Prediction: a View from the
     Trenches", KDD 2013.
     [research.google](https://research.google/pubs/ad-click-prediction-a-view-from-the-trenches/).
 
