@@ -201,6 +201,10 @@ LINK_TARGET = re.compile(r"\]\([^)]*\)")
 HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
 # the mandated chapter opener is a structural affordance, not rhetorical padding
 EXEMPT_LINE = re.compile(r"^\s*>\s*\*\*Why this matters at staff level")
+TABLE_ROW = re.compile(r"^\s*\|")
+# Clause-shape rules read a table row as prose: "| Part VI ...; Part VII ... |"
+# looks like mirrored symmetry but is a list of cells. Skip them for those rules.
+CLAUSE_RULES = {"MCS", "AE", "CR"}
 
 COMPILED = [
     (code, name, re.compile(rx, re.I), sev, budget, fix)
@@ -233,7 +237,10 @@ def check_file(path: Path):
     words = sum(len(l.split()) for _, l in lines) or 1
     errors, density = [], defaultdict(list)
     for lineno, line in lines:
+        is_table = bool(TABLE_ROW.match(line))
         for code, name, rx, sev, budget, fix in COMPILED:
+            if is_table and code in CLAUSE_RULES:
+                continue
             for m in rx.finditer(line):
                 hit = (lineno, code, name, m.group(0).strip()[:60], fix)
                 (errors if sev == ERROR else density[code]).append(hit)
@@ -241,7 +248,9 @@ def check_file(path: Path):
     for code, hits in density.items():
         budget = next(b for c, _, _, _, b, _ in COMPILED if c == code)
         per_k = 1000.0 * len(hits) / words
-        if per_k > budget:
+        # A single occurrence is never a reflex, and on a short file one hit can
+        # exceed any per-1000-word budget. Require a repeat before failing.
+        if len(hits) >= 2 and per_k > budget:
             over.append((code, hits, per_k, budget))
     return errors, over, words
 

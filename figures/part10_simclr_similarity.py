@@ -55,9 +55,10 @@ def main() -> None:
         axes[1].bar(np.arange(2 * B) + (0.2 if t == 0.1 else -0.2), p, width=0.4,
                     color=c, label=f"temperature {t}")
     axes[1].axvline(B, color="black", linestyle=":", linewidth=1.0)
-    axes[1].text(B + 0.15, 0.85, "the positive", fontsize=8, color="#555555")
+    axes[1].text(0.55, 0.95, "dotted line: the positive", transform=axes[1].transAxes,
+                 fontsize=8, color="#555555")
     axes[1].set_xlabel("candidate index"); axes[1].set_ylabel("softmax probability")
-    axes[1].set_title("Anchor 0: a cold temperature concentrates\nall the gradient on the hardest negatives", fontsize=10)
+    axes[1].set_title("Anchor 0: a cold temperature puts nearly all the mass\non the positive and the single hardest negative", fontsize=10)
     axes[1].legend(fontsize=8, frameon=False)
 
     # loss against batch size at fixed embedding quality, and the chance level

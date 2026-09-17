@@ -188,7 +188,7 @@ minutes so you can retrain often, supports **monotonic constraints** (risk must 
 decrease as velocity increases, valuable both for robustness and for regulators),
 and yields per-feature attributions (SHAP) that become reason codes.
 
-The loss is weighted binary cross-entropy,
+The loss is weighted binary cross-entropy:
 
 $$
 \mathcal{L} = -\sum_i \Bigl[ v_i\, y_i \log \hat p_i + (1 - y_i)\log(1 - \hat p_i)\Bigr],

@@ -179,7 +179,7 @@ for the index families).
 
 *The objective.* Treat retrieval as extreme multiclass classification over the corpus
 (Covington et al., RecSys 2016): the probability that user $u$ engages with item $i$
-is a softmax over all items,
+is a softmax over all items:
 
 $$
 P(i \mid u) = \frac{\exp(s(u,i))}{\sum_{j \in \mathcal{C}} \exp(s(u,j))}, \qquad

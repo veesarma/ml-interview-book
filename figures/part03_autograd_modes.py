@@ -29,7 +29,7 @@ loss.backward()
 
 rank = {id(t): i for i, t in enumerate(order)}
 nodes = [  # (tensor, label, column, row)
-    (x, "x", 0, 1.9), (w, "w", 0, 0.75), (b, "b", 0, -0.4),
+    (x, "x", 0, 1.9), (w, "w", 0, 0.75), (b, "b", 0, -0.35),
     (m, "m = x * w", 1, 1.3), (z, "z = m + b", 2, 0.75),
     (h, "h = relu(z)", 3, 0.75), (loss, "L = h.sum()", 4, 0.75),
 ]
@@ -61,11 +61,11 @@ for t, label, c, r in nodes:
     ax.text(c - 0.31, r + 0.31, f"#{rank[id(t)]}", fontsize=6.5, color="#374151")
 ax.text(-0.45, 2.45, "blue = forward value and order  #i;   red = .grad after loss.backward()",
         fontsize=8, color="#374151")
-ax.text(-0.45, -0.95, "relu kills element 1, so its gradient is 0 all the way back to x and w;\n"
+ax.text(-0.45, -1.15, "relu kills element 1, so its gradient is 0 all the way back to x and w;\n"
                       "b was broadcast over 2 elements, so its gradient is the sum of both.",
         fontsize=8, color="#374151")
 ax.set_xlim(-0.5, 4.5)
-ax.set_ylim(-1.15, 2.6)
+ax.set_ylim(-1.6, 2.6)
 ax.axis("off")
 ax.set_title("One run of the engine: values forward, gradients back", fontsize=9)
 

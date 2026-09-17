@@ -31,11 +31,11 @@
   VLM "System 2" for reasoning and a diffusion-transformer "System 1" for
  high-frequency action, trained on a *data pyramid* of web video, synthetic
   trajectories and real robot demonstrations.
-- **Alpamayo-R1** ([arXiv:2511.00088](https://arxiv.org/abs/2511.00088)): reasoning-plus-action
+- Alpamayo-R1 ([arXiv:2511.00088](https://arxiv.org/abs/2511.00088)) does reasoning plus action
   for long-tail driving, released as a teacher model for distillation.
-- **Inference**: TensorRT-LLM and Dynamo are the reference points for in-flight
+- On inference, TensorRT-LLM and Dynamo are the reference points for in-flight
   batching, paged KV cache, quantization (FP8/FP4) and disaggregated prefill/decode.
-- **Training**: Megatron-LM ([arXiv:1909.08053](https://arxiv.org/abs/1909.08053)) is
+- On training, Megatron-LM ([arXiv:1909.08053](https://arxiv.org/abs/1909.08053)) is
   where tensor parallelism was popularised; Nemotron-4 340B
   ([arXiv:2406.11704](https://arxiv.org/abs/2406.11704)) is NVIDIA's own model family,
   notable for a synthetic-data-generation pipeline and an open reward model.

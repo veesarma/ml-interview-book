@@ -68,7 +68,7 @@ def main() -> None:
     b[y == 1] = rng.normal(2.1, 1.0, n_pos)
     b[y == 0] = rng.normal(0.0, 1.0, n_neg)
     neg_idx = np.flatnonzero(y == 0)  # (n_neg,)
-    poisoned = rng.choice(neg_idx, size=int(0.0035 * n_neg), replace=False)  # (0.012*n_neg,)
+    poisoned = rng.choice(neg_idx, size=int(0.008 * n_neg), replace=False)  # (0.008*n_neg,)
     b[poisoned] = rng.normal(4.4, 0.5, poisoned.size)
 
     fpr_a, tpr_a, auc_a = roc(y, a)

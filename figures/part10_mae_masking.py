@@ -62,7 +62,8 @@ def main() -> None:
         for _ in range(300):
             loss, _, _ = model(imgs)
             opt.zero_grad(); loss.backward(); opt.step()
-        final.append(float(torch.stack([model(imgs)[0] for _ in range(5)]).mean()))
+        with torch.no_grad():
+            final.append(float(torch.stack([model(imgs)[0] for _ in range(5)]).mean()))
     ax.bar([f"{int(r * 100)}%" for r in RATIOS], final, color=[colors[i] for i in range(4)], alpha=0.85)
     ax.set_xlabel("mask ratio"); ax.set_ylabel("masked-patch MSE after 300 steps")
     ax.set_title("More masking is a harder task, and the loss says so", fontsize=10)

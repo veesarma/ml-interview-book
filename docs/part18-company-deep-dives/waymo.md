@@ -21,18 +21,18 @@
   traffic signals with attention and latent queries. MotionLM (arXiv:2309.16534) then
   discretises motion into tokens and decodes *joint* multi-agent futures
   autoregressively, with a plain next-token loss.
-- **Simulation**: SimulationCity (2021), the open Waymax simulator (arXiv:2310.08710, JAX,
+- For simulation: SimulationCity (2021), the open Waymax simulator (arXiv:2310.08710, JAX,
   built on the Open Motion Dataset), the Sim Agents challenge (arXiv:2305.12032), and a
   generative **Waymo World Model** built on Genie 3 (Feb 2026 blog).
 - **End-to-end research**: **EMMA** (arXiv:2410.23262), a Gemini-based multimodal model
   that reads camera images and text and writes trajectories, objects and road graph as
   text; explicitly a research model with stated limitations (no lidar, few frames).
-- **Scaling laws** (arXiv:2506.08228, June 2025 blog): motion forecasting and planning
+- Scaling laws (arXiv:2506.08228, June 2025 blog): motion forecasting and planning
   quality follows power laws in data, parameters and compute on internal driving data.
 - **Safety**: the Safety Impact hub compares rider-only crash rates with human
   benchmarks; the peer-reviewed 56.7-million-mile comparison (Traffic Injury
   Prevention, 2025); the 2020 safety-methodologies paper; the Safety Case approach.
-- **Ops**: Fleet Response gives *guidance*, not remote driving (May 2024 blog).
+- Fleet Response gives *guidance*, and explicitly not remote driving (May 2024 blog).
 
 ## 1. The business in one paragraph
 
@@ -288,8 +288,8 @@ blog, June 2025).
 
 !!! tip "How to say it in the interview"
     "I'd use a multimodal foundation model where it earns its place, as an
-    offline teacher and a long-tail reasoner, and I'd not put it in the
-    latency-critical loop without the missing modalities. Waymo's EMMA paper (2024)
+    offline teacher and a long-tail reasoner, and I'd keep it out of the
+    latency-critical loop until the missing modalities are there. Waymo's EMMA paper (2024)
     is my evidence for both halves: co-training trajectories, objects and road graph
     as text improves each task, and the same paper states that it lacks lidar and
     radar, uses few frames and is compute-heavy, so it's research rather than the
@@ -502,8 +502,8 @@ for calibration and abstention.
         expected human count at that exposure, not by the AV count. That is why
         Waymo's peer-reviewed comparison reports by crash type and severity with
         intervals. I'd be explicit that for the rarest outcomes the interval
-        remains wide at tens of millions of miles, and I'd not claim more than
-        the data supports."
+        remains wide at tens of millions of miles, and I'd say so instead of
+        claiming more than the data supports."
 
 !!! interview "Q9. Design the data engine for a fleet with no driver interventions."
     **Answer sketch.** Without disengagements, signals come from Fleet Response

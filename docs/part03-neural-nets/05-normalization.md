@@ -1,13 +1,13 @@
 # Normalization
 
 > **Why this matters at staff level.** BatchNorm's backward pass is the hardest
-> derivation an interviewer can reasonably ask for in 20 minutes, it has two "hidden"
-> paths, through $\mu$ and $\sigma^2$, that most candidates miss. Beyond the algebra,
+> derivation an interviewer can reasonably ask for in 20 minutes, because of the two
+> "hidden" paths through $\mu$ and $\sigma^2$ that most candidates miss. Beyond the algebra,
 > the questions that separate senior from staff are architectural: why every
 > Transformer uses per-token LayerNorm/RMSNorm instead of BatchNorm, why BN breaks at
 > batch size 2 in a detector and what SyncBN costs, why Llama dropped the mean
 > subtraction, and why pre-LN replaced post-LN in every large model. All of it is
-> about *what the statistics depend on*, the batch, the token, or nothing.
+> about *what the statistics depend on*: the batch, the token, or nothing.
 
 ## TL;DR: the interview card
 
@@ -105,9 +105,8 @@ $$
 = -s\sum_m d\hat x_m .
 $$
 
-The second term vanishes because deviations from the mean sum to zero, a detail worth
-saying out loud in an interview, because it is why the final formula has three terms
-and not four. Now collect the three routes into $x_m$, using
+The second term vanishes because deviations from the mean sum to zero. Say that out
+loud in an interview: it is why the final formula has three terms and not four. Now collect the three routes into $x_m$, using
 $\partial\sigma^2/\partial x_m = 2(x_m-\mu)/M$ and $\partial\mu/\partial x_m = 1/M$:
 
 $$
@@ -397,7 +396,8 @@ backward: build the same input, run `F.batch_norm` / `F.layer_norm` / `F.rms_nor
 `F.group_norm` with `requires_grad=True`, backprop a random cotangent, and compare
 `out`, `dx`, `dgamma`, `dbeta` to `atol=1e-10`. Additionally, run BN for three steps
 against `torch.nn.BatchNorm1d` and compare the *running buffers*, then switch both to
-eval and compare outputs, that is what catches the biased/unbiased variance detail.
+eval and compare outputs. That last step is what catches the biased/unbiased variance
+detail.
 `tests/test_nn_normalization.py` does all of this.
 
 ??? example "Full implementation: `src/mlbook/nn/normalization.py`"

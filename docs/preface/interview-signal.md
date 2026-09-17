@@ -30,7 +30,7 @@ design rounds is the clearest public description of that gradient
 | Dimension | Senior answer | Staff answer |
 |---|---|---|
 | Scope | Solves the problem asked. | Reframes the problem if the framing is wrong, then solves the right one. |
-| Trade-offs | Lists them. | Names the two that matter for *this* case, quantifies them, and commits. |
+| Trade-offs | Lists them. | Names the two that bear on *this* case, quantifies them, and commits. |
 | Evidence | "In my experience…" | "We measured X; it moved Y by Z; here is why the alternative would not have." |
 | Systems | Describes the model. | Describes the model, the data pipeline that feeds it, the evaluation that gates it, and what breaks first at 10× scale. |
 | Failure | Knows the textbook failure modes. | Knows which failure mode their own system actually hit, how it was detected, and what changed. |
@@ -61,7 +61,7 @@ row 1–4; a staff-level round has no row below 3 and at least two rows at 4.
 
 ## How to structure any answer
 
-A structure is not a script; it is what lets you think under pressure and lets the
+A structure works as scaffolding rather than a script. It lets you think under pressure and lets the
 interviewer follow you. The one used throughout this book, and in
 [Part XVII](../part17-ml-system-design/00-framework.md), is:
 
@@ -128,8 +128,9 @@ dot-product attention with a causal mask".
     the $T^2$ scores never need to be materialised if you compute softmax online in
     tiles, that is what FlashAttention does. Which one would you like?"
 
-The staff answer is not longer because it says more things; it is longer because
-each thing it says is a decision with a reason.
+The staff answer runs longer because every sentence in it carries a decision and
+the reason behind that decision. Length from extra items is padding. Length from
+reasoning is signal.
 
 **Common failure patterns.**
 

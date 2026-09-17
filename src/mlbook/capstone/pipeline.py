@@ -34,8 +34,13 @@ class PipelineConfig:
     """Every knob, in one place, with the defaults that finish in seconds."""
 
     seed: int = 0
-    n_train: int = 1024
-    n_eval: int = 256
+    n_train: int = 768
+    n_eval: int = 192
+    torch_threads: int = 1
+    """Intra-op threads. Every tensor here is a few kilobytes, so the threading
+    overhead of a parallel kernel costs far more than the kernel saves: on the
+    machine this was developed on, four threads made one training step about
+    250x slower than one thread. Set it to 0 to leave the global setting alone."""
 
     d_v: int = 32
     vision_heads: int = 2
@@ -45,23 +50,23 @@ class PipelineConfig:
     lm_layers: int = 2
     n_query_tokens: int = 8
 
-    sft_steps: int = 700
-    sft_batch_size: int = 64
+    sft_steps: int = 400
+    sft_batch_size: int = 48
     sft_lr: float = 3e-3
     tool_fraction: float = 0.35
 
-    rm_steps: int = 120
-    rm_batch_size: int = 64
+    rm_steps: int = 80
+    rm_batch_size: int = 32
     rm_lr: float = 1e-3
 
-    dpo_steps: int = 100
-    dpo_batch_size: int = 32
+    dpo_steps: int = 80
+    dpo_batch_size: int = 24
     dpo_lr: float = 2e-4
     dpo_beta: float = 0.1
 
-    grpo_steps: int = 40
-    grpo_prompts_per_step: int = 16
-    grpo_group_size: int = 8
+    grpo_steps: int = 25
+    grpo_prompts_per_step: int = 8
+    grpo_group_size: int = 6
     grpo_lr: float = 1e-4
     grpo_temperature: float = 1.0
     grpo_kl_coef: float = 0.02
@@ -109,6 +114,17 @@ def run_pipeline(config: PipelineConfig | None = None, verbose: bool = False) ->
     ``grpo``, ``tool_loop``, ``params``, ``tokens``, ``wall_time_s``, ``config``.
     """
     config = PipelineConfig() if config is None else config
+    previous_threads = torch.get_num_threads()
+    if config.torch_threads:
+        torch.set_num_threads(config.torch_threads)
+    try:
+        return _run_pipeline(config, verbose)
+    finally:
+        torch.set_num_threads(previous_threads)
+
+
+def _run_pipeline(config: PipelineConfig, verbose: bool) -> dict[str, object]:
+    """The body of :func:`run_pipeline`, with the thread setting already applied."""
     torch.manual_seed(config.seed)
     timings: dict[str, float] = {}
     t_start = time.perf_counter()

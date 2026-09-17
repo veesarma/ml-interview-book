@@ -6,7 +6,7 @@ ordered so that each item unlocks the next. It ends with you building a small
 multimodal reasoning model and running its full post-training pipeline
 (SFT → reward model → DPO → GRPO) on code you wrote yourself.
 
-At about ten focused hours a week the plan takes nine months; at fifteen it takes
+At about ten focused hours a week the plan runs to nine months. Fifteen hours brings it to
 six. If your calendar is shorter than that, skip to the
 [8-week variant](#the-8-week-i-have-an-interview-soon-variant) and the
 [week-before checklist](#the-week-before-checklist).
@@ -40,7 +40,7 @@ Every week has the same four parts. Do them in this order; the order is the poin
 Derivations are numbered **D1–D111** and implementations **#1–#60** (the numbering of
 the canon in [Part XVI](../part16-coding-canon/index.md)). Level A/B/C/D tags follow
 the [asymmetric depth](how-to-use.md#4-asymmetric-depth-the-four-target-levels) contract:
-a Level A item must be done from memory; a Level B item may be done with the chapter open.
+a Level A item has to come from memory. For Level B you may keep the chapter open.
 
 ## Phase 1: Foundations (weeks 1–7)
 

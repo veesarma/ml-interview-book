@@ -14,11 +14,11 @@
 - **The bet**: cameras only, no HD maps, learned everything, fleet as the data source. Every design choice below follows from those constraints and from a fixed on-car compute budget (the FSD computer).
 - **Perception lineage (public)**: per-camera CNN features → transformer fusion into a bird's-eye "vector space" (AI Day 2021) → volumetric **occupancy + flow** replacing per-object 3D boxes (CVPR'22 WAD, AI Day 2022) → **end-to-end** network from video to control in FSD V12 (Q4 2023 shareholder letter).
 - **The data engine**: fleet triggers (the AI Day 2021 slides show a catalogue of 221 triggers) → clip upload → **offline auto-labelling** by multi-trip 4D reconstruction and large offline models → targeted retraining → shadow mode → OTA. Iteration speed of this loop is the moat, not any one model.
-- **Occupancy** = predict $o \in [0,1]$ and flow $f \in \R^3$ per voxel from cameras; it handles arbitrary shapes and overhangs that box detectors cannot represent, at the cost of memory scaling with the voxel grid.
-- **Lanes as language**: AI Day 2022 decodes the lane graph autoregressively as tokens, because lanes are a graph with topology, not a segmentation mask.
+- Occupancy means predicting $o \in [0,1]$ and flow $f \in \R^3$ per voxel from cameras. it handles arbitrary shapes and overhangs that box detectors cannot represent, at the cost of memory scaling with the voxel grid.
+- Lanes are decoded as language. AI Day 2022 emits the lane graph autoregressively as tokens, because lanes are a graph with topology, not a segmentation mask.
 - **Dojo**: a custom training chip (D1) and tile, presented at AI Day 2021 and Hot Chips 34, motivated by video-heavy training; press reports in August 2025 say the team was wound down, the durable lesson is the trade-off analysis, not the product.
 - **Optimus**: the humanoid reuses the FSD computer and vision stack (AI Day 2022); the ML story is imitation from teleoperation plus the same data-engine reflexes.
-- **Evaluation vocabulary**: interventions per mile, shadow-mode disagreement, scenario-sliced regression, and the caveats of Tesla's own Vehicle Safety Report (exposure bias: Autopilot miles are mostly highway miles).
+- The evaluation vocabulary you need: interventions per mile, shadow-mode disagreement, scenario-sliced regression, and the caveats of Tesla's own Vehicle Safety Report (exposure bias: Autopilot miles are mostly highway miles).
 
 ## 1. The business in one paragraph
 
@@ -130,8 +130,8 @@ auto-labelling pipeline in §3.3 exists.
     seams and occlusions that matter. The cost is that BEV fusion needs 3D
     supervision for the whole scene, so I'd budget for an offline auto-labelling
     pipeline from day one. I'd evaluate in BEV with range-binned AP and with a
-    per-camera-seam slice, because that's where the previous approach failed, and I
-    would track the temporal module separately with an occlusion-recall slice."
+    per-camera-seam slice, because that's where the previous approach failed, and I'd
+    track the temporal module separately with an occlusion-recall slice."
 
 ### 3.2 Occupancy networks: from boxes to volumes
 
@@ -172,12 +172,12 @@ the same idea: Occ3D (Tian et al., 2023) and the occupancy benchmarks in Part XI
 !!! tip "How to say it in the interview"
     "For a planner that must avoid arbitrary obstacles, I'd make the primary
     perception output a volumetric occupancy grid with flow, not a set of boxes.
-    Tesla's CVPR'22 WAD keynote makes the argument I'd make: boxes need a class,
-    and the objects that hurt you are the ones with no class. I'd keep a box and
+    Tesla's CVPR'22 WAD keynote puts it well: boxes need a class, and the objects
+    that hurt you are the ones with no class. I'd keep a box and
     tracking head for interacting agents, because occupancy carries no identity and
-    prediction needs identity. The rejected alternative is expanding the detector's
-    class list; that chases an unbounded tail. What this costs is memory and resolution:
-    voxel grids grow cubically, so I'd use a coarser far-field resolution and
+    prediction needs identity. Expanding the detector's class list is the other
+    option, and it chases an unbounded tail. Memory and resolution are what occupancy
+    costs me. Voxel grids grow cubically, so I'd use a coarser far-field resolution and
     quantize the head aggressively, which is consistent with the in-car budget the AI
     Day 2022 talk emphasises. For supervision I'd build dense geometry offline
     from multi-trip reconstruction rather than hand-label voxels. I'd evaluate
@@ -280,9 +280,11 @@ framed as end-to-end).
     search gives me an auditable decision and a place to put hard constraints while
     the learned parts absorb the human-likeness. I'd say plainly that Tesla's
     Q4 2023 letter describes V12 as end-to-end, but that the architecture isn't
-    public, so I'd not claim to know how the modular heads are used. The trade-off
-    I'd commit to is: interpretability and constraint-enforcement in the modular
-    planner versus the ceiling on human-likeness that hand-written interfaces impose.
+    public, so I wouldn't claim to know how the modular heads are used. The call I'd
+    commit to is this. The modular planner buys interpretability and a place to
+    enforce hard constraints. Hand-written interfaces cap how human-like the driving
+    can get. Which of those dominates depends on how close the product is to removing
+    the driver.
     I'd evaluate any planner change with closed-loop replay on scenario slices and
     shadow-mode disagreement against the shipped policy, and I'd treat
     intervention rate as the north-star metric while tracking its exposure mix."
@@ -330,8 +332,7 @@ Tesla's Exa-Scale Computer" and "Super-Compute System Scaling for ML Training"; 
     video pipeline, because the software ecosystem and kernels are where most of the
     speedup lives, and I'd reserve custom hardware for a bottleneck that vendors
     won't fix in time. I'd note that press reports in 2025 describe Dojo being
-    wound down; there's no public post-mortem, so I'd not speculate beyond the
-    trade-off. I'd measure the infrastructure by model-FLOP utilisation and by
+    wound down. There's no public post-mortem, so I'd stop at the trade-off. I'd measure the infrastructure by model-FLOP utilisation and by
     samples per second end-to-end from storage, not by peak TFLOPS."
 
 ### 3.6 Optimus: the same stack, a different body

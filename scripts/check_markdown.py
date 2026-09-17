@@ -32,6 +32,8 @@ TAB = re.compile(r'^(?P<indent>\s*)===\s+"')
 FENCE = re.compile(r"^\s*(```|~~~)")
 SNIPPET = re.compile(r'--8<--\s*"([^"]+)"')
 IMG = re.compile(r"!\[[^\]]*\]\(([^)]+\.(?:png|jpg|jpeg|gif|svg))")
+MATH = re.compile(r"^\s*\$\$")
+MATH_ONELINE = re.compile(r"^\s*\$\$.*\$\$\s*$")
 DANGLING = re.compile(r"[,;]\s*$")
 MANDATORY = ["## TL;DR", "## 1.", "## 2.", "## 3.", "## Retype by hand",
              "## 4.", "## 5.", "## 6.", "## 7.", "## References"]
@@ -54,12 +56,16 @@ def check(path: Path) -> list[str]:
     if n_fence % 2:
         problems.append(f"{n_fence} code-fence markers (odd, so one is unclosed)")
 
-    in_fence = False
+    in_fence = in_math = False
     for i, raw in enumerate(lines):
         if FENCE.match(raw):
             in_fence = not in_fence
             continue
-        if in_fence:
+        if MATH.match(raw):
+            if not MATH_ONELINE.match(raw):
+                in_math = not in_math
+            continue
+        if in_fence or in_math:
             continue
 
         # 1 + 2. block bodies must be indented past their opener
@@ -80,15 +86,39 @@ def check(path: Path) -> list[str]:
                 break
 
         # 6. dangling punctuation left by an automated rewrite. A trailing comma
-        #    mid-paragraph is ordinary soft wrapping, so only flag one that ends
-        #    a paragraph (next line blank or end of file).
-        stripped = raw.strip()
-        at_para_end = (i + 1 >= len(lines)) or not lines[i + 1].strip()
-        if stripped and at_para_end and DANGLING.search(stripped) and not stripped.startswith("|"):
+        #    mid-paragraph is ordinary soft wrapping, and a comma or colon before
+        #    a display-math block is correct mathematical writing, so flag only a
+        #    paragraph-final one that is not a lead-in to $$ or a list.
+        # inline code holds slices like [::2, ::2] and paths; not prose
+        raw_prose = re.sub(r"`[^`]*`", " ", raw)
+        stripped = raw_prose.strip()
+        has_math = "$" in raw
+        nxt = lines[i + 1].strip() if i + 1 < len(lines) else ""
+        after = ""
+        for cand in lines[i + 1 : i + 4]:
+            if cand.strip():
+                after = cand.strip()
+                break
+        leads_into_block = after.startswith(("$$", "|", "-", "*", "1.", "```", "!!!", "???"))
+        at_para_end = (i + 1 >= len(lines)) or not nxt
+        if (
+            stripped
+            and at_para_end
+            and not leads_into_block
+            and DANGLING.search(stripped)
+            and not stripped.startswith("|")
+        ):
             problems.append(f"line {i + 1}: paragraph ends in bare punctuation: {stripped[-50:]!r}")
-        if "::" in raw and "http" not in raw and "::=" not in raw and ":::" not in raw:
+        if (
+            "::" in raw_prose
+            and not has_math
+            and "http" not in raw_prose
+            and "::=" not in raw_prose
+            and ":::" not in raw_prose
+            and ".py::" not in raw_prose     # pytest node id
+        ):
             problems.append(f"line {i + 1}: double colon: {stripped[:60]!r}")
-        if re.search(r"\w\s+,", raw):
+        if not has_math and re.search(r"\w\s+,", raw_prose):
             problems.append(f"line {i + 1}: space before comma: {stripped[:60]!r}")
 
     # 4. snippets
