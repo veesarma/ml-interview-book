@@ -40,43 +40,63 @@ for k in range(3):
 ax.set_title("each minibatch trains a different thinned network\n(hollow = dropped, p = 0.5); inference averages them", fontsize=9)
 ax.set_xlim(-0.15, 1.05)
 
-# ---- right: a real experiment ---------------------------------------------------
-x_all, y_all = make_two_moons(n=120, noise=0.35, seed=1)
-x_tr, y_tr, x_va, y_va = x_all[:40], y_all[:40], x_all[40:], y_all[40:]
-
-
-def run(p_drop, epochs=600, lr=0.05, seed=0):
+# ---- right: a real experiment ------------------------------------------------
+# A task where dropout genuinely helps: 100-dim inputs of which only 10 carry signal,
+# 300 training points, a deliberately over-parameterised 100-64-64-2 MLP.
+def make_sparse(n, d=100, k=10, seed=0, noise=0.3):
     rng = np.random.default_rng(seed)
-    l1, l2, l3 = Linear(2, 128, rng), Linear(128, 128, rng), Linear(128, 2, rng)
+    x = rng.normal(size=(n, d))                                  # (n, d)
+    w = np.zeros(d)                                              # (d,)
+    w[:k] = rng.choice([-1.0, 1.0], k)                           # only k features matter
+    logit = x @ w / np.sqrt(k) * 2.0                             # (n,)
+    y = (logit + rng.normal(scale=noise, size=n) > 0).astype(int)  # (n,)
+    return x, y
+
+
+N_TR = 300
+x_all, y_all = make_sparse(N_TR + 1000)
+x_tr, y_tr, x_va, y_va = x_all[:N_TR], y_all[:N_TR], x_all[N_TR:], y_all[N_TR:]
+
+
+def run(p_drop, epochs=400, lr=0.05, width=64, seed=0):
+    rng = np.random.default_rng(seed)
+    l1 = Linear(x_tr.shape[1], width, rng)                       # (d, width)
+    l2 = Linear(width, width, rng)                               # (width, width)
+    l3 = Linear(width, 2, rng)                                   # (width, 2)
     a1, a2 = ReLU(), ReLU()
     d1, d2 = Dropout(p_drop, seed=1), Dropout(p_drop, seed=2)
     loss_fn = CrossEntropyLoss()
-    tr, va = [], []
+    tr, va, acc = [], [], []
     for _ in range(epochs):
         for d in (d1, d2):
             d.training = True
-        h = d2.forward(a2.forward(l2.forward(d1.forward(a1.forward(l1.forward(x_tr))))))
+        h = d2.forward(a2.forward(l2.forward(d1.forward(a1.forward(l1.forward(x_tr))))))  # (N_TR, width)
         tr.append(loss_fn.forward(l3.forward(h), y_tr))
-        g = l3.backward(loss_fn.backward())
+        g = l3.backward(loss_fn.backward())                      # (N_TR, 2) -> (N_TR, width)
         g = l1.backward(a1.backward(d1.backward(l2.backward(a2.backward(d2.backward(g))))))
         for lin in (l1, l2, l3):
             lin.W -= lr * lin.dW
             lin.b -= lr * lin.db
         for d in (d1, d2):
-            d.training = False
-        h = a2.forward(l2.forward(a1.forward(l1.forward(x_va))))
-        va.append(CrossEntropyLoss().forward(l3.forward(h), y_va))
-    return tr, va
+            d.training = False                                   # inference: no mask, no rescale
+        logits = l3.forward(a2.forward(l2.forward(a1.forward(l1.forward(x_va)))))  # (1000, 2)
+        va.append(CrossEntropyLoss().forward(logits, y_va))
+        acc.append(float((logits.argmax(1) == y_va).mean()))
+    return tr, va, acc
 
 
 ax = axes[1]
+finals = {}
 for p, ls in [(0.0, "-"), (0.5, "--")]:
-    tr, va = run(p)
+    tr, va, acc = run(p)
+    finals[p] = (va[-1], acc[-1])
     ax.plot(tr, ls=ls, color="C0", label=f"train, p={p}")
     ax.plot(va, ls=ls, color="C1", label=f"val, p={p}")
-ax.set_xlabel("epoch (full-batch GD, 40 train / 80 val points, noise 0.35)")
+ax.set_xlabel("epoch (full-batch GD; 300 train / 1000 val, 100 features of which 10 matter)")
 ax.set_ylabel("cross-entropy")
-ax.set_title("2-128-128-2 MLP: dropout closes the train/val gap", fontsize=9)
+ax.set_title("100-64-64-2 MLP: p=0 overfits (val {:.2f}, acc {:.2f});\n"
+             "p=0.5 does not (val {:.2f}, acc {:.2f})".format(
+                 finals[0.0][0], finals[0.0][1], finals[0.5][0], finals[0.5][1]), fontsize=9)
 ax.legend(fontsize=8)
 ax.grid(alpha=0.3)
 fig.tight_layout()

@@ -20,9 +20,14 @@ def test_sae_loss_matches_manual():
 def test_train_sae_recovers_superposed_features():
     torch.manual_seed(0)
     torch.set_num_threads(1)
-    X, dirs = sae_mod.make_superposition_data(n=4096, d=16, n_true=32, p_active=0.05)
+    # NOTE: the data seed must differ from the global seed used by the SAE's own
+    # randn init, otherwise the first n_true decoder rows are drawn as the very same
+    # numbers as the true directions and recovery is 1.0 before any training.
+    X, dirs = sae_mod.make_superposition_data(n=4096, d=16, n_true=32, p_active=0.05, seed=7)
     sae = sae_mod.SparseAutoencoder(16, 64)
     before = sae_mod.feature_recovery(sae, dirs).mean()
+    assert before < 0.8  # random dictionary: best |cos| in d=16 over 64 rows is ~0.6
     sae_mod.train_sae(sae, X, l1_coeff=0.2, steps=600)
     after = sae_mod.feature_recovery(sae, dirs)
     assert after.mean() > before and after.mean() > 0.85
+    assert float(after.min()) > 0.6

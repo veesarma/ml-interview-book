@@ -16,7 +16,7 @@ OUT = Path(__file__).resolve().parents[1] / "docs" / "assets" / "figures" / "par
 def main() -> None:
     torch.manual_seed(0)
     torch.set_num_threads(1)
-    X, dirs = make_superposition_data(n=4096, d=16, n_true=32, p_active=0.05)
+    X, dirs = make_superposition_data(n=4096, d=16, n_true=32, p_active=0.05, seed=7)
     sae = SparseAutoencoder(16, 64)
     train_sae(sae, X, l1_coeff=0.2, steps=600)
     cos = (dirs @ sae.W_dec.detach().T).abs()  # (32, 64)

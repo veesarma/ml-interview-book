@@ -10,6 +10,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
+from matplotlib.colors import to_hex  # noqa: E402
 from matplotlib.patches import FancyBboxPatch  # noqa: E402
 
 OUT = Path(__file__).resolve().parents[1] / "docs" / "assets" / "figures" / "part12_taxonomy.png"
@@ -27,7 +28,7 @@ def arrow(ax, x0, y0, x1, y1):
 
 
 def main() -> None:
-    c = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+    c = [to_hex(x) for x in plt.rcParams["axes.prop_cycle"].by_key()["color"]]  # tab10 as #rrggbb
     fig, ax = plt.subplots(figsize=(11, 6.4), facecolor="white")
     ax.set_xlim(0, 11)
     ax.set_ylim(0, 6.4)

@@ -40,7 +40,7 @@ def main() -> None:
     ax2.set_ylabel("data mixture (fraction of tokens)")
     ax2.set_xlabel("percent of pretraining tokens")
     ax2.set_ylim(0, 1)
-    ax2.legend(fontsize=7.5, frameon=False, loc="upper left", ncol=3)
+    ax2.legend(fontsize=7.5, frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.22), ncol=3)
     for ax in (ax1, ax2):
         ax.axvline(anneal_start, color="#888888", linewidth=0.8, linestyle="--")
         ax.axvline(ctx_start, color="#888888", linewidth=0.8, linestyle="--")

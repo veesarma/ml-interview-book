@@ -21,7 +21,7 @@ def main() -> None:
     colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.2), facecolor="white")
 
-    ax1.set_xlim(0, 10)
+    ax1.set_xlim(0, 11.2)
     ax1.set_ylim(0, 6)
     ax1.axis("off")
     ax1.add_patch(FancyBboxPatch((3.2, 3.2), 3.6, 2.2, boxstyle="round,pad=0.02", facecolor="#dddddd", edgecolor="none"))
@@ -34,8 +34,8 @@ def main() -> None:
                                ((6.8, 4.3), (8.6, 3.0)), ((6.8, 1.4), (8.6, 3.0))]:
         ax1.add_patch(FancyArrowPatch((x0, y0), (x1, y1), arrowstyle="->", mutation_scale=11, linewidth=1.4))
     ax1.text(0.7, 3.0, "x", fontsize=11, ha="right", va="center")
-    ax1.text(8.9, 3.0, "h = xWᵀ + (α/r)·xAᵀBᵀ", fontsize=9, ha="left", va="center")
-    ax1.text(5.0, 2.55, "trainable: r·(in + out) params, gradient only flows here", ha="center", fontsize=7.5, color="#444444")
+    ax1.text(8.75, 3.0, "h = xWᵀ\n + (α/r)·xAᵀBᵀ", fontsize=8.5, ha="left", va="center")
+    ax1.text(5.0, 0.15, "trainable: r·(in + out) params — the gradient flows only through A and B", ha="center", fontsize=7.5, color="#444444")
     ax1.set_title("LoRA: W' = W + (α/r) B A, rank r ≪ min(in, out)", fontsize=10, loc="left")
 
     d = 4096
