@@ -730,7 +730,7 @@ for why PR curves, not ROC, belong in imbalanced evaluation.
 !!! interview "Would you use an autoencoder as the primary detector?"
     No. Unsupervised anomaly scores have poor precision at the operating points a
     blocking decision requires, because most anomalies are legitimate rare behaviour
-, a first international purchase, a new device, a large gift order. I'd use
+    , a first international purchase, a new device, a large gift order. I'd use
     isolation forests or clustering on velocity space as a *novelty router*: it
     raises cases to analysts and triggers rule investigation, which is how new attack
     signatures get labelled quickly. Once labelled, the supervised model absorbs

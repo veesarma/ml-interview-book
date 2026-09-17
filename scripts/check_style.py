@@ -261,6 +261,9 @@ def main() -> int:
 
     roots = [Path(p) for p in args.paths] if args.paths else [ROOT / "docs"]
     files = sorted(f for r in roots for f in ([r] if r.is_file() else r.rglob("*.md")))
+    # STYLE.md quotes every banned pattern as an example, and the citations queue
+    # stores raw source titles, so neither can be held to the rules they describe.
+    files = [f for f in files if f.name != "STYLE.md" and "_citations_todo" not in f.parts]
 
     n_err = n_over = 0
     counts: dict[str, int] = defaultdict(int)
