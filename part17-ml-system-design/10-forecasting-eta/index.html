@@ -1,0 +1,7745 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A first-principles-to-frontier compendium for staff-level ML interviews — math, from-scratch code, systems, and production case studies.">
+      
+      
+      
+        <link rel="canonical" href="https://veesarma.github.io/ml-interview-book/part17-ml-system-design/10-forecasting-eta/">
+      
+      
+        <link rel="prev" href="../13-novel-object-3d-detection/">
+      
+      
+        <link rel="next" href="../11-notifications-uplift-experimentation/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Forecasting & ETA - The ML Interview Book</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#forecasting-eta" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="The ML Interview Book" class="md-header__button md-logo" aria-label="The ML Interview Book" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The ML Interview Book
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Forecasting & ETA
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/veesarma/ml-interview-book" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    veesarma/ml-interview-book
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../preface/how-to-use/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Preface
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part01-math/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  I. Math
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part02-classical/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  II. Classical ML
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part03-neural-nets/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  III. Neural Nets
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part04-vision/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  IV. Vision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part05-sequence-transformers/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  V. Sequences & Transformers
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part06-llm-training/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  VI. LLM Training
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part07-post-training/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  VII. Post-training
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part08-multimodal/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  VIII. Multimodal
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part09-generative/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  IX. Generative
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part10-self-supervised/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  X. Self-/Semi-/Weak Supervision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part11-perception-autonomy/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XI. Perception & Autonomy
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part12-rl/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XII. Reinforcement Learning
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part13-retrieval-eval-reliability/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XIII. Retrieval, Eval & Reliability
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part14-systems/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XIV. Systems
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part15-interpretability-safety/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XV. Interpretability & Safety
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part16-coding-canon/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XVI. Coding Canon
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part19-breadth-review/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XIX. Breadth Review
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part20-project-deep-dive/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XX. Your Projects
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XVII. ML System Design
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part18-company-deep-dives/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XVIII. Company Deep Dives
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../references/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  References
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="The ML Interview Book" class="md-nav__button md-logo" aria-label="The ML Interview Book" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    The ML Interview Book
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/veesarma/ml-interview-book" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    veesarma/ml-interview-book
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Preface
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Preface
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/how-to-use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How to use this book
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/study-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Study plan (6–9 months)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/interview-signal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What staff-level signal looks like
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part01-math/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I. Math
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    I. Math
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/01-linear-algebra/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear algebra
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/02-calculus-matrix-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calculus & matrix calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/03-probability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Probability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/04-statistics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/05-information-theory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Information theory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/06-optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/07-tensor-shapes-broadcasting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tensors, shapes & broadcasting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part02-classical/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    II. Classical ML
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    II. Classical ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/01-linear-regression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear regression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/02-logistic-softmax-regression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logistic & softmax regression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/03-trees-and-ensembles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trees & ensembles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/04-knn-kmeans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KNN & K-means
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/05-probabilistic-models-em/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Probabilistic models & EM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/06-dimensionality-reduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dimensionality reduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/07-kernel-methods-svm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kernel methods & SVMs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part03-neural-nets/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    III. Neural Nets
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    III. Neural Nets
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/01-mlp-and-activations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLPs & activations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/02-backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/03-autograd-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building an autograd engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/04-initialization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/05-normalization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Normalization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/06-regularization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Regularization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part04-vision/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IV. Vision
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IV. Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/01-image-representation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image representation & signal processing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/02-convolutions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Convolutions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/03-cnn-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CNN architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/04-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/05-segmentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Segmentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/06-geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geometry & cameras
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/07-3d-perception/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part05-sequence-transformers/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    V. Sequences & Transformers
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    V. Sequences & Transformers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/01-rnn-lstm-gru/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RNN, LSTM, GRU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/02-seq2seq-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seq2seq & early attention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/03-attention-mathematics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attention mathematics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/04-transformer-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/05-positional-encodings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Positional encodings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/06-tokenization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tokenization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part06-llm-training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VI. LLM Training
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VI. LLM Training
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/01-pretraining-data-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pretraining data & objective
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/02-scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/03-large-model-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Large-model architecture (MoE, GQA, SSMs)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/04-efficient-attention-kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Efficient attention & KV cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/05-quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/06-fine-tuning-lora/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & LoRA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/07-mid-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mid-training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part07-post-training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VII. Post-training
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VII. Post-training
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/01-sft/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervised fine-tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/02-reward-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reward models & preferences
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/03-rlhf-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF with PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/04-dpo-and-friends/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DPO and its relatives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/05-reasoning-rl-grpo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reasoning RL, RLVR & GRPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/06-test-time-compute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test-time compute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part08-multimodal/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VIII. Multimodal
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VIII. Multimodal
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/01-vision-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision Transformers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/02-detr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DETR & set prediction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/03-clip-contrastive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLIP & contrastive learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/04-vlm-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VLM architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/05-multimodal-foundation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal foundation models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/06-video-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part09-generative/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IX. Generative
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IX. Generative
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/01-autoencoders-vae/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autoencoders & VAEs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/02-gans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GANs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/03-diffusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/04-flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part10-self-supervised/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    X. Self-/Semi-/Weak Supervision
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_12" id="__nav_12_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    X. Self-/Semi-/Weak Supervision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/01-self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-supervised learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/02-semi-supervised/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Semi-supervised learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/03-weak-supervision-and-auto-labeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Weak supervision & auto-labeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part11-perception-autonomy/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XI. Perception & Autonomy
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_13" id="__nav_13_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XI. Perception & Autonomy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/01-perception-foundation-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Perception foundation models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/02-multi-camera-bev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-camera & BEV
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/03-sensor-fusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor fusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/04-tracking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tracking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/05-occupancy-temporal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Occupancy & temporal perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/06-prediction-planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prediction & planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/07-world-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    World models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part12-rl/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XII. Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_14" id="__nav_14_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XII. Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/01-mdp-bellman/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs & Bellman equations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/02-classical-rl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical RL algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/03-deep-rl-dqn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep RL & DQN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/04-policy-gradients-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy gradients, GAE & PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/05-imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/06-agents-tool-use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents & tool use
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_15" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part13-retrieval-eval-reliability/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIII. Retrieval, Eval & Reliability
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_15" id="__nav_15_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIII. Retrieval, Eval & Reliability
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/01-retrieval-and-rag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/02-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/03-uncertainty-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uncertainty & reliability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_16" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part14-systems/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIV. Systems
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_16" id="__nav_16_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIV. Systems
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/01-distributed-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/02-training-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/03-inference-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inference systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/04-hardware-memory-roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware, memory & roofline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_17" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part15-interpretability-safety/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XV. Interpretability & Safety
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_17" id="__nav_17_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_17">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XV. Interpretability & Safety
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15-interpretability-safety/01-interpretability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpretability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15-interpretability-safety/02-safety-failure-modes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Safety & failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_18" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part16-coding-canon/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVI. Coding Canon
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_18" id="__nav_18_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_18">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVI. Coding Canon
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/01-numpy-torch-cheatsheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NumPy ↔ PyTorch cheat sheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/02-shape-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shape & broadcasting drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/03-timed-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timed coding drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_19" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part19-breadth-review/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIX. Breadth Review
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_19" id="__nav_19_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_19">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIX. Breadth Review
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/01-basics-losses-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basics, losses, models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/02-evaluation-debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation and debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/03-deep-learning-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep learning and Transformers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/04-llms-multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLMs and multimodal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/05-serving-data-engines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serving, data engines, real-world
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/06-rapid-fire/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rapid-fire derivations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_20" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part20-project-deep-dive/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XX. Your Projects
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_20" id="__nav_20_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_20">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XX. Your Projects
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/01-carl-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CARL framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/02-streetsmart-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worked deep dive, StreetSmart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/03-edge-perception-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worked deep dive, edge perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/04-behavioral-leadership/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Behavioral and leadership
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_21" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVII. ML System Design
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_21" id="__nav_21_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_21_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_21">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVII. ML System Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-recommendation-feed-ranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feed & recommendation ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-search-ranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-ads-ctr-prediction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ads CTR / conversion prediction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-fraud-anomaly-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fraud & anomaly detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-perception-system-av/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous-vehicle perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-visual-search-image-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual search & image retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-content-moderation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content moderation & trust
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-llm-product-rag-assistant/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM assistant with RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-ocr-document-understanding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OCR & document understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../13-novel-object-3d-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Novel-object 3D detection from unlabeled fleet data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting & ETA
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting & ETA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-the-whiteboard-in-60-seconds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR: the whiteboard in 60 seconds
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-requirements-scoping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Requirements &amp; scoping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-modelling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Modelling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Modelling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Baselines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-residual-learning-on-top-of-a-physical-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Residual learning on top of a physical model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-stage-decomposition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Stage decomposition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-quantile-regression-and-why-the-mean-is-wrong" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Quantile regression and why the mean is wrong
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-model-families" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 Model families
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-demand-forecasting-and-hierarchy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.6 Demand forecasting and hierarchy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#37-long-tail-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.7 Long-tail events
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-training-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Training &amp; serving
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-evaluation-experimentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Evaluation &amp; experimentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-trade-offs-alternatives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Trade-offs &amp; alternatives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-real-companies-did-it-as-mock-interviews" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How real companies did it: as mock interviews
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. How real companies did it: as mock interviews">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-uber-the-highest-qps-model-in-the-company" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Uber, "the highest-QPS model in the company"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-doordash-the-complaints-come-from-the-tail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 DoorDash, "the complaints come from the tail"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-amazon-thousands-of-series-and-you-need-the-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 Amazon, "thousands of series, and you need the distribution"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-google-maps-the-road-network-is-a-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.4 Google Maps, "the road network is a graph"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75-the-marketplace-your-forecast-changes-the-future" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.5 The marketplace, "your forecast changes the future"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-staff-level-follow-ups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Staff-level follow-ups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-scaling-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Scaling &amp; evolution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11-notifications-uplift-experimentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications, uplift & experimentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../12-ml-platform-feature-store-monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML platform, feature store & monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_22" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part18-company-deep-dives/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVIII. Company Deep Dives
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_22" id="__nav_22_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVIII. Company Deep Dives
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/tesla/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tesla (Autopilot / FSD / Optimus)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/waymo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waymo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/zoox-nuro-aurora/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zoox, Nuro, Aurora & robotaxi peers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/nvidia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NVIDIA (DRIVE, Cosmos, Isaac)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/meta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meta (Feed, Reels, Ads, FAIR)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/google-youtube/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Google & YouTube
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/tiktok-bytedance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TikTok / ByteDance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/netflix-spotify/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Netflix & Spotify
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/pinterest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pinterest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/uber-doordash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uber & DoorDash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/airbnb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Airbnb
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/amazon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Amazon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/apple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Apple
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/stripe-fintech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stripe & fintech fraud
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/frontier-labs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAI, Anthropic & DeepMind
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/scale-ai-data-engines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scale AI & data engines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../references/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-the-whiteboard-in-60-seconds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR: the whiteboard in 60 seconds
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-requirements-scoping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Requirements &amp; scoping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-modelling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Modelling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Modelling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Baselines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-residual-learning-on-top-of-a-physical-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Residual learning on top of a physical model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-stage-decomposition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Stage decomposition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-quantile-regression-and-why-the-mean-is-wrong" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Quantile regression and why the mean is wrong
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-model-families" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 Model families
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-demand-forecasting-and-hierarchy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.6 Demand forecasting and hierarchy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#37-long-tail-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.7 Long-tail events
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-training-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Training &amp; serving
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-evaluation-experimentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Evaluation &amp; experimentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-trade-offs-alternatives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Trade-offs &amp; alternatives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-real-companies-did-it-as-mock-interviews" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How real companies did it: as mock interviews
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. How real companies did it: as mock interviews">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-uber-the-highest-qps-model-in-the-company" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Uber, "the highest-QPS model in the company"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-doordash-the-complaints-come-from-the-tail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 DoorDash, "the complaints come from the tail"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-amazon-thousands-of-series-and-you-need-the-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 Amazon, "thousands of series, and you need the distribution"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-google-maps-the-road-network-is-a-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.4 Google Maps, "the road network is a graph"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75-the-marketplace-your-forecast-changes-the-future" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.5 The marketplace, "your forecast changes the future"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-staff-level-follow-ups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Staff-level follow-ups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-scaling-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Scaling &amp; evolution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="forecasting-eta">Forecasting &amp; ETA<a class="headerlink" href="#forecasting-eta" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Why this matters / who asks it.</strong> Uber, Lyft, DoorDash, Instacart, Amazon,
+Grab and every logistics or marketplace company runs forecasting as a core system,
+and they ask this question in two flavours: "predict the arrival time of this
+specific delivery" and "forecast demand for every region and hour next week". Both
+are business-critical in the same way: the number is shown to a customer, used to
+make a promise, and consumed by an optimiser that decides where to put supply. The
+interviewer is checking whether you know that the mean is the wrong prediction,
+whether you can backtest without leaking the future, and whether you understand
+that your forecast changes the thing you are forecasting.</p>
+</blockquote>
+<h2 id="tldr-the-whiteboard-in-60-seconds">TL;DR: the whiteboard in 60 seconds<a class="headerlink" href="#tldr-the-whiteboard-in-60-seconds" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart LR
+  REQ[Request&lt;br/&gt;origin, destination, time,&lt;br/&gt;order contents] --&gt; PHYS[Physical model&lt;br/&gt;routing engine + live traffic&lt;br/&gt;→ baseline travel time]
+  REQ --&gt; FEAT[Feature service&lt;br/&gt;real-time: traffic, store load,&lt;br/&gt;courier supply, weather&lt;br/&gt;historical: store prep-time stats,&lt;br/&gt;route segment history]
+  PHYS --&gt; ML[ML residual model&lt;br/&gt;predicts correction to the&lt;br/&gt;physical estimate]
+  FEAT --&gt; ML
+  ML --&gt; Q[Quantile heads&lt;br/&gt;p10 / p50 / p90 per stage]
+  Q --&gt; COMP[Compose stages&lt;br/&gt;prep + wait + travel + handoff]
+  COMP --&gt; BUF[Business policy&lt;br/&gt;buffer from the quantile,&lt;br/&gt;not from the mean]
+  BUF --&gt; SHOW[ETA shown to customer]
+  BUF --&gt; OPT[Assignment + pricing optimiser]
+  SHOW -.-&gt;|actual outcome| LOGS[(Outcome logs)]
+  OPT -.-&gt;|changed behaviour| LOGS
+  LOGS --&gt; TRAIN[Training&lt;br/&gt;time-forward backtests]
+  TRAIN --&gt; ML
+  FCT[Demand forecasting&lt;br/&gt;hierarchical, region x hour] --&gt; OPT</code></pre>
+<ul>
+<li><strong>Predict the residual on top of a physical model.</strong> A routing engine already
+  knows the road network and live traffic; the model learns what it systematically
+  gets wrong. Uber's DeepETA is built exactly this way.</li>
+<li><strong>Predict a distribution, not a point.</strong> Delivery times are right-skewed, so the
+  mean sits above the median and below the tail. Quantile (pinball) loss gives p10,
+  p50 and p90 directly.</li>
+<li><strong>The displayed number is a business decision.</strong> Show a quantile, not the
+  prediction: the cost of being late is not the cost of being early, and the buffer
+  encodes that asymmetry.</li>
+<li><strong>Decompose the journey into stages</strong> (prep, wait, travel, handoff), because each
+  has different drivers and different variance, and because the optimiser needs the
+  stages separately.</li>
+<li><strong>Backtest forward in time, always.</strong> Random splits leak tomorrow's traffic into
+  today's training set and produce a model that looks excellent and fails on Monday.</li>
+<li><strong>Features must be as-of the prediction moment.</strong> Point-in-time correctness is the
+  most common source of a too-good backtest in forecasting.</li>
+<li><strong>Hierarchical forecasts must reconcile</strong>: region forecasts should sum to the
+  city forecast, and reconciliation methods make that true without throwing away the
+  detail.</li>
+<li><strong>Feedback loops are real.</strong> A longer displayed ETA changes whether the customer
+  orders, and an assignment optimiser fed by your forecast changes the supply that
+  determines the actual time.</li>
+<li><strong>Latency matters more than you expect.</strong> ETA is called on every search, every map
+  refresh and every assignment decision, which makes it one of the highest-QPS models
+  in the company.</li>
+<li><strong>Evidence</strong>: Uber DeepETA (2022), DoorDash ETA posts (2021 onward), Amazon's
+  DeepAR (2017), Google Maps and DeepMind's graph-network work on ETAs, and the
+  hierarchical forecasting literature.</li>
+</ul>
+<h2 id="1-requirements-scoping">1. Requirements &amp; scoping<a class="headerlink" href="#1-requirements-scoping" title="Permanent link">&para;</a></h2>
+<p><strong>Functional.</strong> Two systems that share infrastructure. (a) <em>ETA</em>: given a specific
+trip or order, return the expected arrival time with uncertainty, updated as the
+trip progresses. (b) <em>Demand and supply forecasting</em>: given a region and a horizon,
+forecast orders, couriers, and their imbalance, at the granularity the optimiser
+consumes.</p>
+<p><strong>Non-functional, with numbers to ask for.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Ask the interviewer</th>
+<th>A defensible assumption</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QPS</td>
+<td>"How often is ETA called per order?"</td>
+<td>Dozens of calls per order across search, checkout, assignment and tracking, so tens of thousands of QPS</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>"Budget per ETA call?"</td>
+<td>Under 50 ms p99, because it sits inside other services' budgets</td>
+</tr>
+<tr>
+<td>Horizon</td>
+<td>"ETA horizon and forecast horizon?"</td>
+<td>ETA: 10 to 90 minutes. Forecast: next hour to next 2 weeks</td>
+</tr>
+<tr>
+<td>Granularity</td>
+<td>"Forecast by what unit?"</td>
+<td>Hexagonal region times 15 minutes for operations; city times day for planning</td>
+</tr>
+<tr>
+<td>Accuracy target</td>
+<td>"What do we optimise: mean error or late rate?"</td>
+<td>Late rate at a promised quantile, plus median absolute error</td>
+</tr>
+<tr>
+<td>Freshness</td>
+<td>"How fresh are traffic and store-load features?"</td>
+<td>Seconds for traffic, minutes for store load</td>
+</tr>
+<tr>
+<td>Coverage</td>
+<td>"How many cities, and how different are they?"</td>
+<td>Hundreds, with very different road networks and behaviour</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Success metrics.</strong></p>
+<ul>
+<li><em>North star</em>: on-time rate against the promise shown to the customer, together with
+  the size of the buffer used to achieve it. Either alone is gameable: promise two
+  hours and you are always on time.</li>
+<li><em>Guardrails</em>: order conversion (a long ETA suppresses orders), courier utilisation,
+  support contacts about lateness, and the optimiser's own objective (delivery cost
+  per order).</li>
+<li><em>Offline proxies</em>: median and mean absolute error, quantile loss at the operating
+  quantiles, calibration of the predicted quantiles (does p90 actually contain 90% of
+  outcomes), and error by segment: city, hour, distance band, and the tail.</li>
+</ul>
+<p><strong>Questions a staff engineer asks.</strong></p>
+<ol>
+<li>"Is the ETA a promise or an estimate? A promise needs a quantile and a buffer
+   policy; an estimate needs the median."</li>
+<li>"What consumes this number? A customer display and an assignment optimiser want
+   different things, and the optimiser usually wants the distribution."</li>
+<li>"How late is 'late' in business terms? Refund thresholds and support costs define
+   the asymmetry I optimise against."</li>
+<li>"Do we already have a routing engine? If so, my model predicts its residual rather
+   than starting from coordinates."</li>
+<li>"Does the ETA we show change behaviour? If yes, my training labels come from a
+   world my own model shaped, and I need that in the design."</li>
+</ol>
+<h2 id="2-data">2. Data<a class="headerlink" href="#2-data" title="Permanent link">&para;</a></h2>
+<p><strong>Sources.</strong> Historical trips and orders with timestamps for every stage, GPS traces,
+the road network and the routing engine's outputs, live traffic, store and restaurant
+operational data (prep times, current load, staffing), courier state (location,
+current assignments, shift), weather, events and holidays, and the displayed ETA
+itself, which is a feature of the world you created.</p>
+<p><strong>Labels.</strong> The outcome timestamp, which is mostly clean but has traps:</p>
+<ul>
+<li><em>Stage attribution</em>: the courier marks "picked up" late, so prep time looks longer
+  and travel time shorter. GPS geofence events are more reliable than app taps, and
+  the design should say which is the source of truth.</li>
+<li><em>Censoring</em>: cancelled orders have no completion time, and they are not missing at
+  random; they cancel because they were slow. Dropping them biases the model
+  optimistic.</li>
+<li><em>Multi-stop trips</em>: batched deliveries where one order waits for another need
+  careful attribution or the model learns that the second order is inherently slow.</li>
+</ul>
+<p><strong>Feedback loops, which are the subtle part.</strong> The ETA you display changes behaviour in
+at least three ways: a long ETA suppresses the order (so the training data
+under-represents conditions where you predicted badly), the ETA feeds the assignment
+optimiser which changes which courier is sent, and couriers adjust their behaviour to
+the displayed time. The consequence for design: the model is trained on data generated
+under its own policy, and offline improvements do not translate mechanically. Mitigate
+with holdout regions or randomised buffer experiments, and treat the online test as
+the arbiter.</p>
+<p><strong>Features.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Examples</th>
+<th>Freshness</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Physical</td>
+<td>Routing engine estimate, distance, number of turns, road classes on the path</td>
+<td>Seconds</td>
+</tr>
+<tr>
+<td>Real-time traffic</td>
+<td>Segment speeds, incidents</td>
+<td>Seconds to minutes</td>
+</tr>
+<tr>
+<td>Spatial</td>
+<td>Origin and destination cells, their historical residuals, airport or campus flags</td>
+<td>Batch, with online lookup</td>
+</tr>
+<tr>
+<td>Store or merchant</td>
+<td>Historical prep-time distribution, current open orders, staffing, menu complexity</td>
+<td>Minutes</td>
+</tr>
+<tr>
+<td>Courier and marketplace</td>
+<td>Supply-demand ratio in the region, current assignment queue depth</td>
+<td>Seconds</td>
+</tr>
+<tr>
+<td>Temporal</td>
+<td>Hour of week, holiday calendar, local events, weather</td>
+<td>Batch plus live weather</td>
+</tr>
+<tr>
+<td>Order</td>
+<td>Item count, special handling, payment type</td>
+<td>Request time</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Spatial features need care.</strong> Latitude and longitude as raw numbers are nearly
+useless to a tree or an MLP; geohash or hexagonal cell embeddings at several
+resolutions are the usual encoding, learned jointly with the task, so that "this
+particular apartment complex takes four extra minutes" becomes learnable.</p>
+<p><strong>Point-in-time correctness.</strong> Every historical feature must be the value that was
+known at prediction time: the store's average prep time computed over data up to that
+moment, the traffic as observed then, the supply ratio then. Computing a store's
+average prep time over the full history, including the future, is the single most
+common leak in this domain, and it produces a backtest that cannot be reproduced
+online. The mechanics are in the
+<a href="../12-ml-platform-feature-store-monitoring/">platform chapter</a>.</p>
+<h2 id="3-modelling">3. Modelling<a class="headerlink" href="#3-modelling" title="Permanent link">&para;</a></h2>
+<h3 id="31-baselines">3.1 Baselines<a class="headerlink" href="#31-baselines" title="Permanent link">&para;</a></h3>
+<p>Two, and both are worth naming. The routing engine alone (distance over expected
+speed, summed along the path) is the physical baseline. A historical average by
+(origin cell, destination cell, hour of week) is the statistical baseline. Both are
+cheap, and a good ML model must beat their combination, not just one of them.</p>
+<h3 id="32-residual-learning-on-top-of-a-physical-model">3.2 Residual learning on top of a physical model<a class="headerlink" href="#32-residual-learning-on-top-of-a-physical-model" title="Permanent link">&para;</a></h3>
+<p>The routing engine encodes the road network, turn restrictions and live traffic. A
+neural network starting from raw coordinates would have to relearn all of that from
+trip data, which it will do badly. Predicting the <em>residual</em> between the routing
+estimate and the observed outcome leaves the model with the part it can learn:
+systematic biases by location, time, merchant, courier and order type.</p>
+<div class="arithmatex">\[
+\widehat{\text{ETA}} = \text{routing}(o, d, t) + f_\theta(x),
+\]</div>
+<p>where <span class="arithmatex">\(f_\theta\)</span> predicts the correction. Uber's <a href="https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/">DeepETA post</a> describes exactly this
+hybrid design, using machine learning to predict the residual between the routing
+engine's ETA and the observed outcome, which they call ETA post-processing.</p>
+<p>Two extra benefits to mention. The physical model gives a sane answer when the ML
+model fails or times out, which is a real fallback. And the residual is a much
+better-conditioned target than the absolute time: it is roughly zero-centred, has
+much smaller variance, and does not require the model to learn that longer distances
+take longer.</p>
+<h3 id="33-stage-decomposition">3.3 Stage decomposition<a class="headerlink" href="#33-stage-decomposition" title="Permanent link">&para;</a></h3>
+<p>For a delivery, the total time is the sum of stages with different drivers:</p>
+<div class="arithmatex">\[
+T = T_{\text{assign}} + T_{\text{to store}} + T_{\text{prep wait}} + T_{\text{pickup}} + T_{\text{to customer}} + T_{\text{handoff}}.
+\]</div>
+<p>Model the stages separately and compose. The reasons: each stage has different
+features (prep depends on the merchant, travel on traffic), the optimiser needs the
+stages separately to decide when to dispatch a courier, and a stage-level error is
+diagnosable while a total-time error is not. The cost is that summing quantiles is
+not the quantile of the sum, so composing uncertainty requires either a simulation
+over the stage distributions or a model of their correlation. Say that out loud; it
+is a favourite follow-up.</p>
+<h3 id="34-quantile-regression-and-why-the-mean-is-wrong">3.4 Quantile regression and why the mean is wrong<a class="headerlink" href="#34-quantile-regression-and-why-the-mean-is-wrong" title="Permanent link">&para;</a></h3>
+<p>Travel and delivery times are right-skewed: a delivery can be much later than
+expected, and only a little earlier. The mean of a skewed distribution is a poor
+promise, because it is exceeded more often than half the time in the direction that
+hurts.</p>
+<p>Train with the pinball (quantile) loss. For a target quantile <span class="arithmatex">\(\tau\)</span> and prediction
+<span class="arithmatex">\(q\)</span>:</p>
+<div class="arithmatex">\[
+L_\tau(y, q) = \max\bigl(\tau (y - q),\; (\tau - 1)(y - q)\bigr),
+\]</div>
+<p>which penalises under-prediction with weight <span class="arithmatex">\(\tau\)</span> and over-prediction with weight
+<span class="arithmatex">\(1 - \tau\)</span>. Minimising it yields the <span class="arithmatex">\(\tau\)</span>-quantile of the conditional distribution.
+Predict several quantiles with separate heads on a shared trunk, and enforce
+monotonicity (p10 below p50 below p90) either by construction (predict p50 and
+non-negative offsets) or by sorting at inference.</p>
+<p><img alt="Pinball loss and the skewed delivery-time distribution" src="../../assets/figures/part17_quantile_eta.png" width="760" /></p>
+<p><em>Left: the quantile loss is an asymmetric penalty whose slope ratio picks the
+quantile. Right (illustrative): a right-skewed delivery-time distribution where the
+median, the p90 and the p99 are far apart, which is why the number you display, the
+number you promise and the number operations plan against are three different numbers.</em></p>
+<p><strong>The buffer is policy, not modelling.</strong> Displaying p50 means being late half the
+time. Displaying p90 means a long, conversion-killing estimate. The displayed value
+comes from a policy that trades lateness cost against conversion, and it should be
+chosen by experiment, with the model supplying a calibrated distribution.</p>
+<h3 id="35-model-families">3.5 Model families<a class="headerlink" href="#35-model-families" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Gradient-boosted trees</strong> on engineered features are the strong default for the
+  residual: fast to train, robust, good with heterogeneous tabular features, and they
+  support quantile loss directly. Weak on high-cardinality categorical features
+  (millions of merchants, millions of cells) and on sequences.</li>
+<li><strong>Neural networks with embeddings</strong> handle the high-cardinality spatial and merchant
+  features, which is where they earn their place. Uber's <a href="https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/">DeepETA post</a> reports that an
+  encoder-decoder architecture with self-attention over the feature set gave them the
+  best accuracy among the architectures they tried, under a hard latency constraint.</li>
+<li><strong>Graph networks</strong> over the road network, where segments are nodes and the model
+  propagates congestion along the graph. DeepMind and Google <a href="https://deepmind.google/blog/traffic-prediction-with-advanced-graph-neural-networks/">described using graph
+  neural networks over route "supersegments"</a> to improve ETA accuracy in Google Maps,
+  reporting improvements in several cities.</li>
+<li><strong>Sequence models over the trip so far</strong>, updating the ETA as the trip progresses,
+  which turns a one-shot prediction into a filtering problem.</li>
+</ul>
+<p>For the interview: GBDT residual model as the baseline that ships, a neural model with
+embeddings when merchant and location cardinality dominates, and graph structure when
+you own the road network and congestion propagation matters.</p>
+<h3 id="36-demand-forecasting-and-hierarchy">3.6 Demand forecasting and hierarchy<a class="headerlink" href="#36-demand-forecasting-and-hierarchy" title="Permanent link">&para;</a></h3>
+<p>The other half of the chapter. Forecast orders and courier supply per region per
+time bucket, for horizons from an hour (dispatch) to weeks (recruitment).</p>
+<p><strong>Global models over many series.</strong> Fitting a separate ARIMA per region wastes the
+structure shared across regions. A single model trained across all series, with the
+series identity as an embedding, learns shared seasonality and transfers to sparse
+series. DeepAR (Salinas, Flunkert &amp; Gasthaus, <a href="https://arxiv.org/abs/1704.04110">arXiv:1704.04110</a>) is the canonical
+version: an autoregressive recurrent network trained on many related time series
+producing probabilistic forecasts, handling widely varying scales through rescaling,
+with the paper reporting around 15% accuracy improvement over the state of the art at
+the time on several real-world datasets.</p>
+<p><strong>Hierarchy and reconciliation.</strong> Forecasts exist at several levels (hexagon, city,
+country; product, category, total) and the business needs them to be consistent.
+Forecasting each level independently produces incoherent numbers. Reconciliation
+projects the independent forecasts onto the space of coherent ones; MinT (Wickramasuriya,
+Athanasopoulos &amp; Hyndman, JASA 2019) computes the reconciliation that minimises the
+trace of the forecast error covariance, and it dominates naive bottom-up or top-down
+approaches because it uses information from every level.</p>
+<p><strong>Seasonality, holidays and events.</strong> Multiple seasonalities (hour of day, day of
+week, month), holiday effects that move (Ramadan, Easter), one-off events (a stadium
+concert), and weather. Encode them as features instead of post-hoc adjustments, so
+the model can learn interactions (rain on a Friday evening is not rain plus Friday).</p>
+<p><strong>Marketplace effects.</strong> The forecast feeds an optimiser that changes pricing and
+incentives, which changes demand. A forecast of "demand" is really a forecast of
+demand <em>under the policy you are about to run</em>, which is a counterfactual problem.
+Practical handling: forecast the exogenous part (weather, events, seasonality) and
+model the policy response separately, or include the planned policy variables as
+features so the forecast is explicitly conditional.</p>
+<h3 id="37-long-tail-events">3.7 Long-tail events<a class="headerlink" href="#37-long-tail-events" title="Permanent link">&para;</a></h3>
+<p>Aggregate error metrics are dominated by the common case, while customer complaints
+come from the tail: the order that took three times the estimate. DoorDash's
+<a href="https://doordash.engineering/2021/04/28/improving-eta-prediction-accuracy-for-long-tail-events/">engineering writing on improving ETA accuracy for long-tail events</a> describes a
+combination of real-time features, historical features designed to capture sparse
+patterns around tail events, and a custom loss function that targets accuracy when
+large deviations occur. The general principle: if you want tail accuracy, put it in
+the loss (quantile loss at a high <span class="arithmatex">\(\tau\)</span>, or an asymmetric cost), because a squared
+error objective will always trade the tail away.</p>
+<h2 id="4-training-serving">4. Training &amp; serving<a class="headerlink" href="#4-training-serving" title="Permanent link">&para;</a></h2>
+<p><strong>Training pipeline.</strong> Outcome logs joined to point-in-time features, split by time,
+trained with quantile losses, validated on a held-out future window, and gated on
+per-segment metrics before release. Retrain cadence: daily or weekly for the ETA
+residual model (traffic patterns and merchant behaviour drift), plus a fast path when
+a city's error jumps. Demand models retrain daily with a rolling window.</p>
+<p><strong>Backtesting properly.</strong> The protocol to describe:</p>
+<ol>
+<li>Split by time, never at random.</li>
+<li>Use rolling-origin evaluation: train on data up to <span class="arithmatex">\(t\)</span>, predict <span class="arithmatex">\([t, t + h]\)</span>,
+   advance <span class="arithmatex">\(t\)</span>, repeat. That gives a distribution of errors across periods instead of
+   one number from one lucky window.</li>
+<li>Respect the label delay: at prediction time you do not know the outcomes of trips
+   still in flight, so the features cannot include them.</li>
+<li>Re-run feature computation as-of the prediction timestamp, instead of joining the
+   current value of an aggregate.</li>
+<li>Evaluate on the same segments the business cares about, since a global improvement
+   that regresses one city is a launch blocker.</li>
+</ol>
+<p><strong>Serving.</strong> ETA is called constantly, so the model is one of the highest-QPS services
+in the company, and Uber's <a href="https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/">DeepETA post</a> says theirs is the highest-QPS model at Uber.
+That drives the architecture: a tight latency budget (a few milliseconds of model
+time), feature fetching that is mostly precomputed and cached, integer-quantised or
+small models, and heavy use of batching where the caller allows it.</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Budget</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Routing engine call (often cached per origin-destination pair)</td>
+<td>20 ms</td>
+</tr>
+<tr>
+<td>Feature fetch (real-time and precomputed)</td>
+<td>10 ms</td>
+</tr>
+<tr>
+<td>Model inference</td>
+<td>5 ms</td>
+</tr>
+<tr>
+<td>Composition, buffer policy, response</td>
+<td>5 ms</td>
+</tr>
+<tr>
+<td>Headroom</td>
+<td>10 ms</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Fallbacks.</strong> If the ML model times out, serve the routing estimate plus a static
+correction. If the routing engine fails, serve a historical average by cell pair and
+hour. Neither is good, and both are far better than failing, because a missing ETA
+blocks checkout.</p>
+<p><strong>Cost.</strong> The model is small and the QPS is enormous, so cost is dominated by the
+number of calls, and hardly at all by model size. Caching at the (origin cell, destination
+cell, time bucket) level for the search-time estimates, where precision matters less,
+cuts most of it; the checkout and assignment calls get the full path.</p>
+<h2 id="5-evaluation-experimentation">5. Evaluation &amp; experimentation<a class="headerlink" href="#5-evaluation-experimentation" title="Permanent link">&para;</a></h2>
+<p><strong>Offline.</strong></p>
+<ul>
+<li>Median and mean absolute error, and quantile loss at the operating quantiles.</li>
+<li><strong>Calibration of the quantiles</strong>: does the p90 prediction actually contain 90% of
+  outcomes, per segment. A miscalibrated p90 makes the buffer policy meaningless.</li>
+<li>Error by segment: city, hour of week, distance band, merchant type, and by
+  prediction magnitude (long trips fail differently).</li>
+<li>Tail metrics: the rate of outcomes exceeding the prediction by more than 10 minutes,
+  which is the number customer support feels.</li>
+<li>Pitfalls: random splits (leak), joining aggregates computed over the full history
+  (leak), dropping cancelled orders (optimistic bias), and reporting a single global
+  MAE that hides a broken city.</li>
+</ul>
+<p><strong>Online.</strong> A/B on the on-time rate and the buffer size together, with conversion and
+courier utilisation as guardrails. Two complications specific to this domain:</p>
+<ul>
+<li><strong>Interference.</strong> The assignment optimiser is shared, so a treatment that predicts
+  differently changes which couriers are assigned and therefore the control group's
+  outcomes. Randomise by region and time (switchback) instead of by user, which is
+  the design covered in the
+  <a href="../11-notifications-uplift-experimentation/">experimentation chapter</a>.</li>
+<li><strong>The forecast changes the outcome.</strong> Showing a longer ETA can make the delivery
+  genuinely later (the courier paces to the estimate) or earlier (the customer is
+  ready). Measure the actual duration as well as the error, or you will optimise a
+  metric you are moving by definition.</li>
+</ul>
+<p><strong>Monitoring.</strong> Prediction and residual distributions per city, quantile calibration
+drift, feature staleness and null rates (a stale traffic feed looks like a model
+regression), fallback rate, and the gap between predicted and actual on-time rate.
+Retrain triggers: a city's calibration drifting past a threshold, a road-network or
+routing-engine update, a new market launch, or a seasonal regime change.</p>
+<h2 id="6-trade-offs-alternatives">6. Trade-offs &amp; alternatives<a class="headerlink" href="#6-trade-offs-alternatives" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Chosen</th>
+<th>Alternative</th>
+<th>When you'd flip</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Target</td>
+<td>Residual on a physical model</td>
+<td>End-to-end time from raw inputs</td>
+<td>No routing engine available, or the physical model is unavailable in a market</td>
+</tr>
+<tr>
+<td>Output</td>
+<td>Quantiles (p10, p50, p90)</td>
+<td>Point estimate</td>
+<td>Downstream consumer genuinely wants one number and owns its own buffer</td>
+</tr>
+<tr>
+<td>Loss</td>
+<td>Pinball at operating quantiles</td>
+<td>Squared error</td>
+<td>Symmetric costs and a roughly symmetric distribution, which is rare here</td>
+</tr>
+<tr>
+<td>Structure</td>
+<td>Stage decomposition</td>
+<td>Single total-time model</td>
+<td>Simple trips with one stage, or when stage timestamps are unreliable</td>
+</tr>
+<tr>
+<td>Model</td>
+<td>GBDT residual, neural for high-cardinality features</td>
+<td>Deep model everywhere</td>
+<td>Merchant and location cardinality is low; GBDT is cheaper to train and serve</td>
+</tr>
+<tr>
+<td>Road network</td>
+<td>Features from the routing engine</td>
+<td>Graph neural network over segments</td>
+<td>You own the network and congestion propagation is the dominant error source</td>
+</tr>
+<tr>
+<td>Demand forecasting</td>
+<td>One global model across series</td>
+<td>Per-series classical models</td>
+<td>Few series with long clean histories and strong individual structure</td>
+</tr>
+<tr>
+<td>Hierarchy</td>
+<td>Reconciled forecasts (MinT-style)</td>
+<td>Bottom-up summation</td>
+<td>Very few levels, or when only one level is consumed</td>
+</tr>
+<tr>
+<td>Displayed value</td>
+<td>Policy-chosen quantile plus buffer</td>
+<td>The model's point prediction</td>
+<td>Never; the display is a business decision with an asymmetric cost</td>
+</tr>
+<tr>
+<td>Experiment unit</td>
+<td>Region-time switchback</td>
+<td>User-level A/B</td>
+<td>No shared optimiser and no spillover, which is uncommon in a marketplace</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Failure modes.</strong></p>
+<ul>
+<li><em>A stale traffic feed</em>: predictions drift optimistic across a whole city at once.
+  Detect on feature freshness, not on model error, because model error takes hours to
+  accumulate.</li>
+<li><em>A new merchant with no history</em>: prep-time features are missing and the model falls
+  back to a category prior that is wrong. Monitor new-entity volume and their error.</li>
+<li><em>Road network change or a routing engine update</em>: the residual model was trained
+  against the old physical model, so its corrections are now wrong. Version the
+  physical model as an input to the ML model and retrain when it changes.</li>
+<li><em>Seasonal regime shift</em>: a model trained on summer data is wrong in December.
+  Rolling-origin backtests across seasons reveal it; a single holdout window will not.</li>
+<li><em>Buffer creep</em>: each team adds a safety margin, and the customer sees an estimate
+  20 minutes too long. Audit the end-to-end buffer as one number owned by one team.</li>
+</ul>
+<h2 id="7-how-real-companies-did-it-as-mock-interviews">7. How real companies did it: as mock interviews<a class="headerlink" href="#7-how-real-companies-did-it-as-mock-interviews" title="Permanent link">&para;</a></h2>
+<h3 id="71-uber-the-highest-qps-model-in-the-company">7.1 Uber, "the highest-QPS model in the company"<a class="headerlink" href="#71-uber-the-highest-qps-model-in-the-company" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "We already have a routing engine that uses map data and live
+traffic, and its ETAs are systematically wrong in ways riders notice. Fix the accuracy
+without breaking a latency budget that sits inside every other service."</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the routing engine stays, so the ML problem is
+the correction; latency is severe because ETA is called everywhere; the model must
+serve globally across very different cities. <em>Metrics</em>: error against observed
+arrival, by segment. <em>Data</em>: origin, destination, request time, real-time traffic,
+and the nature of the request, such as whether it is a rideshare pickup or a delivery
+dropoff. <em>Model</em>: predict the residual between the routing engine's estimate and the
+observed outcome, with an architecture chosen under the latency constraint. <em>Serve</em>:
+a very high QPS prediction service with a hard latency ceiling and a fallback to the
+routing estimate. <em>Evaluate</em>: offline error by segment, then online.</p>
+<p><strong>What the source says.</strong> Uber's engineering post <a href="https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/">"DeepETA: How Uber Predicts Arrival
+Times Using Deep Learning"</a> (February 2022) describes a routing engine that predicts
+ETA as a sum of segment traversal times along the best path, an ML model that predicts
+the residual between that estimate and the observed outcome (which they call ETA post
+processing), features including origin, destination, request time, real-time traffic
+and request type, an encoder-decoder architecture with self-attention selected for
+accuracy under their latency constraints, and the statement that this is the
+highest-QPS model at Uber.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: learn the residual, keep the physics</p>
+<p>"I'd keep the routing engine and train the model to predict its residual, instead
+of learning arrival time end to end from coordinates. Uber published this design
+as <a href="https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/">DeepETA</a> in 2022: the routing engine sums segment traversal times along the
+best path using map data and live traffic, and the ML model predicts the
+difference between that and what actually happened. The alternative, an
+end-to-end model from raw inputs, would have to rediscover the road network and
+turn restrictions from trip data, which it does badly and expensively. The
+residual target is also much better conditioned, roughly zero-centred with small
+variance, so a smaller model hits the accuracy bar. Uber describe this as their
+highest-QPS model, so a smaller model is worth real money. The extra benefit I'd point out is
+the fallback: if the ML service times out, the routing estimate is still a
+serviceable answer, which a pure end-to-end model does not give me."</p>
+</div>
+<h3 id="72-doordash-the-complaints-come-from-the-tail">7.2 DoorDash, "the complaints come from the tail"<a class="headerlink" href="#72-doordash-the-complaints-come-from-the-tail" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "Our average ETA error looks fine and our customers are
+unhappy. The complaints are about the deliveries that run far over. What do you
+change?"</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the metric being optimised (mean error) is not
+the metric being felt (large deviations); the delivery has multiple stages with
+different variance. <em>Metrics</em>: rate of large over-runs, plus quantile calibration.
+<em>Data</em>: real-time signals about store load and courier supply that predict congestion,
+plus historical features that capture sparse patterns for particular stores and time
+windows. <em>Model</em>: keep the structure, change the loss to penalise large deviations,
+and add the features that carry tail signal. <em>Serve</em>: same path. <em>Evaluate</em>: tail
+metrics explicitly, not just MAE.</p>
+<p><strong>What the source says.</strong> DoorDash's engineering post <a href="https://doordash.engineering/2021/04/28/improving-eta-prediction-accuracy-for-long-tail-events/">"Improving ETA Prediction
+Accuracy for Long-tail Events"</a> (April 2021) describes a three-part approach: adding
+real-time features to the model, using historical features that help the model learn
+sparse patterns around tail events, and a custom loss function that optimises for
+accuracy when large deviations occur. Their later engineering writing describes
+<a href="https://careersatdoordash.com/blog/improving-etas-with-multi-task-models-deep-learning-and-probabilistic-forecasts/">multi-task models and probabilistic forecasts for ETAs</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: put the tail in the loss</p>
+<p>"If the complaints are about large over-runs, I'd change the loss before I change
+the architecture. Squared error spends its capacity on the middle of the
+distribution and will happily trade away the tail, so I'd move to quantile loss
+at a high tau, or an explicitly asymmetric cost that matches what a late delivery
+costs us in refunds and support contacts. DoorDash described exactly this in
+their <a href="https://doordash.engineering/2021/04/28/improving-eta-prediction-accuracy-for-long-tail-events/">2021 post on long-tail ETA accuracy</a>: real-time features, historical
+features aimed at sparse tail patterns, and a custom loss targeting large
+deviations. The alternative is to keep the loss and add a bigger buffer, which
+fixes the on-time rate and costs conversion on every single order, including the
+ones that were never at risk. The trade-off with a tail-weighted loss is that
+median accuracy degrades slightly, so I'd report median error and tail rate side
+by side and let the product decide the trade, instead of hiding it in a single
+number."</p>
+</div>
+<h3 id="73-amazon-thousands-of-series-and-you-need-the-distribution">7.3 Amazon, "thousands of series, and you need the distribution"<a class="headerlink" href="#73-amazon-thousands-of-series-and-you-need-the-distribution" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "We forecast demand for millions of products across many
+warehouses. Most products have short, sparse histories. Fitting a model per series
+does not work. What do you build?"</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the consumer is an inventory optimiser that
+needs quantiles, not point forecasts, because safety stock is a quantile decision;
+scales vary by orders of magnitude across products. <em>Metrics</em>: quantile loss at the
+service levels the business uses. <em>Data</em>: many related series with covariates
+(promotions, price, seasonality). <em>Model</em>: one global autoregressive model trained
+across all series, with per-series embeddings, rescaling to handle scale variation,
+and a probabilistic output so the optimiser gets a distribution. <em>Serve</em>: batch
+forecasts on a schedule. <em>Evaluate</em>: quantile loss and calibration, backtested
+rolling-origin.</p>
+<p><strong>What the source says.</strong> Salinas, Flunkert &amp; Gasthaus, "DeepAR: Probabilistic
+Forecasting with Autoregressive Recurrent Networks" (<a href="https://arxiv.org/abs/1704.04110">arXiv:1704.04110</a>) describes
+training a single autoregressive recurrent model on a large number of related time
+series to produce probabilistic forecasts, handling widely varying scales through
+rescaling and velocity-based sampling, learning seasonality and growing uncertainty
+from the data, and reports accuracy improvements of around 15% over the state of the
+art on several real-world datasets.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: one global model, probabilistic output</p>
+<p>"For many sparse related series I'd train one global model across all of them
+with a series embedding, and I'd make the output a distribution. DeepAR is the
+reference: one autoregressive recurrent model trained across many related series,
+rescaled to cope with scales that differ by orders of magnitude, producing
+probabilistic forecasts, with reported accuracy gains of around 15% over the
+prior state of the art. The alternative is a classical model per series, which is
+interpretable and works well when a series has a long clean history, and which
+starves on the thousands of products with six weeks of sparse data. The reason
+I insist on the probabilistic output: the consumer is an inventory optimiser
+choosing safety stock, and safety stock is a quantile decision, so a
+point forecast forces the optimiser to invent its own uncertainty model from
+nothing."</p>
+</div>
+<h3 id="74-google-maps-the-road-network-is-a-graph">7.4 Google Maps, "the road network is a graph"<a class="headerlink" href="#74-google-maps-the-road-network-is-a-graph" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "Our ETAs are computed from segment speeds, and they miss the
+way congestion propagates: a jam two kilometres ahead will affect this segment in
+five minutes. How would you capture that?"</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the structure we are failing to use is the
+connectivity of the road network over time. <em>Model</em>: represent the route as a graph of
+connected segments and run a graph neural network so that information propagates
+between adjacent segments, predicting travel time over the composed route instead of
+summing independent segment estimates. <em>Data</em>: historical and live traffic over the
+network. <em>Serve</em>: precompute over commonly travelled groupings of segments to keep
+query-time cost bounded. <em>Evaluate</em>: ETA accuracy per city, since road networks and
+traffic behaviour differ.</p>
+<p><strong>What the sources say.</strong> DeepMind and Google published a <a href="https://deepmind.google/blog/traffic-prediction-with-advanced-graph-neural-networks/">description of using graph
+neural networks to improve ETA predictions in Google Maps</a>, operating over
+"supersegments" (sequences of adjacent road segments) so the model can account for
+connectivity, and reported improvements in real-time ETA accuracy across a number of
+cities.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: graph structure when you own the network</p>
+<p>"If congestion propagation is the dominant error source, I'd model the route as a
+graph instead of a sum of independent segments. DeepMind and Google <a href="https://deepmind.google/blog/traffic-prediction-with-advanced-graph-neural-networks/">described
+doing this for Google Maps</a>, using graph neural networks over supersegments,
+sequences of adjacent road segments, and reported improved real-time ETA accuracy
+across a number of cities. The alternative, my segment-sum baseline with traffic
+features, is far cheaper and cannot express 'this segment will be slow in five
+minutes because of what is happening downstream'. The trade-off is serving cost
+and complexity: a graph model over a live network is expensive at query time,
+which is why they precompute over supersegments instead of running the graph per
+request. I'd only take this on if I owned the road network data, and I'd check
+first whether my residual model with downstream-traffic features already captures
+most of it, because it often does at a fraction of the cost."</p>
+</div>
+<h3 id="75-the-marketplace-your-forecast-changes-the-future">7.5 The marketplace, "your forecast changes the future"<a class="headerlink" href="#75-the-marketplace-your-forecast-changes-the-future" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "Our demand forecast feeds surge pricing and courier
+incentives. When we forecast high demand, we raise pricing, and demand falls. Our
+forecast is then wrong, and we retrain on that. What is going on and how do you fix
+it?"</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the forecast is an input to a policy that
+changes the outcome, so "demand" is not exogenous. <em>Metrics</em>: forecast error
+conditional on the policy, plus the optimiser's own objective. <em>Model</em>: separate the
+exogenous drivers (weather, events, seasonality, trend) from the policy response, and
+make the forecast explicitly conditional on the planned policy variables, so it
+answers "demand if we price like this". <em>Data</em>: policy variables logged as features;
+randomised or switchback experiments to identify the response. <em>Evaluate</em>: backtest
+conditionally, and use switchback experiments to estimate the policy response rather
+than reading it off observational data.</p>
+<p><strong>What the sources say.</strong> The switchback experimental design used to handle exactly
+this kind of interference in marketplaces is described in DoorDash's <a href="https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/">engineering
+writing on switchback testing</a> and in the causal-inference literature on experiments
+under interference; the design details are covered in the
+<a href="../11-notifications-uplift-experimentation/">experimentation chapter</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: forecast conditionally, identify the response experimentally</p>
+<p>"The forecast has become a self-fulfilling input, so I'd stop forecasting
+'demand' and start forecasting 'demand given the policy we are about to run'.
+Concretely: the model takes the planned pricing and incentive variables as
+features, so its output is explicitly conditional, and the exogenous part
+(weather, events, seasonality) is modelled separately. The part that cannot come
+from observational data is the policy response itself, because historically we
+only priced high when we predicted high demand, so price and demand are
+confounded. That has to come from randomisation, and in a marketplace the unit
+has to be region-time instead of user, because supply is shared. DoorDash has
+<a href="https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/">written about switchback experiments</a> for this reason. The trade-off is that
+switchbacks are noisy and need long run times, so I'd use them to estimate the
+response curve occasionally instead of continuously."</p>
+</div>
+<h2 id="8-staff-level-follow-ups">8. Staff-level follow-ups<a class="headerlink" href="#8-staff-level-follow-ups" title="Permanent link">&para;</a></h2>
+<div class="admonition interview">
+<p class="admonition-title">Your offline MAE improved by 8% and the on-time rate did not move. Why?</p>
+<p>Several possibilities, and I'd check them in order. First, the displayed ETA is a
+quantile plus a buffer, so improving the median does nothing to the on-time rate
+unless the buffer policy is re-tuned against the new distribution; the fix is to
+re-optimise the buffer jointly with the model. Second, the improvement may be
+concentrated where it does not matter, for example short trips that were already
+on time, so I'd decompose the gain by distance band and by whether the order was
+at risk. Third, leakage: an 8% offline gain that vanishes online is the classic
+signature of a feature computed with information not available at prediction time.
+Fourth, the feedback loop: a better ETA changes assignment decisions, which
+changes the actual durations, so the outcome distribution moved under me.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Why not just predict the mean and add a constant buffer?</p>
+<p>Because the right buffer is not constant. The spread of the outcome distribution
+varies enormously by context: a short trip on a quiet Tuesday has a few minutes of
+spread, a long trip through a city centre on Friday evening with a busy merchant
+has thirty. A constant buffer is simultaneously too small in the high-variance
+case, which is where the complaints come from, and too large in the low-variance
+case, which costs conversion on every one of those orders. Predicting quantiles
+gives me a context-dependent spread, so the buffer adapts. The extra cost is
+calibration work: a p90 that is not really a p90 is worse than a constant buffer,
+because it gives false confidence to the policy layer.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">How do you compose stage-level uncertainty into a total?</p>
+<p>Not by adding quantiles, because the p90 of a sum is not the sum of the p90s
+unless the stages are perfectly correlated. Three options. Simulate: sample from
+each stage's predicted distribution and take quantiles of the sum, which handles
+arbitrary shapes and needs a correlation model. Model the total directly with its
+own quantile heads, using the stage predictions as features, which sidesteps the
+composition problem and loses the stage-level interpretability the optimiser
+wants. Or assume a parametric family per stage (log-normal is a decent fit for
+travel times) and compose analytically with an estimated correlation. In practice
+I'd predict stages for the optimiser and a separate total-time model for the
+displayed number, and reconcile the two so they do not contradict each other
+visibly.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Walk me through a backtest that will not lie to me.</p>
+<p>Time-ordered splits with rolling origins: train on everything up to <span class="arithmatex">\(t\)</span>, evaluate
+on <span class="arithmatex">\([t, t+h]\)</span>, roll forward, and report the distribution of errors over many
+origins rather than one number. Every feature recomputed as-of the prediction
+timestamp, which in practice means the feature store has to support point-in-time
+joins rather than the training job joining current aggregate tables. Trips still
+in flight at <span class="arithmatex">\(t\)</span> contribute no label and no features derived from their outcome.
+Cancelled orders handled explicitly rather than dropped, since they cancel for
+reasons correlated with lateness. And evaluation across at least a full seasonal
+cycle, or you will discover in December that the model only knows summer. The
+test I'd run to catch a leak: shuffle the timestamps and confirm performance
+collapses; if it does not, something in the pipeline is reading the future.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">A city launches next month with no historical data. What do you do?</p>
+<p>Start with the physical model, which needs only map data, plus a residual model
+trained on similar cities with the city identity held out, so the model must
+generalise from city-level attributes (density, road type mix, average speeds)
+rather than memorise. Add a conservative buffer initially, and shrink it as data
+accumulates, with the shrink schedule tied to measured calibration rather than to
+the calendar. Instrument heavily from day one: the first weeks of a new market are
+when the residual distribution is most informative, and transfer from the wrong
+donor city is the failure I'd watch for, so I'd compare the new city's residual
+distribution to the donors weekly.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">5x demand spike from a storm. What happens to your system?</p>
+<p>Two distinct problems. The forecast is wrong because storms are rare in the
+training data, which argues for weather as an explicit feature and for a
+fallback that widens the predicted distribution when the feature values are
+outside the training range, rather than confidently predicting the usual. The ETA
+model degrades because supply-demand ratios go outside anything it has seen, and
+the model extrapolates badly; monotonic constraints on the supply features help
+here, since more demand per courier must not decrease the predicted time. The
+serving system itself is fine, since it is a small model at high QPS. The
+operational answer is to widen buffers automatically when features are
+out-of-distribution, which is a detectable condition, and to say so in the product
+rather than silently promising times we cannot hit.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Which should feed the optimiser: the point estimate or the distribution?</p>
+<p>The distribution, when the optimiser can use it. Assignment decisions are
+fundamentally about risk: sending a courier who will probably be quick but might
+be very slow is different from sending one who is reliably medium, and only the
+distribution can express that. Practically the optimiser usually wants a few
+quantiles rather than a full distribution, so I'd expose p10, p50 and p90 per
+stage. The cost is that the optimiser's problem gets harder and slower, so I'd
+negotiate: give it the distribution for the decisions where risk matters
+(assignment, batching) and the median for the ones where it does not (display
+ordering).</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">What breaks first at 10x volume?</p>
+<p>The feature service, because ETA is called dozens of times per order and each call
+fans out to real-time features. The fixes are caching at coarse granularity for
+the low-stakes calls (search-time estimates), and pushing precomputed features
+close to the model. Second is the training data volume, which forces sampling
+strategies that preserve the tail, since uniform down-sampling throws away exactly
+the rare events the tail-weighted loss needs. The model itself scales fine; it is
+small by design because of the latency budget.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Give me the metric you would show the operations leadership.</p>
+<p>On-time rate against the promise, plotted with the average buffer on the same
+chart, segmented by city. Either alone is easy to move in a way that helps nobody:
+on-time rate goes to 100% by promising two hours, and the buffer goes to zero by
+being late constantly. The pair shows whether the forecast is genuinely getting
+sharper. Underneath it I'd keep quantile calibration per city as the health
+metric, because when calibration drifts, both headline numbers stop meaning what
+people think they mean.</p>
+</div>
+<h2 id="9-scaling-evolution">9. Scaling &amp; evolution<a class="headerlink" href="#9-scaling-evolution" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>One city.</strong> The routing engine plus a historical-average correction by cell pair
+  and hour. Log everything with stage timestamps, because that logging is what makes
+  the next version possible.</li>
+<li><strong>Several cities.</strong> A GBDT residual model with point-in-time features, quantile
+  heads, a buffer policy chosen by experiment, and rolling-origin backtests. Demand
+  forecasting with one global model across regions.</li>
+<li><strong>Global.</strong> Neural residual models with high-cardinality spatial and merchant
+  embeddings, stage decomposition feeding an optimiser, tail-weighted losses,
+  per-city calibration monitoring, switchback experimentation, and hierarchical
+  reconciled demand forecasts.</li>
+<li><strong>Batch to real-time.</strong> ETAs updated continuously during the trip using the observed
+  progress so far, which turns the model into a filter; demand forecasts refreshed
+  every few minutes for dispatch rather than hourly for planning.</li>
+<li><strong>Single model to jointly optimised.</strong> The end state couples forecasting, pricing and
+  assignment: the forecast is conditional on the policy, the policy is chosen against
+  the forecast distribution, and the whole loop is evaluated with switchbacks. That
+  coupling is where the remaining value is, and it is also where the evaluation
+  difficulty moves from modelling to causal inference.</li>
+</ul>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Uber Engineering. "DeepETA: How Uber Predicts Arrival Times Using Deep Learning." February 2022 (<a href="https://www.uber.com/us/en/blog/deepeta-how-uber-predicts-arrival-times/">uber.com</a>).</li>
+<li>DoorDash Engineering. "Improving ETA Prediction Accuracy for Long-tail Events." April 2021 (<a href="https://doordash.engineering/2021/04/28/improving-eta-prediction-accuracy-for-long-tail-events/">doordash.engineering</a>); "Improving ETAs with multi-task models, deep learning, and probabilistic forecasts" (<a href="https://careersatdoordash.com/blog/improving-etas-with-multi-task-models-deep-learning-and-probabilistic-forecasts/">careersatdoordash.com</a>); "Switchback Tests and Randomized Experimentation Under Network Effects at DoorDash" (<a href="https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/">careersatdoordash.com</a>).</li>
+<li>Salinas, D., Flunkert, V., Gasthaus, J. "DeepAR: Probabilistic Forecasting with Autoregressive Recurrent Networks." 2017 (<a href="https://arxiv.org/abs/1704.04110">arXiv:1704.04110</a>); published in the International Journal of Forecasting, 2020.</li>
+<li>DeepMind and Google. "Traffic prediction with advanced Graph Neural Networks" (graph neural networks over supersegments for Google Maps ETAs), 2020 (<a href="https://deepmind.google/blog/traffic-prediction-with-advanced-graph-neural-networks/">deepmind.google</a>).</li>
+<li>Wickramasuriya, S. L., Athanasopoulos, G., Hyndman, R. J. "Optimal Forecast Reconciliation for Hierarchical and Grouped Time Series Through Trace Minimization." JASA 2019.</li>
+<li>Hyndman, R. J., Athanasopoulos, G. "Forecasting: Principles and Practice," 3rd edition. Online textbook covering hierarchical forecasting, backtesting and evaluation (<a href="https://otexts.com/fpp3/">otexts.com/fpp3</a>).</li>
+<li>Koenker, R., Bassett, G. "Regression Quantiles." Econometrica 1978.</li>
+<li>Book cross-references: <a href="../11-notifications-uplift-experimentation/">notifications, uplift &amp; experimentation (switchbacks)</a>, <a href="../12-ml-platform-feature-store-monitoring/">ML platform &amp; point-in-time features</a>, <a href="../../part13-retrieval-eval-reliability/03-uncertainty-reliability/">uncertainty &amp; reliability</a>.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../13-novel-object-3d-detection/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Novel-object 3D detection from unlabeled fleet data">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Novel-object 3D detection from unlabeled fleet data
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../11-notifications-uplift-experimentation/" class="md-footer__link md-footer__link--next" aria-label="Next: Notifications, uplift &amp; experimentation">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Notifications, uplift & experimentation
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "navigation.tracking", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,7694 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A first-principles-to-frontier compendium for staff-level ML interviews — math, from-scratch code, systems, and production case studies.">
+      
+      
+      
+        <link rel="canonical" href="https://veesarma.github.io/ml-interview-book/part17-ml-system-design/12-ml-platform-feature-store-monitoring/">
+      
+      
+        <link rel="prev" href="../11-notifications-uplift-experimentation/">
+      
+      
+        <link rel="next" href="../../part18-company-deep-dives/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>ML platform, feature store & monitoring - The ML Interview Book</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ml-platform-feature-store-monitoring" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="The ML Interview Book" class="md-header__button md-logo" aria-label="The ML Interview Book" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The ML Interview Book
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ML platform, feature store & monitoring
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/veesarma/ml-interview-book" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    veesarma/ml-interview-book
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../preface/how-to-use/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Preface
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part01-math/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  I. Math
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part02-classical/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  II. Classical ML
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part03-neural-nets/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  III. Neural Nets
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part04-vision/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  IV. Vision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part05-sequence-transformers/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  V. Sequences & Transformers
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part06-llm-training/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  VI. LLM Training
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part07-post-training/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  VII. Post-training
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part08-multimodal/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  VIII. Multimodal
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part09-generative/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  IX. Generative
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part10-self-supervised/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  X. Self-/Semi-/Weak Supervision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part11-perception-autonomy/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XI. Perception & Autonomy
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part12-rl/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XII. Reinforcement Learning
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part13-retrieval-eval-reliability/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XIII. Retrieval, Eval & Reliability
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part14-systems/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XIV. Systems
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part15-interpretability-safety/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XV. Interpretability & Safety
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part16-coding-canon/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XVI. Coding Canon
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part19-breadth-review/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XIX. Breadth Review
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part20-project-deep-dive/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XX. Your Projects
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XVII. ML System Design
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part18-company-deep-dives/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XVIII. Company Deep Dives
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../references/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  References
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="The ML Interview Book" class="md-nav__button md-logo" aria-label="The ML Interview Book" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    The ML Interview Book
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/veesarma/ml-interview-book" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    veesarma/ml-interview-book
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Preface
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Preface
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/how-to-use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How to use this book
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/study-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Study plan (6–9 months)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/interview-signal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What staff-level signal looks like
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part01-math/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I. Math
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    I. Math
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/01-linear-algebra/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear algebra
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/02-calculus-matrix-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calculus & matrix calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/03-probability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Probability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/04-statistics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/05-information-theory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Information theory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/06-optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/07-tensor-shapes-broadcasting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tensors, shapes & broadcasting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part02-classical/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    II. Classical ML
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    II. Classical ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/01-linear-regression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear regression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/02-logistic-softmax-regression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logistic & softmax regression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/03-trees-and-ensembles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trees & ensembles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/04-knn-kmeans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KNN & K-means
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/05-probabilistic-models-em/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Probabilistic models & EM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/06-dimensionality-reduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dimensionality reduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/07-kernel-methods-svm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kernel methods & SVMs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part03-neural-nets/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    III. Neural Nets
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    III. Neural Nets
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/01-mlp-and-activations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLPs & activations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/02-backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/03-autograd-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building an autograd engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/04-initialization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/05-normalization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Normalization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/06-regularization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Regularization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part04-vision/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IV. Vision
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IV. Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/01-image-representation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image representation & signal processing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/02-convolutions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Convolutions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/03-cnn-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CNN architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/04-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/05-segmentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Segmentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/06-geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geometry & cameras
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/07-3d-perception/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part05-sequence-transformers/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    V. Sequences & Transformers
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    V. Sequences & Transformers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/01-rnn-lstm-gru/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RNN, LSTM, GRU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/02-seq2seq-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seq2seq & early attention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/03-attention-mathematics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attention mathematics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/04-transformer-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/05-positional-encodings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Positional encodings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/06-tokenization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tokenization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part06-llm-training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VI. LLM Training
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VI. LLM Training
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/01-pretraining-data-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pretraining data & objective
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/02-scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/03-large-model-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Large-model architecture (MoE, GQA, SSMs)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/04-efficient-attention-kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Efficient attention & KV cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/05-quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/06-fine-tuning-lora/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & LoRA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/07-mid-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mid-training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part07-post-training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VII. Post-training
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VII. Post-training
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/01-sft/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervised fine-tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/02-reward-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reward models & preferences
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/03-rlhf-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF with PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/04-dpo-and-friends/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DPO and its relatives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/05-reasoning-rl-grpo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reasoning RL, RLVR & GRPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/06-test-time-compute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test-time compute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part08-multimodal/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VIII. Multimodal
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VIII. Multimodal
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/01-vision-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision Transformers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/02-detr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DETR & set prediction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/03-clip-contrastive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLIP & contrastive learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/04-vlm-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VLM architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/05-multimodal-foundation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal foundation models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/06-video-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part09-generative/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IX. Generative
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IX. Generative
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/01-autoencoders-vae/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autoencoders & VAEs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/02-gans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GANs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/03-diffusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/04-flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part10-self-supervised/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    X. Self-/Semi-/Weak Supervision
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_12" id="__nav_12_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    X. Self-/Semi-/Weak Supervision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/01-self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-supervised learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/02-semi-supervised/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Semi-supervised learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/03-weak-supervision-and-auto-labeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Weak supervision & auto-labeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part11-perception-autonomy/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XI. Perception & Autonomy
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_13" id="__nav_13_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XI. Perception & Autonomy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/01-perception-foundation-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Perception foundation models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/02-multi-camera-bev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-camera & BEV
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/03-sensor-fusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor fusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/04-tracking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tracking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/05-occupancy-temporal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Occupancy & temporal perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/06-prediction-planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prediction & planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/07-world-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    World models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part12-rl/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XII. Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_14" id="__nav_14_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XII. Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/01-mdp-bellman/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs & Bellman equations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/02-classical-rl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical RL algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/03-deep-rl-dqn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep RL & DQN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/04-policy-gradients-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy gradients, GAE & PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/05-imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/06-agents-tool-use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents & tool use
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_15" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part13-retrieval-eval-reliability/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIII. Retrieval, Eval & Reliability
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_15" id="__nav_15_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIII. Retrieval, Eval & Reliability
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/01-retrieval-and-rag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/02-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/03-uncertainty-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uncertainty & reliability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_16" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part14-systems/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIV. Systems
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_16" id="__nav_16_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIV. Systems
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/01-distributed-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/02-training-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/03-inference-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inference systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/04-hardware-memory-roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware, memory & roofline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_17" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part15-interpretability-safety/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XV. Interpretability & Safety
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_17" id="__nav_17_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_17">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XV. Interpretability & Safety
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15-interpretability-safety/01-interpretability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpretability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15-interpretability-safety/02-safety-failure-modes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Safety & failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_18" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part16-coding-canon/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVI. Coding Canon
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_18" id="__nav_18_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_18">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVI. Coding Canon
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/01-numpy-torch-cheatsheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NumPy ↔ PyTorch cheat sheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/02-shape-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shape & broadcasting drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/03-timed-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timed coding drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_19" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part19-breadth-review/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIX. Breadth Review
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_19" id="__nav_19_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_19">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIX. Breadth Review
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/01-basics-losses-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basics, losses, models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/02-evaluation-debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation and debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/03-deep-learning-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep learning and Transformers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/04-llms-multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLMs and multimodal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/05-serving-data-engines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serving, data engines, real-world
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/06-rapid-fire/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rapid-fire derivations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_20" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part20-project-deep-dive/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XX. Your Projects
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_20" id="__nav_20_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_20">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XX. Your Projects
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/01-carl-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CARL framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/02-streetsmart-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worked deep dive, StreetSmart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/03-edge-perception-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worked deep dive, edge perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/04-behavioral-leadership/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Behavioral and leadership
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_21" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVII. ML System Design
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_21" id="__nav_21_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_21_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_21">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVII. ML System Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-recommendation-feed-ranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feed & recommendation ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-search-ranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-ads-ctr-prediction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ads CTR / conversion prediction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-fraud-anomaly-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fraud & anomaly detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-perception-system-av/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous-vehicle perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-visual-search-image-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual search & image retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-content-moderation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content moderation & trust
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-llm-product-rag-assistant/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM assistant with RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-ocr-document-understanding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OCR & document understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../13-novel-object-3d-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Novel-object 3D detection from unlabeled fleet data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-forecasting-eta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting & ETA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11-notifications-uplift-experimentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications, uplift & experimentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML platform, feature store & monitoring
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML platform, feature store & monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-the-whiteboard-in-60-seconds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR: the whiteboard in 60 seconds
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-requirements-scoping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Requirements &amp; scoping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-data-the-feature-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Data: the feature platform
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Data: the feature platform">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-the-problem-it-solves" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 The problem it solves
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-point-in-time-correctness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Point-in-time correctness
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-batch-streaming-and-request-time-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Batch, streaming and request-time features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-storage-and-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Storage and serving
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-data-quality-and-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Data quality and validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-training-tracking-and-the-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Training, tracking and the registry
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-serving-cicd-and-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Serving, CI/CD and release
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-cost-scheduling-and-organisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Cost, scheduling and organisation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-llmops-what-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. LLMOps: what changes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-trade-offs-alternatives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Trade-offs &amp; alternatives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-how-real-companies-did-it-as-mock-interviews" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. How real companies did it: as mock interviews
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. How real companies did it: as mock interviews">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#91-uber-the-same-feature-offline-and-online" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.1 Uber, "the same feature, offline and online"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#92-airbnb-define-it-once-backfill-it-correctly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.2 Airbnb, "define it once, backfill it correctly"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#93-netflix-let-scientists-write-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.3 Netflix, "let scientists write Python"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#94-google-test-the-data-not-just-the-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.4 Google, "test the data, not just the model"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#95-the-technical-debt-view-what-this-platform-is-actually-preventing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.5 The technical-debt view, "what this platform is actually preventing"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-staff-level-follow-ups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Staff-level follow-ups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-scaling-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Scaling &amp; evolution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_22" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part18-company-deep-dives/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVIII. Company Deep Dives
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_22" id="__nav_22_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVIII. Company Deep Dives
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/tesla/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tesla (Autopilot / FSD / Optimus)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/waymo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waymo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/zoox-nuro-aurora/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zoox, Nuro, Aurora & robotaxi peers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/nvidia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NVIDIA (DRIVE, Cosmos, Isaac)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/meta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meta (Feed, Reels, Ads, FAIR)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/google-youtube/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Google & YouTube
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/tiktok-bytedance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TikTok / ByteDance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/netflix-spotify/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Netflix & Spotify
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/pinterest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pinterest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/uber-doordash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uber & DoorDash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/airbnb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Airbnb
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/amazon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Amazon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/apple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Apple
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/stripe-fintech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stripe & fintech fraud
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/frontier-labs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAI, Anthropic & DeepMind
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/scale-ai-data-engines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scale AI & data engines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../references/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-the-whiteboard-in-60-seconds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR: the whiteboard in 60 seconds
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-requirements-scoping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Requirements &amp; scoping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-data-the-feature-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Data: the feature platform
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Data: the feature platform">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-the-problem-it-solves" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 The problem it solves
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-point-in-time-correctness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Point-in-time correctness
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-batch-streaming-and-request-time-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Batch, streaming and request-time features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-storage-and-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Storage and serving
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-data-quality-and-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Data quality and validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-training-tracking-and-the-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Training, tracking and the registry
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-serving-cicd-and-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Serving, CI/CD and release
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-cost-scheduling-and-organisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Cost, scheduling and organisation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-llmops-what-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. LLMOps: what changes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-trade-offs-alternatives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Trade-offs &amp; alternatives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-how-real-companies-did-it-as-mock-interviews" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. How real companies did it: as mock interviews
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. How real companies did it: as mock interviews">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#91-uber-the-same-feature-offline-and-online" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.1 Uber, "the same feature, offline and online"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#92-airbnb-define-it-once-backfill-it-correctly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.2 Airbnb, "define it once, backfill it correctly"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#93-netflix-let-scientists-write-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.3 Netflix, "let scientists write Python"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#94-google-test-the-data-not-just-the-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.4 Google, "test the data, not just the model"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#95-the-technical-debt-view-what-this-platform-is-actually-preventing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.5 The technical-debt view, "what this platform is actually preventing"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-staff-level-follow-ups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Staff-level follow-ups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-scaling-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Scaling &amp; evolution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="ml-platform-feature-store-monitoring">ML platform, feature store &amp; monitoring<a class="headerlink" href="#ml-platform-feature-store-monitoring" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Why this matters / who asks it.</strong> Uber, Airbnb, Netflix, Meta, Spotify, Stripe,
+LinkedIn and DoorDash all built one, and they ask about it because at a certain
+size the bottleneck stops being any single model and becomes the time from idea to
+a model serving traffic safely. The business problem is leverage: a platform that
+lets fifty teams ship models without fifty bespoke pipelines, without a new
+training-serving skew bug per team, and without an outage every time somebody
+pushes a model. The interviewer is checking whether you can name point-in-time
+correctness and say why it is hard, whether you understand that monitoring an ML
+system is different from monitoring a service, and whether you know what to
+centralise and what to leave to teams.</p>
+</blockquote>
+<h2 id="tldr-the-whiteboard-in-60-seconds">TL;DR: the whiteboard in 60 seconds<a class="headerlink" href="#tldr-the-whiteboard-in-60-seconds" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart LR
+  subgraph data [Data plane]
+    SRC[(Sources: events,&lt;br/&gt;OLTP snapshots, logs)] --&gt; BATCH[Batch compute&lt;br/&gt;Spark/SQL, backfills]
+    SRC --&gt; STREAM[Stream compute&lt;br/&gt;Flink/Kafka, windows]
+    BATCH --&gt; OFF[(Offline store&lt;br/&gt;warehouse, PIT joins)]
+    STREAM --&gt; ONL[(Online store&lt;br/&gt;KV, ms reads)]
+    BATCH -.-&gt;|same transformation code| STREAM
+    OFF &lt;-.-&gt;|consistency checks| ONL
+  end
+  subgraph train [Training plane]
+    OFF --&gt; DS[Dataset builder&lt;br/&gt;point-in-time join + versioning]
+    DS --&gt; TR[Training jobs&lt;br/&gt;CPU/GPU scheduling, tracking]
+    TR --&gt; REG[Model registry&lt;br/&gt;lineage, metrics, artefacts, owner]
+  end
+  subgraph serve [Serving plane]
+    REG --&gt; GATE[Release gates&lt;br/&gt;offline metrics, fairness,&lt;br/&gt;latency, data validation]
+    GATE --&gt; SHADOW[Shadow] --&gt; CAN[Canary] --&gt; PROD[Production serving]
+    ONL --&gt; PROD
+    PROD --&gt; LOG[Log served features&lt;br/&gt;+ predictions + outcomes]
+    LOG --&gt; OFF
+  end
+  PROD --&gt; MON[Monitoring&lt;br/&gt;data quality, drift, calibration,&lt;br/&gt;latency, cost, business metric]
+  MON -.-&gt;|retrain / rollback triggers| TR</code></pre>
+<ul>
+<li><strong>The feature store's real job is consistency.</strong> One definition, computed once,
+  available for training (historically, point-in-time correct) and for serving (now,
+  in milliseconds). Two code paths for one feature is the most expensive bug in
+  applied ML.</li>
+<li><strong>Point-in-time correctness</strong> means each training row sees only values that existed
+  before its label event. Getting it wrong produces a backtest that cannot be
+  reproduced online.</li>
+<li><strong>Log the features you served.</strong> Recomputing features at training time from raw
+  sources reintroduces skew; logging what the model actually saw removes a whole
+  class of bugs.</li>
+<li><strong>The registry is the system of record</strong>: every model version with its data version,
+  code version, metrics, owner and deployment state, so every production prediction
+  is traceable to a training run.</li>
+<li><strong>CI/CD for models is not CI/CD for code.</strong> The tests are data tests and metric
+  gates, and the release path is shadow, canary, ramp, with an automatic rollback.</li>
+<li><strong>Monitor four layers</strong>: infrastructure, data quality, model behaviour (prediction
+  distribution, calibration), and business outcome. Most incidents are visible in
+  layer two long before layer four.</li>
+<li><strong>Drift is a trigger for investigation.</strong> Input drift with stable performance is
+  normal; the retraining decision comes from measured performance or from a
+  scheduled cadence.</li>
+<li><strong>Cost and scheduling become platform problems</strong> once GPUs are shared: quotas,
+  preemption, queueing, and a chargeback model that makes teams see their spend.</li>
+<li><strong>LLMOps adds prompt and context versioning, eval gates, judge validation, and
+  per-request cost tracking</strong>, on top of the same skeleton.</li>
+<li><strong>Evidence</strong>: Uber Michelangelo and Palette, Airbnb Chronon (formerly Zipline),
+  Netflix Metaflow, Meta FBLearner Flow, Google TFX and the Rules of ML, Spotify's
+  and Stripe's platform writing, and the technical-debt literature.</li>
+</ul>
+<h2 id="1-requirements-scoping">1. Requirements &amp; scoping<a class="headerlink" href="#1-requirements-scoping" title="Permanent link">&para;</a></h2>
+<p><strong>Functional.</strong> Let a team define a feature once and use it in training and serving;
+build a training dataset with correct historical values; train at scale on shared
+compute; register, evaluate and promote a model through environments; serve it with
+low latency and a rollback path; monitor everything; and reproduce any production
+prediction after the fact.</p>
+<p><strong>Non-functional, with numbers to ask for.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Ask the interviewer</th>
+<th>A defensible assumption</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Teams and models</td>
+<td>"How many teams, how many models in production?"</td>
+<td>40 teams, 500 models, 50 retrained weekly</td>
+</tr>
+<tr>
+<td>Serving scale</td>
+<td>"Peak predictions per second across all models?"</td>
+<td>Millions per second aggregate, with a long tail of low-QPS models</td>
+</tr>
+<tr>
+<td>Feature reads</td>
+<td>"Features per prediction, and the online store's p99?"</td>
+<td>200 features per request, p99 under 10 ms</td>
+</tr>
+<tr>
+<td>Training scale</td>
+<td>"Largest dataset and largest model?"</td>
+<td>10 TB datasets; models from GBDT to multi-GPU deep nets</td>
+</tr>
+<tr>
+<td>Latency budgets</td>
+<td>"Tightest serving SLA on the platform?"</td>
+<td>10 ms for the fraud and ads paths</td>
+</tr>
+<tr>
+<td>Compliance</td>
+<td>"Audit requirements? Model risk governance? Data residency?"</td>
+<td>Yes for credit and identity; lineage and approvals required</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>"Is compute charged back to teams?"</td>
+<td>It should be, and usually it is not yet</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Success metrics.</strong> Platform metrics are about leverage and reliability:</p>
+<ul>
+<li><em>North star</em>: time from idea to a model serving production traffic, and the number
+  of models a team can maintain per engineer.</li>
+<li><em>Guardrails</em>: production incidents attributable to the platform, rollback time,
+  training-serving skew incidents, and platform cost per prediction.</li>
+<li><em>Operational</em>: online store p99, feature freshness lag, training job success rate
+  and queue time, and the fraction of models with monitoring configured (which is the
+  honest measure of whether the platform is being used properly).</li>
+</ul>
+<p><strong>Questions a staff engineer asks.</strong></p>
+<ol>
+<li>"What is the most painful thing teams do today? A platform built without that
+   answer becomes a system nobody adopts."</li>
+<li>"Are the models mostly batch scoring or online? Online serving forces the feature
+   store; batch scoring does not."</li>
+<li>"Do we need reproducibility for audit, or only for debugging? Audit changes the
+   retention and lineage requirements substantially."</li>
+<li>"Who owns a model in production at 3am? Platform ownership and model ownership are
+   different, and the on-call boundary has to be explicit."</li>
+<li>"How much heterogeneity do we support? Every framework we allow is a serving
+   runtime we maintain."</li>
+</ol>
+<h2 id="2-data-the-feature-platform">2. Data: the feature platform<a class="headerlink" href="#2-data-the-feature-platform" title="Permanent link">&para;</a></h2>
+<h3 id="21-the-problem-it-solves">2.1 The problem it solves<a class="headerlink" href="#21-the-problem-it-solves" title="Permanent link">&para;</a></h3>
+<p>A team writes a feature (a user's 7-day transaction count) twice: once in SQL for the
+training pipeline, once in application code for the serving path. The definitions
+drift. Window boundaries differ, timezone handling differs, a null becomes a zero in
+one and a mean in the other, and the model degrades in a way that no offline metric
+shows. This is training-serving skew, and it is the single most common source of the
+"great offline, flat online" result that this part keeps returning to.</p>
+<p>Uber's <a href="https://www.uber.com/us/en/blog/michelangelo-machine-learning-platform/">Michelangelo</a> <a href="https://www.uber.com/us/en/blog/palette-meta-store-journey/">Palette</a> is built explicitly around this: a centralised feature
+store organised by entities and feature groups, with an offline store for historical
+data and an online store for low-latency retrieval, and a transformation framework
+that executes the same feature logic in offline pipelines and online serving. Airbnb's
+<a href="https://medium.com/airbnb-engineering/chronon-airbnbs-ml-feature-platform-is-now-open-source-d9c4dba859e8">Chronon</a> (open-sourced in 2024, originally named Zipline) is described the same way: a
+platform where practitioners define feature transformations once and apply them
+consistently in offline batch backfills and low-latency online serving.</p>
+<h3 id="22-point-in-time-correctness">2.2 Point-in-time correctness<a class="headerlink" href="#22-point-in-time-correctness" title="Permanent link">&para;</a></h3>
+<p>A training row is a (entity, label timestamp, label) triple. The features joined to it
+must be the values that were <em>knowable</em> at that timestamp. Joining the current value
+of an aggregate leaks the future.</p>
+<p><img alt="Point-in-time join versus a naive latest-value join" src="../../assets/figures/part17_point_in_time.png" width="720" /></p>
+<p><em>The feature's value changes over time. A point-in-time join picks, for each label
+event, the last value written before that event. A naive join against the current
+table gives every training row the same future value, which makes the backtest look
+excellent and the production model look broken.</em></p>
+<p>Two subtleties beyond the basic as-of join:</p>
+<ul>
+<li><strong>Availability lag versus event time.</strong> A value computed at 02:00 from data up to
+  01:00 is not available to a model serving at 01:30. The correct join uses the time
+  the value <em>became available online</em>, not the time the underlying event happened. A
+  feature store that stores only event timestamps will still produce leakage.</li>
+<li><strong>Label leakage through the entity.</strong> Joining a merchant-level aggregate that
+  includes the very transaction being labelled is a self-referential leak that survives
+  a correct temporal join. Exclude the labelled event from its own aggregates.</li>
+</ul>
+<p>The test that catches most of these: shuffle the label timestamps and confirm model
+performance collapses to chance. If it does not, something in the pipeline is reading
+the future.</p>
+<h3 id="23-batch-streaming-and-request-time-features">2.3 Batch, streaming and request-time features<a class="headerlink" href="#23-batch-streaming-and-request-time-features" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Computed</th>
+<th>Freshness</th>
+<th>Example</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Batch</td>
+<td>Scheduled jobs over the warehouse</td>
+<td>Hours to a day</td>
+<td>User's 90-day spend, merchant category stats</td>
+<td>Cheap per feature, expensive to backfill</td>
+</tr>
+<tr>
+<td>Streaming</td>
+<td>Continuous windows over the event bus</td>
+<td>Seconds</td>
+<td>Transactions in the last 60 seconds, session actions</td>
+<td>Expensive to operate, essential for fraud and real-time ranking</td>
+</tr>
+<tr>
+<td>Request-time</td>
+<td>Computed in the serving path from the request</td>
+<td>Immediate</td>
+<td>Distance between two coordinates, ratios of other features</td>
+<td>Free, but must be replicated exactly in training</td>
+</tr>
+<tr>
+<td>On-demand from another service</td>
+<td>Fetched at request time</td>
+<td>Whatever that service provides</td>
+<td>Live inventory, current price</td>
+<td>Adds a dependency and a latency tail</td>
+</tr>
+</tbody>
+</table>
+<p>Palette supports batch (Hive/Spark), near-real-time (Flink streaming) and external
+"bring your own" features from microservices, which is the shape most platforms
+converge on. The design question to raise in an interview: request-time and
+streaming features are where skew hides, because they are the ones whose training-time
+reconstruction is hardest, and logging served values is the reliable fix.</p>
+<h3 id="24-storage-and-serving">2.4 Storage and serving<a class="headerlink" href="#24-storage-and-serving" title="Permanent link">&para;</a></h3>
+<p>Two stores with one logical definition: a warehouse or lake for history (columnar,
+partitioned by time, supporting as-of joins over billions of rows) and a key-value
+store for online reads (single-digit millisecond p99, high fan-out per request).
+Materialisation moves values from the first to the second on a schedule or from the
+stream. Practical concerns to name: fan-out (200 feature reads per prediction times
+tens of thousands of QPS is a serious read load, so features are grouped into rows
+that are fetched together), TTLs and backfills, and schema evolution when a feature's
+definition changes (version the feature instead of mutating it, so old models keep
+working).</p>
+<h3 id="25-data-quality-and-validation">2.5 Data quality and validation<a class="headerlink" href="#25-data-quality-and-validation" title="Permanent link">&para;</a></h3>
+<p>Every feature has expectations: type, range, null rate, cardinality, and a
+distribution. Validate them at ingestion and at serving. Google's TFX data-validation
+work (Breck et al., <a href="https://proceedings.mlsys.org/paper_files/paper/2019/hash/928f1160e52192e3e0017fb63ab65391-Abstract.html">"Data Validation for Machine Learning", MLSys 2019</a>) describes
+schema-based validation of training and serving data to catch errors early, and the
+practical value is that most model incidents start as data incidents that a schema
+check catches in minutes, long before they surface as accuracy regressions.</p>
+<h2 id="3-training-tracking-and-the-registry">3. Training, tracking and the registry<a class="headerlink" href="#3-training-tracking-and-the-registry" title="Permanent link">&para;</a></h2>
+<p><strong>Training orchestration.</strong> A workflow system runs dataset build, training, evaluation
+and registration as a versioned DAG. Two philosophies, both defensible: a
+workflow-first platform where the pipeline is the unit (<a href="https://engineering.fb.com/2016/05/09/core-infra/introducing-fblearner-flow-facebook-s-ai-backbone/">FBLearner Flow</a>, <a href="https://research.google/pubs/tfx-a-tensorflow-based-production-scale-machine-learning-platform/">TFX</a>), and a
+library-first platform where the data scientist writes Python and the platform handles
+infrastructure (<a href="https://netflixtechblog.com/open-sourcing-metaflow-a-human-centric-framework-for-data-science-fa72e04a5d9">Netflix's Metaflow</a>, which is explicitly designed to let scientists work
+in familiar code while the platform manages compute, data and versioning). The
+library-first approach wins adoption where the users are researchers; the
+workflow-first approach wins governance where the users are many teams shipping to
+production.</p>
+<p><strong>Experiment tracking.</strong> Every run records its parameters, code version, dataset
+version, environment, metrics and artefacts. The requirement that makes it worth
+building instead of buying: it must be automatic, because tracking that depends on
+discipline is tracking that is missing exactly when you need it.</p>
+<p><strong>The model registry</strong> holds each model version with:</p>
+<ul>
+<li>Lineage: which dataset version, which feature definitions and versions, which code
+  commit, which training run.</li>
+<li>Evaluation: metrics on standard slices, fairness metrics where applicable, and the
+  comparison against the incumbent.</li>
+<li>Operational metadata: owner, on-call, serving runtime, resource profile, expected
+  QPS.</li>
+<li>State: staging, shadow, canary, production, retired, with the history of transitions.</li>
+</ul>
+<p>The registry is what makes "why did this prediction happen" answerable. Combined with
+logged served features and logged predictions, you can reconstruct any decision, which
+is required in regulated domains and useful everywhere.</p>
+<p><strong>Reproducibility.</strong> Deterministic seeds, pinned environments, immutable dataset
+versions, and content-addressed artefacts. Exact bit-level reproducibility on GPU is
+often impractical; what you need is the ability to retrain and get a model within a
+tolerance, and to explain any difference.</p>
+<h2 id="4-serving-cicd-and-release">4. Serving, CI/CD and release<a class="headerlink" href="#4-serving-cicd-and-release" title="Permanent link">&para;</a></h2>
+<p><strong>Serving runtimes.</strong> Support a small number deliberately: a tree-model runtime, a
+general tensor runtime, and a Python fallback for the long tail of odd models. Each
+runtime is a surface to maintain, optimise and secure. Standard formats help;
+per-team custom serving does not scale.</p>
+<p><strong>The release path.</strong></p>
+<ol>
+<li><strong>Offline gates</strong>: metrics on standard slices against the incumbent, plus data
+   validation on the training set, plus latency and memory benchmarks on the target
+   hardware. Automatic, and blocking.</li>
+<li><strong>Shadow</strong>: the new model runs on live traffic without its predictions being used.
+   Compare score distributions, latency, and disagreement with the incumbent. This
+   catches skew, which offline evaluation cannot.</li>
+<li><strong>Canary</strong>: a small traffic slice uses the new model, with automatic rollback on
+   guardrail breach.</li>
+<li><strong>Ramp</strong> with monitoring at each step, then full traffic, keeping the previous
+   version warm for rollback.</li>
+</ol>
+<p>Two things to emphasise. Shadow mode is where training-serving skew appears, because
+it is the first time the model sees production features through the production path;
+a systematic offset between shadow and offline scores is a skew bug, not a model
+property. And rollback must be tested regularly, because a rollback path that has
+never been exercised is a rollback path that does not work.</p>
+<p><strong>Model-specific CI.</strong> Beyond unit tests: schema tests on input data, invariance tests
+(a prediction should not change when an irrelevant field changes), directional tests
+(risk should increase with velocity), performance tests on a golden set, and a
+behavioural regression suite of cases the model previously got wrong. Breck et al.'s
+<a href="https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/">"ML Test Score" (IEEE Big Data 2017)</a> is a usable checklist for what to test in features,
+model development, infrastructure and monitoring.</p>
+<h2 id="5-monitoring">5. Monitoring<a class="headerlink" href="#5-monitoring" title="Permanent link">&para;</a></h2>
+<p>Four layers. The discipline is to monitor all of them, since teams usually watch
+only the first and the last.</p>
+<p><strong>Layer 1: infrastructure.</strong> Latency percentiles per model, error rates, throughput,
+resource saturation, and the online store's read latency and availability. Standard
+service monitoring, and it catches the failures that page someone.</p>
+<p><strong>Layer 2: data quality.</strong> Per-feature null rate, range violations, cardinality
+changes, freshness lag, and the rate of defaults substituted for missing features.
+Most ML incidents are data incidents, and this layer detects them in minutes. The
+single highest-value alarm on a mature platform is "the null rate for feature X jumped
+from 0.1% to 40%", because that fires before any accuracy metric moves.</p>
+<p><strong>Layer 3: model behaviour.</strong></p>
+<ul>
+<li><em>Prediction distribution</em>: the mean and quantiles of the score, per segment. A shift
+  without a corresponding input shift means something broke.</li>
+<li><em>Input drift</em>: population stability index or a distributional distance per feature
+  against the training distribution. Treat it as a trigger for investigation.</li>
+<li><em>Calibration</em>: predicted versus observed rates, wherever labels arrive. This is the
+  earliest true-quality signal in ads, fraud and ranking.</li>
+<li><em>Feature attribution drift</em>: a change in which features drive predictions, which
+  catches a subtler class of breakage than marginal drift.</li>
+</ul>
+<p><strong>Layer 4: outcome.</strong> The business metric, and the model's contribution to it, which
+usually needs an experiment or a holdout, which a dashboard cannot give you.</p>
+<p><strong>Drift and retraining triggers.</strong> Distinguish covariate shift (inputs move, the
+relationship holds) from concept drift (the relationship itself changes). Covariate
+shift with stable measured performance is not a reason to retrain. The practical
+trigger policy: retrain on a schedule set by how fast the domain moves; retrain early
+on a measured performance or calibration breach; and treat drift alarms as
+investigation triggers instead of as automatic retraining, because automatic
+retraining on a drift alarm is how a data bug gets baked into a model.</p>
+<p><strong>Label delay</strong> shapes everything here. Where labels arrive in seconds (clicks) you can
+monitor accuracy directly. Where they take months (chargebacks, churn), you monitor
+proxies and calibration on matured windows, and the monitoring design has to make that
+lag explicit instead of plotting an accuracy number that silently refers to last
+quarter.</p>
+<h2 id="6-cost-scheduling-and-organisation">6. Cost, scheduling and organisation<a class="headerlink" href="#6-cost-scheduling-and-organisation" title="Permanent link">&para;</a></h2>
+<p><strong>GPU scheduling.</strong> Once GPUs are shared, the platform needs quotas per team, a
+queueing policy, preemption for low-priority jobs, gang scheduling for distributed
+training (a job needing 8 GPUs must get all 8 or none), and bin-packing for
+inference. Utilisation is the number to watch: a cluster at 30% utilisation with
+teams complaining about queue times usually has a fragmentation problem, and adding
+capacity will not fix it.</p>
+<p><strong>Cost attribution.</strong> Charge back training and serving cost to teams and show it in
+the same dashboard as their model metrics. Behaviour changes when a team can see that
+their hourly retraining costs more than the revenue the model's last improvement
+generated. Without chargeback, the platform team is the only one with an incentive to
+care, and they are the ones least able to decide what to cut.</p>
+<p><strong>Build versus buy.</strong> Managed feature stores, experiment trackers and serving stacks
+exist (<a href="https://docs.feast.dev/">Feast</a> and <a href="https://docs.tecton.ai/">Tecton</a> in the feature-store space, several vendors elsewhere). The
+honest decision rule: buy where your requirements are ordinary, build where your
+requirements are load-bearing and unusual. For most companies the feature store's
+<em>integration</em> with their existing event bus and warehouse is the hard part, which is
+why open-source projects like <a href="https://medium.com/airbnb-engineering/chronon-airbnbs-ml-feature-platform-is-now-open-source-d9c4dba859e8">Chronon</a> (Airbnb, with Stripe as a co-maintainer) get
+adopted and extended instead of used as-is.</p>
+<p><strong>What to centralise.</strong> Centralise the things where inconsistency is expensive:
+feature definitions, the registry, the release path, monitoring, and the serving
+runtimes. Leave modelling, evaluation criteria and retraining policy to teams, because
+those are domain decisions and a platform that dictates them will be routed around.</p>
+<h2 id="7-llmops-what-changes">7. LLMOps: what changes<a class="headerlink" href="#7-llmops-what-changes" title="Permanent link">&para;</a></h2>
+<p>The skeleton is the same, and five things are new:</p>
+<ul>
+<li><strong>Prompts and context are artefacts.</strong> They are versioned, reviewed and rolled back
+  like code, and a prompt change is a model change for release purposes.</li>
+<li><strong>Evaluation gates are the release gate.</strong> A regression suite of prompts with a
+  validated judge (see the <a href="../08-llm-product-rag-assistant/">LLM assistant chapter</a>)
+  blocks promotion, and the judge's agreement with humans is itself monitored.</li>
+<li><strong>The model is often a vendor's</strong> and it changes underneath you. Pin versions where
+  the provider allows it, run the regression suite on every provider update, and keep
+  a fallback provider for the paths where availability matters.</li>
+<li><strong>Cost per request is variable</strong> and depends on context length, so cost monitoring
+  moves from a monthly finance question to a per-request metric with alerts.</li>
+<li><strong>Retrieval indexes are stateful dependencies</strong> with their own freshness, quality and
+  version, so they need the same lineage treatment as a feature store: which index
+  version served this answer.</li>
+</ul>
+<p>Observability also changes shape: you log the prompt, the retrieved context, the
+generation and the guardrail outcomes, which is a lot of text with privacy
+implications, so sampling and redaction policies are part of the design.</p>
+<h2 id="8-trade-offs-alternatives">8. Trade-offs &amp; alternatives<a class="headerlink" href="#8-trade-offs-alternatives" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Chosen</th>
+<th>Alternative</th>
+<th>When you'd flip</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Feature computation</td>
+<td>One definition compiled to batch and streaming</td>
+<td>Separate pipelines per environment</td>
+<td>Only batch scoring, where the online store is unnecessary</td>
+</tr>
+<tr>
+<td>Training features</td>
+<td>Log served features</td>
+<td>Recompute from raw sources</td>
+<td>Historical backfill for a new feature, where you must recompute; validate against logged values</td>
+</tr>
+<tr>
+<td>Platform style</td>
+<td>Library-first (Metaflow-like) for researchers</td>
+<td>Workflow-first (TFX-like) for governance</td>
+<td>Many teams shipping regulated models, where enforced structure is worth the friction</td>
+</tr>
+<tr>
+<td>Serving</td>
+<td>A few supported runtimes</td>
+<td>Any framework a team wants</td>
+<td>Early, small organisation where flexibility beats consistency</td>
+</tr>
+<tr>
+<td>Release</td>
+<td>Shadow, canary, ramp with auto-rollback</td>
+<td>Direct deploy with monitoring</td>
+<td>Low-stakes internal models; never for revenue or safety paths</td>
+</tr>
+<tr>
+<td>Retraining</td>
+<td>Scheduled plus performance-triggered</td>
+<td>Automatic on drift alarm</td>
+<td>Never automatic on drift alone; it bakes in data bugs</td>
+</tr>
+<tr>
+<td>Monitoring</td>
+<td>All four layers</td>
+<td>Business metric only</td>
+<td>Never; the business metric moves too late to be an alarm</td>
+</tr>
+<tr>
+<td>Feature store</td>
+<td>Build on your own event bus and warehouse</td>
+<td>Buy a managed one</td>
+<td>Ordinary requirements and a small team; buying is usually right at that size</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>Chargeback to teams</td>
+<td>Central budget</td>
+<td>Very small organisation where the platform team can see everything</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Failure modes.</strong></p>
+<ul>
+<li><em>Skew introduced by a "harmless" refactor</em>: a feature's null handling changes in one
+  path. Detect with shadow-mode score comparison and with online-offline consistency
+  checks that sample requests and recompute.</li>
+<li><em>A silent upstream schema change</em>: an integer becomes a string, the parser coerces,
+  every prediction shifts. Schema validation at ingestion.</li>
+<li><em>Backfill that leaks</em>: a new feature backfilled with current values, so the retrained
+  model looks better and fails online. Enforce point-in-time semantics in the backfill
+  tool instead of trusting the author.</li>
+<li><em>Registry drift</em>: what is serving is not what the registry says. Have serving report
+  its own model version, and alarm on disagreement.</li>
+<li><em>Monitoring configured for 60% of models</em>: the rest fail silently. Make monitoring a
+  requirement for promotion instead of a follow-up task.</li>
+<li><em>A shared GPU cluster where one team's job starves everyone</em>: quotas and preemption,
+  plus visibility into queue times per team.</li>
+</ul>
+<h2 id="9-how-real-companies-did-it-as-mock-interviews">9. How real companies did it: as mock interviews<a class="headerlink" href="#9-how-real-companies-did-it-as-mock-interviews" title="Permanent link">&para;</a></h2>
+<h3 id="91-uber-the-same-feature-offline-and-online">9.1 Uber, "the same feature, offline and online"<a class="headerlink" href="#91-uber-the-same-feature-offline-and-online" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "Our teams keep shipping models that perform worse in
+production than in the notebook, and every investigation finds a feature computed
+differently in the two places. Build the thing that stops this."</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the requirement is one definition with two
+materialisations, and the hard part is that offline needs historically correct values
+while online needs millisecond reads. <em>Metrics</em>: skew incidents, and online store p99.
+<em>Data</em>: features organised by entity, sourced from batch jobs, streams, and existing
+services. <em>Model</em>: no model; the deliverable is the transformation framework that runs
+the same logic in the Spark pipeline and the serving path, plus the dual store.
+<em>Serve</em>: offline store for training joins, online key-value store for serving, kept in
+sync. <em>Evaluate</em>: consistency checks that sample production requests, recompute the
+features offline, and compare.</p>
+<p><strong>What the sources say.</strong> Uber's engineering writing on <a href="https://www.uber.com/us/en/blog/michelangelo-machine-learning-platform/">Michelangelo</a> and <a href="https://www.uber.com/us/en/blog/palette-meta-store-journey/">Palette</a>
+describes a centralised feature store organised by entities and feature groups, with
+offline storage for historical data and a low-latency online store, three ways to
+create features (batch via Hive and Spark, near-real-time via Flink streaming, and
+external features from microservices), and a transformer framework that executes the
+same feature transformation logic in offline pipelines and online serving to guarantee
+training-serving consistency.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: one definition, two materialisations</p>
+<p>"The feature platform's contract is that a feature is defined once and the platform
+produces both materialisations: the historical values for training and the current
+value for serving. Uber's <a href="https://www.uber.com/us/en/blog/palette-meta-store-journey/">Michelangelo Palette</a> is built this way, with an offline
+store and an online store behind one definition, and a transformer framework that
+runs the same transformation logic in the offline Spark pipeline and in the serving
+path. The alternative is what most teams have: a SQL query for training and
+application code for serving, which is faster to write and drifts within a quarter,
+usually on null handling or window boundaries. The trade-off is expressiveness. A
+single definition has to compile to both Spark and a streaming engine, so the
+feature language is constrained, and teams will occasionally want something it
+cannot express. I'd take that constraint, and provide a logged-served-features
+escape hatch for the genuinely odd cases so they are still reproducible."</p>
+</div>
+<h3 id="92-airbnb-define-it-once-backfill-it-correctly">9.2 Airbnb, "define it once, backfill it correctly"<a class="headerlink" href="#92-airbnb-define-it-once-backfill-it-correctly" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "A data scientist wants a new feature. Today they write a
+pipeline, wait a week for a backfill, discover the backfill leaked future data, and
+start again. Fix the loop."</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the pain is the iteration cycle on features, and
+the correctness trap is the backfill. <em>Model</em>: a declarative feature definition from
+which the platform generates both the streaming computation and the batch backfill,
+with point-in-time semantics built into the backfill rather than left to the author.
+<em>Serve</em>: low-latency online serving from the same definition. <em>Evaluate</em>: time to a
+usable feature, and the absence of leakage in generated backfills.</p>
+<p><strong>What the sources say.</strong> Airbnb's engineering blog post announcing that <a href="https://medium.com/airbnb-engineering/chronon-airbnbs-ml-feature-platform-is-now-open-source-d9c4dba859e8">Chronon,
+their ML feature platform, is now open source</a> (2024) describes a platform that
+transforms raw data into ML-ready features, handling batch and streaming compute,
+low-latency serving, and observability, and lets practitioners define transformations
+once and apply them consistently in offline backfills and online serving; the project
+was originally called Zipline, and Stripe is described as an early adopter and
+co-maintainer.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: put point-in-time semantics in the tool</p>
+<p>"The backfill is where correctness gets lost, so I'd make point-in-time semantics
+a property of the platform rather than something each author has to implement.
+Airbnb's <a href="https://medium.com/airbnb-engineering/chronon-airbnbs-ml-feature-platform-is-now-open-source-d9c4dba859e8">Chronon</a>, which they open-sourced in 2024 and which was originally Zipline,
+is built around defining a transformation once and getting both the offline
+backfill and the low-latency online serving from it. The alternative is a library
+of helper functions and a code-review culture, which works until the first tired
+engineer joins against a current-value table and produces a backtest everyone
+believes. The trade-off is that the platform now owns a hard distributed-computing
+problem, correctly reconstructing historical feature values over billions of rows,
+and that is genuinely expensive to build. Which is why I'd adopt an existing
+implementation rather than write one, and spend my team's time on the integration
+with our own event bus and warehouse, which is the part nobody can do for us."</p>
+</div>
+<h3 id="93-netflix-let-scientists-write-python">9.3 Netflix, "let scientists write Python"<a class="headerlink" href="#93-netflix-let-scientists-write-python" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "Our data scientists are productive in notebooks and lost in
+our infrastructure. Every production hand-off is a rewrite. What would you build?"</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the constraint is human, so the platform's job is
+to meet scientists where they are and add infrastructure underneath. <em>Model</em>: a Python
+library where a workflow is a class with steps, and the platform provides versioning,
+data access, dependency management and the ability to move a step to a large machine or
+to the cloud without changing the code. <em>Serve</em>: the same artefacts run in production
+scheduling. <em>Evaluate</em>: how often a prototype becomes production without a rewrite.</p>
+<p><strong>What the sources say.</strong> Netflix's technology blog describes <a href="https://netflixtechblog.com/open-sourcing-metaflow-a-human-centric-framework-for-data-science-fa72e04a5d9">Metaflow as a
+human-centric framework</a> for data science, designed so that scientists write ordinary
+Python while the framework handles infrastructure concerns including versioning,
+data access, compute scaling and deployment; it was open-sourced in 2019.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: adoption is a platform metric</p>
+<p>"I'd optimise the platform for adoption, which means meeting scientists in Python
+rather than in a workflow DSL. Netflix built <a href="https://netflixtechblog.com/open-sourcing-metaflow-a-human-centric-framework-for-data-science-fa72e04a5d9">Metaflow</a> on that premise: scientists
+write normal Python and the framework supplies versioning, data access, scaling to
+bigger machines and deployment. The alternative is a workflow-first platform like
+TFX or FBLearner, where the pipeline is the unit and the structure is enforced,
+which buys governance and standardisation and costs you the researchers, who will
+prototype outside it and hand you something to rewrite. The trade-off I'd name is
+that library-first platforms make it easy to write a production pipeline that
+nobody reviewed, so I'd pair it with mandatory release gates in the registry: you
+can build however you like, and you cannot reach production traffic without passing
+the same offline gates, shadow run and monitoring configuration as everyone else."</p>
+</div>
+<h3 id="94-google-test-the-data-not-just-the-model">9.4 Google, "test the data, not just the model"<a class="headerlink" href="#94-google-test-the-data-not-just-the-model" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "Our model degraded for three weeks before anyone noticed, and
+the cause was an upstream field that started arriving empty. How would that have been
+caught on day one?"</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the failure was a data failure with a slow
+accuracy signal, so the detection has to be on the data rather than on the metric.
+<em>Model</em>: a schema per feature (types, ranges, expected null rates, cardinality,
+distribution), inferred from a healthy window and then enforced; validate the training
+data and the serving data against it and alarm on violations. <em>Serve</em>: validation in
+the ingestion path and sampled validation at serving. <em>Evaluate</em>: time to detection
+for injected data faults, which is a testable property.</p>
+<p><strong>What the sources say.</strong> Breck et al., <a href="https://proceedings.mlsys.org/paper_files/paper/2019/hash/928f1160e52192e3e0017fb63ab65391-Abstract.html">"Data Validation for Machine Learning"</a> (MLSys
+2019) describes a data-validation system deployed at Google as part of TFX, based on
+inferring and enforcing a schema over the data feeding ML pipelines, catching errors
+in training and serving data before they degrade models. Google's <a href="https://developers.google.com/machine-learning/guides/rules-of-ml">"Rules of Machine
+Learning"</a> (Zinkevich) makes the related operational point about logging the features
+used at serving time and training on them.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: a schema per feature, enforced both sides</p>
+<p>"The fastest detector for this class of failure is a data schema, not a model
+metric. I'd infer a schema per feature from a healthy window, types, ranges, null
+rates and cardinality, then enforce it on both the training data and a sample of
+serving traffic, and alarm on violations. Google described exactly this system in
+'Data Validation for Machine Learning' at <a href="https://proceedings.mlsys.org/paper_files/paper/2019/hash/928f1160e52192e3e0017fb63ab65391-Abstract.html">MLSys 2019</a>, deployed as part of TFX to
+catch data errors before they degrade models. The alternative is monitoring
+accuracy, which is what we do today and which is why it took three weeks: accuracy
+moves slowly, it is confounded by seasonality, and in many domains the labels
+arrive too late to be an alarm at all. The cost of schemas is maintenance, since
+legitimate changes trigger alerts, so I'd version the schema and make updating it
+part of the normal change process rather than something an on-call engineer
+silences at 3am."</p>
+</div>
+<h3 id="95-the-technical-debt-view-what-this-platform-is-actually-preventing">9.5 The technical-debt view, "what this platform is actually preventing"<a class="headerlink" href="#95-the-technical-debt-view-what-this-platform-is-actually-preventing" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "Convince me a platform team is worth the headcount. The
+product teams say they can ship models fine on their own."</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the cost of not having one is not visible as a
+line item; it shows up as incidents, as duplicated pipelines, and as the slow
+accumulation of systems nobody can change. <em>Argument</em>: name the specific debts,
+entanglement where changing one feature changes everything downstream, undeclared
+consumers reading a model's outputs, feedback loops where a model's predictions become
+its own training data, pipeline jungles, and configuration debt, then map each to a
+platform capability that contains it. <em>Evaluate</em>: incident counts, time to ship, and
+the number of models a team maintains per engineer.</p>
+<p><strong>What the source says.</strong> Sculley et al., <a href="https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems">"Hidden Technical Debt in Machine Learning
+Systems"</a> (NeurIPS 2015) catalogues these failure patterns, including entanglement
+("changing anything changes everything"), correction cascades, undeclared consumers,
+data dependencies, feedback loops, pipeline jungles and configuration debt, and argues
+that the ML code is a small fraction of a real production ML system.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: name the debt the platform prevents</p>
+<p>"I'd make the case in the language of the <a href="https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems">2015 'Hidden Technical Debt in Machine
+Learning Systems' paper</a>, because it names the failures precisely: entanglement,
+undeclared consumers, hidden feedback loops, pipeline jungles, configuration debt,
+and the observation that the model code is a small fraction of the real system.
+Each of those maps to a platform capability. Undeclared consumers are contained by
+a registry with lineage and by an access-controlled prediction API. Feedback loops
+are contained by holdout traffic and logged policy versions. Pipeline jungles are
+contained by one dataset builder. The alternative, letting each team build their
+own, is genuinely faster for the first two teams and becomes forty incompatible
+pipelines by the tenth. The trade-off I'd be honest about is that a platform built
+before the pain is a platform nobody adopts, so I'd build it on the back of the two
+or three capabilities teams are already asking for and let it grow from there."</p>
+</div>
+<h2 id="10-staff-level-follow-ups">10. Staff-level follow-ups<a class="headerlink" href="#10-staff-level-follow-ups" title="Permanent link">&para;</a></h2>
+<div class="admonition interview">
+<p class="admonition-title">Define point-in-time correctness and tell me how you would catch a violation.</p>
+<p>Every training row's features must be the values that were available online at that
+row's label timestamp, which means joining on the time the value became <em>available</em>
+rather than the time the underlying event happened. Violations come from three
+places: joining a current-value table, using an aggregate that includes the labelled
+event itself, and ignoring computation lag so a feature computed at 02:00 is
+attributed to 01:30. To catch them: shuffle label timestamps and confirm performance
+collapses; compare a model trained on logged served features against one trained on
+recomputed features, since a large gap points at leakage in the recomputation; and
+inspect the top features for any whose importance is implausibly high, which is how
+leaks usually announce themselves.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Should every team use the feature store?</p>
+<p>Every team with an online model, yes, because that is where skew lives. Teams doing
+pure batch scoring get less value, since they can compute features in the same job
+that scores, and forcing them through the platform adds friction for a problem they
+do not have. What I would require of everyone regardless is the registry, the
+release gates and the monitoring, because those protect the company rather than the
+team. The general principle I'd state: mandate the things whose absence hurts
+others, and make optional the things whose absence only hurts you.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Drift alarms are firing. Do you retrain?</p>
+<p>Not on the alarm alone. First I'd check whether the drift is in the input
+distribution or in the relationship between inputs and outcome, because covariate
+shift with stable measured performance is a normal consequence of the business
+growing and retraining on it gains nothing. Then I'd check whether it is a data bug
+masquerading as drift, which is far more common: a schema change, a new client
+version, a broken upstream service. Retraining on a data bug bakes it in and makes
+the next investigation much harder. My policy is: retrain on a schedule set by how
+fast the domain moves, retrain early when measured performance or calibration
+degrades, and treat drift as an investigation trigger with a human in the loop.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">A model in production is making bad predictions. Walk me through the debug.</p>
+<p>In order of speed. First, is it serving the model we think it is: compare the
+version reported by the serving process against the registry. Second, are the
+features right: take a sampled production request, look at the logged served
+features, and compare against the offline recomputation for the same entity and
+time. A systematic difference is skew and is the most likely cause. Third, has the
+input distribution moved: per-feature drift and null rates against the training
+window. Fourth, is the model itself wrong: score a golden set through the
+production path and compare with the offline evaluation. Fifth, has the world
+changed: check calibration on whatever labels have matured. The order matters
+because the first three are minutes of work and cover most incidents, while the last
+two are hours.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">How do you handle a feature whose definition needs to change?</p>
+<p>Version it rather than mutating it. Create v2 alongside v1, backfill v2 with
+point-in-time semantics, let models migrate by retraining against v2 explicitly,
+and retire v1 when no registered model depends on it, which the registry can tell
+you. Mutating a feature in place changes the inputs of every model consuming it
+without retraining any of them, and the effect is a slow, unattributable
+degradation across several teams at once. The cost of versioning is storage and a
+migration each team has to schedule, which is exactly the friction that makes people
+want to mutate in place, so the platform has to make migration cheap.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Shadow mode says the new model's scores are systematically 8% higher than offline. What is going on?</p>
+<p>That is a skew signature, and shadow mode caught it doing its job. The likely
+causes, in order: a feature computed differently in the serving path (defaults for
+missing values are the classic, where offline has the true value and online
+substitutes a mean), a feature that is stale online because its materialisation lags
+(the model sees an older value than the training row did), a preprocessing
+difference such as a different normalisation constant baked into the training
+pipeline, or a genuinely different traffic mix between the offline evaluation set
+and live traffic, which is not a bug but does invalidate the comparison. I'd diff
+the logged served features against the offline features for the same requests, which
+localises it in one query.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">How would you decide what to build versus buy?</p>
+<p>Buy where the requirement is ordinary and build where it is load-bearing and
+unusual. Experiment tracking and model serving are ordinary for most companies.
+The feature platform is the interesting case: the abstractions are ordinary and the
+integration with your event bus, warehouse and identity model is specific, which is
+why adopting an open-source implementation like Chronon or Feast and investing in
+the integration usually beats both buying a black box and writing one from scratch.
+I'd also weigh the exit cost: anything that ends up holding the definitions of every
+feature in the company is something you will not migrate off easily, so I'd prefer
+an open format there even at some feature cost.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">What breaks first as the platform grows from 50 to 500 models?</p>
+<p>Ownership. At 50 models a platform team can know them all; at 500 nobody does, and
+the failure is models with no owner, no monitoring and no retraining, quietly
+serving stale predictions. The fixes are organisational and enforced by the
+platform: an owner and on-call rotation required for promotion, monitoring required
+for promotion, and automatic retirement of models with no traffic. Technically, the
+next thing to break is the online store's fan-out, since 500 models times 200
+features per prediction is a serious read load, which pushes you toward feature
+grouping and caching. Third is the cost line, which is when chargeback stops being
+optional.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">What does this platform look like if half the models become LLM-based?</p>
+<p>The skeleton holds and five things change. Prompts and retrieval context become
+versioned artefacts in the registry, so a prompt change goes through the same
+release path as a weight change. The release gate becomes an evaluation suite with
+a validated judge, and the judge's human agreement is itself a monitored metric.
+The model may belong to a vendor and change underneath you, so version pinning,
+regression runs on provider updates and a fallback provider become platform
+features. Cost becomes per-request and context-length dependent, so it needs
+alerting rather than a monthly report. And retrieval indexes become stateful
+dependencies with lineage, because "which index version produced this answer" is the
+LLM equivalent of "which feature version produced this prediction".</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Give me the platform metric you would report to engineering leadership.</p>
+<p>Time from a working model in a notebook to that model serving production traffic
+with monitoring configured, measured as a distribution across teams rather than an
+average, alongside the count of production incidents attributable to the platform.
+The first is the leverage the platform exists to provide, and reporting the
+distribution rather than the mean exposes the teams the platform is failing. The
+second is the tax, and a platform that improves the first while quietly raising the
+second is not actually helping.</p>
+</div>
+<h2 id="11-scaling-evolution">11. Scaling &amp; evolution<a class="headerlink" href="#11-scaling-evolution" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>One team, a few models.</strong> No platform. A shared repository with a convention for
+  training scripts, a place to store artefacts, and the discipline of logging served
+  features. That last habit is what makes everything later possible.</li>
+<li><strong>Several teams.</strong> The registry and the release path first, because inconsistent
+  deployment causes incidents that cross team boundaries. Then a dataset builder with
+  point-in-time joins, then monitoring as a requirement for promotion.</li>
+<li><strong>Many teams, online models.</strong> The feature platform with dual stores and one
+  definition, shared serving runtimes, data validation, drift monitoring, and shared
+  GPU scheduling with quotas. This is where the platform becomes a product with its own
+  roadmap and its own users.</li>
+<li><strong>Batch to real-time.</strong> Streaming feature computation is the biggest step, because it
+  adds an operational surface (a stream processor with state, watermarks and
+  reprocessing) that is harder to run than any batch job. Introduce it for the models
+  that need seconds of freshness, not for everything.</li>
+<li><strong>Predictive to generative.</strong> The platform extends rather than being replaced:
+  prompts and indexes join features and weights as versioned artefacts, evaluation
+  suites join metric gates, and per-request cost joins the monitoring stack. Uber's own
+  writing describes <a href="https://www.uber.com/us/en/blog/from-predictive-to-generative-ai/">Michelangelo extending from predictive to generative AI workloads</a>
+  along these lines, which is the pattern to expect.</li>
+</ul>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Uber Engineering. "Meet Michelangelo: Uber's Machine Learning Platform" (<a href="https://www.uber.com/us/en/blog/michelangelo-machine-learning-platform/">uber.com</a>); "Palette Meta Store Journey" (<a href="https://www.uber.com/us/en/blog/palette-meta-store-journey/">uber.com</a>) and the recorded talk "Michelangelo Palette: A Feature Engineering Platform at Uber" (<a href="https://www.infoq.com/presentations/michelangelo-palette-uber/">infoq.com</a>); "From Predictive to Generative: How Michelangelo Accelerates Uber's AI Journey" (<a href="https://www.uber.com/us/en/blog/from-predictive-to-generative-ai/">uber.com</a>).</li>
+<li>Airbnb Engineering. "Chronon, Airbnb's ML Feature Platform, Is Now Open Source." 2024, the project was originally named Zipline (<a href="https://medium.com/airbnb-engineering/chronon-airbnbs-ml-feature-platform-is-now-open-source-d9c4dba859e8">medium.com/airbnb-engineering</a>).</li>
+<li>Netflix Technology Blog. "Open-Sourcing Metaflow, a Human-Centric Framework for Data Science." 2019 (<a href="https://netflixtechblog.com/open-sourcing-metaflow-a-human-centric-framework-for-data-science-fa72e04a5d9">netflixtechblog.com</a>).</li>
+<li>Meta Engineering. "Introducing FBLearner Flow: Facebook's AI backbone." 2016 (<a href="https://engineering.fb.com/2016/05/09/core-infra/introducing-fblearner-flow-facebook-s-ai-backbone/">engineering.fb.com</a>).</li>
+<li>Baylor, D. et al. "TFX: A TensorFlow-Based Production-Scale Machine Learning Platform." KDD 2017 (<a href="https://research.google/pubs/tfx-a-tensorflow-based-production-scale-machine-learning-platform/">research.google</a>).</li>
+<li>Breck, E. et al. "Data Validation for Machine Learning." MLSys 2019 (<a href="https://proceedings.mlsys.org/paper_files/paper/2019/hash/928f1160e52192e3e0017fb63ab65391-Abstract.html">proceedings.mlsys.org</a>).</li>
+<li>Breck, E. et al. "The ML Test Score: A Rubric for ML Production Readiness and Technical Debt Reduction." IEEE Big Data 2017 (<a href="https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/">research.google</a>).</li>
+<li>Sculley, D. et al. "Hidden Technical Debt in Machine Learning Systems." NeurIPS 2015 (<a href="https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems">papers.nips.cc</a>).</li>
+<li>Zinkevich, M. "Rules of Machine Learning: Best Practices for ML Engineering." Google Developers guide (<a href="https://developers.google.com/machine-learning/guides/rules-of-ml">developers.google.com</a>).</li>
+<li>Feast (<a href="https://docs.feast.dev/">docs.feast.dev</a>) and Tecton (<a href="https://docs.tecton.ai/">docs.tecton.ai</a>) documentation, the open-source and managed feature stores.</li>
+<li>Book cross-references: <a href="../../part14-systems/01-distributed-training/">distributed training</a>, <a href="../../part14-systems/02-training-systems/">training systems</a>, <a href="../../part14-systems/03-inference-systems/">inference systems</a>, <a href="../../part13-retrieval-eval-reliability/02-evaluation/">evaluation</a>, <a href="../08-llm-product-rag-assistant/">LLM assistant with RAG</a>, <a href="../04-fraud-anomaly-detection/">fraud &amp; anomaly detection</a>, <a href="../10-forecasting-eta/">forecasting &amp; ETA</a>.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../11-notifications-uplift-experimentation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Notifications, uplift &amp; experimentation">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Notifications, uplift & experimentation
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../part18-company-deep-dives/" class="md-footer__link md-footer__link--next" aria-label="Next: Part XVIII: Company deep dives">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Part XVIII: Company deep dives
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "navigation.tracking", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

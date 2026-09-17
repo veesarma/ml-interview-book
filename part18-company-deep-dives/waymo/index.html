@@ -1,0 +1,7358 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A first-principles-to-frontier compendium for staff-level ML interviews — math, from-scratch code, systems, and production case studies.">
+      
+      
+      
+        <link rel="canonical" href="https://veesarma.github.io/ml-interview-book/part18-company-deep-dives/waymo/">
+      
+      
+        <link rel="prev" href="../tesla/">
+      
+      
+        <link rel="next" href="../zoox-nuro-aurora/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Waymo - The ML Interview Book</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#waymo" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="The ML Interview Book" class="md-header__button md-logo" aria-label="The ML Interview Book" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The ML Interview Book
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Waymo
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/veesarma/ml-interview-book" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    veesarma/ml-interview-book
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../preface/how-to-use/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Preface
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part01-math/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  I. Math
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part02-classical/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  II. Classical ML
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part03-neural-nets/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  III. Neural Nets
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part04-vision/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  IV. Vision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part05-sequence-transformers/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  V. Sequences & Transformers
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part06-llm-training/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  VI. LLM Training
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part07-post-training/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  VII. Post-training
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part08-multimodal/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  VIII. Multimodal
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part09-generative/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  IX. Generative
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part10-self-supervised/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  X. Self-/Semi-/Weak Supervision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part11-perception-autonomy/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XI. Perception & Autonomy
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part12-rl/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XII. Reinforcement Learning
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part13-retrieval-eval-reliability/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XIII. Retrieval, Eval & Reliability
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part14-systems/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XIV. Systems
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part15-interpretability-safety/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XV. Interpretability & Safety
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part16-coding-canon/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XVI. Coding Canon
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part19-breadth-review/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XIX. Breadth Review
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part20-project-deep-dive/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XX. Your Projects
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part17-ml-system-design/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XVII. ML System Design
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XVIII. Company Deep Dives
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../references/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  References
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="The ML Interview Book" class="md-nav__button md-logo" aria-label="The ML Interview Book" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    The ML Interview Book
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/veesarma/ml-interview-book" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    veesarma/ml-interview-book
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Preface
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Preface
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/how-to-use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How to use this book
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/study-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Study plan (6–9 months)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/interview-signal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What staff-level signal looks like
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part01-math/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I. Math
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    I. Math
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/01-linear-algebra/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear algebra
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/02-calculus-matrix-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calculus & matrix calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/03-probability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Probability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/04-statistics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/05-information-theory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Information theory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/06-optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/07-tensor-shapes-broadcasting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tensors, shapes & broadcasting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part02-classical/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    II. Classical ML
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    II. Classical ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/01-linear-regression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear regression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/02-logistic-softmax-regression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logistic & softmax regression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/03-trees-and-ensembles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trees & ensembles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/04-knn-kmeans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KNN & K-means
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/05-probabilistic-models-em/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Probabilistic models & EM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/06-dimensionality-reduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dimensionality reduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/07-kernel-methods-svm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kernel methods & SVMs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part03-neural-nets/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    III. Neural Nets
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    III. Neural Nets
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/01-mlp-and-activations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLPs & activations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/02-backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/03-autograd-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building an autograd engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/04-initialization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/05-normalization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Normalization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/06-regularization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Regularization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part04-vision/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IV. Vision
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IV. Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/01-image-representation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image representation & signal processing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/02-convolutions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Convolutions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/03-cnn-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CNN architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/04-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/05-segmentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Segmentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/06-geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geometry & cameras
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/07-3d-perception/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part05-sequence-transformers/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    V. Sequences & Transformers
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    V. Sequences & Transformers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/01-rnn-lstm-gru/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RNN, LSTM, GRU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/02-seq2seq-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seq2seq & early attention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/03-attention-mathematics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attention mathematics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/04-transformer-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/05-positional-encodings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Positional encodings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/06-tokenization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tokenization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part06-llm-training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VI. LLM Training
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VI. LLM Training
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/01-pretraining-data-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pretraining data & objective
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/02-scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/03-large-model-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Large-model architecture (MoE, GQA, SSMs)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/04-efficient-attention-kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Efficient attention & KV cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/05-quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/06-fine-tuning-lora/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & LoRA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/07-mid-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mid-training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part07-post-training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VII. Post-training
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VII. Post-training
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/01-sft/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervised fine-tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/02-reward-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reward models & preferences
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/03-rlhf-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF with PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/04-dpo-and-friends/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DPO and its relatives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/05-reasoning-rl-grpo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reasoning RL, RLVR & GRPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/06-test-time-compute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test-time compute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part08-multimodal/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VIII. Multimodal
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VIII. Multimodal
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/01-vision-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision Transformers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/02-detr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DETR & set prediction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/03-clip-contrastive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLIP & contrastive learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/04-vlm-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VLM architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/05-multimodal-foundation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal foundation models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/06-video-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part09-generative/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IX. Generative
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IX. Generative
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/01-autoencoders-vae/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autoencoders & VAEs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/02-gans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GANs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/03-diffusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/04-flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part10-self-supervised/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    X. Self-/Semi-/Weak Supervision
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_12" id="__nav_12_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    X. Self-/Semi-/Weak Supervision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/01-self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-supervised learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/02-semi-supervised/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Semi-supervised learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/03-weak-supervision-and-auto-labeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Weak supervision & auto-labeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part11-perception-autonomy/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XI. Perception & Autonomy
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_13" id="__nav_13_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XI. Perception & Autonomy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/01-perception-foundation-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Perception foundation models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/02-multi-camera-bev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-camera & BEV
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/03-sensor-fusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor fusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/04-tracking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tracking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/05-occupancy-temporal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Occupancy & temporal perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/06-prediction-planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prediction & planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/07-world-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    World models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part12-rl/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XII. Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_14" id="__nav_14_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XII. Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/01-mdp-bellman/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs & Bellman equations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/02-classical-rl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical RL algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/03-deep-rl-dqn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep RL & DQN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/04-policy-gradients-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy gradients, GAE & PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/05-imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/06-agents-tool-use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents & tool use
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_15" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part13-retrieval-eval-reliability/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIII. Retrieval, Eval & Reliability
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_15" id="__nav_15_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIII. Retrieval, Eval & Reliability
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/01-retrieval-and-rag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/02-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/03-uncertainty-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uncertainty & reliability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_16" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part14-systems/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIV. Systems
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_16" id="__nav_16_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIV. Systems
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/01-distributed-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/02-training-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/03-inference-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inference systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/04-hardware-memory-roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware, memory & roofline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_17" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part15-interpretability-safety/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XV. Interpretability & Safety
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_17" id="__nav_17_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_17">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XV. Interpretability & Safety
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15-interpretability-safety/01-interpretability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpretability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15-interpretability-safety/02-safety-failure-modes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Safety & failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_18" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part16-coding-canon/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVI. Coding Canon
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_18" id="__nav_18_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_18">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVI. Coding Canon
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/01-numpy-torch-cheatsheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NumPy ↔ PyTorch cheat sheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/02-shape-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shape & broadcasting drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/03-timed-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timed coding drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_19" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part19-breadth-review/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIX. Breadth Review
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_19" id="__nav_19_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_19">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIX. Breadth Review
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/01-basics-losses-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basics, losses, models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/02-evaluation-debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation and debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/03-deep-learning-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep learning and Transformers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/04-llms-multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLMs and multimodal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/05-serving-data-engines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serving, data engines, real-world
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/06-rapid-fire/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rapid-fire derivations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_20" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part20-project-deep-dive/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XX. Your Projects
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_20" id="__nav_20_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_20">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XX. Your Projects
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/01-carl-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CARL framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/02-streetsmart-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worked deep dive, StreetSmart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/03-edge-perception-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worked deep dive, edge perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/04-behavioral-leadership/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Behavioral and leadership
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_21" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part17-ml-system-design/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVII. ML System Design
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_21" id="__nav_21_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_21">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVII. ML System Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/00-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/01-recommendation-feed-ranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feed & recommendation ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/02-search-ranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/03-ads-ctr-prediction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ads CTR / conversion prediction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/04-fraud-anomaly-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fraud & anomaly detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/05-perception-system-av/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous-vehicle perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/06-visual-search-image-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual search & image retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/07-content-moderation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content moderation & trust
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/08-llm-product-rag-assistant/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM assistant with RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/09-ocr-document-understanding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OCR & document understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/13-novel-object-3d-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Novel-object 3D detection from unlabeled fleet data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/10-forecasting-eta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting & ETA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/11-notifications-uplift-experimentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications, uplift & experimentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/12-ml-platform-feature-store-monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML platform, feature store & monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_22" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVIII. Company Deep Dives
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_22" id="__nav_22_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_22_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVIII. Company Deep Dives
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tesla/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tesla (Autopilot / FSD / Optimus)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waymo
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waymo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-the-interview-card" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR: the interview card
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-the-business-in-one-paragraph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. The business in one paragraph
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-ml-problems-that-define-the-company" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The ML problems that define the company
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-stack-as-publicly-described" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The stack as publicly described
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-deep-dives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Deep dives
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Deep dives">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-lidar-centric-fusion-and-sensor-redundancy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Lidar-centric fusion and sensor redundancy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-prediction-from-wayformer-to-motionlm-motion-as-language" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Prediction: from Wayformer to MotionLM (motion as language)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-simulation-and-closed-loop-evaluation-simulationcity-waymax-sim-agents-the-world-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Simulation and closed-loop evaluation: SimulationCity, Waymax, Sim Agents, the World Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-emma-and-scaling-laws-does-the-foundation-model-recipe-apply-to-driving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 EMMA and scaling laws: does the foundation-model recipe apply to driving?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-the-safety-framework-and-rider-only-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 The safety framework and rider-only metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-operating-a-rider-only-fleet-fleet-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.6 Operating a rider-only fleet: Fleet Response
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-likely-interview-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Likely interview questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-what-to-bring-from-your-background" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. What to bring from your background
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Sources
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../zoox-nuro-aurora/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zoox, Nuro, Aurora & robotaxi peers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nvidia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NVIDIA (DRIVE, Cosmos, Isaac)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../meta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meta (Feed, Reels, Ads, FAIR)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../google-youtube/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Google & YouTube
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tiktok-bytedance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TikTok / ByteDance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../netflix-spotify/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Netflix & Spotify
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pinterest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pinterest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../uber-doordash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uber & DoorDash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../airbnb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Airbnb
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../amazon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Amazon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../apple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Apple
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stripe-fintech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stripe & fintech fraud
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../frontier-labs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAI, Anthropic & DeepMind
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scale-ai-data-engines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scale AI & data engines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../references/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-the-interview-card" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR: the interview card
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-the-business-in-one-paragraph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. The business in one paragraph
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-ml-problems-that-define-the-company" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The ML problems that define the company
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-stack-as-publicly-described" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The stack as publicly described
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-deep-dives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Deep dives
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Deep dives">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-lidar-centric-fusion-and-sensor-redundancy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Lidar-centric fusion and sensor redundancy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-prediction-from-wayformer-to-motionlm-motion-as-language" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Prediction: from Wayformer to MotionLM (motion as language)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-simulation-and-closed-loop-evaluation-simulationcity-waymax-sim-agents-the-world-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Simulation and closed-loop evaluation: SimulationCity, Waymax, Sim Agents, the World Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-emma-and-scaling-laws-does-the-foundation-model-recipe-apply-to-driving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 EMMA and scaling laws: does the foundation-model recipe apply to driving?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-the-safety-framework-and-rider-only-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 The safety framework and rider-only metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-operating-a-rider-only-fleet-fleet-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.6 Operating a rider-only fleet: Fleet Response
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-likely-interview-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Likely interview questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-what-to-bring-from-your-background" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. What to bring from your background
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Sources
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="waymo">Waymo<a class="headerlink" href="#waymo" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Why this matters at staff level.</strong> Waymo runs the largest rider-only (no human in
+the driver's seat) robotaxi service that publishes its data, and it publishes more
+peer-reviewed ML than any other AV company: the Open Dataset, Wayformer, MotionLM,
+Waymax, EMMA, a scaling-law study, and a stream of safety papers with human
+benchmarks. Interviews there are graded on whether you can reason like their papers
+do: joint multi-agent futures, closed-loop evaluation, statistically honest safety
+claims, and the discipline of a safety case. Strong signal is naming the trade-off a
+Waymo paper made and what it measured.</p>
+</blockquote>
+<h2 id="tldr-the-interview-card">TL;DR: the interview card<a class="headerlink" href="#tldr-the-interview-card" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>The bet</strong>: redundant sensing (lidar + cameras + radar + audio), a safety case,
+  geo-fenced rider-only operation, and a relentless evaluation stack. Learned
+  components everywhere, but behind evidence.</li>
+<li><strong>Perception</strong>: multi-sensor fusion; the 6th-generation Driver carries 13 cameras,
+  4 lidar, 6 radar and external audio receivers (Aug 2024 blog). The Open Dataset
+  (<a href="https://arxiv.org/abs/1912.04838">arXiv:1912.04838</a>) is their public shape of the perception problem.</li>
+<li><strong>Prediction lineage</strong>: Wayformer (<a href="https://arxiv.org/abs/2207.05844">arXiv:2207.05844</a>) encodes agents, road graph and
+  traffic signals with attention and latent queries. MotionLM (<a href="https://arxiv.org/abs/2309.16534">arXiv:2309.16534</a>) then
+  discretises motion into tokens and decodes <em>joint</em> multi-agent futures
+  autoregressively, with a plain next-token loss.</li>
+<li>For simulation: SimulationCity (2021), the open Waymax simulator (<a href="https://arxiv.org/abs/2310.08710">arXiv:2310.08710</a>, JAX,
+  built on the Open Motion Dataset), the Sim Agents challenge (<a href="https://arxiv.org/abs/2305.12032">arXiv:2305.12032</a>), and a
+  generative <strong>Waymo World Model</strong> built on Genie 3 (Feb 2026 blog).</li>
+<li><strong>End-to-end research</strong>: <strong>EMMA</strong> (<a href="https://arxiv.org/abs/2410.23262">arXiv:2410.23262</a>), a Gemini-based multimodal model
+  that reads camera images and text and writes trajectories, objects and road graph as
+  text; explicitly a research model with stated limitations (no lidar, few frames).</li>
+<li>Scaling laws (<a href="https://arxiv.org/abs/2506.08228">arXiv:2506.08228</a>, June 2025 blog): motion forecasting and planning
+  quality follows power laws in data, parameters and compute on internal driving data.</li>
+<li><strong>Safety</strong>: the Safety Impact hub compares rider-only crash rates with human
+  benchmarks; the peer-reviewed 56.7-million-mile comparison (Traffic Injury
+  Prevention, 2025); the 2020 safety-methodologies paper; the Safety Case approach.</li>
+<li>Fleet Response gives <em>guidance</em>, and explicitly not remote driving (May 2024 blog).</li>
+</ul>
+<p><img alt="Publicly announced architecture shifts at Tesla and Waymo" src="../../assets/figures/part18_architecture_timeline.png" width="720" /></p>
+<p>Waymo's public lane on the timeline moves through datasets, prediction papers and
+simulators before it reaches end-to-end research, which is the opposite order from
+Tesla's. Placing a question on this timeline ("that was the Wayformer era, MotionLM
+changed the factorisation") is itself a signal in the room.</p>
+<h2 id="1-the-business-in-one-paragraph">1. The business in one paragraph<a class="headerlink" href="#1-the-business-in-one-paragraph" title="Permanent link">&para;</a></h2>
+<p>Waymo, Alphabet's autonomous-driving subsidiary, operates a commercial rider-only
+ride-hailing service in several U.S. metropolitan areas and licenses nothing to
+consumers: the product is the trip. That changes the economics of every ML decision
+relative to Tesla. Sensors can be expensive (a purpose-integrated lidar/camera/radar
+suite), operations can be geo-fenced and mapped, and every mile driven is a mile the
+company is liable for, so the evaluation and safety-case machinery is as much the
+product as the driver. Waymo publishes unusually openly, through the Waymo Open
+Dataset and its challenges, a research page, a safety hub with human benchmarks, and
+papers at ICCV/NeurIPS/ICRA, so the interview material is largely primary.</p>
+<h2 id="the-ml-problems-that-define-the-company">The ML problems that define the company<a class="headerlink" href="#the-ml-problems-that-define-the-company" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Why it is hard</th>
+<th>Public evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Redundant multi-sensor perception at range</strong></td>
+<td>Fusing lidar, camera and radar with different rates, resolutions and failure modes; long-range detection at highway speed; weather.</td>
+<td>6th-generation Driver blog (sensor counts and redundancy rationale); Waymo Open Dataset (<a href="https://arxiv.org/abs/1912.04838">arXiv:1912.04838</a>).</td>
+</tr>
+<tr>
+<td><strong>Joint prediction of interacting agents</strong></td>
+<td>Marginal per-agent forecasts are inconsistent with each other; the planner needs joint futures with calibrated multimodality.</td>
+<td>Wayformer (<a href="https://arxiv.org/abs/2207.05844">arXiv:2207.05844</a>); MotionLM (<a href="https://arxiv.org/abs/2309.16534">arXiv:2309.16534</a>); Open Motion Dataset (<a href="https://arxiv.org/abs/2104.10133">arXiv:2104.10133</a>).</td>
+</tr>
+<tr>
+<td><strong>Closed-loop evaluation before real miles</strong></td>
+<td>Log replay is open-loop; reactive simulation needs realistic agents; rare events must be synthesised.</td>
+<td>SimulationCity (2021); Waymax (<a href="https://arxiv.org/abs/2310.08710">arXiv:2310.08710</a>); Sim Agents challenge (<a href="https://arxiv.org/abs/2305.12032">arXiv:2305.12032</a>); Waymo World Model (2026).</td>
+</tr>
+<tr>
+<td><strong>Statistically honest safety claims</strong></td>
+<td>Serious crashes are rare; human benchmarks must be matched on geography and reporting thresholds.</td>
+<td>Safety Impact hub; Traffic Injury Prevention paper (2025); Swiss Re collaboration (2023 blog); safety methodologies paper (2020).</td>
+</tr>
+<tr>
+<td><strong>Whether end-to-end multimodal models belong in the loop</strong></td>
+<td>Foundation models bring world knowledge but lack lidar, temporal depth and latency guarantees.</td>
+<td>EMMA (<a href="https://arxiv.org/abs/2410.23262">arXiv:2410.23262</a>); scaling-laws report (<a href="https://arxiv.org/abs/2506.08228">arXiv:2506.08228</a>).</td>
+</tr>
+<tr>
+<td><strong>Operating a rider-only fleet</strong></td>
+<td>No driver to intervene; remote humans must help without becoming a latency-critical control loop.</td>
+<td>Fleet Response blog (2024).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-the-stack-as-publicly-described">2. The stack as publicly described<a class="headerlink" href="#2-the-stack-as-publicly-described" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart LR
+  subgraph Car["Waymo Driver (on vehicle)"]
+    S[Lidar + cameras + radar&lt;br/&gt;+ external audio&lt;br/&gt;&lt;i&gt;6th-gen blog 2024&lt;/i&gt;] --&gt; PER[Perception&lt;br/&gt;multi-sensor fusion, tracking&lt;br/&gt;&lt;i&gt;Open Dataset paper&lt;/i&gt;]
+    PER --&gt; PRED[Behaviour prediction&lt;br/&gt;Wayformer / MotionLM-style&lt;br/&gt;&lt;i&gt;ICRA'23, ICCV'23&lt;/i&gt;]
+    PER --&gt; MAP[HD map + localisation&lt;br/&gt;&lt;i&gt;known; details not public&lt;/i&gt;]
+    PRED --&gt; PLAN[Planner&lt;br/&gt;&lt;i&gt;learned + engineered; details not public&lt;/i&gt;]:::inf
+    MAP --&gt; PLAN
+    PLAN --&gt; CTL[Controls]
+  end
+  subgraph Ops["Operations"]
+    CTL -.-&gt; FR[Fleet Response&lt;br/&gt;guidance, not remote driving&lt;br/&gt;&lt;i&gt;2024 blog&lt;/i&gt;]
+  end
+  subgraph Offline["Offline research and evaluation"]
+    LOGS[Driving logs] --&gt; WOD[Open Dataset / Open Motion Dataset&lt;br/&gt;&lt;i&gt;public subsets&lt;/i&gt;]
+    LOGS --&gt; SIM[Simulation&lt;br/&gt;SimulationCity, Waymax, Sim Agents,&lt;br/&gt;World Model on Genie 3]
+    LOGS --&gt; SCL[Scaling-law study&lt;br/&gt;500k hours internal data&lt;br/&gt;&lt;i&gt;2025&lt;/i&gt;]
+    LOGS --&gt; EMMA[EMMA: Gemini-based end-to-end&lt;br/&gt;research model&lt;br/&gt;&lt;i&gt;2024&lt;/i&gt;]
+    SIM --&gt; SAFE[Safety case + readiness determinations&lt;br/&gt;rider-only metrics vs human benchmarks]
+    SAFE --&gt; CTL
+  end
+  classDef inf fill:#fff3cd,stroke:#b8860b;</code></pre>
+<p><strong>Known versus inferred.</strong> Sensor composition, the prediction papers, the simulators,
+EMMA and the safety publications are primary. The on-vehicle planner is shaded: Waymo
+has not published its production planner architecture; the scaling-law report says
+learned planning is studied at scale, and the Fleet Response post says humans give
+guidance rather than control, but how learned and engineered components share the
+production planner is an inference.</p>
+<h2 id="3-deep-dives">3. Deep dives<a class="headerlink" href="#3-deep-dives" title="Permanent link">&para;</a></h2>
+<h3 id="31-lidar-centric-fusion-and-sensor-redundancy">3.1 Lidar-centric fusion and sensor redundancy<a class="headerlink" href="#31-lidar-centric-fusion-and-sensor-redundancy" title="Permanent link">&para;</a></h3>
+<p><strong>The problem.</strong> A rider-only vehicle cannot fall back on a human when a sensor is
+blinded. Perception must degrade gracefully across modalities that fail differently
+(cameras in glare and darkness, lidar in dense fog and spray, radar with poor angular
+resolution), and it must detect at ranges that give the planner time at highway speed.</p>
+<p><strong>The approach.</strong> Waymo's public description of the 6th-generation Driver lists 13
+cameras, 4 lidar, 6 radar and external audio receivers and frames the suite around
+overlapping fields of view and redundancy across modalities. The Open Dataset paper
+defines the perception problem the way the company thinks about it: synchronised
+multi-lidar and multi-camera data with 3D and 2D labels, tracking IDs, and a
+challenge suite that rewards range and rare classes. The fusion mathematics is the
+subject of <a href="../../part11-perception-autonomy/03-sensor-fusion/">Sensor fusion</a>:
+early fusion (project image features onto points or voxels), late fusion (per-sensor
+detectors then association), and learned mid-level fusion (a shared BEV where lidar
+gives geometry and cameras give semantics). Tracking across sensors and time is in
+<a href="../../part11-perception-autonomy/04-tracking/">Tracking</a>.</p>
+<p><strong>The trade-off.</strong> Redundant sensing buys detection at range and graceful degradation,
+at the cost of hardware expense, calibration and time-synchronisation burden, and a
+labelling pipeline that must reconcile modalities. The rejected alternative, camera-only,
+is the Tesla bet; Waymo's public rationale for redundancy is safety-case driven: a
+claim of acceptable safety without a driver needs independent evidence paths.</p>
+<p><strong>Sources.</strong> "Meet the 6th-generation Waymo Driver" (Waymo blog, Aug 2024); Sun et al.,
+"Scalability in Perception for Autonomous Driving: Waymo Open Dataset" (CVPR 2020,
+<a href="https://arxiv.org/abs/1912.04838">arXiv:1912.04838</a>).</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"For a rider-only vehicle I'd design perception around redundant modalities
+with independent failure modes, because there's no human fallback; Waymo's
+6th-generation Driver post lays out the same rationale with overlapping cameras,
+lidar, radar and audio. I'd fuse at the feature level into a shared
+bird's-eye-view grid, with lidar supplying geometry and cameras semantics, but I
+would keep a lidar-only detection path alive as an independent evidence source
+for the safety case. I'd rule out camera-only; it's the
+right bet for a consumer fleet with a driver, not for a driverless one. The
+trade-off is cost and calibration burden, so I'd invest in automatic
+calibration monitoring and time-sync checks as production alarms. I'd
+evaluate with the Open Dataset's conventions: 3D AP by range and class, tracking
+MOTA with identity switches, and a degraded-sensor slice where each modality is
+ablated at test time."</p>
+</div>
+<h3 id="32-prediction-from-wayformer-to-motionlm-motion-as-language">3.2 Prediction: from Wayformer to MotionLM (motion as language)<a class="headerlink" href="#32-prediction-from-wayformer-to-motionlm-motion-as-language" title="Permanent link">&para;</a></h3>
+<p><strong>The problem.</strong> The planner needs the joint distribution over what <em>several</em> agents
+will do next, including how they react to each other, with calibrated multimodality
+(the pedestrian may or may not cross). Predicting each agent independently gives
+futures that contradict each other.</p>
+<p><strong>The approach, step one: Wayformer.</strong> Nayakanti et al. build a scene encoder over
+heterogeneous inputs (agent histories, road graph, traffic signals, interactions) with
+attention, compare early, late and hierarchical fusion, and use <em>latent query
+attention</em> to keep cost independent of the number of input elements; the decoder emits
+<span class="arithmatex">\(K\)</span> trajectory modes as a Gaussian mixture. The loss is the mixture negative
+log-likelihood, exactly as derived in
+<a href="../../part11-perception-autonomy/06-prediction-planning/">Prediction &amp; planning</a>:</p>
+<div class="arithmatex">\[
+\mathcal{L} = -\log \sum_{k=1}^{K} \pi_k \prod_{t=1}^{T} \mathcal{N}\big(y_t \mid \mu_{k,t}, \Sigma_{k,t}\big),
+\]</div>
+<p>usually trained with a hard assignment to the closest mode for stability.</p>
+<p><strong>Step two: MotionLM.</strong> Seff et al. discretise each agent's motion into a small
+vocabulary of motion tokens and cast multi-agent forecasting as language modelling:
+a decoder-only transformer generates tokens for all agents jointly, interleaved in
+time, trained with the standard next-token cross-entropy. This removes anchors and
+latent-variable optimisation, yields <em>joint</em> futures in one decoding pass, and gives
+temporally causal conditional rollouts (what does agent B do if agent A does X?).
+Sampled rollouts are clustered to produce the <span class="arithmatex">\(K\)</span> modes the benchmarks score. The
+paper reports state-of-the-art results on the Open Motion Dataset interactive
+challenge. The tokenisation and decoding are the same machinery as
+<a href="../../part05-sequence-transformers/06-tokenization/">Tokenization</a> and
+<a href="../../part05-sequence-transformers/04-transformer-architectures/">Transformer architectures</a>,
+applied to continuous motion.</p>
+<p><strong>The trade-off.</strong> Tokenised joint decoding trades resolution (a discrete vocabulary)
+and inference cost (autoregressive sampling of many rollouts) for consistency between
+agents and a training objective that scales like language models do. The rejected
+alternative, marginal per-agent mixtures plus post-hoc interaction heuristics, is
+cheaper but produces inconsistent joint futures, which MotionLM's abstract names as the
+motivation.</p>
+<p><strong>Sources.</strong> Nayakanti et al., "Wayformer" (ICRA 2023, <a href="https://arxiv.org/abs/2207.05844">arXiv:2207.05844</a>); Seff et al.,
+"MotionLM: Multi-Agent Motion Forecasting as Language Modeling" (ICCV 2023,
+<a href="https://arxiv.org/abs/2309.16534">arXiv:2309.16534</a>); Ettinger et al., "Large Scale Interactive Motion Forecasting for
+Autonomous Driving: The Waymo Open Motion Dataset" (ICCV 2021, <a href="https://arxiv.org/abs/2104.10133">arXiv:2104.10133</a>).</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd model prediction as joint, autoregressive generation over discrete
+motion tokens for all agents, the design in Waymo's MotionLM paper (ICCV 2023),
+because the planner needs futures that are consistent between agents and because
+a plain next-token loss scales without anchors or latent-variable tricks. I'd
+keep a Wayformer-style scene encoder underneath, with latent queries so cost does
+not grow with the number of map and agent elements, which is what that paper
+(ICRA 2023) shows. The alternative I'd reject as the primary model is
+per-agent Gaussian mixtures with interaction heuristics on top; MotionLM's own
+motivation is that those give inconsistent joint futures. The cost is
+inference cost, since I'd need many sampled rollouts, so I'd cache the
+encoder and batch rollouts, and I'd distil to a cheaper marginal head for
+latency-critical paths. I'd evaluate with the Open Motion Dataset interactive
+metrics, minADE, miss rate and the joint mAP, and with a calibration check on mode
+probabilities, because a planner that trusts an over-confident mode is worse
+than one with a wider distribution."</p>
+</div>
+<h3 id="33-simulation-and-closed-loop-evaluation-simulationcity-waymax-sim-agents-the-world-model">3.3 Simulation and closed-loop evaluation: SimulationCity, Waymax, Sim Agents, the World Model<a class="headerlink" href="#33-simulation-and-closed-loop-evaluation-simulationcity-waymax-sim-agents-the-world-model" title="Permanent link">&para;</a></h3>
+<p><strong>The problem.</strong> Log replay is open-loop: the recorded agents do not react to a new
+planner, so it cannot measure compounding error. Real miles are slow, expensive and
+cannot be re-run. Rare events must be generated, not waited for.</p>
+<p><strong>The approach.</strong> SimulationCity (2021 blog) describes synthesising entire trips,
+including sensor-level realism, from real-world data. Waymax (NeurIPS 2023 datasets
+track) is a public, hardware-accelerated JAX simulator built on the Open Motion
+Dataset in which the ego and other agents can be replayed or controlled by learned
+policies, with metrics such as collisions and off-road, so that imitation and
+reinforcement learning can be run closed-loop. The Sim Agents challenge (2023) defines
+how to score the <em>realism</em> of learned traffic agents, by comparing distributions of
+kinematic and interaction statistics rather than trajectory error. In February 2026
+Waymo described a generative Waymo World Model built on Google DeepMind's Genie 3 for
+simulation, with the stated purpose of generating realistic, controllable scenarios
+including rare ones. Block-NeRF (CVPR 2022, <a href="https://arxiv.org/abs/2202.05263">arXiv:2202.05263</a>), a Waymo research paper
+on city-scale neural rendering, is the earlier public hint of neural sensor
+simulation. The conceptual material is in
+<a href="../../part11-perception-autonomy/07-world-models/">World models</a> and, for RL in a
+simulator, <a href="../../part12-rl/03-deep-rl-dqn/">Deep RL</a> and
+<a href="../../part12-rl/04-policy-gradients-ppo/">Policy gradients &amp; PPO</a>.</p>
+<p><strong>The trade-off.</strong> Closed-loop simulation buys reactivity and rare-event coverage at
+the cost of a sim-to-real gap in two places: agent behaviour (are the sim agents
+human-like?) and sensors (does the rendered scene fool perception the way the real
+one would?). Waymo's public answer is to measure both: realism metrics for agents
+(Sim Agents), and neural rendering from real logs for sensors. The rejected
+alternative is relying on log replay plus real miles, which cannot scale to rare
+interactive events.</p>
+<p><strong>Sources.</strong> "Simulation City: introducing Waymo's most advanced simulation system yet"
+(Waymo blog, 2021); Gulino et al., "Waymax: An Accelerated, Data-Driven Simulator for
+Large-Scale Autonomous Driving Research" (NeurIPS 2023, <a href="https://arxiv.org/abs/2310.08710">arXiv:2310.08710</a>; code on
+GitHub); Montali et al., "The Waymo Open Sim Agents Challenge" (<a href="https://arxiv.org/abs/2305.12032">arXiv:2305.12032</a>);
+"The Waymo World Model: A New Frontier for Autonomous Driving Simulation" (Waymo blog,
+Feb 2026); Tancik et al., "Block-NeRF" (CVPR 2022, <a href="https://arxiv.org/abs/2202.05263">arXiv:2202.05263</a>).</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd build evaluation in three tiers and make closed-loop simulation the
+middle one: log replay for cheap regression, a reactive simulator for compounding
+behaviour, and real rider-only miles as the final evidence. Waymo's Waymax paper
+(NeurIPS 2023) is the pattern I'd follow for the simulator, a data-driven
+environment built from logged scenarios where other agents can be replayed or
+controlled by learned policies, and the Sim Agents challenge is how I'd score
+those agents, by distributional realism rather than trajectory error. The
+alternative I'd reject is replay-only evaluation; it can't see that a new
+planner changes what other agents do. What this costs is the sim-to-real gap, and I
+would attack it on both sides: realism metrics for agents and neural rendering
+from real logs for sensors, the direction of SimulationCity and the 2026 World
+Model post. I'd validate the simulator itself by checking that its ranking
+of candidate planners agrees with shadow-mode and real-mile outcomes on the same
+scenario slices."</p>
+</div>
+<h3 id="34-emma-and-scaling-laws-does-the-foundation-model-recipe-apply-to-driving">3.4 EMMA and scaling laws: does the foundation-model recipe apply to driving?<a class="headerlink" href="#34-emma-and-scaling-laws-does-the-foundation-model-recipe-apply-to-driving" title="Permanent link">&para;</a></h3>
+<p><strong>The problem.</strong> Modular stacks are interpretable but every interface is a
+hand-designed bottleneck; foundation models carry world knowledge and scale with
+data, but do they help driving, and what do they cost?</p>
+<p><strong>The approach.</strong> EMMA (Hwang et al., 2024) fine-tunes Gemini to map camera images and
+text (ego history, routing command) to text outputs: future waypoints, 3D object
+boxes, road-graph elements, and a chain-of-thought driving rationale; representing
+everything as text lets one model be co-trained across tasks, and the paper reports
+that co-training improves the individual tasks and that the model is competitive on
+public planning and detection benchmarks. The paper is equally explicit about
+limitations: no lidar or radar, a small number of image frames, high compute, and a
+statement that it is research, not the production driver. The scaling-law report
+(Baniodeh et al., 2025; blog "New Insights for Scaling Laws in Autonomous Driving")
+trains motion-forecasting and planning models on about 500,000 hours of internal
+driving data and reports power-law improvements in loss with data, parameters and
+compute, with the improvement carrying to closed-loop planning metrics. The general
+scaling machinery (compute-optimal allocation, power-law fits) is derived in
+<a href="../../part06-llm-training/02-scaling-laws/">Scaling laws</a>; the VLM architecture is in
+<a href="../../part08-multimodal/04-vlm-architecture/">VLM architecture</a>.</p>
+<p><strong>The trade-off.</strong> A single multimodal model buys transfer, co-training gains, and
+the ability to reason in language about rare scenes; it gives up sensor completeness,
+latency guarantees and auditable intermediate outputs. Waymo's public stance is to
+publish it as research and to state the gaps, which is itself the answer to "would
+you deploy it?".</p>
+<p><strong>Sources.</strong> Hwang et al., "EMMA: End-to-End Multimodal Model for Autonomous Driving"
+(<a href="https://arxiv.org/abs/2410.23262">arXiv:2410.23262</a>; blog "Introducing EMMA", Oct 2024; research page); Baniodeh et al.,
+"Scaling Laws of Motion Forecasting and Planning, A Technical Report" (<a href="https://arxiv.org/abs/2506.08228">arXiv:2506.08228</a>;
+blog, June 2025).</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd use a multimodal foundation model where it earns its place, as an
+offline teacher and a long-tail reasoner, and I'd keep it out of the
+latency-critical loop until the missing modalities are there. Waymo's EMMA paper (2024)
+is my evidence for both halves: co-training trajectories, objects and road graph
+as text improves each task, and the same paper states that it lacks lidar and
+radar, uses few frames and is compute-heavy, so it's research rather than the
+production driver. I'd justify investing in scale with Waymo's 2025 scaling-law
+report, which shows power-law gains in forecasting and planning on half a million
+hours of driving that carry into closed-loop metrics. The alternative I'd
+reject is a modular stack frozen at today's interfaces; the scaling result says
+learned components keep improving. The price is auditability, so I'd
+distil the large model into a smaller onboard model and keep independent safety
+checks. I'd evaluate on closed-loop planning metrics in Waymax-style
+simulation, on a rare-scenario slice where language reasoning should help, and on
+latency at the onboard budget."</p>
+</div>
+<h3 id="35-the-safety-framework-and-rider-only-metrics">3.5 The safety framework and rider-only metrics<a class="headerlink" href="#35-the-safety-framework-and-rider-only-metrics" title="Permanent link">&para;</a></h3>
+<p><strong>The problem.</strong> "Safer than a human" is a statistical claim about rare events with
+mismatched denominators: human crash statistics are under-reported, differ by
+geography and road type, and use different injury thresholds.</p>
+<p><strong>The approach.</strong> Waymo's public safety methodology paper (2020) describes layered
+methods, hardware, behavioural, and operational, and how readiness determinations are
+made; the Safety Case approach document frames the argument as claims backed by
+evidence. The Safety Impact hub publishes rider-only miles and crash rates against
+human benchmarks matched to the same geographies and adjusted for under-reporting,
+across outcomes such as any-injury-reported and serious-injury-or-worse; the
+peer-reviewed comparison by crash type at 56.7 million rider-only miles (Kusano,
+Scanlon et al., Traffic Injury Prevention, 2025) is the reference paper. The
+collaboration with the reinsurer Swiss Re (2023 blog) compares liability claims, an
+independent data source. In late 2025 Waymo also published on third-party audits and
+on a framework for building safety into an AI-driven stack ("Demonstrably Safe AI for
+Autonomous Driving"). The statistics you need, rate estimation for rare events,
+confidence intervals for ratios, and the exposure-matching logic, are in
+<a href="../../part01-math/04-statistics/">Statistics</a> and
+<a href="../../part13-retrieval-eval-reliability/03-uncertainty-reliability/">Uncertainty &amp; reliability</a>.</p>
+<p><strong>The trade-off.</strong> A safety case constrains how fast you can ship (every change needs
+evidence), which is the price of a driverless claim. The rejected alternative, a
+single aggregate crash-rate comparison without matching, is what the Tesla Vehicle
+Safety Report does; the Waymo papers exist because that comparison is confounded.</p>
+<p><strong>Sources.</strong> Waymo Safety page; Safety Impact hub; "Waymo's Safety Methodologies and
+Safety Readiness Determinations" (2020); "Waymo Safety Case Approach" (white paper);
+Kusano et al., Traffic Injury Prevention (2025); "Waymo's autonomous vehicles are
+significantly safer than human-driven ones, says new research led by Swiss Re"
+(Waymo blog, 2023); Safety Data Hub launch (2024); independent audits (2025).</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd make the safety claim as a matched-rate comparison with confidence
+intervals, by crash type and injury severity, against human benchmarks from the
+same geographies and adjusted for under-reporting, which is the design of Waymo's
+peer-reviewed comparison at 56.7 million rider-only miles (Traffic Injury
+Prevention, 2025) and of its Safety Impact hub. I'd reject a single
+fleet-wide crashes-per-mile ratio, because exposure differs by road type and the
+denominators aren't comparable. I'd add an independent data source, as
+Waymo did with Swiss Re's liability claims, because self-reported crash data
+invites doubt. The trade-off is release speed: a safety case demands evidence
+for every change, so I'd tie the evidence to scenario slices in simulation
+and to rider-only outcomes. I'd report power explicitly: for serious injuries
+at the rates involved, the confidence interval at tens of millions of miles is
+wide, and I'd say so rather than over-claim."</p>
+</div>
+<h3 id="36-operating-a-rider-only-fleet-fleet-response">3.6 Operating a rider-only fleet: Fleet Response<a class="headerlink" href="#36-operating-a-rider-only-fleet-fleet-response" title="Permanent link">&para;</a></h3>
+<p><strong>The problem.</strong> With no driver, the vehicle sometimes reaches a situation it cannot
+resolve alone (an ambiguous closure, a confusing scene). A remote human must help
+without becoming a low-latency control loop that the safety case would then have to
+cover.</p>
+<p><strong>The approach.</strong> Waymo's Fleet Response post (May 2024) describes remote humans who
+provide guidance, such as confirming an interpretation or suggesting a path, while
+the vehicle remains responsible for driving and for safety; it explicitly contrasts
+this with remote driving. The ML consequence is that the <em>request</em> itself is a
+classifier problem (when to ask, at what confidence) and a data-engine signal (every
+request marks a scene the model found hard). See <a href="../../part13-retrieval-eval-reliability/03-uncertainty-reliability/">Uncertainty &amp; reliability</a>
+for calibration and abstention.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd design remote assistance as guidance rather than control, exactly the
+distinction Waymo's Fleet Response post draws, because a remote-driving loop
+would put network latency inside the safety case. The trigger for asking would
+be a calibrated uncertainty signal from the planner with a hard time budget,
+and every request would be logged as a hard-scene example for training. The
+alternative I'd reject is teleoperation. I'd measure requests per
+thousand miles, time-to-resolution, and the share of requests that later became
+autonomous decisions after retraining."</p>
+</div>
+<h2 id="4-likely-interview-questions">4. Likely interview questions<a class="headerlink" href="#4-likely-interview-questions" title="Permanent link">&para;</a></h2>
+<div class="admonition interview">
+<p class="admonition-title">Q1. Design perception for a rider-only robotaxi with lidar, cameras and radar. Where do you fuse, and how do you prove redundancy?</p>
+<p><strong>Answer sketch.</strong> Requirements: range, classes, weather, failure independence.
+Mid-level fusion in a shared BEV (lidar geometry, camera semantics, radar velocity);
+a lidar-only fallback detector as an independent evidence path; tracking with
+per-modality health signals; calibration and time-sync monitoring; evaluation by
+range/class/weather and by single-modality ablation. Links:
+<a href="../../part11-perception-autonomy/03-sensor-fusion/">Sensor fusion</a>, <a href="../../part17-ml-system-design/05-perception-system-av/">AV perception design</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd fuse at the feature level into a shared BEV and keep an
+independent lidar-only path, because the 6th-generation Driver post frames
+the suite around redundancy and a safety case needs independent evidence. I
+would reject late fusion of per-sensor boxes as the primary route; it
+discards complementary evidence before the decision. The cost is
+calibration burden, which I'd monitor in production. I'd evaluate
+with Open Dataset-style 3D AP by range and class and an ablation slice per
+modality, so I can quantify what each sensor buys."</p>
+</div>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Q2. Marginal versus joint prediction: when does the difference matter and how would you build the joint model?</p>
+<p><strong>Answer sketch.</strong> It matters whenever agents interact (merges, unprotected
+turns, pedestrians and yielding cars). Joint model: shared scene encoder,
+tokenised motion, autoregressive interleaved decoding (MotionLM), sampled
+rollouts clustered into modes; cost mitigations. Evaluate with interactive
+metrics and calibration. Link: <a href="../../part11-perception-autonomy/06-prediction-planning/">Prediction &amp; planning</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd go joint for interacting agents and marginal for the rest, and I
+would build the joint model as MotionLM does: motion tokens, one autoregressive
+decoder over all agents, a plain next-token loss. The rejected alternative is
+marginal mixtures with interaction heuristics, which the MotionLM paper
+identifies as producing inconsistent futures. Joint decoding costs rollouts;
+I'd batch and cache. I'd evaluate on the Open Motion Dataset
+interactive split with joint metrics and a calibration check."</p>
+</div>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Q3. Explain how you would tokenise continuous motion and what you lose.</p>
+<p><strong>Answer sketch.</strong> Quantise per-step deltas (or accelerations) into a small
+vocabulary per axis at a fixed rate; losses: resolution and smoothness (mitigate
+with finer vocab or a continuous refinement head); gains: cross-entropy training,
+sampling, conditional rollouts. Compare with Gaussian-mixture heads.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd quantise per-step motion deltas into a small vocabulary at a fixed
+rate, as MotionLM does, because it turns forecasting into next-token
+prediction with sampling and conditioning for free. I'd name the loss:
+resolution and smoothness, which I'd recover with a finer vocabulary or a
+continuous refinement head. The alternative is a Gaussian-mixture decoder,
+which is smoother but needs anchors or latent-variable tricks for
+multimodality. I'd evaluate minADE at the vocabulary's resolution limit
+to make sure quantisation isn't the bottleneck."</p>
+</div>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Q4. Design the closed-loop evaluation system for a planner change.</p>
+<p><strong>Answer sketch.</strong> Scenario bank mined from logs and synthesised; reactive sim
+agents scored for realism; metrics (collision, off-road, progress, comfort,
+constraint violations); statistical comparison against the incumbent with
+paired scenarios; escalation to shadow mode and rider-only miles; a correlation
+check that sim rankings predict real outcomes. Link: <a href="../../part13-retrieval-eval-reliability/02-evaluation/">Evaluation</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd run every planner change through paired closed-loop scenarios in a
+Waymax-style simulator with sim agents validated by Sim Agents-style realism
+metrics, then shadow mode, then rider-only miles. I'd reject replay as the
+gate. The price is the sim-to-real gap; I'd measure it by whether the
+simulator's ranking of candidates matches real outcomes on shared scenario
+slices, and I'd treat a disagreement as a simulator bug to fix before
+trusting the next result."</p>
+</div>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Q5. How do you measure whether learned sim agents are realistic enough?</p>
+<p><strong>Answer sketch.</strong> Distributional metrics over kinematics (speed, acceleration,
+heading change), interactions (time-to-collision, distance to nearest agent), and
+map compliance, compared with logged agents; not trajectory error, because many
+futures are valid. Adversarial checks: does the planner exploit sim-agent
+weaknesses? Link: <a href="../../part11-perception-autonomy/07-world-models/">World models</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd score sim agents by distributional realism, kinematics,
+interaction statistics and map compliance against logged behaviour, which is
+the framing of the Waymo Open Sim Agents Challenge, rather than by trajectory
+error, since many futures are valid. I'd add an exploitation check: if a
+planner's sim score improves while its shadow-mode disagreement worsens, the
+agents are exploitable."</p>
+</div>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Q6. Would you deploy an EMMA-style model on the vehicle? Defend your answer.</p>
+<p><strong>Answer sketch.</strong> Not as the primary driver today: the paper states no lidar,
+few frames, high compute. Use it as an offline teacher, a long-tail reasoner, a
+labeller, and a source of distilled onboard models; revisit as latency and
+sensor coverage improve. Link: <a href="../../part08-multimodal/04-vlm-architecture/">VLM architecture</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"Not in the latency-critical loop, and I'd use Waymo's own EMMA paper as
+the reason: it lacks lidar and radar, uses few frames and is compute-heavy,
+and the authors present it as research. I'd deploy it offline as a
+teacher and labeller and distil onboard. The trade-off is the loss of
+language-level reasoning at runtime, which I'd partially recover by
+distilling rationales into the onboard model's auxiliary targets. I'd
+evaluate on the rare-scenario slice where the paper's co-training gains
+showed up."</p>
+</div>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Q7. Waymo published scaling laws for prediction and planning. How would you use them to plan a training budget?</p>
+<p><strong>Answer sketch.</strong> Fit power laws on small runs; allocate compute-optimally
+between parameters and data; check that the open-loop improvement transfers to
+closed-loop; watch for the irreducible-loss floor from genuine uncertainty. Link:
+<a href="../../part06-llm-training/02-scaling-laws/">Scaling laws</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd run a sweep of small models to fit power laws, then allocate
+compute between parameters and data along the fitted frontier, and I'd
+only trust the plan if closed-loop metrics track the open-loop loss, which is
+the check Waymo's 2025 report makes. The alternative, scaling one model until
+the budget runs out, wastes compute on the wrong axis. I'd report the
+irreducible-loss estimate, because part of driving is genuinely uncertain and
+no model closes it."</p>
+</div>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Q8. You have 60 million rider-only miles. How many serious-injury crashes do you need to claim a 50% reduction with confidence?</p>
+<p><strong>Answer sketch.</strong> Model counts as Poisson; a ratio of rates with a confidence
+interval; power depends on the <em>expected human count</em> at that exposure; show the
+calculation and the sensitivity to under-reporting corrections; conclude that
+claims about rarer outcomes need far more miles. Link: <a href="../../part01-math/04-statistics/">Statistics</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd model crashes as Poisson counts, form the rate ratio against a
+matched human benchmark, and compute the interval; the width is set by the
+expected human count at that exposure, not by the AV count. That is why
+Waymo's peer-reviewed comparison reports by crash type and severity with
+intervals. I'd be explicit that for the rarest outcomes the interval
+remains wide at tens of millions of miles, and I'd say so instead of
+claiming more than the data supports."</p>
+</div>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Q9. Design the data engine for a fleet with no driver interventions.</p>
+<p><strong>Answer sketch.</strong> Without disengagements, signals come from Fleet Response
+requests, planner uncertainty, hard-brake and near-miss detectors, sim-agent
+disagreement, and perception self-consistency; mine logs offline with large
+models; synthesise rare cases; keep human review on the disagreement slice.
+Link: <a href="../../part10-self-supervised/03-weak-supervision-and-auto-labeling/">Weak supervision &amp; auto-labelling</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"With no driver, I'd treat Fleet Response requests, calibrated planner
+uncertainty and near-miss detectors as the trigger signals, since Waymo's
+Fleet Response post shows those requests mark exactly the scenes the driver
+found hard. I'd mine logs offline with large models and synthesise rare
+cases in simulation. The alternative, waiting for real crashes, is
+unacceptable and statistically hopeless. I'd measure the engine by the
+drop in requests per mile on the scenarios it targeted."</p>
+</div>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Q10. Waymo relies on HD maps. How do you detect that the map is wrong, and what does the driver do?</p>
+<p><strong>Answer sketch.</strong> Online map inference from perception (lane and boundary
+heads) compared with the prior map; a change-detection classifier with
+conservative behaviour on disagreement; fleet-level aggregation to update the
+map; evaluation with injected changes. Mark that Waymo's mapping internals are
+not public. Link: <a href="../../part11-perception-autonomy/02-multi-camera-bev/">Multi-camera &amp; BEV</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd run online map inference from perception and compare it with the
+prior, treating disagreement as a change-detection problem with conservative
+fallback behaviour, and aggregate confirmed changes across the fleet. I'd
+say that Waymo's mapping internals aren't public, so this is my design, not
+theirs. The cost is false alarms causing over-cautious driving, so I'd
+tune the detector on injected changes and measure both miss rate and
+comfort impact."</p>
+</div>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Q11. Coding: implement multi-object tracking association with a Kalman filter and the Hungarian algorithm.</p>
+<p><strong>Answer sketch.</strong> Constant-velocity Kalman state per track <span class="arithmatex">\([x,y,v_x,v_y]\)</span>;
+predict; cost matrix from Mahalanobis or IoU distance; Hungarian assignment
+with gating; birth/death logic; shapes on every tensor; test on a synthetic
+scene with crossings. Reference: <a href="../../part11-perception-autonomy/04-tracking/">Tracking</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd write the predict step, a gated cost matrix, and Hungarian
+assignment, then the track lifecycle, and I'd test on two crossing
+objects, which is where identity switches happen. The rejected shortcut is
+greedy nearest-neighbour matching; it fails at crossings. I'd evaluate
+with MOTA and identity switches, the Open Dataset tracking conventions."</p>
+</div>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Q12. Weather: lidar in heavy rain and cameras at night. How does the stack degrade and how do you validate it?</p>
+<p><strong>Answer sketch.</strong> Per-modality confidence; fusion weights conditioned on
+health; operational design domain limits enforced by a classifier; validation by
+weather-sliced metrics and by collected adverse-weather datasets; the 6th-gen
+blog states the new sensor suite targets more weather.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"I'd make degradation explicit: per-modality health estimates feed the
+fusion and an operational-domain classifier that can pause service, because a
+rider-only vehicle must know when it's outside its envelope. Waymo's
+6th-generation post states the suite was designed for more weather, so I
+would validate on weather-sliced metrics and modality ablations. The
+trade-off is availability versus risk, and I'd report both."</p>
+</div>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Q13. What would you take from Waymo's publications into a perception team elsewhere?</p>
+<p><strong>Answer sketch.</strong> The evaluation culture: public datasets with range-binned
+metrics, closed-loop simulators with realism scoring, statistically matched
+safety claims, and publishing limitations alongside results (EMMA). Also the
+prediction lineage as evidence that language-model machinery transfers to
+continuous domains.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview</p>
+<p>"The evaluation discipline: Waymo's papers ship with the metric that would
+expose their weakness, EMMA lists its limitations, the safety papers report
+intervals, and Waymax makes closed-loop testing a public artefact. I'd
+bring that culture before any architecture."</p>
+</div>
+</div>
+<h2 id="5-what-to-bring-from-your-background">5. What to bring from your background<a class="headerlink" href="#5-what-to-bring-from-your-background" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Detection and tracking at scale</strong> map directly onto the perception and Open
+  Dataset conventions; be fluent in range-binned AP, MOTA and identity switches, and
+  in how label noise and class imbalance show up in those numbers.</li>
+<li><strong>Sensor-fusion and calibration</strong> experience (even camera-only multi-view) is the
+  bridge to lidar-centric fusion; be ready to derive where each modality's error
+  enters BEV.</li>
+<li><strong>Statistical rigour</strong>: Waymo's safety work is the most statistically careful in
+  the industry; bring experience designing matched comparisons, confidence intervals
+  for rare-event rates, and A/B tests with correct units.</li>
+<li><strong>ML-systems experience</strong> in evaluation infrastructure (scenario banks, regression
+  gates, simulators) is valued as highly as modelling; Waymo publishes simulators, so
+  they hire for people who build them.</li>
+<li><strong>OCR / document-understanding</strong> experience translates to the <em>sequence-decoding</em>
+  view of driving (lanes, tokens, EMMA's text outputs): you know how to train and
+  evaluate autoregressive structured outputs.</li>
+</ul>
+<h2 id="6-sources">6. Sources<a class="headerlink" href="#6-sources" title="Permanent link">&para;</a></h2>
+<p><strong>Papers</strong></p>
+<ul>
+<li>Sun et al., "Scalability in Perception for Autonomous Driving: Waymo Open Dataset" (CVPR 2020). <a href="https://arxiv.org/abs/1912.04838">arXiv:1912.04838</a>; dataset at <a href="https://waymo.com/open/">waymo.com/open</a></li>
+<li>Ettinger et al., "Large Scale Interactive Motion Forecasting for Autonomous Driving: The Waymo Open Motion Dataset" (ICCV 2021). <a href="https://arxiv.org/abs/2104.10133">arXiv:2104.10133</a></li>
+<li>Nayakanti et al., "Wayformer: Motion Forecasting via Simple &amp; Efficient Attention Networks" (ICRA 2023). <a href="https://arxiv.org/abs/2207.05844">arXiv:2207.05844</a></li>
+<li>Seff et al., "MotionLM: Multi-Agent Motion Forecasting as Language Modeling" (ICCV 2023). <a href="https://arxiv.org/abs/2309.16534">arXiv:2309.16534</a></li>
+<li>Gulino et al., "Waymax: An Accelerated, Data-Driven Simulator for Large-Scale Autonomous Driving Research" (NeurIPS 2023). <a href="https://arxiv.org/abs/2310.08710">arXiv:2310.08710</a>, <a href="https://github.com/waymo-research/waymax">github.com/waymo-research/waymax</a></li>
+<li>Montali et al., "The Waymo Open Sim Agents Challenge" (2023). <a href="https://arxiv.org/abs/2305.12032">arXiv:2305.12032</a></li>
+<li>Hwang et al., "EMMA: End-to-End Multimodal Model for Autonomous Driving" (2024). <a href="https://arxiv.org/abs/2410.23262">arXiv:2410.23262</a>, <a href="https://waymo.com/research/emma/">research page</a></li>
+<li>Baniodeh et al., "Scaling Laws of Motion Forecasting and Planning. A Technical Report" (2025). <a href="https://arxiv.org/abs/2506.08228">arXiv:2506.08228</a></li>
+<li>"WOD-E2E: Waymo Open Dataset for End-to-End Driving in Challenging Long-tail Scenarios" (2025). <a href="https://arxiv.org/abs/2510.26125">arXiv:2510.26125</a></li>
+<li>Tancik et al., "Block-NeRF: Scalable Large Scene Neural View Synthesis" (CVPR 2022). <a href="https://arxiv.org/abs/2202.05263">arXiv:2202.05263</a></li>
+<li>Kusano, Scanlon et al., "Comparison of Waymo Rider-Only Crash Rates by Crash Type to Human Benchmarks at 56.7 Million Miles", <em>Traffic Injury Prevention</em> (2025). <a href="https://www.tandfonline.com/doi/full/10.1080/15389588.2025.2499887">doi:10.1080/15389588.2025.2499887</a></li>
+</ul>
+<p><strong>Blog posts and company documents</strong></p>
+<ul>
+<li>"Meet the 6th-generation Waymo Driver" (Aug 2024). <a href="https://waymo.com/blog/2024/08/meet-the-6th-generation-waymo-driver/">waymo.com/blog/2024/08/meet-the-6th-generation-waymo-driver/</a></li>
+<li>"Introducing EMMA" (Oct 2024). <a href="https://waymo.com/blog/2024/10/introducing-emma/">waymo.com/blog/2024/10/introducing-emma/</a></li>
+<li>"New Insights for Scaling Laws in Autonomous Driving" (June 2025). <a href="https://waymo.com/blog/2025/06/scaling-laws-in-autonomous-driving/">waymo.com/blog/2025/06/scaling-laws-in-autonomous-driving/</a></li>
+<li>"Simulation City" (2021). <a href="https://waymo.com/blog/2021/07/simulation-city/">waymo.com/blog/2021/07/simulation-city/</a></li>
+<li>"Waymo advances AI research with our multifunctional Waymax simulator" (Oct 2023). <a href="https://waymo.com/blog/2023/10/waymo-advances-ai-research-with-our-multifunctional-waymax-simulator">waymo.com/blog/2023/10/…waymax-simulator</a></li>
+<li>"The Waymo World Model: A New Frontier for Autonomous Driving Simulation" (Feb 2026). <a href="https://waymo.com/blog/2026/02/the-waymo-world-model-a-new-frontier-for-autonomous-driving-simulation/">waymo.com/blog/2026/02/…</a>; Google DeepMind, "Genie 3: A new frontier for world models" (Aug 2025). <a href="https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/">deepmind.google/blog/genie-3-a-new-frontier-for-world-models/</a></li>
+<li>"Fleet Response" (May 2024). <a href="https://waymo.com/blog/2024/05/fleet-response/">waymo.com/blog/2024/05/fleet-response/</a></li>
+<li>Waymo Safety. <a href="https://waymo.com/safety/">waymo.com/safety/</a>; Safety Impact hub. <a href="https://waymo.com/safety/impact/">waymo.com/safety/impact/</a>; Safety Data Hub launch (Sept 2024). <a href="https://waymo.com/blog/2024/09/safety-data-hub/">waymo.com/blog/2024/09/safety-data-hub/</a></li>
+<li>"Waymo's Safety Methodologies and Safety Readiness Determinations" (2020). <a href="https://waymo.com/research/waymos-safety-methodologies-and-safety-readiness/">waymo.com/research/waymos-safety-methodologies-and-safety-readiness/</a></li>
+<li>"Waymo Safety Case Approach" (white paper). <a href="https://assets.ctfassets.net/e6t5diu0txbw/66jOjPtNIjzawaK0ZjpU3q/7f081b392cf29a3355c97d0d758fe6cf/Waymo_Safety_Case_Approach.pdf">PDF</a></li>
+<li>"Waymo's autonomous vehicles are significantly safer than human-driven ones, says new research led by Swiss Re" (Sept 2023). <a href="https://waymo.com/blog/2023/09/waymos-autonomous-vehicles-are-significantly-safer-than-human-driven-ones/">waymo.com/blog/2023/09/…</a></li>
+<li>"Demonstrably Safe AI for Autonomous Driving" (Dec 2025). <a href="https://waymo.com/blog/2025/12/demonstrably-safe-ai-for-autonomous-driving/">waymo.com/blog/2025/12/demonstrably-safe-ai-for-autonomous-driving/</a></li>
+<li>Independent audits (Nov 2025). <a href="https://waymo.com/blog/2025/11/independent-audits/">waymo.com/blog/2025/11/independent-audits/</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../tesla/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Tesla (Autopilot / FSD / Optimus)">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Tesla (Autopilot / FSD / Optimus)
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../zoox-nuro-aurora/" class="md-footer__link md-footer__link--next" aria-label="Next: Zoox, Nuro, Aurora &amp; robotaxi peers">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Zoox, Nuro, Aurora & robotaxi peers
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "navigation.tracking", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,7803 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A first-principles-to-frontier compendium for staff-level ML interviews — math, from-scratch code, systems, and production case studies.">
+      
+      
+      
+        <link rel="canonical" href="https://veesarma.github.io/ml-interview-book/part17-ml-system-design/06-visual-search-image-retrieval/">
+      
+      
+        <link rel="prev" href="../05-perception-system-av/">
+      
+      
+        <link rel="next" href="../07-content-moderation/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Visual search & image retrieval - The ML Interview Book</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#visual-search-image-retrieval" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="The ML Interview Book" class="md-header__button md-logo" aria-label="The ML Interview Book" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The ML Interview Book
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Visual search & image retrieval
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/veesarma/ml-interview-book" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    veesarma/ml-interview-book
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../preface/how-to-use/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Preface
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part01-math/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  I. Math
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part02-classical/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  II. Classical ML
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part03-neural-nets/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  III. Neural Nets
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part04-vision/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  IV. Vision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part05-sequence-transformers/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  V. Sequences & Transformers
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part06-llm-training/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  VI. LLM Training
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part07-post-training/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  VII. Post-training
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part08-multimodal/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  VIII. Multimodal
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part09-generative/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  IX. Generative
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part10-self-supervised/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  X. Self-/Semi-/Weak Supervision
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part11-perception-autonomy/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XI. Perception & Autonomy
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part12-rl/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XII. Reinforcement Learning
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part13-retrieval-eval-reliability/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XIII. Retrieval, Eval & Reliability
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part14-systems/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XIV. Systems
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part15-interpretability-safety/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XV. Interpretability & Safety
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part16-coding-canon/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XVI. Coding Canon
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part19-breadth-review/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XIX. Breadth Review
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part20-project-deep-dive/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XX. Your Projects
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XVII. ML System Design
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../part18-company-deep-dives/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  XVIII. Company Deep Dives
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../references/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  References
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="The ML Interview Book" class="md-nav__button md-logo" aria-label="The ML Interview Book" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    The ML Interview Book
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/veesarma/ml-interview-book" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    veesarma/ml-interview-book
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Preface
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Preface
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/how-to-use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How to use this book
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/study-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Study plan (6–9 months)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/interview-signal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What staff-level signal looks like
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part01-math/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I. Math
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    I. Math
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/01-linear-algebra/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear algebra
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/02-calculus-matrix-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calculus & matrix calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/03-probability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Probability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/04-statistics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/05-information-theory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Information theory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/06-optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/07-tensor-shapes-broadcasting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tensors, shapes & broadcasting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part02-classical/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    II. Classical ML
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    II. Classical ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/01-linear-regression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear regression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/02-logistic-softmax-regression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logistic & softmax regression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/03-trees-and-ensembles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trees & ensembles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/04-knn-kmeans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KNN & K-means
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/05-probabilistic-models-em/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Probabilistic models & EM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/06-dimensionality-reduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dimensionality reduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/07-kernel-methods-svm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kernel methods & SVMs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part03-neural-nets/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    III. Neural Nets
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    III. Neural Nets
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/01-mlp-and-activations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLPs & activations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/02-backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/03-autograd-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building an autograd engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/04-initialization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/05-normalization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Normalization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/06-regularization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Regularization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part04-vision/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IV. Vision
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IV. Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/01-image-representation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image representation & signal processing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/02-convolutions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Convolutions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/03-cnn-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CNN architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/04-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/05-segmentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Segmentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/06-geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geometry & cameras
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/07-3d-perception/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part05-sequence-transformers/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    V. Sequences & Transformers
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    V. Sequences & Transformers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/01-rnn-lstm-gru/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RNN, LSTM, GRU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/02-seq2seq-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seq2seq & early attention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/03-attention-mathematics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attention mathematics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/04-transformer-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/05-positional-encodings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Positional encodings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/06-tokenization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tokenization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part06-llm-training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VI. LLM Training
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VI. LLM Training
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/01-pretraining-data-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pretraining data & objective
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/02-scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/03-large-model-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Large-model architecture (MoE, GQA, SSMs)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/04-efficient-attention-kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Efficient attention & KV cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/05-quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/06-fine-tuning-lora/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & LoRA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/07-mid-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mid-training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part07-post-training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VII. Post-training
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VII. Post-training
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/01-sft/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervised fine-tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/02-reward-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reward models & preferences
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/03-rlhf-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF with PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/04-dpo-and-friends/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DPO and its relatives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/05-reasoning-rl-grpo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reasoning RL, RLVR & GRPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/06-test-time-compute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test-time compute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part08-multimodal/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VIII. Multimodal
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VIII. Multimodal
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/01-vision-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision Transformers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/02-detr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DETR & set prediction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/03-clip-contrastive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLIP & contrastive learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/04-vlm-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VLM architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/05-multimodal-foundation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal foundation models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/06-video-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part09-generative/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IX. Generative
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IX. Generative
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/01-autoencoders-vae/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autoencoders & VAEs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/02-gans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GANs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/03-diffusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/04-flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part10-self-supervised/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    X. Self-/Semi-/Weak Supervision
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_12" id="__nav_12_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    X. Self-/Semi-/Weak Supervision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/01-self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-supervised learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/02-semi-supervised/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Semi-supervised learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/03-weak-supervision-and-auto-labeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Weak supervision & auto-labeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part11-perception-autonomy/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XI. Perception & Autonomy
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_13" id="__nav_13_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XI. Perception & Autonomy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/01-perception-foundation-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Perception foundation models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/02-multi-camera-bev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-camera & BEV
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/03-sensor-fusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor fusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/04-tracking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tracking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/05-occupancy-temporal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Occupancy & temporal perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/06-prediction-planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prediction & planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/07-world-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    World models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part12-rl/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XII. Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_14" id="__nav_14_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XII. Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/01-mdp-bellman/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs & Bellman equations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/02-classical-rl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical RL algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/03-deep-rl-dqn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep RL & DQN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/04-policy-gradients-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy gradients, GAE & PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/05-imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/06-agents-tool-use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents & tool use
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_15" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part13-retrieval-eval-reliability/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIII. Retrieval, Eval & Reliability
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_15" id="__nav_15_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIII. Retrieval, Eval & Reliability
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/01-retrieval-and-rag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/02-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/03-uncertainty-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uncertainty & reliability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_16" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part14-systems/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIV. Systems
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_16" id="__nav_16_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIV. Systems
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/01-distributed-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/02-training-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/03-inference-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inference systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/04-hardware-memory-roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware, memory & roofline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_17" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part15-interpretability-safety/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XV. Interpretability & Safety
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_17" id="__nav_17_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_17">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XV. Interpretability & Safety
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15-interpretability-safety/01-interpretability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpretability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15-interpretability-safety/02-safety-failure-modes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Safety & failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_18" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part16-coding-canon/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVI. Coding Canon
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_18" id="__nav_18_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_18">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVI. Coding Canon
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/01-numpy-torch-cheatsheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NumPy ↔ PyTorch cheat sheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/02-shape-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shape & broadcasting drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/03-timed-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timed coding drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_19" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part19-breadth-review/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIX. Breadth Review
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_19" id="__nav_19_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_19">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIX. Breadth Review
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/01-basics-losses-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basics, losses, models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/02-evaluation-debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation and debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/03-deep-learning-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep learning and Transformers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/04-llms-multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLMs and multimodal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/05-serving-data-engines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serving, data engines, real-world
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/06-rapid-fire/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rapid-fire derivations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_20" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part20-project-deep-dive/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XX. Your Projects
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_20" id="__nav_20_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_20">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XX. Your Projects
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/01-carl-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CARL framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/02-streetsmart-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worked deep dive, StreetSmart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/03-edge-perception-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worked deep dive, edge perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/04-behavioral-leadership/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Behavioral and leadership
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_21" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVII. ML System Design
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_21" id="__nav_21_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_21_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_21">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVII. ML System Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-recommendation-feed-ranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feed & recommendation ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-search-ranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-ads-ctr-prediction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ads CTR / conversion prediction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-fraud-anomaly-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fraud & anomaly detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-perception-system-av/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous-vehicle perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual search & image retrieval
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual search & image retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-the-whiteboard-in-60-seconds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR: the whiteboard in 60 seconds
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-requirements-scoping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Requirements &amp; scoping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-modelling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Modelling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Modelling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Baseline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-the-embedding-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 The embedding model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-detection-and-the-which-object-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Detection and the "which object" problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-approximate-nearest-neighbour-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Approximate nearest neighbour search
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-re-ranking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 Re-ranking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-product-matching-and-near-duplicate-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.6 Product matching and near-duplicate detection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#37-multimodal-and-text-refinement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.7 Multimodal and text refinement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#38-cold-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.8 Cold start
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-training-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Training &amp; serving
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-evaluation-experimentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Evaluation &amp; experimentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-trade-offs-alternatives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Trade-offs &amp; alternatives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-real-companies-did-it-as-mock-interviews" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How real companies did it: as mock interviews
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. How real companies did it: as mock interviews">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-pinterest-a-camera-search-for-a-visual-product" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Pinterest, "a camera search for a visual product"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-ebay-a-hundred-million-listings-that-change-every-day" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 eBay, "a hundred million listings that change every day"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-alibaba-visual-search-as-a-shopping-product-at-scale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 Alibaba, "visual search as a shopping product at scale"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-google-lens-the-query-is-the-world" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.4 Google Lens, "the query is the world"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75-the-index-make-a-billion-vectors-fit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.5 The index, "make a billion vectors fit"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-staff-level-follow-ups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Staff-level follow-ups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-scaling-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Scaling &amp; evolution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-content-moderation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content moderation & trust
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-llm-product-rag-assistant/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM assistant with RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-ocr-document-understanding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OCR & document understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../13-novel-object-3d-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Novel-object 3D detection from unlabeled fleet data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-forecasting-eta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting & ETA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11-notifications-uplift-experimentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications, uplift & experimentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../12-ml-platform-feature-store-monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML platform, feature store & monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_22" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part18-company-deep-dives/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVIII. Company Deep Dives
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_22" id="__nav_22_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVIII. Company Deep Dives
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/tesla/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tesla (Autopilot / FSD / Optimus)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/waymo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waymo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/zoox-nuro-aurora/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zoox, Nuro, Aurora & robotaxi peers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/nvidia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NVIDIA (DRIVE, Cosmos, Isaac)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/meta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meta (Feed, Reels, Ads, FAIR)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/google-youtube/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Google & YouTube
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/tiktok-bytedance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TikTok / ByteDance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/netflix-spotify/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Netflix & Spotify
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/pinterest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pinterest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/uber-doordash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uber & DoorDash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/airbnb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Airbnb
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/amazon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Amazon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/apple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Apple
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/stripe-fintech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stripe & fintech fraud
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/frontier-labs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAI, Anthropic & DeepMind
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/scale-ai-data-engines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scale AI & data engines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../references/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-the-whiteboard-in-60-seconds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR: the whiteboard in 60 seconds
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-requirements-scoping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Requirements &amp; scoping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-modelling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Modelling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Modelling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Baseline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-the-embedding-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 The embedding model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-detection-and-the-which-object-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Detection and the "which object" problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-approximate-nearest-neighbour-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Approximate nearest neighbour search
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-re-ranking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 Re-ranking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-product-matching-and-near-duplicate-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.6 Product matching and near-duplicate detection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#37-multimodal-and-text-refinement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.7 Multimodal and text refinement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#38-cold-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.8 Cold start
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-training-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Training &amp; serving
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-evaluation-experimentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Evaluation &amp; experimentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-trade-offs-alternatives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Trade-offs &amp; alternatives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-real-companies-did-it-as-mock-interviews" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How real companies did it: as mock interviews
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. How real companies did it: as mock interviews">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-pinterest-a-camera-search-for-a-visual-product" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Pinterest, "a camera search for a visual product"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-ebay-a-hundred-million-listings-that-change-every-day" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 eBay, "a hundred million listings that change every day"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-alibaba-visual-search-as-a-shopping-product-at-scale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 Alibaba, "visual search as a shopping product at scale"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-google-lens-the-query-is-the-world" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.4 Google Lens, "the query is the world"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75-the-index-make-a-billion-vectors-fit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.5 The index, "make a billion vectors fit"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-staff-level-follow-ups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Staff-level follow-ups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-scaling-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Scaling &amp; evolution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="visual-search-image-retrieval">Visual search &amp; image retrieval<a class="headerlink" href="#visual-search-image-retrieval" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Why this matters / who asks it.</strong> Pinterest (Lens, Shop the Look), Google (Lens),
+Amazon (StyleSnap), eBay, Alibaba, Shopify and every marketplace with a camera icon
+ask this question. The business problem is that a photograph carries an intent no
+keyword can express, and the company owns a catalogue of hundreds of millions of
+items that could satisfy it. The interviewer is looking for three things: whether
+you can choose and train an embedding model for the actual retrieval task,
+whether you know what a billion-vector index costs in memory and latency, and
+whether you understand that the hard part of "shop the look" is object detection
+and product matching rather than similarity search.</p>
+</blockquote>
+<h2 id="tldr-the-whiteboard-in-60-seconds">TL;DR: the whiteboard in 60 seconds<a class="headerlink" href="#tldr-the-whiteboard-in-60-seconds" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart LR
+  Q[Query image&lt;br/&gt;camera or saved photo] --&gt; PRE[Preprocess&lt;br/&gt;resize, orientation, quality check]
+  PRE --&gt; DET[Object detection + crop&lt;br/&gt;which thing did the user mean?]
+  DET --&gt; EMB[Query embedding&lt;br/&gt;shared vision encoder]
+  EMB --&gt; ANN[ANN search&lt;br/&gt;IVF-PQ / HNSW over&lt;br/&gt;catalogue embeddings]
+  ANN --&gt; RANK[Re-ranking&lt;br/&gt;cross-attention or metric refinement,&lt;br/&gt;attributes, price, availability, quality]
+  RANK --&gt; DEDUP[Near-duplicate collapse&lt;br/&gt;+ diversity + business rules]
+  DEDUP --&gt; RES[Results with hotspots]
+  CAT[(Catalogue images)] --&gt; IDX[Indexing pipeline&lt;br/&gt;embed, dedup, shard, build index]
+  IDX --&gt; ANN
+  TXT[Text query or attributes] -.-&gt;|multimodal| EMB
+  RES -.-&gt;|clicks, saves, purchases| TRAIN[Training: metric learning&lt;br/&gt;on engagement + catalogue pairs]
+  TRAIN --&gt; EMB
+  TRAIN --&gt; IDX</code></pre>
+<ul>
+<li><strong>Detection first.</strong> A photo of a living room contains a sofa, a lamp and a rug.
+  Detecting objects and letting the user pick one (or picking the salient one) turns
+  an ambiguous query into a well-posed one. Pinterest's Lens and Shop the Look work
+  this way.</li>
+<li><strong>One embedding space, many uses.</strong> A single vision encoder serves search,
+  recommendations and near-duplicate detection, which saves an index and keeps
+  behaviour consistent across surfaces.</li>
+<li><strong>Metric learning with the right positives.</strong> In-batch sampled softmax or a
+  triplet loss over pairs that come from engagement (clicked or purchased after a
+  visual query) and from catalogue structure (same product, different photo).</li>
+<li><strong>CLIP-style contrastive pretraining</strong> gives zero-shot text-image alignment and a
+  strong initialisation, then fine-tune on catalogue data for the product-matching
+  task that pretraining does not cover.</li>
+<li><strong>ANN at a billion vectors is a memory problem before it is a latency problem.</strong>
+  fp32 at 128 dims costs 512 GB per billion; product quantisation to 32 bytes brings
+  it to 32 GB and costs recall. Pick the point on that curve deliberately.</li>
+<li><strong>Near-duplicates dominate the catalogue.</strong> The same product appears under twenty
+  sellers with different crops. Collapse duplicates at index time and again at
+  result time, or the top ten will be one item shown ten ways.</li>
+<li><strong>Index freshness</strong> is an ingestion pipeline: new listings should be searchable in
+  minutes, which means incremental inserts plus periodic full rebuilds.</li>
+<li><strong>Latency budget</strong>: detection 30 ms, embedding 20 ms, ANN 20 ms, re-rank 30 ms,
+  network and assembly the rest, inside a 500 ms perceived budget on mobile.</li>
+<li><strong>Evaluation</strong>: recall@k against human-judged matches, exact-product accuracy for
+  product matching, and online engagement (clicks, saves, purchases per visual
+  search), with a human relevance audit as the guardrail.</li>
+<li><strong>Evidence</strong>: Pinterest (visual search 2015, Lens and Shop the Look 2017 to 2019,
+  unified visual embeddings 2021), eBay (visual search 2017), Alibaba (Pailitao,
+  KDD 2018), Google Lens, and the ANN literature (FAISS, HNSW, ScaNN).</li>
+</ul>
+<h2 id="1-requirements-scoping">1. Requirements &amp; scoping<a class="headerlink" href="#1-requirements-scoping" title="Permanent link">&para;</a></h2>
+<p><strong>Functional.</strong> Accept an image (camera capture, gallery photo, or a crop of an
+existing page image), optionally with a text refinement ("in blue"), detect the
+objects in it, and return ranked catalogue items that match the selected object, with
+the detected regions shown as tappable hotspots. Support "more like this" from any
+catalogue image, and support duplicate detection for the catalogue team.</p>
+<p><strong>Non-functional, with the numbers to ask for.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Ask the interviewer</th>
+<th>A defensible assumption</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Catalogue size</td>
+<td>"How many indexable images? How many distinct products?"</td>
+<td>1B images, 300M distinct products</td>
+</tr>
+<tr>
+<td>Query volume</td>
+<td>"Visual searches per second at peak?"</td>
+<td>2k/s average, 10k/s peak</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>"Perceived budget on mobile, including upload?"</td>
+<td>500 ms after upload; 800 ms end to end on a mobile network</td>
+</tr>
+<tr>
+<td>Freshness</td>
+<td>"How fast must a new listing be visually searchable?"</td>
+<td>Under 10 minutes</td>
+</tr>
+<tr>
+<td>Image quality</td>
+<td>"Camera photos, or catalogue photos, or both?"</td>
+<td>Both, and camera photos are the hard case</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>"GPU budget for embedding the catalogue and serving queries?"</td>
+<td>Catalogue embedding is a one-off plus incremental; query GPUs scale with QPS</td>
+</tr>
+<tr>
+<td>Coverage</td>
+<td>"Which verticals? Fashion, home, everything?"</td>
+<td>Start with two verticals where the catalogue is dense</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Success metrics.</strong></p>
+<ul>
+<li>Online: click-through and save rate on visual search results, purchases attributed
+  to visual search, and the fraction of visual searches that produce any engagement
+  (a proxy for "did we understand the photo at all").</li>
+<li>Guardrails: human-rated relevance on a sampled set, latency p99, the rate of
+  empty or low-confidence results, and duplicate rate in the top ten.</li>
+<li>Offline: recall@k against an adjudicated match set, exact-product top-1 accuracy
+  for the product-matching task, and detection AP for the object-detection stage.</li>
+</ul>
+<p><strong>Questions a staff engineer asks.</strong></p>
+<ol>
+<li>"Is the task <em>find this exact product</em> or <em>find things that look like this</em>?
+   Exact matching and style similarity want different training pairs and different
+   thresholds, and conflating them is the usual reason a visual search feels wrong."</li>
+<li>"Who supplies the catalogue images, and are they clean studio shots? A
+   studio-to-camera domain gap is the single largest source of error."</li>
+<li>"Can the user pick the object, or must we choose? Picking wrongly on a busy photo
+   looks worse than returning nothing."</li>
+<li>"Do we have text alongside the image at query time? A hybrid query is much easier
+   than a pure image query."</li>
+<li>"What happens on a no-match? A grid of bad results is worse than an honest 'we
+   could not find this'."</li>
+</ol>
+<h2 id="2-data">2. Data<a class="headerlink" href="#2-data" title="Permanent link">&para;</a></h2>
+<p><strong>Sources.</strong> The catalogue (product images, titles, attributes, category, price,
+seller), user-generated images (pins, listings photos, reviews), query images from
+the visual search itself, engagement logs joining a query image to the results shown
+and to what the user clicked or bought, and human-adjudicated match sets.</p>
+<p><strong>Labels.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Pair source</th>
+<th>How it is made</th>
+<th>Strength</th>
+<th>Bias</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Same-product, different photo</td>
+<td>Catalogue structure (one SKU, several images)</td>
+<td>Strong positive for exact matching</td>
+<td>Only covers catalogue-quality images</td>
+</tr>
+<tr>
+<td>Click or save after a visual query</td>
+<td>Engagement logs</td>
+<td>Plentiful, weakly positive</td>
+<td>Position bias, and the user may click something merely pretty</td>
+</tr>
+<tr>
+<td>Purchase after a visual query</td>
+<td>Order logs</td>
+<td>Strongest intent signal</td>
+<td>Sparse, delayed</td>
+</tr>
+<tr>
+<td>Human-adjudicated match</td>
+<td>Paid raters on sampled queries</td>
+<td>Clean evaluation data</td>
+<td>Expensive, small</td>
+</tr>
+<tr>
+<td>Augmented pair</td>
+<td>Crop, colour jitter, re-compress, re-photograph</td>
+<td>Free, teaches invariance</td>
+<td>Synthetic gap to real camera photos</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The domain gap.</strong> The query photo is taken on a phone, in bad light, at an angle,
+against a cluttered background. The catalogue photo is shot on white. A model trained
+only on catalogue-to-catalogue pairs looks excellent offline and fails on the first
+real query. Two fixes belong in the design: train with pairs that cross the domain
+(user photos matched to catalogue items through purchase logs), and augment
+aggressively toward the camera domain (perspective warps, motion blur, JPEG
+artefacts, background compositing).</p>
+<p><strong>Position and presentation bias.</strong> Visual results are a grid, so the bias is
+weaker than a single-column feed but still present, and the top-left cell gets
+disproportionate attention. Log the grid position and either debias with a position
+feature during training or run a small randomisation of the top row to estimate
+propensities. The mechanics are in the
+<a href="../01-recommendation-feed-ranking/#35-position-bias">feed chapter</a>.</p>
+<p><strong>Catalogue hygiene.</strong> Duplicate and near-duplicate images are the norm in a
+marketplace. Before indexing, group images by perceptual hash and by embedding
+similarity, pick a canonical image per product group, and store the group id in the
+index payload so the serving path can collapse results.</p>
+<p><strong>Privacy.</strong> Query images are user content. Store them only with consent and only as
+long as needed; strip EXIF location; run a safety classifier before any image enters
+a training set; and treat photos containing people with extra care, since visual
+search on faces is a different product with different rules.</p>
+<h2 id="3-modelling">3. Modelling<a class="headerlink" href="#3-modelling" title="Permanent link">&para;</a></h2>
+<h3 id="31-baseline">3.1 Baseline<a class="headerlink" href="#31-baseline" title="Permanent link">&para;</a></h3>
+<p>A pretrained image classifier with the penultimate layer as the embedding, cosine
+similarity, and a flat index over a few million catalogue images. It works well
+enough to test demand and to collect the engagement data that the real model needs.
+Its weakness is that classification features cluster by category, so a red dress and
+a blue dress of the same cut sit far apart while two unrelated dresses sit close.</p>
+<h3 id="32-the-embedding-model">3.2 The embedding model<a class="headerlink" href="#32-the-embedding-model" title="Permanent link">&para;</a></h3>
+<p>The training objective decides what "similar" means, so it is the decision to justify
+first.</p>
+<p><strong>Contrastive (sampled softmax / InfoNCE).</strong> With a batch of <span class="arithmatex">\(B\)</span> pairs, embeddings
+<span class="arithmatex">\(u_i\)</span> for the query image and <span class="arithmatex">\(v_i\)</span> for the positive catalogue image, both
+<span class="arithmatex">\(L_2\)</span>-normalised, and temperature <span class="arithmatex">\(\tau\)</span>:</p>
+<div class="arithmatex">\[
+\mathcal{L} = -\frac{1}{B}\sum_{i=1}^{B} \log
+\frac{\exp(u_i^\top v_i / \tau)}{\sum_{j=1}^{B} \exp(u_i^\top v_j / \tau)} .
+\]</div>
+<p>Every other item in the batch is a negative, so large batches matter. The same
+sampling-bias correction used in recommendation retrieval applies when items appear
+at very different frequencies: subtract <span class="arithmatex">\(\log q_j\)</span> from the logits, as derived in the
+<a href="../01-recommendation-feed-ranking/#32-retrieval-the-two-tower-model-and-its-objective">feed chapter</a>.</p>
+<p><strong>Triplet / margin losses.</strong> <span class="arithmatex">\(\max(0, \|u - v^+\|^2 - \|u - v^-\|^2 + m)\)</span>, with
+negatives mined for difficulty. Easier to control for exact-match tasks, harder to
+scale, and sensitive to the mining schedule.</p>
+<p><strong>Multi-task heads.</strong> One trunk with several heads (category, attributes, exact
+product id) plus the metric head. The auxiliary supervision stabilises training and
+gives attribute features the re-ranker can use.</p>
+<p><strong>CLIP-style pretraining</strong> (Radford et al., "Learning Transferable Visual Models From
+Natural Language Supervision", ICML 2021, <a href="https://arxiv.org/abs/2103.00020">arXiv:2103.00020</a>) aligns images and text in
+one space from web-scale pairs, which gives text-refined visual search almost for
+free and a strong initialisation. Fine-tuning on catalogue pairs is still required,
+since CLIP-style pretraining learns semantic similarity rather than
+exact-product identity, and a visual search that returns "a sofa" when the user
+photographed a specific sofa fails the product task. The contrastive machinery is
+covered in <a href="../../part08-multimodal/03-clip-contrastive/">CLIP &amp; contrastive learning</a>.</p>
+<p><strong>Dimension and normalisation.</strong> 128 to 512 dimensions is the usual range.
+<span class="arithmatex">\(L_2\)</span>-normalise so that inner product equals cosine, which lets the index use the
+cheaper metric. Every extra dimension is a linear increase in index memory, so treat
+the dimension as a budget decision measured by recall@k, not as a hyperparameter to
+maximise.</p>
+<h3 id="33-detection-and-the-which-object-problem">3.3 Detection and the "which object" problem<a class="headerlink" href="#33-detection-and-the-which-object-problem" title="Permanent link">&para;</a></h3>
+<p>A query photo rarely contains one thing. Pinterest's Lens work and Shop the Look
+both frame this as detect-then-retrieve: run an object detector trained on the
+verticals you sell, show the detected regions as hotspots, and retrieve for the
+selected or most salient region. Three design notes:</p>
+<ul>
+<li>The detector's class set should match the shopping taxonomy, not COCO. "Throw
+  pillow" and "area rug" matter; "person" is there only to be excluded.</li>
+<li>Salience matters when the user does not tap. Centre bias, area, and detector
+  confidence combine into a simple ranker for which crop to use by default.</li>
+<li>For a whole-scene query ("complete this room"), the task changes from matching one
+  object to composing a set, which is a different objective and a different
+  evaluation.</li>
+</ul>
+<h3 id="34-approximate-nearest-neighbour-search">3.4 Approximate nearest neighbour search<a class="headerlink" href="#34-approximate-nearest-neighbour-search" title="Permanent link">&para;</a></h3>
+<p>The index is where the cost lives. Three families, and the trade-offs you should be
+able to state without notes:</p>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>How it works</th>
+<th>Memory per vector</th>
+<th>Strengths</th>
+<th>Weaknesses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (exact)</td>
+<td>Brute-force scan</td>
+<td><span class="arithmatex">\(4d\)</span> bytes (fp32)</td>
+<td>Perfect recall, trivial updates</td>
+<td>Linear in corpus, only viable to a few million</td>
+</tr>
+<tr>
+<td>IVF + PQ</td>
+<td>Cluster into cells, scan a few cells, compress residuals into codes</td>
+<td>16 to 64 bytes</td>
+<td>Smallest memory at billion scale, tunable</td>
+<td>Recall loss from quantisation, training step needed</td>
+</tr>
+<tr>
+<td>HNSW (graph)</td>
+<td>Navigable small-world graph, greedy descent</td>
+<td><span class="arithmatex">\(4d\)</span> + graph links</td>
+<td>Highest recall per query time</td>
+<td>Memory hungry, deletions are awkward</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="ANN recall-throughput frontier and index memory by representation" src="../../assets/figures/part17_ann_tradeoff.png" width="760" /></p>
+<p><em>Left: an illustrative recall-versus-throughput frontier. Graph indexes hold high
+recall to high throughput and pay for it in memory; compressed IVF-PQ gives up some
+recall and fits where a graph index would not. Right: index memory for one billion
+128-dimensional vectors, which is the number that decides how many machines you need.</em></p>
+<p>Practical arithmetic to do out loud: one billion vectors at 128 dimensions in fp32 is
+512 GB, which needs sharding across machines. The same billion at 32-byte PQ codes is
+32 GB, which fits in one large host's memory with room for the coarse quantiser. That
+difference decides the architecture, so measure the recall cost of the compression on
+your own data before choosing. FAISS (Johnson, Douze &amp; Jégou, "Billion-scale
+similarity search with GPUs", <a href="https://arxiv.org/abs/1702.08734">arXiv:1702.08734</a>) is the reference implementation for
+the IVF-PQ family; HNSW comes from Malkov &amp; Yashunin (<a href="https://arxiv.org/abs/1603.09320">arXiv:1603.09320</a>); ScaNN
+(Guo et al., ICML 2020, <a href="https://arxiv.org/abs/1908.10396">arXiv:1908.10396</a>) adds anisotropic quantisation tuned for
+inner-product search.</p>
+<p><strong>Sharding and routing.</strong> Partition by vertical or by a coarse cluster id so a query
+touches a few shards. Replicate each shard for throughput and availability. Keep a
+small in-memory cache of embeddings for the hottest products so the re-ranker does
+not round-trip.</p>
+<p><strong>Filtering.</strong> Real queries have constraints (in stock, ships to this country, under
+this price). Pre-filtering breaks the index structure; post-filtering can empty the
+result set. The usual compromise is to over-retrieve by a factor of five to ten and
+filter afterwards, with separate indexes for the big partitions (country, vertical)
+where the filter is highly selective.</p>
+<h3 id="35-re-ranking">3.5 Re-ranking<a class="headerlink" href="#35-re-ranking" title="Permanent link">&para;</a></h3>
+<p>ANN gives a coarse ordering by embedding distance. The re-ranker improves precision
+on the top 100 to 500 using signals the embedding cannot carry:</p>
+<ul>
+<li>A stronger visual comparison: cross-attention over the query crop and the candidate
+  image, or a local-feature geometric verification for exact-product matching (the
+  classical approach still works well for rigid objects with texture).</li>
+<li>Attribute agreement (colour, pattern, material) predicted by auxiliary heads.</li>
+<li>Product quality, price sanity, seller trust, stock, and engagement priors.</li>
+<li>Near-duplicate collapse so the ten results are ten products.</li>
+</ul>
+<h3 id="36-product-matching-and-near-duplicate-detection">3.6 Product matching and near-duplicate detection<a class="headerlink" href="#36-product-matching-and-near-duplicate-detection" title="Permanent link">&para;</a></h3>
+<p>Deduplication is a distinct problem from search, and the interviewer often pivots to
+it. Two thresholds, two mechanisms:</p>
+<ul>
+<li><strong>Exact/near-exact copies</strong> (same photo re-uploaded, re-cropped, re-compressed):
+  perceptual hashing (pHash, or PDQ from the moderation world) is cheap, precise and
+  explainable. Use it first.</li>
+<li><strong>Same product, different photo</strong>: embedding similarity above a tuned threshold,
+  verified by a pairwise classifier over image, title and attribute features. This is
+  the same shape as the mini-mock in the
+  <a href="../00-framework/#9-a-worked-mini-mock-design-duplicate-listing-detection-for-a-marketplace">framework chapter</a>.</li>
+</ul>
+<p>Both feed a clustering step that assigns a canonical product id, which the index
+payload carries so serving can collapse results in one pass.</p>
+<h3 id="37-multimodal-and-text-refinement">3.7 Multimodal and text refinement<a class="headerlink" href="#37-multimodal-and-text-refinement" title="Permanent link">&para;</a></h3>
+<p>Once images and text share a space, the query can be a combination: the embedding of
+the photo plus a text delta ("in green", "cheaper"). The simple version adds
+normalised embeddings with a learned weight. The better version trains a small
+composition network on triplets of (image, modifier text, target image), which is the
+composed-image-retrieval setup. Keep the simple version as the launch path and the
+composed model as the follow-up, since the training data for composition has to be
+built.</p>
+<h3 id="38-cold-start">3.8 Cold start<a class="headerlink" href="#38-cold-start" title="Permanent link">&para;</a></h3>
+<p>A new product gets an embedding the moment its image is processed, so visual search
+has no cold-start problem in the recommendation sense. What it does have is a
+<em>quality</em> cold start: no engagement priors for the re-ranker. Fall back to
+category-level priors and seller reputation, and let the exploration slots in the
+grid gather the first interactions.</p>
+<h2 id="4-training-serving">4. Training &amp; serving<a class="headerlink" href="#4-training-serving" title="Permanent link">&para;</a></h2>
+<p><strong>Indexing pipeline.</strong> New or updated catalogue images land on a queue. A worker
+runs safety classification, the detector (for catalogue images with multiple items),
+the embedding model, and perceptual hashing, then writes the vector plus payload
+(product id, group id, filters) to the index build service. Incremental inserts keep
+freshness under ten minutes; a full rebuild runs weekly, or whenever the embedding
+model changes.</p>
+<p><strong>Model version and index version move together.</strong> Changing the encoder invalidates
+every vector in the index. The rollout is: embed the whole catalogue with the new
+model into a parallel index, run both indexes in shadow, compare recall and
+engagement on a sample, then switch. Budget for the cost of a full re-embedding when
+proposing a model change, because at a billion images it is a real number (a billion
+images at 2 ms of GPU time each is about 550 GPU-hours).</p>
+<p><strong>Serving path and latency budget (500 ms perceived, after upload).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Budget</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Decode, resize, quality check</td>
+<td>15 ms</td>
+<td>reject blurry or tiny images early</td>
+</tr>
+<tr>
+<td>Object detection</td>
+<td>30 ms</td>
+<td>GPU, batched across concurrent requests</td>
+</tr>
+<tr>
+<td>Query embedding</td>
+<td>20 ms</td>
+<td>same GPU call as detection where possible</td>
+</tr>
+<tr>
+<td>ANN search (fan-out to shards)</td>
+<td>25 ms</td>
+<td>over-retrieve 5x for filtering</td>
+</tr>
+<tr>
+<td>Filter, dedup, payload fetch</td>
+<td>25 ms</td>
+<td>in-memory payloads</td>
+</tr>
+<tr>
+<td>Re-rank top 300</td>
+<td>40 ms</td>
+<td>GPU for the cross-attention variant</td>
+</tr>
+<tr>
+<td>Assembly, hotspot layout</td>
+<td>15 ms</td>
+<td></td>
+</tr>
+<tr>
+<td>Network and headroom</td>
+<td>rest</td>
+<td>mobile upload dominates end-to-end time</td>
+</tr>
+</tbody>
+</table>
+<p><strong>On-device options.</strong> Running detection on the phone cuts upload size (send the crop,
+not the photo) and improves perceived latency on slow networks. The trade-off is a
+second detector to maintain and a version-skew problem between app releases and
+server models. A common compromise: on-device detection for the hotspot UI,
+server-side detection as the source of truth for retrieval.</p>
+<p><strong>Caching.</strong> Cache embeddings for repeated queries (the same photo searched twice),
+cache popular catalogue payloads, and cache whole result sets for "more like this"
+from a catalogue image, since that query is deterministic until the index changes.</p>
+<p><strong>Cost.</strong> At 10k QPS peak with 50 ms of GPU per query, the serving fleet needs about
+500 GPU-seconds per second, so a few hundred GPUs with batching and headroom. The
+index fleet is memory-bound: a billion PQ-compressed vectors plus payloads across
+replicated shards, which is a RAM bill rather than a GPU bill.</p>
+<h2 id="5-evaluation-experimentation">5. Evaluation &amp; experimentation<a class="headerlink" href="#5-evaluation-experimentation" title="Permanent link">&para;</a></h2>
+<p><strong>Offline.</strong></p>
+<ul>
+<li>Recall@k against an adjudicated match set, reported per vertical and per query
+  type (camera photo versus catalogue image), because the camera-photo numbers are
+  the ones that predict the product experience.</li>
+<li>Exact-product top-1 accuracy for the matching task, which is the metric that
+  catches a model that has learned category similarity and nothing finer.</li>
+<li>Detection AP on the shopping taxonomy.</li>
+<li>ANN recall against brute force on a sample, measured after every index build. A
+  quiet drop here looks exactly like a model regression and is much more common.</li>
+<li>Pitfalls: evaluating on catalogue-to-catalogue pairs only, evaluating recall
+  against logged clicks (which only exist for what the old index returned), and
+  reporting a single number across verticals where one vertical dominates volume.</li>
+</ul>
+<p><strong>Online.</strong> A/B on engagement per visual search, with human relevance audits as the
+guardrail and latency as the second guardrail. Interleaving works well here because
+the result set is a grid and attribution is per item. Watch the "no engagement at
+all" rate, since that is where a broken detector shows up first.</p>
+<p><strong>Monitoring.</strong> Query image statistics (resolution, blur, dark frames), detector
+confidence distribution, ANN recall on the canary sample, index size and staleness,
+duplicate rate in the top ten, and per-vertical engagement. Retrain the encoder on a
+slow cadence (monthly), retrain the re-ranker weekly, and rebuild the index whenever
+either changes.</p>
+<h2 id="6-trade-offs-alternatives">6. Trade-offs &amp; alternatives<a class="headerlink" href="#6-trade-offs-alternatives" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Chosen</th>
+<th>Alternative</th>
+<th>When you'd flip</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Query framing</td>
+<td>Detect objects, retrieve per object</td>
+<td>Whole-image retrieval</td>
+<td>Single-object domains (a shoe on white) where detection adds latency for nothing</td>
+</tr>
+<tr>
+<td>Encoder</td>
+<td>CLIP-style pretrain, fine-tune on catalogue pairs</td>
+<td>Train from scratch on catalogue data</td>
+<td>Huge proprietary catalogue and a narrow domain, where pretraining transfers little</td>
+</tr>
+<tr>
+<td>Loss</td>
+<td>In-batch contrastive with large batches</td>
+<td>Triplet with hard mining</td>
+<td>Exact-product matching with few classes per batch, where explicit margins are easier to control</td>
+</tr>
+<tr>
+<td>Index</td>
+<td>IVF-PQ at billion scale</td>
+<td>HNSW</td>
+<td>Corpus under ~100M and memory is available; HNSW gives better recall per millisecond</td>
+</tr>
+<tr>
+<td>Filtering</td>
+<td>Over-retrieve then filter</td>
+<td>Filtered ANN traversal</td>
+<td>Very selective filters (country plus category), where separate indexes win</td>
+</tr>
+<tr>
+<td>Dedup</td>
+<td>Hash for exact, embedding plus classifier for near</td>
+<td>Embedding only</td>
+<td>Hashing is cheap and precise; skip it only if storage of hashes is a problem</td>
+</tr>
+<tr>
+<td>Re-rank</td>
+<td>Cross-attention on top 300</td>
+<td>Embedding distance only</td>
+<td>Latency-critical surfaces, or when the embedding is already fine-tuned on the exact task</td>
+</tr>
+<tr>
+<td>Detection</td>
+<td>Server-side</td>
+<td>On-device</td>
+<td>Poor networks and large photos, where uploading a crop is a real win</td>
+</tr>
+<tr>
+<td>Text refinement</td>
+<td>Add a weighted text embedding</td>
+<td>Train a composition model</td>
+<td>Once you have modifier-labelled triplets, the composition model is better</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Failure modes.</strong></p>
+<ul>
+<li><em>Category collapse</em>: the model returns the right category and the wrong product.
+  Detect with exact-product top-1, not recall@50.</li>
+<li><em>Domain gap</em>: strong offline numbers, weak camera-photo performance. Detect by
+  splitting every metric by query source.</li>
+<li><em>Index and model version skew</em>: half the index embedded with the old encoder.
+  Version the index, refuse mixed versions, and monitor a canary set.</li>
+<li><em>Duplicate flooding</em>: one product occupying the grid. Collapse by group id and
+  monitor the duplicate rate.</li>
+<li><em>Safety</em>: a visual query returning unsafe or infringing items. Run classification
+  at index time and filter at serving; see <a href="../07-content-moderation/">content moderation</a>.</li>
+</ul>
+<h2 id="7-how-real-companies-did-it-as-mock-interviews">7. How real companies did it: as mock interviews<a class="headerlink" href="#7-how-real-companies-did-it-as-mock-interviews" title="Permanent link">&para;</a></h2>
+<h3 id="71-pinterest-a-camera-search-for-a-visual-product">7.1 Pinterest, "a camera search for a visual product"<a class="headerlink" href="#71-pinterest-a-camera-search-for-a-visual-product" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "Pinners save images of rooms and outfits. They want to find
+and buy the individual objects in those images. Build visual search, and do it
+without a research budget the size of a search engine's."</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the corpus is billions of pins, most queries
+come from within the app, and the product is "find this object" rather than "find a
+similar picture". <em>Metrics</em>: engagement with visual results, then purchases.
+<em>Data</em>: pin images with rich metadata, plus click and save logs from the existing
+surfaces. <em>Model</em>: a shared embedding from a deep network, reused across surfaces;
+object detection to turn a scene into objects; a light re-ranker for precision.
+<em>Serve</em>: distributed embedding and ANN infrastructure built on commodity parts, with
+incremental indexing. <em>Evaluate</em>: offline relevance plus live A/B on engagement.</p>
+<p><strong>What the sources say.</strong> Jing et al., "Visual Search at Pinterest" (KDD 2015,
+<a href="https://arxiv.org/abs/1505.07647">arXiv:1505.07647</a>) describes building a visual search system with commodity components
+and reports engagement gains from visual-similarity products. Zhai et al., "Visual
+Discovery at Pinterest" (WWW 2017, <a href="https://arxiv.org/abs/1702.04680">arXiv:1702.04680</a>) covers the move to object-level
+search and the Lens product. Zhai et al., "Learning a Unified Embedding for Visual
+Search at Pinterest" (KDD 2019, <a href="https://arxiv.org/abs/1908.01707">arXiv:1908.01707</a>) reports replacing several
+specialised embeddings with one multi-task embedding serving several products, which
+simplified serving and improved metrics. Beal et al., "Billion-scale pretraining with
+vision transformers for multi-task visual representations" (WACV 2022,
+<a href="https://arxiv.org/abs/2108.05887">arXiv:2108.05887</a>) describes their later transformer-based unified representation.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: one embedding, many surfaces</p>
+<p>"I'd train one embedding and use it for visual search, related pins and
+deduplication, with task-specific heads on top of a shared trunk. The
+alternative is a separate model per surface, which lets each team tune its own
+objective. The cost of that is three indexes, three training pipelines, and
+inconsistent behaviour when the same pair of images is similar on one surface
+and not on another. Pinterest published this exact consolidation in 'Learning a
+Unified Embedding for Visual Search at Pinterest' at KDD 2019, where one
+multi-task embedding replaced several specialised ones and improved their
+metrics while simplifying serving. I'd flip back to a specialised model if one
+surface needed a very different notion of similarity, for example exact-product
+matching for legal takedowns, where I want a threshold I can defend rather than
+a shared representation."</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: detect before you retrieve</p>
+<p>"The first stage is an object detector, not the embedding. A photo of a living
+room has a sofa, a lamp and a rug in it, and retrieving on the whole image
+returns other living rooms, which is not what the user wants to buy. Pinterest
+described this shift to object-level search in 'Visual Discovery at Pinterest'
+(WWW 2017), where detected objects become the searchable units and the UI shows
+them as hotspots. The alternative is whole-image retrieval, which is cheaper by
+30 ms and is the right call for a single-object domain like sneakers on a white
+background. The trade-off is that a wrong crop is a visible failure: if we pick
+the lamp when the user meant the sofa, the results look broken even though
+retrieval worked. So I'd show the hotspots and let the user correct us, and pick
+the default crop by salience and detector confidence."</p>
+</div>
+<h3 id="72-ebay-a-hundred-million-listings-that-change-every-day">7.2 eBay, "a hundred million listings that change every day"<a class="headerlink" href="#72-ebay-a-hundred-million-listings-that-change-every-day" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "Our inventory turns over constantly and most listings are
+photographed by sellers on phones. Build visual search on top of that, on a budget,
+and keep it fresh."</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: inventory churn is the defining constraint, so
+indexing throughput matters more than index sophistication; images are low quality
+and varied. <em>Metrics</em>: recall of the right item plus engagement. <em>Data</em>: listing
+images with category and aspect metadata. <em>Model</em>: a category-aware embedding, with
+category prediction narrowing the search space before the ANN step. <em>Serve</em>: a
+distributed index rebuilt continuously as listings come and go, with binary or
+compressed codes to keep memory in budget. <em>Evaluate</em>: offline retrieval metrics,
+then A/B.</p>
+<p><strong>What the source says.</strong> Yang et al., "Visual Search at eBay" (KDD 2017,
+<a href="https://arxiv.org/abs/1706.03154">arXiv:1706.03154</a>) describes a deployed visual search system over a large, rapidly
+changing inventory, including category recognition to constrain the search, binary
+semantic-hash style representations for efficiency, and a scalable serving
+infrastructure that handles inventory churn.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: use the taxonomy to shrink the search</p>
+<p>"I'd predict the category from the query image and restrict the ANN search to
+that category's partition. eBay reported doing this in 'Visual Search at eBay'
+(KDD 2017), using category recognition to narrow the candidate set before visual
+matching over an inventory that turns over daily. The alternative is a single
+global index, which is simpler and avoids a hard failure when the category
+prediction is wrong. The trade-off is exactly that failure: if the classifier
+says 'shoes' and the user photographed a bag, we return nothing useful, so I'd
+search the top two or three predicted categories rather than one, and fall back
+to the global index when the category confidence is low. What I get in return is
+a smaller scan, better precision within category, and an index I can shard along
+a boundary that matches how listings arrive."</p>
+</div>
+<h3 id="73-alibaba-visual-search-as-a-shopping-product-at-scale">7.3 Alibaba, "visual search as a shopping product at scale"<a class="headerlink" href="#73-alibaba-visual-search-as-a-shopping-product-at-scale" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "Hundreds of millions of shoppers take photos of things they
+want. Build the search behind it, with a catalogue in the billions, and keep the
+per-query cost low enough to be free to the user."</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the query is a shopper's photo, the target is an
+exact or near-exact product, and the scale forces a compressed index. <em>Metrics</em>:
+conversion from visual search. <em>Data</em>: user click and purchase logs joined to query
+images. <em>Model</em>: a detection step to localise the item (with a way to avoid expensive
+box annotation), a deep embedding trained with user-behaviour-derived pairs, and a
+re-ranking stage. <em>Serve</em>: a multi-level index with an engineering path for billions
+of images. <em>Evaluate</em>: offline retrieval plus live conversion.</p>
+<p><strong>What the source says.</strong> Zhang et al., <a href="https://dl.acm.org/doi/abs/10.1145/3219819.3219820">"Visual Search at Alibaba"</a> (KDD 2018)
+describes Pailitao, their visual search product,
+including a detection approach that avoids exhaustive box labelling, deep metric
+learning on user-click data, and the engineering of a billion-scale index serving
+hundreds of millions of users.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: train on behaviour, not on catalogue structure alone</p>
+<p>"The pairs I'd train on come from behaviour: the user photographed something,
+saw a grid, and bought one item. That pair crosses the domain gap between a
+phone photo and a studio image, which catalogue-only pairs never do. Alibaba
+reported training their visual search embeddings on user-click data in 'Visual
+Search at Alibaba' (<a href="https://dl.acm.org/doi/abs/10.1145/3219819.3219820">KDD 2018</a>), alongside a detection step designed to avoid
+exhaustive box annotation. The alternative, training only on same-product
+catalogue images, gives clean labels and a model that looks great offline and
+fails on the first real camera photo. The trade-off with behavioural pairs is
+noise: people click attractive items that are not matches, so I'd weight
+purchases above clicks, and keep a small human-adjudicated set purely for
+evaluation so the noise never contaminates the metric."</p>
+</div>
+<h3 id="74-google-lens-the-query-is-the-world">7.4 Google Lens, "the query is the world"<a class="headerlink" href="#74-google-lens-the-query-is-the-world" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "Point a camera at anything. Text, a plant, a product, a
+landmark. Give the user something useful. How do you route that?"</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the query is unconstrained, so the first
+decision is intent routing rather than retrieval. <em>Metrics</em>: usefulness per query
+type, measured separately. <em>Model</em>: a classifier or a set of detectors that decides
+whether this is text (route to OCR and translation), a product (route to shopping
+retrieval), a plant or animal (fine-grained classification), a landmark
+(location-aware retrieval), or something else. Each route is a different system with
+a different index. <em>Serve</em>: on-device for the cheap paths and text detection,
+server for the heavy retrieval. <em>Evaluate</em>: per-route metrics, since a single
+aggregate number would hide the failure of any one route.</p>
+<p><strong>What the sources say.</strong> Google's product documentation and <a href="https://blog.google/products-and-platforms/products/search/visual-search-ai/">Search blog posts</a>
+describe Lens routing camera queries into modes including text recognition and
+translation, shopping results, and identification of plants, animals and landmarks,
+with on-device processing for some paths; Google's <a href="https://blog.google/products-and-platforms/products/search/multisearch/">"multisearch" announcement</a>
+describes combining an image with a text refinement in one query.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: routing is the architecture</p>
+<p>"For an open-ended camera product the first model is a router, because the
+systems behind 'read this sign', 'buy this jacket' and 'name this plant' share
+almost nothing except the camera. Google Lens works this way, with separate
+modes for text, shopping, and identification of plants, animals and landmarks,
+and their <a href="https://blog.google/products-and-platforms/products/search/multisearch/">multisearch work</a> adds a text refinement on top of an image query. The
+alternative is one universal embedding over everything, which sounds elegant and
+loses to specialised indexes on every individual task. The trade-off with
+routing is that a routing error is a total failure, so I'd allow multiple routes
+to fire and merge their results with a confidence-weighted blend rather than
+committing to one. For OCR specifically I'd hand off to the pipeline in the
+<a href="../09-ocr-document-understanding/">OCR chapter</a> rather than treating text as an
+object class."</p>
+</div>
+<h3 id="75-the-index-make-a-billion-vectors-fit">7.5 The index, "make a billion vectors fit"<a class="headerlink" href="#75-the-index-make-a-billion-vectors-fit" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "You told me a billion 128-dimensional vectors. That's half a
+terabyte in float32. What do you actually build?"</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: recall target, latency target, update rate,
+and whether the fleet is CPU or GPU. <em>Model</em>: inverted file with product
+quantisation, trained coarse quantiser, residual codes at 32 bytes, refined by
+re-ranking the top candidates with fuller-precision vectors fetched from a payload
+store. <em>Serve</em>: shard by coarse cluster, replicate for throughput, incremental
+inserts with periodic rebuilds. <em>Evaluate</em>: recall against brute force on a fixed
+sample after every build.</p>
+<p><strong>What the sources say.</strong> Johnson, Douze &amp; Jégou, "Billion-scale similarity search
+with GPUs" (<a href="https://arxiv.org/abs/1702.08734">arXiv:1702.08734</a>) describes the FAISS design and reports billion-scale
+k-NN construction on GPUs. Jégou, Douze &amp; Schmid, "Product Quantization for Nearest
+Neighbor Search" (IEEE TPAMI 2011) is the original PQ method. Malkov &amp; Yashunin,
+"Efficient and robust approximate nearest neighbor search using Hierarchical
+Navigable Small World graphs" (<a href="https://arxiv.org/abs/1603.09320">arXiv:1603.09320</a>) is HNSW. Guo et al., "Accelerating
+Large-Scale Inference with Anisotropic Vector Quantization" (ICML 2020,
+<a href="https://arxiv.org/abs/1908.10396">arXiv:1908.10396</a>) is ScaNN's quantisation tuned for inner product.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: pick the index from the memory budget</p>
+<p>"I'd start from memory. A billion vectors at 128 dimensions in float32 is
+512 GB, which means sharding across machines before I've served a single query.
+Product quantisation to 32 bytes per vector brings that to 32 GB, which fits on
+one large host with the coarse quantiser, and the method comes straight from
+Jégou and colleagues' product quantisation work with FAISS as the reference
+implementation. The alternative is HNSW, which gives better recall at the same
+query time and stores full vectors plus graph links, so it costs several times
+the memory. My rule is: under about a hundred million vectors, HNSW and pay for
+the RAM; above that, IVF-PQ with a re-ranking pass over full-precision vectors
+for the top few hundred, which recovers most of the recall the compression cost.
+Either way I'd measure recall against brute force on a fixed sample after every
+index build, because a silent recall drop after a rebuild looks identical to a
+model regression and is far more common."</p>
+</div>
+<h2 id="8-staff-level-follow-ups">8. Staff-level follow-ups<a class="headerlink" href="#8-staff-level-follow-ups" title="Permanent link">&para;</a></h2>
+<div class="admonition interview">
+<p class="admonition-title">The results look plausible but they are never the exact product. What is wrong?</p>
+<p>The model has learned category and style similarity, and the training pairs
+never taught it identity. Check the exact-product top-1 metric; recall@50 will
+look fine while top-1 is poor. The fixes, in order: add same-product pairs
+(different photos of one SKU) as positives and other products in the same
+category as hard negatives, since the negative that teaches identity is the
+visually similar wrong item; add a re-ranking stage with geometric verification
+or cross-attention on the top candidates; and check whether the embedding
+dimension is too small to carry fine detail. If the catalogue has many
+genuinely identical-looking products from different sellers, the task may be
+underdetermined from the image alone, and the answer is to use title and
+attributes in the re-ranker.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">How do you handle the gap between a camera photo and a catalogue photo?</p>
+<p>Train across it. The pairs that matter are user photo to catalogue item, which
+you get from purchase logs after a visual query. Before you have those logs,
+simulate the gap with augmentation: perspective warp, motion blur, JPEG
+re-compression, colour temperature shifts, and compositing onto cluttered
+backgrounds. Report every metric split by query source, since an aggregate
+number dominated by catalogue-to-catalogue queries will hide the problem
+entirely. If the gap is still large, a domain-adaptation head or a separate
+query encoder sharing the item encoder's output space is worth trying, at the
+cost of a second model to keep aligned.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">You want to change the embedding model. Walk me through the rollout.</p>
+<p>The index is derived from the model, so a model change is a full re-embedding.
+Plan it as: embed the catalogue with the new encoder into a parallel index
+(budget the GPU hours and say the number out loud), run both indexes in shadow
+on live queries, compare recall against a fixed adjudicated set and compare the
+result sets for drift, then A/B the new index on a traffic slice, then switch
+and keep the old index warm for rollback. The two ways this goes wrong: serving
+a query embedded with the new model against vectors embedded with the old one,
+which silently returns noise, so version the index and refuse mixed versions;
+and forgetting that downstream consumers (recommendations, dedup thresholds)
+were tuned against the old space, so their thresholds need refitting.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">5x traffic spike on a shopping holiday. What happens?</p>
+<p>Detection and embedding are GPU work that batches well, so raise the batch size
+and accept 20 ms more latency. ANN search degrades gracefully by reducing the
+number of probed cells, which trades recall for throughput, and that is the knob
+I would turn first because the recall cost is measurable. Cut the re-ranking
+depth from 300 to 100. Serve cached results for "more like this" queries, which
+are deterministic. The thing that does not scale in minutes is index memory, so
+the shard replicas must be provisioned ahead of a known peak.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">The top ten is the same product ten times. Fix it.</p>
+<p>Group at index time. Cluster the catalogue by perceptual hash for exact copies
+and by embedding distance plus a title and attribute classifier for
+same-product-different-photo, assign a canonical group id, and store it in the
+index payload. At serving, keep the best-scoring item per group in the first
+pass, then allow a second item per group only below rank ten. Monitor the
+duplicate rate in the top ten as a launch guardrail, because a change to the
+encoder shifts the clustering thresholds and can reintroduce the problem
+silently.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">How do you evaluate when you have no labels for a new vertical?</p>
+<p>Start with pairs the catalogue gives you for free: multiple images of the same
+SKU form positives, and items in the same leaf category form hard negatives.
+That gives a proxy metric on day one. Then buy a small adjudicated set,
+a few thousand queries with rated matches, sampled to over-represent camera
+photos, and treat it as the golden set that no training data touches. Use active
+sampling for the rating budget: rate the queries where the candidate models
+disagree most, since those are the ones that carry information.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Would you run the detector on the device or on the server?</p>
+<p>Both, for different jobs. On-device detection gives an immediate hotspot UI and
+lets the app upload a crop instead of a full photo, which on a slow mobile
+network saves more time than any server-side optimisation. Server-side detection
+is the source of truth for retrieval, because it can be updated without an app
+release and it runs the same model version as the training data. The cost of
+running both is a version-skew problem when the on-device boxes disagree with
+the server's, which users see as the hotspot moving after results load. I'd
+accept that and keep the on-device model deliberately conservative.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">The interviewer says: now support 'find me this jacket but in green'.</p>
+<p>Two implementations, and I'd ship the simple one first. The simple one adds the
+text embedding to the image embedding with a learned weight, which works because
+a CLIP-style pretrained space aligns the two modalities, and it needs no new
+training data. The better one trains a composition network on triplets of
+(query image, modifier text, target image), which requires building that triplet
+set from catalogue attributes: take two products differing only in colour and
+generate the modifier from the attribute diff. The trade-off is data work
+against quality, and the honest ordering is to ship the additive version,
+measure how often the modifier is ignored, and use that to justify the triplet
+pipeline.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">What breaks first at 10x catalogue size?</p>
+<p>Index memory and rebuild time. At ten billion vectors, even PQ codes need many
+machines, so the query fan-out grows and tail latency with it; the fix is
+routing by category or coarse cluster so a query touches a few shards instead of
+all of them. Second is the embedding backlog: a catalogue that turns over daily
+at ten times the size needs ten times the embedding throughput, and that is a
+steady GPU cost people forget to budget. Third is deduplication, which is
+quadratic if done naively and needs blocking by hash or coarse cluster.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Where do foundation models change this design?</p>
+<p>In the encoder and in the labels. A strong pretrained vision-language encoder
+replaces a from-scratch trunk and brings text alignment with it, so text
+refinement and zero-shot attribute extraction come along. A vision-language
+model can also generate attribute labels and synthetic captions for the
+catalogue at index time, which improves the re-ranker's features without human
+labelling. What stays out of the hot path is any per-candidate large-model call:
+at 10k QPS and 300 candidates, that arithmetic does not close, so the large
+model runs offline and its judgments are distilled into the ranker.</p>
+</div>
+<h2 id="9-scaling-evolution">9. Scaling &amp; evolution<a class="headerlink" href="#9-scaling-evolution" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Ten million images.</strong> A pretrained encoder, a flat or HNSW index on one machine,
+  whole-image retrieval, no re-ranker. Spend the effort on collecting query images
+  and engagement logs, since those are what the next stage needs.</li>
+<li><strong>A hundred million.</strong> Fine-tuned embedding on behavioural pairs, object detection
+  in the query path, HNSW or IVF-PQ with sharding, a re-ranker, deduplication, and
+  per-vertical metrics.</li>
+<li><strong>A billion and up.</strong> Compressed index with routing, incremental indexing with
+  minute-level freshness, a unified multi-task embedding serving several products, a
+  re-embedding pipeline that can rebuild the catalogue on demand, and an adjudicated
+  evaluation set per vertical.</li>
+<li><strong>Batch to real-time.</strong> Freshness moves from nightly rebuilds to streaming inserts,
+  and the evaluation moves with it: a canary sample re-checked after every
+  incremental build, since incremental inserts degrade graph indexes over time.</li>
+<li><strong>Multimodal and generative.</strong> Text refinement first, then composed retrieval, then
+  generative product discovery where a model proposes complementary items ("complete
+  this room"). Each step adds a new evaluation problem, and each should ship behind
+  the same engagement guardrails as the base product.</li>
+</ul>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Jing, Y. et al. "Visual Search at Pinterest." KDD 2015 (<a href="https://arxiv.org/abs/1505.07647">arXiv:1505.07647</a>).</li>
+<li>Zhai, A. et al. "Visual Discovery at Pinterest." WWW 2017 (<a href="https://arxiv.org/abs/1702.04680">arXiv:1702.04680</a>).</li>
+<li>Zhai, A. et al. "Learning a Unified Embedding for Visual Search at Pinterest." KDD 2019 (<a href="https://arxiv.org/abs/1908.01707">arXiv:1908.01707</a>).</li>
+<li>Beal, J. et al. "Billion-scale pretraining with vision transformers for multi-task visual representations." WACV 2022 (<a href="https://arxiv.org/abs/2108.05887">arXiv:2108.05887</a>).</li>
+<li>Yang, F. et al. "Visual Search at eBay." KDD 2017 (<a href="https://arxiv.org/abs/1706.03154">arXiv:1706.03154</a>).</li>
+<li>Zhang, Y. et al. "Visual Search at Alibaba." KDD 2018 (<a href="https://dl.acm.org/doi/abs/10.1145/3219819.3219820">dl.acm.org</a>).</li>
+<li>Radford, A. et al. "Learning Transferable Visual Models From Natural Language Supervision." ICML 2021 (<a href="https://arxiv.org/abs/2103.00020">arXiv:2103.00020</a>).</li>
+<li>Johnson, J., Douze, M., Jégou, H. "Billion-scale similarity search with GPUs." 2017 (<a href="https://arxiv.org/abs/1702.08734">arXiv:1702.08734</a>).</li>
+<li>Jégou, H., Douze, M., Schmid, C. "Product Quantization for Nearest Neighbor Search." IEEE TPAMI 2011.</li>
+<li>Malkov, Y., Yashunin, D. "Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs." 2016 (<a href="https://arxiv.org/abs/1603.09320">arXiv:1603.09320</a>).</li>
+<li>Guo, R. et al. "Accelerating Large-Scale Inference with Anisotropic Vector Quantization" (ScaNN). ICML 2020 (<a href="https://arxiv.org/abs/1908.10396">arXiv:1908.10396</a>).</li>
+<li>Google. "Go beyond the search box: Introducing multisearch" (<a href="https://blog.google/products-and-platforms/products/search/multisearch/">blog.google</a>) and the Search blog post on visual search with Lens and multisearch (<a href="https://blog.google/products-and-platforms/products/search/visual-search-ai/">blog.google</a>).</li>
+<li>Book cross-references: <a href="../../part08-multimodal/03-clip-contrastive/">CLIP &amp; contrastive learning</a>, <a href="../../part13-retrieval-eval-reliability/01-retrieval-and-rag/">retrieval &amp; RAG</a>, <a href="../09-ocr-document-understanding/">OCR &amp; document understanding</a>, <a href="../07-content-moderation/">content moderation</a>.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../05-perception-system-av/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Autonomous-vehicle perception">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Autonomous-vehicle perception
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../07-content-moderation/" class="md-footer__link md-footer__link--next" aria-label="Next: Content moderation &amp; trust">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Content moderation & trust
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "navigation.tracking", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
