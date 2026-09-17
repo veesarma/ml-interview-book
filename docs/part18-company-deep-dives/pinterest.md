@@ -71,14 +71,14 @@ flowchart LR
 
 **The problem.** A user embedding computed from the last few actions predicts the next action well but forgets long-term interests; a batch embedding is cheap to serve but stale; the ranker also needs to react to what the user did seconds ago.
 
-**The approach.** PinnerFormer (KDD 2022) is a transformer over a user's action sequence trained with a *dense all-action* loss. The target is not the next action. From every position in the sequence the model predicts the positive engagements that follow over the next several days, so a once-a-day batch embedding remains useful all day. TransAct (KDD 2023) encodes the user's *most recent* actions with a transformer at request time inside the Homefeed ranker, combined with the batch embedding; the paper describes hybrid batch/real-time design, ablations, and a random time-window mask to reduce the model's tendency to over-focus on recency. TransAct V2 (2025) extends sequence length and adds negative-action handling; the 2023 engineering post reports large Homefeed engagement gains from real-time actions.
+**The approach.** PinnerFormer (KDD 2022) is a transformer over a user's action sequence trained with a *dense all-action* loss. The target is not the next action. From every position in the sequence the model predicts the positive engagements that follow over the next several days, so a once-a-day batch embedding remains useful all day. TransAct (KDD 2023) encodes the user's *most recent* actions with a transformer at request time inside the Homefeed ranker, combined with the batch embedding; the paper describes hybrid batch/real-time design, ablations, and a random time-window mask to reduce the model's tendency to over-focus on recency. TransAct V2 (2025) extends sequence length and adds negative-action handling; the 2022 engineering post reports large Homefeed engagement gains from real-time actions.
 
 **Math link.** The dense all-action objective is a contrastive loss between the sequence representation at position $t$ and the embeddings of positives in $[t, t+\Delta]$; see [CLIP & contrastive learning](../part08-multimodal/03-clip-contrastive.md) and [feed ranking](../part17-ml-system-design/01-recommendation-feed-ranking.md).
 
 **The trade-off.** Batch embeddings are cheap and cover long histories; request-time encoders are expensive but reactive. Pinterest chose both: PinnerFormer for long-term, TransAct for real-time, and reports that the combination beats either alone.
 
 !!! tip "How to say it in the interview"
-    "I'd model the user with two components, following what Pinterest published: a daily batch embedding trained for long-term engagement, as in the PinnerFormer paper from KDD 2022, and a request-time transformer over the last few dozen actions inside the ranker, as in TransAct from KDD 2023. The PinnerFormer decision I'd copy is the dense all-action loss (predicting engagements over the next days from every position instead of the next action) because that is what makes a once-a-day embedding hold up across the day. The TransAct decision I'd copy is the random time-window mask, since the paper found a real-time encoder otherwise overfits to the last action and reduces diversity. I'd reject a real-time-only encoder over the full history for latency reasons. The trade-off is two pipelines to maintain. The 2023 Homefeed post reports the real-time addition was worth it. Evaluation: offline recall for future engagement, then Homefeed engagement and diversity in an A/B."
+    "I'd model the user with two components, following what Pinterest published: a daily batch embedding trained for long-term engagement, as in the PinnerFormer paper from KDD 2022, and a request-time transformer over the last few dozen actions inside the ranker, as in TransAct from KDD 2023. The PinnerFormer decision I'd copy is the dense all-action loss (predicting engagements over the next days from every position instead of the next action) because that is what makes a once-a-day embedding hold up across the day. The TransAct decision I'd copy is the random time-window mask, since the paper found a real-time encoder otherwise overfits to the last action and reduces diversity. I'd reject a real-time-only encoder over the full history for latency reasons. The trade-off is two pipelines to maintain. The 2022 Homefeed post reports the real-time addition was worth it. Evaluation: offline recall for future engagement, then Homefeed engagement and diversity in an A/B."
 
 ### 4.3 Visual search: a decade of Pinterest Lens
 
@@ -190,15 +190,27 @@ flowchart LR
 
 ## Sources
 
-* Ying et al., "Graph Convolutional Neural Networks for Web-Scale Recommender Systems", KDD 2018 (arXiv 1806.01973).
-* Eksombatchai et al., "Pixie: A System for Recommending 3+ Billion Items to 200+ Million Users in Real-Time", WWW 2018.
-* Pal et al., "PinnerSage: Multi-Modal User Embedding Framework for Recommendations at Pinterest", KDD 2020.
-* Pancha et al., "PinnerFormer: Sequence Modeling for User Representation at Pinterest", KDD 2022 (arXiv 2205.04507).
-* Xia et al., "TransAct: Transformer-based Realtime User Action Model for Recommendation at Pinterest", KDD 2023; "TransAct V2", 2025.
-* Pinterest Engineering, "How Pinterest Leverages Realtime User Actions in Recommendation to Boost Homefeed Engagement Volume", 2023.
-* Jing et al., "Visual Search at Pinterest", KDD 2015; Zhai et al., "Visual Discovery at Pinterest", WWW 2017; Zhai et al., "Learning a Unified Embedding for Visual Search at Pinterest", KDD 2019; Shiau et al., "Shop The Look: Building a Large Scale Visual Shopping System at Pinterest", KDD 2020.
-* Baltescu et al., "ItemSage: Learning Product Embeddings for Shopping Recommendations at Pinterest", KDD 2022; Pinterest, "OmniSage: Large Scale, Multi-Entity Heterogeneous Graph Representation Learning", 2025.
-* Zhao et al., "Notification Volume Control and Optimization System at Pinterest", KDD 2018.
-* Liu et al., "Related Pins at Pinterest: The Evolution of a Real-World Recommender System", WWW 2017.
-* Pinterest Engineering, "MLEnv: Standardizing ML at Pinterest Under One ML Engine", 2023.
-* Pinterest Newsroom and Engineering posts on skin tone ranges (2018 onward) and body type ranges (2023).
+**Graph and sequence representations**
+
+* Ying et al., "Graph Convolutional Neural Networks for Web-Scale Recommender Systems" (PinSage), KDD 2018. [arXiv:1806.01973](https://arxiv.org/abs/1806.01973) · [Pinterest Engineering](https://medium.com/pinterest-engineering/pinsage-a-new-graph-convolutional-neural-network-for-web-scale-recommender-systems-88795a107f48)
+* Eksombatchai et al., "Pixie: A System for Recommending 3+ Billion Items to 200+ Million Users in Real-Time", WWW 2018. [arXiv:1711.07601](https://arxiv.org/abs/1711.07601)
+* Pal et al., "PinnerSage: Multi-Modal User Embedding Framework for Recommendations at Pinterest", KDD 2020. [arXiv:2007.03634](https://arxiv.org/abs/2007.03634) · [Pinterest Engineering](https://medium.com/pinterest-engineering/pinnersage-multi-modal-user-embedding-framework-for-recommendations-at-pinterest-bfd116b49475)
+* Pancha et al., "PinnerFormer: Sequence Modeling for User Representation at Pinterest", KDD 2022. [arXiv:2205.04507](https://arxiv.org/abs/2205.04507)
+* Xia et al., "TransAct: Transformer-based Realtime User Action Model for Recommendation at Pinterest", KDD 2023. [arXiv:2306.00248](https://arxiv.org/abs/2306.00248) · [ACM DL](https://dl.acm.org/doi/10.1145/3580305.3599918) · Xia et al., "TransAct V2: Lifelong User Action Sequence Modeling on Pinterest Recommendation", 2025. [arXiv:2506.02267](https://arxiv.org/abs/2506.02267)
+* Pinterest Engineering, "How Pinterest Leverages Realtime User Actions in Recommendation to Boost Homefeed Engagement Volume", November 2022. [Pinterest Engineering](https://medium.com/pinterest-engineering/how-pinterest-leverages-realtime-user-actions-in-recommendation-to-boost-homefeed-engagement-volume-165ae2e8cde8)
+* Liu et al., "Related Pins at Pinterest: The Evolution of a Real-World Recommender System", WWW 2017 companion. [arXiv:1702.07969](https://arxiv.org/abs/1702.07969) · [ACM DL](https://dl.acm.org/doi/10.1145/3041021.3054202)
+
+**Visual search and shopping**
+
+* Jing et al., "Visual Search at Pinterest", KDD 2015. [arXiv:1505.07647](https://arxiv.org/abs/1505.07647) · [ACM DL](https://dl.acm.org/doi/10.1145/2783258.2788621)
+* Zhai et al., "Visual Discovery at Pinterest", WWW 2017. [arXiv:1702.04680](https://arxiv.org/abs/1702.04680)
+* Zhai et al., "Learning a Unified Embedding for Visual Search at Pinterest", KDD 2019. [arXiv:1908.01707](https://arxiv.org/abs/1908.01707) · [ACM DL](https://dl.acm.org/doi/10.1145/3292500.3330739) · [Pinterest Engineering](https://medium.com/pinterest-engineering/unifying-visual-embeddings-for-visual-search-at-pinterest-74ea7ea103f0)
+* Shiau et al., "Shop The Look: Building a Large Scale Visual Shopping System at Pinterest", KDD 2020. [arXiv:2006.10866](https://arxiv.org/abs/2006.10866) · [KDD 2020](https://www.kdd.org/kdd2020/accepted-papers/view/shop-the-look-building-a-large-scale-visual-shopping-system-at-pinterest)
+* Baltescu et al., "ItemSage: Learning Product Embeddings for Shopping Recommendations at Pinterest", KDD 2022. [arXiv:2205.11728](https://arxiv.org/abs/2205.11728) · [ACM DL](https://dl.acm.org/doi/10.1145/3534678.3539170)
+* Pinterest, "OmniSage: Large Scale, Multi-Entity Heterogeneous Graph Representation Learning", KDD 2025. [arXiv:2504.17811](https://arxiv.org/abs/2504.17811) · [ACM DL](https://dl.acm.org/doi/10.1145/3711896.3737253)
+
+**Notifications, platform and inclusive search**
+
+* Zhao et al., "Notification Volume Control and Optimization System at Pinterest", KDD 2018. [ACM DL](https://dl.acm.org/doi/10.1145/3219819.3219906) · [KDD 2018](https://www.kdd.org/kdd2018/accepted-papers/view/notification-volume-control-and-optimization-system-at-pinterest)
+* Pinterest Engineering, "MLEnv: Standardizing ML at Pinterest Under One ML Engine to Accelerate Innovation", September 2023. [Pinterest Engineering](https://medium.com/pinterest-engineering/mlenv-standardizing-ml-at-pinterest-under-one-ml-engine-to-accelerate-innovation-e2b30b2f6768)
+* Pinterest Newsroom, "Introducing more inclusive beauty results", 2018 ([newsroom archive](https://newsroom-archive.pinterest.com/introducing-more-inclusive-beauty-results)); Pinterest Engineering, "Powering inclusive search & recommendations with our new visual skin tone model" ([Pinterest Engineering](https://medium.com/pinterest-engineering/powering-inclusive-search-recommendations-with-our-new-visual-skin-tone-model-1d3ba6eeffc7)); Pinterest Newsroom, "Pinterest announces industry-first body type technology to increase body representation on platform", 2023 ([newsroom.pinterest.com](https://newsroom.pinterest.com/news/pinterest-announces-industry-first-body-type-technology/)) and "Pinterest's new body type ranges deliver better and more inclusive search results", 2024 ([newsroom.pinterest.com](https://newsroom.pinterest.com/news/pinterests-new-body-type-ranges-deliver-better-more-inclusive-search-results/)).
