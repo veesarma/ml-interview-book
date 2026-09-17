@@ -45,8 +45,21 @@ def discounted_returns(rewards: list[float], gamma: float) -> np.ndarray:
     return G
 
 
-def mc_evaluation(env, pi: np.ndarray, gamma: float, n_episodes: int, rng: np.random.Generator) -> np.ndarray:
-    """First-visit Monte Carlo estimate of ``V^pi``; returns (S,)."""
+def mc_evaluation(
+    env,
+    pi: np.ndarray,
+    gamma: float,
+    n_episodes: int,
+    rng: np.random.Generator,
+    alpha: float | None = None,
+) -> np.ndarray:
+    """First-visit Monte Carlo estimate of ``V^pi``; returns (S,).
+
+    Args:
+        alpha: step size. ``None`` uses ``1/n(s)``, the running mean, which converges to the
+            sample average. A constant ``alpha`` tracks instead of converging, and is what
+            you use to compare MC against TD at an equal step size.
+    """
     S = env.n_states
     V, counts = np.zeros(S), np.zeros(S)  # (S,), (S,)
     for _ in range(n_episodes):
@@ -58,7 +71,8 @@ def mc_evaluation(env, pi: np.ndarray, gamma: float, n_episodes: int, rng: np.ra
                 continue
             seen.add(s)
             counts[s] += 1
-            V[s] += (G[t] - V[s]) / counts[s]  # incremental mean
+            step = 1.0 / counts[s] if alpha is None else alpha
+            V[s] += step * (G[t] - V[s])  # incremental mean, or a constant-alpha update
     return V
 
 

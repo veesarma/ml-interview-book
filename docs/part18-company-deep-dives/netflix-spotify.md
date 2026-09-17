@@ -13,7 +13,7 @@ Netflix sells a subscription to a catalogue; its recommender's job is to make ea
 
 | Problem | Why it is hard | Public evidence |
 |---|---|---|
-| Netflix homepage ranking | Rows and titles must be chosen jointly; surrogate metrics (plays) vs retention; catalogue is small but member states are rich | Gomez-Uribe & Hunt (ACM TMIS 2016); "Deep Learning for Recommender Systems: A Netflix Case Study" (AI Magazine 2021); "Netflix's Foundation Model for Personalized Recommendation" (Netflix Tech Blog, 2025) |
+| Netflix homepage ranking | Rows and titles must be chosen jointly; surrogate metrics (plays) vs retention; catalogue is small but member states are rich | Gomez-Uribe & Hunt (ACM TMIS 2015); "Deep Learning for Recommender Systems: A Netflix Case Study" (AI Magazine 2021); "Netflix's Foundation Model for Personalized Recommendation" (Netflix Tech Blog, 2025) |
 | Artwork personalisation | Choose an image per member per title under a bandit feedback loop with no offline ground truth | ["Artwork Personalization at Netflix"](https://netflixtechblog.com/artwork-personalization-c589f074ad76) (Netflix Tech Blog, 2017) |
 | Experiment sensitivity | A/B on retention needs huge samples; ranking changes are subtle | "Innovating Faster on Personalization Algorithms at Netflix Using Interleaving" (2017); Netflix experimentation blog series (2021) |
 | Calibration and diversity | Recommendations drift to a member's majority interest | "Calibrated Recommendations" (Steck, RecSys 2018) |
@@ -191,22 +191,22 @@ flowchart LR
 
 **Netflix**
 
-* Gomez-Uribe & Hunt, "The Netflix Recommender System: Algorithms, Business Value, and Innovation", ACM Transactions on Management Information Systems, 2016.
+* Gomez-Uribe & Hunt, "The Netflix Recommender System: Algorithms, Business Value, and Innovation", ACM Transactions on Management Information Systems 6(4), Article 13, December 2015. [doi:10.1145/2843948](https://dl.acm.org/doi/10.1145/2843948)
 * Netflix Tech Blog, "Artwork Personalization at Netflix", December 2017. [netflixtechblog.com](https://netflixtechblog.com/artwork-personalization-c589f074ad76)
 * Netflix Tech Blog, "Innovating Faster on Personalization Algorithms at Netflix Using Interleaving", November 2017. [netflixtechblog.com](https://netflixtechblog.com/interleaving-in-online-experiments-at-netflix-a04ee392ec55)
-* Steck et al., "Deep Learning for Recommender Systems: A Netflix Case Study", AI Magazine, 2021.
-* Steck, "Calibrated Recommendations", RecSys 2018.
-* Netflix Tech Blog, "Netflix's Foundation Model for Personalized Recommendation", 2025.
-* Netflix Tech Blog, "Per-Title Encode Optimization", December 2015; "Dynamic optimizer, a perceptual video encoding optimization framework", 2018; "Toward A Practical Perceptual Video Quality Metric" (VMAF), 2016.
-* Netflix Tech Blog, "Open-Sourcing Metaflow, a Human-Centric Framework for Data Science", 2019.
-* Netflix Tech Blog experimentation series ("Decision Making at Netflix", 2021); "Match Cutting at Netflix", 2022; posts on the media understanding platform, 2023.
+* Steck et al., "Deep Learning for Recommender Systems: A Netflix Case Study", AI Magazine 42(3), 2021. [doi:10.1609/aimag.v42i3.18140](https://onlinelibrary.wiley.com/doi/abs/10.1609/aimag.v42i3.18140) · [AI Magazine](https://ojs.aaai.org/aimagazine/index.php/aimagazine/article/view/18140)
+* Steck, "Calibrated Recommendations", RecSys 2018. [ACM DL](https://dl.acm.org/doi/10.1145/3240323.3240372)
+* Netflix Tech Blog, "Foundation Model for Personalized Recommendation", March 2025. Cited by title and venue: the canonical post URL could not be confirmed from search results.
+* Netflix Tech Blog, "Per-Title Encode Optimization", December 2015 ([techblog.netflix.com](http://techblog.netflix.com/2015/12/per-title-encode-optimization.html)); "Dynamic optimizer, a perceptual video encoding optimization framework", 2018 ([netflixtechblog.com](https://netflixtechblog.com/dynamic-optimizer-a-perceptual-video-encoding-optimization-framework-e19f1e3a277f)); "Toward A Practical Perceptual Video Quality Metric" (VMAF), June 2016 ([techblog.netflix.com](http://techblog.netflix.com/2016/06/toward-practical-perceptual-video.html)).
+* Netflix Tech Blog, "Open-Sourcing Metaflow, a Human-Centric Framework for Data Science", December 2019. [netflixtechblog.com](https://netflixtechblog.com/open-sourcing-metaflow-a-human-centric-framework-for-data-science-fa72e04a5d9)
+* Netflix Tech Blog experimentation series, "Decision Making at Netflix", September 2021 ([netflixtechblog.com](https://netflixtechblog.com/decision-making-at-netflix-33065fa06481)) and "Experimentation is a major focus of Data Science across Netflix" ([netflixtechblog.com](https://netflixtechblog.com/experimentation-is-a-major-focus-of-data-science-across-netflix-f67923f8e985)); "Match Cutting at Netflix: Finding Cuts with Smooth Visual Transitions", November 2022 ([netflixtechblog.com](https://netflixtechblog.com/match-cutting-at-netflix-finding-cuts-with-smooth-visual-transitions-31c3fc14ae59), code at [github.com/Netflix/matchcut](https://github.com/Netflix/matchcut)); "Building a Media Understanding Platform for ML Innovations", 2023 ([netflixtechblog.com](https://netflixtechblog.com/building-a-media-understanding-platform-for-ml-innovations-9bef9962dcb7)) and "Scaling Media Machine Learning at Netflix" ([netflixtechblog.com](https://netflixtechblog.com/scaling-media-machine-learning-at-netflix-f19b400243)).
 
 **Spotify**
 
-* McInerney et al., "Explore, Exploit, Explain: Personalizing Explainable Recommendations with Bandits", RecSys 2018.
-* Hansen et al., "Contextual and Sequential User Embeddings for Large-Scale Music Recommendation", RecSys 2020.
-* Anderson et al., "Algorithmic Effects on the Diversity of Consumption on Spotify", WWW 2020.
-* Spotify Engineering, "The Rise (and Lessons Learned) of ML Models to Personalize Content on Home", Parts I and II, 2021.
-* Spotify Engineering, "Introducing Natural Language Search for Podcast Episodes", 2022.
-* Bernhardsson, Annoy (Approximate Nearest Neighbors Oh Yeah), open source, 2013; Spotify, Voyager, open source, 2023.
-* Spotify Engineering, posts on the Confidence experimentation platform, 2023–2024.
+* McInerney et al., "Explore, Exploit, Explain: Personalizing Explainable Recommendations with Bandits", RecSys 2018. [ACM DL](https://dl.acm.org/doi/10.1145/3240323.3240354) · [Spotify Research](https://research.atspotify.com/publications/explore-exploit-explain-personalizing-explainable-recommendations-with-bandits)
+* Hansen et al., "Contextual and Sequential User Embeddings for Large-Scale Music Recommendation", RecSys 2020. [ACM DL](https://dl.acm.org/doi/10.1145/3383313.3412248) · [Spotify Research](https://research.atspotify.com/publications/contextual-and-sequential-user-embeddings-for-large-scale-music-recommendation) · code at [github.com/spotify-research/cosernn](https://github.com/spotify-research/cosernn)
+* Anderson et al., "Algorithmic Effects on the Diversity of Consumption on Spotify", WWW 2020. [ACM DL](https://dl.acm.org/doi/10.1145/3366423.3380281) · [Spotify Research](https://research.atspotify.com/algorithmic-effects-on-the-diversity-of-consumption-on-spotify/)
+* Spotify Engineering, "The Rise (and Lessons Learned) of ML Models to Personalize Content on Home", November 2021: [Part I](https://engineering.atspotify.com/2021/11/the-rise-and-lessons-learned-of-ml-models-to-personalize-content-on-home-part-i) · [Part II](https://engineering.atspotify.com/2021/11/the-rise-and-lessons-learned-of-ml-models-to-personalize-content-on-home-part-ii)
+* Spotify Engineering, "Introducing Natural Language Search for Podcast Episodes", March 2022. [engineering.atspotify.com](https://engineering.atspotify.com/2022/03/introducing-natural-language-search-for-podcast-episodes)
+* Bernhardsson, Annoy (Approximate Nearest Neighbors Oh Yeah), open source, 2013 ([erikbern.com](https://erikbern.com/2013/04/12/annoy.html), [github.com/spotify/annoy](https://github.com/spotify/annoy)); Spotify Engineering, "Introducing Voyager: Spotify's New Nearest-Neighbor Search Library", October 2023 ([engineering.atspotify.com](https://engineering.atspotify.com/2023/10/introducing-voyager-spotifys-new-nearest-neighbor-search-library), [github.com/spotify/voyager](https://github.com/spotify/voyager)).
+* Spotify Engineering, "Coming Soon: Confidence, An Experimentation Platform from Spotify", August 2023. [engineering.atspotify.com](https://engineering.atspotify.com/2023/08/coming-soon-confidence-an-experimentation-platform-from-spotify)

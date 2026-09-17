@@ -721,11 +721,11 @@ have written about measuring long-term member value rather than short-term engag
 - Pinterest Engineering. "User state-based notification volume optimization" and subsequent posts on their notification system and relevance.
 - Deng, A., Xu, Y., Kohavi, R., Walker, T. "Improving the Sensitivity of Online Controlled Experiments by Utilizing Pre-Experiment Data" (CUPED). WSDM 2013.
 - Kohavi, R., Tang, D., Xu, Y. "Trustworthy Online Controlled Experiments: A Practical Guide to A/B Testing." Cambridge University Press, 2020.
-- Künzel, S. R. et al. "Metalearners for estimating heterogeneous treatment effects using machine learning." PNAS 2019 (arXiv:1706.03461).
-- Wager, S., Athey, S. "Estimation and Inference of Heterogeneous Treatment Effects using Random Forests." JASA 2018 (arXiv:1510.04342).
-- Athey, S., Tibshirani, J., Wager, S. "Generalized Random Forests." Annals of Statistics 2019 (arXiv:1610.01271).
+- Künzel, S. R. et al. "Metalearners for estimating heterogeneous treatment effects using machine learning." PNAS 2019 ([arXiv:1706.03461](https://arxiv.org/abs/1706.03461)).
+- Wager, S., Athey, S. "Estimation and Inference of Heterogeneous Treatment Effects using Random Forests." JASA 2018 ([arXiv:1510.04342](https://arxiv.org/abs/1510.04342)).
+- Athey, S., Tibshirani, J., Wager, S. "Generalized Random Forests." Annals of Statistics 2019 ([arXiv:1610.01271](https://arxiv.org/abs/1610.01271)).
 - Radcliffe, N. J., Surry, P. D. "Real-World Uplift Modelling with Significance-Based Uplift Trees." Stochastic Solutions white paper, 2011.
-- Johari, R., Pekelis, L., Walsh, D. J. "Always Valid Inference: Bringing Sequential Analysis to A/B Testing." 2015 (arXiv:1512.04922).
+- Johari, R., Pekelis, L., Walsh, D. J. "Always Valid Inference: Bringing Sequential Analysis to A/B Testing." 2015 ([arXiv:1512.04922](https://arxiv.org/abs/1512.04922)).
 - Lan, K. K. G., DeMets, D. L. "Discrete Sequential Boundaries for Clinical Trials." Biometrika 1983.
 - DoorDash Engineering. Posts on switchback testing for marketplace experiments.
 - Ugander, J. et al. "Graph Cluster Randomization: Network Exposure to Multiple Universes." KDD 2013.

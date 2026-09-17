@@ -20,9 +20,12 @@ from mlbook.capstone.preference_stage import (
     freeze_reference,
     group_advantages,
     grpo_loss,
+    informative_groups,
     k3_kl,
     mean_dpo_margin,
     run_dpo,
+    run_grpo,
+    sample_group,
     sequence_logprob,
 )
 from mlbook.capstone.projector import Projector
@@ -386,6 +389,39 @@ def test_group_advantages_are_zero_mean_within_each_group():
     # a group where every sample got the same reward carries no signal
     flat = torch.full((2, 4), 0.7)
     assert torch.allclose(group_advantages(flat), torch.zeros(2, 4), atol=1e-6)
+
+
+def test_informative_groups_flags_only_the_ones_with_reward_variance():
+    rewards = torch.tensor([
+        [1.0, 1.0, 1.0, 1.0],   # all right: zero advantage, no gradient
+        [0.0, 0.0, 0.0, 0.0],   # all wrong: zero advantage, no gradient
+        [1.0, 0.0, 1.0, 0.0],   # the only group that teaches anything
+    ])
+    keep = informative_groups(rewards)
+    assert keep.tolist() == [False, False, True]
+    advantages = group_advantages(rewards)
+    assert torch.allclose(advantages[~keep], torch.zeros(2, 4), atol=1e-6)
+    assert advantages[keep].abs().min() > 0.0
+
+
+def test_sample_group_shapes_and_reward_agreement(model, examples):
+    generator = torch.Generator().manual_seed(0)
+    repeated, answers, rewards = sample_group(model, examples[:5], group_size=4, generator=generator)
+    assert len(repeated) == len(answers) == 20
+    assert rewards.shape == (5, 4)
+    assert repeated[0] is examples[0] and repeated[3] is examples[0], "prompt-major order"
+    assert repeated[4] is examples[1]
+    for i, (ex, answer) in enumerate(zip(repeated, answers)):
+        assert float(rewards.reshape(-1)[i]) == float(answer == ex.answer)
+
+
+def test_grpo_with_filtering_uses_fewer_groups_than_it_draws(model, examples):
+    reference = freeze_reference(model)
+    report = run_grpo(model, reference, examples, steps=3, prompts_per_step=4,
+                      group_size=6, oversample=3, lr=1e-5, seed=0)
+    assert 0.0 <= report["informative_group_rate"] <= 1.0
+    assert report["groups_used"] <= 3 * 4
+    assert len(report["mean_rewards"]) == 3
 
 
 def test_k3_kl_is_non_negative_and_zero_at_equality():

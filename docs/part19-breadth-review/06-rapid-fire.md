@@ -14,6 +14,15 @@ heading, produce the answer out loud or on paper, then open the card. Anything y
 cannot produce in fifteen seconds goes on tomorrow's list. A full pass takes about
 25 minutes once warm.
 
+| Section | Cards | Drill it before |
+|---|---|---|
+| [Losses and probability](#losses-and-probability) | 8 | any ML depth round |
+| [Statistics, evaluation, ensembles](#statistics-evaluation-ensembles) | 7 | a metrics or experimentation round |
+| [Networks and training](#networks-and-training) | 7 | a training-dynamics or debugging round |
+| [Attention and Transformers](#attention-and-transformers) | 8 | any LLM or multimodal round |
+| [The LLM stack](#the-llm-stack) | 7 | an LLM infrastructure or serving round |
+| [Vision and multimodal](#vision-and-multimodal) | 5 | a perception or VLM round |
+
 The three sections after the cards are about delivery: the answer skeleton, the three
 habits, and a short list of the sentences that cost candidates offers.
 

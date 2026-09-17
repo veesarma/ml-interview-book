@@ -97,7 +97,7 @@ certify or debug.
 The six camera frusta overlap only near their edges, so most of the BEV plane is covered by
 exactly one camera. Any error in that camera's extrinsics moves objects in the shared frame
 with no second view to contradict it, which is the geometric reason calibration drift shows
-up as a perception problem rather than a calibration alarm.
+up as a perception problem instead of a calibration alarm.
 
 ## Prerequisites
 

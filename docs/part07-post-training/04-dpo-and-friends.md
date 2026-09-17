@@ -29,7 +29,7 @@ The last row is the thing to notice: the chosen response's log-prob *fell* below
 
 ![DPO implicit reward margin and chosen / rejected implicit rewards over training on the toy LM](../assets/figures/part07_dpo_margin.png){ width="760" }
 
-Left: the margin climbs steadily. Right: the two implicit rewards are plotted separately, and the rejected one falls much faster than the chosen one rises. Nothing in the loss pins either curve above zero, because only the difference appears in it, so a run can end with both responses less likely than under the reference. Where the freed probability mass goes is not constrained by the pairs at all, which is why DPO runs need a length monitor and a held-out win-rate rather than the loss alone.
+Left: the margin climbs steadily, from $0$ to about $1.9$ over 120 steps. Right: the two implicit rewards are plotted separately, and both end up *below* zero, at roughly $-0.69$ for the chosen response and $-2.59$ for the rejected one. The chosen response has become less likely than under the reference, and the loss still improved throughout, because only the difference between the two appears in it. Where the freed probability mass goes is not constrained by the pairs at all, which is why DPO runs need a length monitor and a held-out win-rate rather than the loss alone.
 
 ```mermaid
 flowchart LR

@@ -6,45 +6,45 @@ before reaching these (STYLE.md section 4). A later pass with fresh budget shoul
 verify each one, add the link to the chapter, and tick the box.
 
 - [ ] docs/part18-company-deep-dives/google-youtube.md | Google Cloud Document AI documentation; Google Lens product pages
-- [ ] docs/part18-company-deep-dives/netflix-spotify.md | Gomez-Uribe & Hunt, "The Netflix Recommender System: Algorithms, Business Value, and Innovation", ACM Transactions on Management Information Systems, 2016
-- [ ] docs/part18-company-deep-dives/netflix-spotify.md | Steck et al., "Deep Learning for Recommender Systems: A Netflix Case Study", AI Magazine, 2021
-- [ ] docs/part18-company-deep-dives/netflix-spotify.md | Steck, "Calibrated Recommendations", RecSys 2018
-- [ ] docs/part18-company-deep-dives/netflix-spotify.md | Netflix Tech Blog, "Netflix's Foundation Model for Personalized Recommendation", 2025
-- [ ] docs/part18-company-deep-dives/netflix-spotify.md | Netflix Tech Blog, "Per-Title Encode Optimization", December 2015; "Dynamic optimizer, a perceptual video encoding optimization framework", 2018; "Toward A Practical Perceptual Video Quality Metric" (VMAF), 2016
-- [ ] docs/part18-company-deep-dives/netflix-spotify.md | Netflix Tech Blog, "Open-Sourcing Metaflow, a Human-Centric Framework for Data Science", 2019
-- [ ] docs/part18-company-deep-dives/netflix-spotify.md | Netflix Tech Blog experimentation series ("Decision Making at Netflix", 2021); "Match Cutting at Netflix", 2022; posts on the media understanding platform, 2023
-- [ ] docs/part18-company-deep-dives/netflix-spotify.md | McInerney et al., "Explore, Exploit, Explain: Personalizing Explainable Recommendations with Bandits", RecSys 2018
-- [ ] docs/part18-company-deep-dives/netflix-spotify.md | Hansen et al., "Contextual and Sequential User Embeddings for Large-Scale Music Recommendation", RecSys 2020
-- [ ] docs/part18-company-deep-dives/netflix-spotify.md | Anderson et al., "Algorithmic Effects on the Diversity of Consumption on Spotify", WWW 2020
-- [ ] docs/part18-company-deep-dives/netflix-spotify.md | Spotify Engineering, "The Rise (and Lessons Learned) of ML Models to Personalize Content on Home", Parts I and II, 2021
-- [ ] docs/part18-company-deep-dives/netflix-spotify.md | Spotify Engineering, "Introducing Natural Language Search for Podcast Episodes", 2022
-- [ ] docs/part18-company-deep-dives/netflix-spotify.md | Bernhardsson, Annoy (Approximate Nearest Neighbors Oh Yeah), open source, 2013; Spotify, Voyager, open source, 2023
-- [ ] docs/part18-company-deep-dives/netflix-spotify.md | Spotify Engineering, posts on the Confidence experimentation platform, 2023–2024
-- [ ] docs/part18-company-deep-dives/pinterest.md | Ying et al., "Graph Convolutional Neural Networks for Web-Scale Recommender Systems", KDD 2018 (arXiv 1806.01973)
-- [ ] docs/part18-company-deep-dives/pinterest.md | Eksombatchai et al., "Pixie: A System for Recommending 3+ Billion Items to 200+ Million Users in Real-Time", WWW 2018
-- [ ] docs/part18-company-deep-dives/pinterest.md | Pal et al., "PinnerSage: Multi-Modal User Embedding Framework for Recommendations at Pinterest", KDD 2020
-- [ ] docs/part18-company-deep-dives/pinterest.md | Pancha et al., "PinnerFormer: Sequence Modeling for User Representation at Pinterest", KDD 2022 (arXiv 2205.04507)
-- [ ] docs/part18-company-deep-dives/pinterest.md | Xia et al., "TransAct: Transformer-based Realtime User Action Model for Recommendation at Pinterest", KDD 2023; "TransAct V2", 2025
-- [ ] docs/part18-company-deep-dives/pinterest.md | Pinterest Engineering, "How Pinterest Leverages Realtime User Actions in Recommendation to Boost Homefeed Engagement Volume", 2023
-- [ ] docs/part18-company-deep-dives/pinterest.md | Jing et al., "Visual Search at Pinterest", KDD 2015; Zhai et al., "Visual Discovery at Pinterest", WWW 2017; Zhai et al., "Learning a Unified Embedding for Visual Search at Pinterest", KDD 2019; Shiau et al., "Shop The Look: Building a Large Scale Visual Shopping System at Pinterest", KDD 2020
-- [ ] docs/part18-company-deep-dives/pinterest.md | Baltescu et al., "ItemSage: Learning Product Embeddings for Shopping Recommendations at Pinterest", KDD 2022; Pinterest, "OmniSage: Large Scale, Multi-Entity Heterogeneous Graph Representation Learning", 2025
-- [ ] docs/part18-company-deep-dives/pinterest.md | Zhao et al., "Notification Volume Control and Optimization System at Pinterest", KDD 2018
-- [ ] docs/part18-company-deep-dives/pinterest.md | Liu et al., "Related Pins at Pinterest: The Evolution of a Real-World Recommender System", WWW 2017
-- [ ] docs/part18-company-deep-dives/pinterest.md | Pinterest Engineering, "MLEnv: Standardizing ML at Pinterest Under One ML Engine", 2023
-- [ ] docs/part18-company-deep-dives/pinterest.md | Pinterest Newsroom and Engineering posts on skin tone ranges (2018 onward) and body type ranges (2023)
-- [ ] docs/part18-company-deep-dives/uber-doordash.md | Uber Engineering, "Meet Michelangelo: Uber's Machine Learning Platform", 2017; "Scaling Machine Learning at Uber with Michelangelo", 2018; "From Predictive to Generative: How Michelangelo Accelerates Uber's AI Journey", 2024
-- [ ] docs/part18-company-deep-dives/uber-doordash.md | Uber Engineering, "DeepETA: How Uber Predicts Arrival Times Using Deep Learning", February 2022
-- [ ] docs/part18-company-deep-dives/uber-doordash.md | Uber Engineering, "Experimentation in a Ridesharing Marketplace", 2018, and its 2018 post describing the internals of the experimentation platform
-- [ ] docs/part18-company-deep-dives/uber-doordash.md | Uber Engineering, "Forecasting at Uber: An Introduction", 2018; "Engineering Extreme Event Forecasting at Uber with Recurrent Neural Networks", 2017
-- [ ] docs/part18-company-deep-dives/uber-doordash.md | Uber Engineering, "Project RADAR: Intelligent Early Fraud Detection System with Humans in the Loop", 2022
-- [ ] docs/part18-company-deep-dives/uber-doordash.md | Uber Engineering, "Food Discovery with Uber Eats: Using Graph Learning to Power Recommendations", 2019; "Innovative Recommendation Applications Using Two Tower Embeddings at Uber", 2023
-- [ ] docs/part18-company-deep-dives/uber-doordash.md | Sergeev & Del Balso, "Horovod: fast and easy distributed deep learning in TensorFlow", 2018 (arXiv 1802.05799)
-- [ ] docs/part18-company-deep-dives/uber-doordash.md | Uber Newsroom, Real-Time ID Check (2016 onward) and driver document requirements
-- [ ] docs/part18-company-deep-dives/uber-doordash.md | DoorDash Engineering, "Next-Generation Optimization for Dasher Dispatch at DoorDash", 2020; "Using ML and Optimization to Solve DoorDash's Dispatch Problem", 2021
-- [ ] docs/part18-company-deep-dives/uber-doordash.md | DoorDash Engineering, "Switchback Tests and Randomized Experimentation Under Network Effects at DoorDash", 2018; "Analyzing Switchback Experiments by Cluster Robust Standard Error to Prevent False Positive Results", 2019
-- [ ] docs/part18-company-deep-dives/uber-doordash.md | DoorDash Engineering, "Meet Sibyl: DoorDash's New Prediction Service", 2020; "Building a Gigascale ML Feature Store with Redis, Binary Serialization, String Hashing, and Compression", 2020; "Building Riviera: A Declarative Real-Time Feature Engineering Framework", 2021; "Introducing Fabricator: A Declarative Feature Engineering Framework", 2022
-- [ ] docs/part18-company-deep-dives/uber-doordash.md | DoorDash Engineering, "Things Not Strings: Understanding Search Intent with Better Recall", 2022
-- [ ] docs/part18-company-deep-dives/uber-doordash.md | DoorDash Engineering, posts on ETA prediction for long-tail events (2023) and on multi-task, probabilistic ETA models (2024); "Path to high-quality LLM-based Dasher support automation", 2024
+- [x] docs/part18-company-deep-dives/netflix-spotify.md | Gomez-Uribe & Hunt, "The Netflix Recommender System: Algorithms, Business Value, and Innovation", ACM Transactions on Management Information Systems, 2016
+- [x] docs/part18-company-deep-dives/netflix-spotify.md | Steck et al., "Deep Learning for Recommender Systems: A Netflix Case Study", AI Magazine, 2021
+- [x] docs/part18-company-deep-dives/netflix-spotify.md | Steck, "Calibrated Recommendations", RecSys 2018
+- [x] UNVERIFIABLE docs/part18-company-deep-dives/netflix-spotify.md | Netflix Tech Blog, "Netflix's Foundation Model for Personalized Recommendation", 2025 | searched twice; no canonical netflixtechblog.com URL confirmed in search results, chapter keeps title-and-venue
+- [x] docs/part18-company-deep-dives/netflix-spotify.md | Netflix Tech Blog, "Per-Title Encode Optimization", December 2015; "Dynamic optimizer, a perceptual video encoding optimization framework", 2018; "Toward A Practical Perceptual Video Quality Metric" (VMAF), 2016
+- [x] docs/part18-company-deep-dives/netflix-spotify.md | Netflix Tech Blog, "Open-Sourcing Metaflow, a Human-Centric Framework for Data Science", 2019
+- [x] docs/part18-company-deep-dives/netflix-spotify.md | Netflix Tech Blog experimentation series ("Decision Making at Netflix", 2021); "Match Cutting at Netflix", 2022; posts on the media understanding platform, 2023
+- [x] docs/part18-company-deep-dives/netflix-spotify.md | McInerney et al., "Explore, Exploit, Explain: Personalizing Explainable Recommendations with Bandits", RecSys 2018
+- [x] docs/part18-company-deep-dives/netflix-spotify.md | Hansen et al., "Contextual and Sequential User Embeddings for Large-Scale Music Recommendation", RecSys 2020
+- [x] docs/part18-company-deep-dives/netflix-spotify.md | Anderson et al., "Algorithmic Effects on the Diversity of Consumption on Spotify", WWW 2020
+- [x] docs/part18-company-deep-dives/netflix-spotify.md | Spotify Engineering, "The Rise (and Lessons Learned) of ML Models to Personalize Content on Home", Parts I and II, 2021
+- [x] docs/part18-company-deep-dives/netflix-spotify.md | Spotify Engineering, "Introducing Natural Language Search for Podcast Episodes", 2022
+- [x] docs/part18-company-deep-dives/netflix-spotify.md | Bernhardsson, Annoy (Approximate Nearest Neighbors Oh Yeah), open source, 2013; Spotify, Voyager, open source, 2023
+- [x] docs/part18-company-deep-dives/netflix-spotify.md | Spotify Engineering, posts on the Confidence experimentation platform, 2023–2024
+- [x] docs/part18-company-deep-dives/pinterest.md | Ying et al., "Graph Convolutional Neural Networks for Web-Scale Recommender Systems", KDD 2018 (arXiv 1806.01973)
+- [x] docs/part18-company-deep-dives/pinterest.md | Eksombatchai et al., "Pixie: A System for Recommending 3+ Billion Items to 200+ Million Users in Real-Time", WWW 2018
+- [x] docs/part18-company-deep-dives/pinterest.md | Pal et al., "PinnerSage: Multi-Modal User Embedding Framework for Recommendations at Pinterest", KDD 2020
+- [x] docs/part18-company-deep-dives/pinterest.md | Pancha et al., "PinnerFormer: Sequence Modeling for User Representation at Pinterest", KDD 2022 (arXiv 2205.04507)
+- [x] docs/part18-company-deep-dives/pinterest.md | Xia et al., "TransAct: Transformer-based Realtime User Action Model for Recommendation at Pinterest", KDD 2023; "TransAct V2", 2025
+- [x] docs/part18-company-deep-dives/pinterest.md | Pinterest Engineering, "How Pinterest Leverages Realtime User Actions in Recommendation to Boost Homefeed Engagement Volume", 2023
+- [x] docs/part18-company-deep-dives/pinterest.md | Jing et al., "Visual Search at Pinterest", KDD 2015; Zhai et al., "Visual Discovery at Pinterest", WWW 2017; Zhai et al., "Learning a Unified Embedding for Visual Search at Pinterest", KDD 2019; Shiau et al., "Shop The Look: Building a Large Scale Visual Shopping System at Pinterest", KDD 2020
+- [x] docs/part18-company-deep-dives/pinterest.md | Baltescu et al., "ItemSage: Learning Product Embeddings for Shopping Recommendations at Pinterest", KDD 2022; Pinterest, "OmniSage: Large Scale, Multi-Entity Heterogeneous Graph Representation Learning", 2025
+- [x] docs/part18-company-deep-dives/pinterest.md | Zhao et al., "Notification Volume Control and Optimization System at Pinterest", KDD 2018
+- [x] docs/part18-company-deep-dives/pinterest.md | Liu et al., "Related Pins at Pinterest: The Evolution of a Real-World Recommender System", WWW 2017
+- [x] docs/part18-company-deep-dives/pinterest.md | Pinterest Engineering, "MLEnv: Standardizing ML at Pinterest Under One ML Engine", 2023
+- [x] docs/part18-company-deep-dives/pinterest.md | Pinterest Newsroom and Engineering posts on skin tone ranges (2018 onward) and body type ranges (2023)
+- [x] docs/part18-company-deep-dives/uber-doordash.md | Uber Engineering, "Meet Michelangelo: Uber's Machine Learning Platform", 2017; "Scaling Machine Learning at Uber with Michelangelo", 2018; "From Predictive to Generative: How Michelangelo Accelerates Uber's AI Journey", 2024
+- [x] docs/part18-company-deep-dives/uber-doordash.md | Uber Engineering, "DeepETA: How Uber Predicts Arrival Times Using Deep Learning", February 2022
+- [x] docs/part18-company-deep-dives/uber-doordash.md | Uber Engineering, "Experimentation in a Ridesharing Marketplace", 2018, and its 2018 post describing the internals of the experimentation platform
+- [x] docs/part18-company-deep-dives/uber-doordash.md | Uber Engineering, "Forecasting at Uber: An Introduction", 2018; "Engineering Extreme Event Forecasting at Uber with Recurrent Neural Networks", 2017
+- [x] docs/part18-company-deep-dives/uber-doordash.md | Uber Engineering, "Project RADAR: Intelligent Early Fraud Detection System with Humans in the Loop", 2022
+- [x] docs/part18-company-deep-dives/uber-doordash.md | Uber Engineering, "Food Discovery with Uber Eats: Using Graph Learning to Power Recommendations", 2019; "Innovative Recommendation Applications Using Two Tower Embeddings at Uber", 2023
+- [x] docs/part18-company-deep-dives/uber-doordash.md | Sergeev & Del Balso, "Horovod: fast and easy distributed deep learning in TensorFlow", 2018 (arXiv 1802.05799)
+- [x] docs/part18-company-deep-dives/uber-doordash.md | Uber Newsroom, Real-Time ID Check (2016 onward) and driver document requirements
+- [x] docs/part18-company-deep-dives/uber-doordash.md | DoorDash Engineering, "Next-Generation Optimization for Dasher Dispatch at DoorDash", 2020; "Using ML and Optimization to Solve DoorDash's Dispatch Problem", 2021
+- [x] docs/part18-company-deep-dives/uber-doordash.md | DoorDash Engineering, "Switchback Tests and Randomized Experimentation Under Network Effects at DoorDash", 2018; "Analyzing Switchback Experiments by Cluster Robust Standard Error to Prevent False Positive Results", 2019
+- [x] docs/part18-company-deep-dives/uber-doordash.md | DoorDash Engineering, "Meet Sibyl: DoorDash's New Prediction Service", 2020; "Building a Gigascale ML Feature Store with Redis, Binary Serialization, String Hashing, and Compression", 2020; "Building Riviera: A Declarative Real-Time Feature Engineering Framework", 2021; "Introducing Fabricator: A Declarative Feature Engineering Framework", 2022
+- [x] docs/part18-company-deep-dives/uber-doordash.md | DoorDash Engineering, "Things Not Strings: Understanding Search Intent with Better Recall", 2022
+- [x] docs/part18-company-deep-dives/uber-doordash.md | DoorDash Engineering, posts on ETA prediction for long-tail events (2023) and on multi-task, probabilistic ETA models (2024); "Path to high-quality LLM-based Dasher support automation", 2024
 - [ ] docs/part18-company-deep-dives/airbnb.md | Haldar et al., "Improving Deep Learning for Airbnb Search", KDD 2020 (arXiv 2002.05515)
 - [ ] docs/part18-company-deep-dives/airbnb.md | Grbovic & Cheng, "Real-time Personalization using Embeddings for Search Ranking at Airbnb", KDD 2018
 - [ ] docs/part18-company-deep-dives/airbnb.md | Abdool et al., "Managing Diversity in Airbnb Search", KDD 2020 (arXiv 2004.02621)
@@ -86,19 +86,19 @@ verify each one, add the link to the chapter, and tick the box.
 - [ ] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "Hey Siri: An On-device DNN-powered Voice Trigger for Apple's Personal Assistant", 2017; "Personalized Hey Siri", 2018; "Deep Learning for Siri's Voice: On-device Deep Mixture Density Networks for Hybrid Unit Selection Synthesis", 2017
 - [ ] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "Learning with Privacy at Scale", Apple ML Journal, 2017
 - [ ] docs/part18-company-deep-dives/apple.md | Apple Machine Learning Research, "Understanding Aggregate Trends for Apple Intelligence Using Differential Privacy", 2025
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, Radar documentation: risk scores and risk levels, risk insights, rules (allow, block, review, 3D Secure), and the manual review queue
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, documentation and engineering writing on how Radar's machine learning is built and on the use of signals from across the Stripe network
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, engineering writing on identifying linked fraudulent accounts through similarity and clustering
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, Identity documentation: document checks, selfie matching, and supported document types by country
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, documentation on adaptive acceptance and network tokens for authorisation-rate optimisation
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, 2025 announcement of a payments foundation model trained self-supervised on transaction data, with card-testing detection as a reported application
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Equal Credit Opportunity Act and Regulation B, adverse action notice requirements
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Consumer Financial Protection Bureau, Circular 2022-03, "Adverse action notification requirements in connection with credit decisions based on complex algorithms", 2022
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Board of Governors of the Federal Reserve System and Office of the Comptroller of the Currency, Supervisory Guidance on Model Risk Management (SR 11-7 / OCC 2011-12), 2011
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Fair Credit Reporting Act, adverse action provisions
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | PayPal, public statements and engineering writing on machine learning for fraud and risk; model internals are not published
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Affirm, public descriptions of machine-learned underwriting for buy-now-pay-later credit decisions, operating under ECOA adverse action requirements; model internals are not published
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Block (Square and Cash App), public descriptions of risk and fraud modelling; model internals are not published
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Coinbase, engineering writing on risk, fraud and account-takeover defence; model internals are not published
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Dal Pozzolo et al., "Credit Card Fraud Detection: A Realistic Modeling and a Novel Learning Strategy", IEEE Transactions on Neural Networks and Learning Systems, 2018 (delayed labels and verification latency)
-- [ ] docs/part18-company-deep-dives/stripe-fintech.md | Dal Pozzolo et al., "Calibrating Probability with Undersampling for Unbalanced Classification", IEEE Symposium Series on Computational Intelligence, 2015
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, Radar documentation: risk scores and risk levels, risk insights, rules (allow, block, review, 3D Secure), and the manual review queue
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, documentation and engineering writing on how Radar's machine learning is built and on the use of signals from across the Stripe network
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, engineering writing on identifying linked fraudulent accounts through similarity and clustering
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, Identity documentation: document checks, selfie matching, and supported document types by country
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, documentation on adaptive acceptance and network tokens for authorisation-rate optimisation
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Stripe, 2025 announcement of a payments foundation model trained self-supervised on transaction data, with card-testing detection as a reported application
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Equal Credit Opportunity Act and Regulation B, adverse action notice requirements
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Consumer Financial Protection Bureau, Circular 2022-03, "Adverse action notification requirements in connection with credit decisions based on complex algorithms", 2022
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Board of Governors of the Federal Reserve System and Office of the Comptroller of the Currency, Supervisory Guidance on Model Risk Management (SR 11-7 / OCC 2011-12), 2011
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Fair Credit Reporting Act, adverse action provisions
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | PayPal, public statements and engineering writing on machine learning for fraud and risk; model internals are not published
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Affirm, public descriptions of machine-learned underwriting for buy-now-pay-later credit decisions, operating under ECOA adverse action requirements; model internals are not published
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Block (Square and Cash App), public descriptions of risk and fraud modelling; model internals are not published
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Coinbase, engineering writing on risk, fraud and account-takeover defence; model internals are not published
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Dal Pozzolo et al., "Credit Card Fraud Detection: A Realistic Modeling and a Novel Learning Strategy", IEEE Transactions on Neural Networks and Learning Systems, 2018 (delayed labels and verification latency)
+- [x] docs/part18-company-deep-dives/stripe-fintech.md | Dal Pozzolo et al., "Calibrating Probability with Undersampling for Unbalanced Classification", IEEE Symposium Series on Computational Intelligence, 2015

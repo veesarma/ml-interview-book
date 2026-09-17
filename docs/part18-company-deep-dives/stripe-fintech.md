@@ -238,28 +238,28 @@ Both costs scale with the amount, but not identically, which is why the optimal 
 
 **Stripe**
 
-* Stripe, Radar documentation: risk scores and risk levels, risk insights, rules (allow, block, review, 3D Secure), and the manual review queue.
-* Stripe, documentation and engineering writing on how Radar's machine learning is built and on the use of signals from across the Stripe network.
-* Stripe, engineering writing on identifying linked fraudulent accounts through similarity and clustering.
-* Stripe, Identity documentation: document checks, selfie matching, and supported document types by country.
-* Stripe, documentation on adaptive acceptance and network tokens for authorisation-rate optimisation.
-* Stripe, 2025 announcement of a payments foundation model trained self-supervised on transaction data, with card-testing detection as a reported application.
+* Stripe, Radar documentation: the [Radar overview](https://docs.stripe.com/radar), [risk evaluations](https://docs.stripe.com/radar/risk-evaluation) (score 0–99, elevated at 65, high at 75), [risk insights](https://docs.stripe.com/radar/reviews/risk-insights), [fraud prevention rules](https://docs.stripe.com/radar/rules) and the [review queue](https://docs.stripe.com/radar/reviews).
+* Drapeau, "How we built it: Stripe Radar", Stripe engineering blog, 2023. [stripe.com](https://stripe.com/blog/how-we-built-it-stripe-radar) · [stripe.dev](https://stripe.dev/blog/how-we-built-it-stripe-radar) · Stripe, "A primer on machine learning for fraud detection" ([stripe.com](https://stripe.com/radar/guide))
+* Tausz, "Similarity clustering to catch fraud rings", Stripe engineering blog. [stripe.com](https://stripe.com/blog/similarity-clustering)
+* Stripe, Identity documentation: [Identity overview](https://docs.stripe.com/identity), [verification checks](https://docs.stripe.com/identity/verification-checks) (document, selfie, ID number, address, phone) and [verifying identity documents](https://docs.stripe.com/identity/verify-identity-documents).
+* Stripe, authorisation-rate optimisation: [Authorization Boost](https://stripe.com/authorization-boost) (Adaptive Acceptance, network tokens, card account updater), [optimization documentation](https://docs.stripe.com/payments/analytics/optimization) and the guide on [reducing network declines](https://stripe.com/guides/optimizing-authorization-rates).
+* Stripe, Sessions 2025 announcement of a transformer-based payments foundation model trained self-supervised on tens of billions of transactions, with card-testing detection as the headline application. [stripe.com newsroom](https://stripe.com/newsroom/news/sessions-2025)
 
 **Regulation and model governance (United States)**
 
-* Equal Credit Opportunity Act and Regulation B, adverse action notice requirements.
-* Consumer Financial Protection Bureau, Circular 2022-03, "Adverse action notification requirements in connection with credit decisions based on complex algorithms", 2022.
-* Board of Governors of the Federal Reserve System and Office of the Comptroller of the Currency, Supervisory Guidance on Model Risk Management (SR 11-7 / OCC 2011-12), 2011.
-* Fair Credit Reporting Act, adverse action provisions.
+* Equal Credit Opportunity Act, Regulation B, [12 CFR 1002.9 (Notifications)](https://www.ecfr.gov/current/title-12/chapter-X/part-1002/subpart-A/section-1002.9) — the adverse action notice and statement of specific reasons.
+* Consumer Financial Protection Bureau, Circular 2022-03, "Adverse action notification requirements in connection with credit decisions based on complex algorithms", 2022. [consumerfinance.gov](https://www.consumerfinance.gov/compliance/circulars/circular-2022-03-adverse-action-notification-requirements-in-connection-with-credit-decisions-based-on-complex-algorithms/) · [Federal Register](https://www.federalregister.gov/documents/2022/06/14/2022-12729/consumer-financial-protection-circular-2022-03-adverse-action-notification-requirements-in)
+* Board of Governors of the Federal Reserve System and Office of the Comptroller of the Currency, Supervisory Guidance on Model Risk Management (SR 11-7 / OCC 2011-12), 2011. [federalreserve.gov](https://www.federalreserve.gov/supervisionreg/srletters/sr1107.htm) · [PDF](https://www.federalreserve.gov/boarddocs/srletters/2011/sr1107.pdf). The Federal Reserve issued revised guidance, SR 26-2, in April 2026 ([federalreserve.gov PDF](https://www.federalreserve.gov/supervisionreg/srletters/SR2602.pdf)); the principles cited here (documentation, independent validation, ongoing monitoring) carry over.
+* Fair Credit Reporting Act, adverse action provisions, [15 U.S.C. 1681m](https://uscode.house.gov/view.xhtml?req=granuleid%3AUSC-1999-title15-section1681m&num=0&edition=1999); full statute at [ftc.gov](https://www.ftc.gov/system/files/documents/statutes/fair-credit-reporting-act/545a_fair-credit-reporting-act-0918.pdf).
 
-**Other fintech companies**
+**Other fintech companies** (public descriptions; model internals are not published)
 
-* PayPal, public statements and engineering writing on machine learning for fraud and risk; model internals are not published.
-* Affirm, public descriptions of machine-learned underwriting for buy-now-pay-later credit decisions, operating under ECOA adverse action requirements; model internals are not published.
-* Block (Square and Cash App), public descriptions of risk and fraud modelling; model internals are not published.
-* Coinbase, engineering writing on risk, fraud and account-takeover defence; model internals are not published.
+* PayPal Technology Blog, "Deploying Large-scale Fraud Detection Machine Learning Models at PayPal" ([medium.com/paypal-tech](https://medium.com/paypal-tech/machine-learning-model-ci-cd-and-shadow-platform-8c4f44998c78)) and "How PayPal Uses Real-time Graph Database and Graph Analysis to Fight Fraud" ([medium.com/paypal-tech](https://medium.com/paypal-tech/how-paypal-uses-real-time-graph-database-and-graph-analysis-to-fight-fraud-96a2b918619a)).
+* Affirm, public descriptions of machine-learned underwriting for buy-now-pay-later credit decisions, operating under ECOA adverse action requirements.
+* Block (Square and Cash App), public descriptions of risk and fraud modelling.
+* Coinbase engineering blog, "Detecting Fraudulent Transactions: Coinbase Scalable Blockchain Address Risk Scoring System" ([coinbase.com](https://www.coinbase.com/blog/detecting-fraudulent-transactions-coinbase-scalable-blockchain-address-risk)) and "Reducing Fraud Loss With an Automated Dynamic Policy" ([coinbase.com](https://www.coinbase.com/blog/reducing-fraud-loss-with-an-automated-dynamic-policy)).
 
 **Background reading on the problem shape**
 
-* Dal Pozzolo et al., "Credit Card Fraud Detection: A Realistic Modeling and a Novel Learning Strategy", IEEE Transactions on Neural Networks and Learning Systems, 2018 (delayed labels and verification latency).
-* Dal Pozzolo et al., "Calibrating Probability with Undersampling for Unbalanced Classification", IEEE Symposium Series on Computational Intelligence, 2015.
+* Dal Pozzolo et al., "Credit Card Fraud Detection: A Realistic Modeling and a Novel Learning Strategy", IEEE Transactions on Neural Networks and Learning Systems, 2018 (delayed labels and verification latency). [IEEE Xplore](https://ieeexplore.ieee.org/document/8038008/)
+* Dal Pozzolo et al., "Calibrating Probability with Undersampling for Unbalanced Classification", IEEE Symposium Series on Computational Intelligence, 2015. [dblp](https://dblp.org/rec/conf/ssci/PozzoloCJB15.html)

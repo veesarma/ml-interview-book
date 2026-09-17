@@ -91,8 +91,8 @@ $$
 with a learned temperature $\tau$ and a learned bias $b$. The temperature is stored as
 $\log(1/\tau)$ and exponentiated, which keeps it positive and makes its gradient
 well-scaled; CLIP does the same. The bias is initialised negative (around $-4$) so that
-before training every phrase is "off", which matters because the positives are a tiny
-fraction of the $N \times K$ pairs.
+before training every phrase is "off". The positives are a tiny fraction of the
+$N \times K$ pairs, so a neutral initialisation would drown them.
 
 ### 2.2 Why sigmoid and not softmax
 
@@ -113,9 +113,9 @@ $(1-p^t)^\gamma$ with $\gamma = 2$ is doing the same job as in RetinaNet
 ([Part IV](../part04-vision/04-detection.md)): the $N \times K$ grid is overwhelmingly
 negative, so easy negatives must stop dominating the gradient.
 
-Normalising by the positive count rather than by $NK$ keeps the loss scale independent of
-how many phrases the caller passed in, which matters because a caller can pass 3 phrases or
-1,200 (the LVIS vocabulary).
+Normalising by the positive count, instead of by $NK$, keeps the loss scale independent of
+how many phrases the caller passed in. A caller can pass 3 phrases or 1,200 (the LVIS
+vocabulary), and the loss should mean the same thing in both cases.
 
 ### 2.3 Detection as a sequence
 
@@ -165,7 +165,7 @@ $$
 \hat m_t = \text{Decoder}\big(F_t, \; \text{MemAttn}(F_t, \{(F_{t'}, \hat m_{t'})\}_{t' < t}), \; q\big).
 $$
 
-That is a tracker whose association is learned attention rather than IoU, and which needs
+That is a tracker whose association is learned attention instead of IoU, and which needs
 no class list at all. Chapter 4 contrasts it with SORT.
 
 ## 3. Implementation
@@ -193,7 +193,7 @@ class OpenVocabHead(nn.Module):
 ```
 
 Three details carry the weight. `F.normalize` on both sides is what makes the logit a
-cosine rather than a dot product, so a region feature with large norm cannot win every
+cosine instead of a dot product, so a region feature with large norm cannot win every
 phrase. `log_inv_temp.exp()` keeps $1/\tau$ positive under unconstrained gradient descent.
 The scalar `bias` shifts every logit, which sets the prior probability that a region is any
 object at all; with `bias_init = -4.0` the initial sigmoid is about 0.018.
@@ -210,7 +210,7 @@ def region_word_alignment_loss(logits, targets, alpha=0.25, gamma=2.0):
     return focal.sum() / targets.sum().clamp(min=1.0)
 ```
 
-`targets` is `(B, N, K)` in $\{0,1\}$, and a background region is a row of zeros rather than
+`targets` is `(B, N, K)` in $\{0,1\}$, and a background region is a row of zeros instead of
 a separate background class. That is the structural difference from a softmax head, and it
 is why the model can say "none of your phrases" without you reserving a slot for it.
 
@@ -302,7 +302,7 @@ composition ("the cone **behind** the truck").
 sigmoids give you $K$ independent probabilities whose scale depends on the phrase. The word
 "car" and the phrase "a silver sedan viewed from behind" do not produce comparable logits,
 so a single global threshold misfires. In production you calibrate per phrase on a held-out
-set, or you rank rather than threshold.
+set, or you rank instead of thresholding.
 
 | Situation | Use | Decision rule |
 |---|---|---|
@@ -361,7 +361,7 @@ Failure modes worth naming out loud:
     [Florence-2 (arXiv 2311.06242)](https://arxiv.org/abs/2311.06242).
 
 !!! production "Tencent, YOLO-World, open vocabulary at detector speed"
-    YOLO-World's contribution is the deployment story rather than the accuracy: a
+    YOLO-World's contribution is the deployment story more than the accuracy: a
     re-parameterisable vision-language path aggregation network lets you fold the text
     embeddings for a fixed vocabulary into the network weights after prompting, so online
     inference has no text tower. They report 35.4 AP on LVIS at 52.0 FPS on a V100. That is
@@ -383,7 +383,7 @@ Failure modes worth naming out loud:
     ([arXiv 2304.07193](https://arxiv.org/abs/2304.07193)). Depth Anything scaled monocular
     depth by building a data engine over roughly 62M unlabelled images
     ([arXiv 2401.10891](https://arxiv.org/abs/2401.10891)). In an AV stack both show up as
-    initialisation and as pseudo-label sources rather than as deployed models: a frozen
+    initialisation and as pseudo-label sources, and not as deployed models: a frozen
     DINOv2 backbone is a strong starting point for a BEV encoder, and Depth Anything's
     relative depth is a usable supervision signal where you have no LiDAR.
 
@@ -393,7 +393,7 @@ Failure modes worth naming out loud:
     A softmax asserts a fixed, mutually exclusive class set. Grounded pretraining violates
     both parts: the phrase set differs per image, and phrases nest, so a region can be
     correctly labelled by "car", "red car" and "vehicle" at once. Per-pair sigmoids let the
-    phrase set be an input rather than an architectural constant, and let a region match
+    phrase set be an input instead of an architectural constant, and let a region match
     zero phrases, which is how background is represented without a background class.
 
     The cost is that the $N \times K$ grid is almost entirely negative, so you need focal
@@ -419,7 +419,7 @@ Failure modes worth naming out loud:
     which are correlated across frames in a way human label noise is not. If the teacher
     consistently misses the new class under low sun angle, so will the student, and no
     amount of pseudo-label volume fixes it. So the audit is stratified by the conditions you
-    care about, not uniform.
+    care about, and never uniform.
 
     **Staff-level follow-up: when would you keep the big model online instead?** When the
     vocabulary genuinely changes at runtime and cannot be fixed at build time (a
@@ -447,7 +447,7 @@ Failure modes worth naming out loud:
 
 !!! interview "SAM 2 gives you class-free video object segmentation. Does that replace your tracker?"
     It replaces part of it. SAM 2's memory attention does the association that a tracker's
-    Hungarian matching does, and it does it on appearance and shape rather than on IoU, so
+    Hungarian matching does, and it does it on appearance and shape instead of on IoU, so
     it handles deformation and partial occlusion well without you tuning a motion model.
 
     It does not replace three things a production tracker provides. First, birth and death
@@ -471,7 +471,7 @@ Failure modes worth naming out loud:
     average the normalised embeddings, which is the standard CLIP prompt-ensembling trick
     and usually recovers a point or two of AP. Version the prompt list as a code artefact
     with its own evaluation, because changing a string changes model behaviour with no code
-    diff. And measure per-phrase calibration rather than assuming the scores are comparable.
+    diff. And measure per-phrase calibration instead of assuming the scores are comparable.
 
     **Staff-level follow-up: how would you detect this regression in CI?** Keep a small
     fixed set of crops with known labels and assert on per-phrase score ranges, not only on
@@ -485,7 +485,7 @@ Failure modes worth naming out loud:
     models) covers the whole pipeline: `<OCR>` gives you the text, `<OCR_WITH_REGION>` gives
     you text plus boxes, a question gives you document VQA.
 
-    What carries over to driving is the engineering lesson rather than the architecture. OCR
+    What carries over to driving is the engineering lesson more than the architecture. OCR
     systems learned that a classical multi-stage pipeline with explicit intermediate
     representations (detect, rectify, recognise) is easier to debug and beats end-to-end at
     low data volume, and that end-to-end wins once you have enough data and a good enough
@@ -511,7 +511,7 @@ probability for every pair, and why is that the right starting point for a focal
 
 ??? success "Solution"
     $\sigma(-4) = 0.0180$. With roughly one positive per hundreds of pairs, starting near the
-    base rate means the initial loss is dominated by the few positives rather than by
+    base rate means the initial loss is dominated by the few positives instead of by
     thousands of confidently-wrong negatives. Starting at $\sigma(0) = 0.5$ would give every
     negative a large gradient in the first steps and can collapse the projection before the
     positives have any influence.
@@ -571,7 +571,7 @@ produces a well-formed box list.
     ```
 
     Constrained decoding makes the validity filter in `decode` unnecessary, which is why
-    production systems do it in the decoder rather than as a post-process.
+    production systems do it in the decoder instead of as a post-process.
 
 **★★★ Exercise 5.** You are given a frozen CLIP text tower and a detector whose region
 features are 256-dimensional while CLIP's embedding is 512-dimensional. You train only the

@@ -24,20 +24,22 @@ def _single_threaded():
 
 
 def smoke_config() -> PipelineConfig:
-    """A quarter-size run: same code path, fewer steps."""
+    """A smaller run: the same code path with a shorter SFT stage.
+
+    The GRPO settings are left at their defaults because that stage's behaviour
+    depends on them (see :func:`mlbook.capstone.preference_stage.run_grpo`), and
+    a shortened GRPO run stops part way through its drift rather than converging.
+    """
     return PipelineConfig(
         seed=0,
         n_train=480,
-        n_eval=160,
+        n_eval=192,
         sft_steps=300,
         sft_batch_size=32,
         rm_steps=60,
         rm_batch_size=24,
         dpo_steps=40,
         dpo_batch_size=16,
-        grpo_steps=20,
-        grpo_prompts_per_step=8,
-        grpo_group_size=4,
     )
 
 
@@ -81,22 +83,36 @@ def test_reward_model_ranks_preferences(report):
 
 
 def test_post_training_does_not_reduce_accuracy(report):
-    """DPO and GRPO both push probability mass onto the verified answer, so
-    neither may fall below the SFT policy by more than the noise of a
-    160-example evaluation, where one example is worth 0.006."""
+    """Neither preference stage may fall below the SFT policy.
+
+    Across five seeds of this configuration the change against SFT ranged from
+    -0.005 to +0.026 for GRPO and -0.005 to +0.047 for DPO, so 0.02 is a real
+    bound rather than a shrug: it is four examples out of 192, about half the
+    standard error of an accuracy near 0.5 at that sample size.
+    """
     acc = report["accuracy"]
-    tolerance = 0.03
+    tolerance = 0.02
     assert acc["dpo"] >= acc["sft"] - tolerance
     assert acc["grpo"] >= acc["sft"] - tolerance
     assert report["dpo"]["margin_before"] == pytest.approx(0.0, abs=1e-5)
     assert report["dpo"]["margin_after"] > report["dpo"]["margin_before"]
 
 
-def test_grpo_reward_does_not_collapse(report):
+def test_grpo_optimises_the_verifier_reward(report):
+    """GRPO's objective is the expected reward of a *sample*, so that is what is
+    checked here; greedy exact match is a different statistic and moves later."""
     grpo = report["grpo"]
     assert 0.0 <= grpo["reward_first"] <= 1.0
     assert 0.0 <= grpo["reward_last"] <= 1.0
-    assert grpo["reward_last"] >= grpo["reward_first"] - 0.1
+    assert grpo["reward_last"] >= grpo["reward_first"] - 0.05
+
+
+def test_grpo_drops_the_degenerate_groups(report):
+    """Dynamic sampling has to be doing something and not everything: a rate of
+    1.0 would mean the filter never fired, a rate of 0.0 that nothing survived."""
+    rate = report["grpo"]["informative_group_rate"]
+    assert 0.1 < rate < 0.95
+    assert report["grpo"]["groups_used"] > 0
 
 
 def test_tool_loop_helps(report):

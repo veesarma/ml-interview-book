@@ -17,8 +17,8 @@ from mlbook.rl.envs import GridWorld  # noqa: E402
 from mlbook.rl.mc_td import discounted_returns, generate_episode, mc_evaluation, td0_evaluation, td_lambda_evaluation  # noqa: E402
 
 OUT = Path(__file__).resolve().parents[1] / "docs" / "assets" / "figures" / "part12_td_vs_mc.png"
-GAMMA, SEEDS = 0.95, 12
-CHECKPOINTS = [25, 50, 100, 200, 400, 800]
+GAMMA, SEEDS = 0.95, 10
+CHECKPOINTS = [25, 50, 100, 200, 400, 800, 1600]
 
 
 def main() -> None:
@@ -26,10 +26,13 @@ def main() -> None:
     pi = np.full((16, 4), 0.25)
     V_true = policy_evaluation(env.P, env.R, pi, GAMMA)
     start = env.to_index(env.start)
+    # Every method uses the same constant step size, so the comparison is about the target
+    # and not about the schedule. The 1/n variant of MC is shown for reference.
     methods = {
-        "MC (first visit)": lambda n, rng: mc_evaluation(env, pi, GAMMA, n, rng),
+        "MC (first visit), α=0.05": lambda n, rng: mc_evaluation(env, pi, GAMMA, n, rng, alpha=0.05),
         "TD(0), α=0.05": lambda n, rng: td0_evaluation(env, pi, GAMMA, n, 0.05, rng),
         "TD(λ=0.8), α=0.05": lambda n, rng: td_lambda_evaluation(env, pi, GAMMA, 0.8, n, 0.05, rng),
+        "MC with 1/n averaging": lambda n, rng: mc_evaluation(env, pi, GAMMA, n, rng),
     }
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.8), facecolor="white")
     for name, fn in methods.items():
@@ -40,9 +43,12 @@ def main() -> None:
                 errs[s, j] = np.sqrt(np.mean((V - V_true) ** 2))
         axes[0].errorbar(CHECKPOINTS, errs.mean(0), yerr=errs.std(0), label=name, marker="o", ms=3, capsize=2, lw=1.4)
     axes[0].set_xscale("log")
+    axes[0].set_xticks(CHECKPOINTS)
+    axes[0].set_xticklabels([str(c) for c in CHECKPOINTS], fontsize=8)
+    axes[0].minorticks_off()
     axes[0].set_xlabel("episodes")
     axes[0].set_ylabel("RMS error of V vs DP (all states)")
-    axes[0].set_title("Prediction error, uniform random policy on GridWorld", fontsize=9.5, loc="left")
+    axes[0].set_title("Prediction error at equal step size, uniform random policy on GridWorld", fontsize=9.5, loc="left")
     axes[0].legend(fontsize=8, frameon=False)
 
     # Target distributions at the start state: MC return vs TD target with the converged V

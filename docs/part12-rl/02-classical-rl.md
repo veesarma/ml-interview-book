@@ -62,13 +62,24 @@ every method in RL descends from one of them:
   called **bootstrapping**, and it is the single most consequential idea in RL: it is
   what makes learning fast and it is what makes deep RL unstable (chapter 3).
 
-![Left: RMS error of MC, TD(0) and TD(lambda) against the DP solution as episodes accumulate. Right: histograms of the MC and TD targets at the start state, showing the variance gap.](../assets/figures/part12_td_vs_mc.png){ width="820" }
+![Left: RMS error of constant-step MC, TD(0), TD(lambda) and 1/n-averaged MC against the DP solution as episodes accumulate. Right: histograms of the MC and TD targets at the start state, showing the variance gap.](../assets/figures/part12_td_vs_mc.png){ width="820" }
 
-The right-hand panel is the argument in one picture. Both targets are centred on
-$V^\pi(\text{start})$, so neither is systematically wrong once $V$ is correct. The MC
-target is spread over the whole range of possible episode outcomes; the TD target takes
-one reward plus a number you already believe, so it clusters tightly. Lower variance is
-why TD gets to a given accuracy in fewer episodes in the left panel.
+The right-hand panel is the variance claim, measured. Both targets have mean
+$V^\pi(\text{start}) = -0.73$, so neither is systematically wrong once $V$ is correct. The
+MC target is spread across every possible episode outcome with a standard deviation of
+0.27; the TD target takes one reward plus a number already in the table, and its standard
+deviation is 0.02, about 13 times smaller.
+
+The left panel is less tidy than the usual story, and the details are worth having. All
+three constant-step methods use $\alpha = 0.05$, so the comparison is about the target
+rather than the schedule. TD(0) is the *worst* method for the first hundred episodes:
+information about the goal reaches a state one step per visit, so a 16-state grid takes
+many episodes to propagate it, while one MC episode informs every state it touched. TD(0)
+overtakes constant-step MC around 400 episodes and keeps improving, which is the variance
+advantage showing up once propagation is no longer the bottleneck. The constant-step curves
+then flatten and drift, because a fixed $\alpha$ tracks rather than converges; MC with
+$1/n$ averaging keeps descending. Bootstrapping buys variance and costs propagation speed,
+and which one dominates depends on the horizon and on how long you train.
 
 ## 2. The math
 
@@ -782,9 +793,11 @@ fitting in a table, you are in chapter 3.
     grows with the horizon (roughly $\sigma^2/(1-\gamma^2)$ for i.i.d. rewards). TD uses
     $r + \gamma V(s')$, in which only one transition is random, so the variance is roughly
     $\sigma^2$, but the target is biased whenever $V$ is wrong, since it contains your own
-    estimate. In practice TD reaches a given accuracy in far fewer episodes, and it can
-    learn online without waiting for termination. $n$-step and TD($\lambda$) interpolate,
-    and the best $n$ is usually neither 1 nor infinity.
+    estimate. TD's variance advantage is what makes it reach a lower asymptotic error for a
+    given step size, and it can learn online without waiting for termination. The cost is
+    propagation speed: information moves one step per update, so on a small problem with
+    terminal-only rewards MC can be ahead for the first few hundred episodes. $n$-step and
+    TD($\lambda$) interpolate, and the best $n$ is usually neither 1 nor infinity.
 
     **Staff-level follow-up: on a finite batch of data, what do they converge to?**
     Different answers. MC converges to the values minimising squared error against the

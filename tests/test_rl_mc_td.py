@@ -34,6 +34,13 @@ def test_mc_evaluation_matches_dp_at_start():
     assert abs(V[start] - V_true[start]) < 0.08
 
 
+def test_mc_evaluation_with_constant_alpha_also_converges():
+    """A constant step tracks instead of averaging, so it needs a looser tolerance."""
+    env, pi, V_true, start = _setup()
+    V = mc_evaluation(env, pi, GAMMA, 1500, np.random.default_rng(0), alpha=0.05)
+    assert abs(V[start] - V_true[start]) < 0.12
+
+
 def test_td0_evaluation_matches_dp_at_start():
     env, pi, V_true, start = _setup()
     V = td0_evaluation(env, pi, GAMMA, 1500, alpha=0.05, rng=np.random.default_rng(0))

@@ -126,13 +126,14 @@
     ![Two ROC curves and the precision at the shipped operating point](../assets/figures/part19_auc_kpi.png){ width="720" }
 
     The figure is case 1 and case 2 at once, on synthetic data with a 2% positive
-    rate. Model B orders the population better everywhere (AUC 0.876 to 0.925) because
-    a new feature separates the bulk of the distribution. That same feature fires on a
-    benign slice, which lands in the top of the score list, and the analyst queue only
-    ever sees the top 2,000 alerts a day: precision there falls from 0.38 to 0.20 and
-    recall at that queue depth falls from 0.20 to 0.10. Every number in that paragraph
-    comes from `figures/part19_auc_kpi.py`, so you can change the queue depth and
-    watch the verdict flip.
+    rate. A new feature in model B separates most of the population better than model
+    A does, and the summary metric rewards that (AUC 0.876 to 0.925). The same feature
+    also fires on a benign slice of negatives, which lands at the very top of the
+    score list, and the analyst queue only ever sees the top 2,000 alerts a day.
+    Precision there falls from 0.38 to 0.20, and recall at that queue depth falls from
+    0.20 to 0.10. Every number in this paragraph comes from
+    `figures/part19_auc_kpi.py`, so you can change the queue depth and watch the
+    verdict flip.
 
     !!! note "Correction to a common phrasing"
         The rank identity is exact only with no ties. With ties,
@@ -405,6 +406,12 @@
     * **Accuracy is the wrong or a buggy metric.** Measured on a subset, computed
       incorrectly, or too coarse to track a continuous loss.
 
+    Run them in this order, because each step costs less than the one after it:
+    plot the prediction histogram and the confusion matrix (one minute, catches
+    the degenerate-majority case), compute AUC or PR-AUC on the same predictions (one
+    minute, separates sharpening from stalling), sweep the threshold on validation
+    (catches the mismatch), then read the accuracy code.
+
     !!! interview "Staff move"
         Switch instruments before you switch hypotheses. "I stop trusting accuracy as
         the lens and look at AUC or PR-AUC plus per-class metrics. Falling loss with
@@ -470,6 +477,12 @@
       ratio.
     * **Domain adaptation** when you have unlabelled target data.
     * **Prior correction** when only $P(Y)$ moved, which has a closed form.
+
+    The triage order when an alarm fires: confirm the drift is in the inputs and not in
+    the logging pipeline (a schema change looks exactly like covariate shift), identify
+    which slices moved, label a few hundred examples from the drifted slice to measure
+    the real performance drop, and only then choose between reweighting, adaptation and
+    retraining. Most drift alarms in practice are broken upstream jobs.
 
     !!! interview "Staff move"
         Give the architectural answer. "Build the data engine, not just the model. A
