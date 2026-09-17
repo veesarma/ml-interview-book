@@ -123,6 +123,12 @@ finds hard. Both [Tesla's auto-labelling pipeline](tesla.md#33-the-data-engine-a
 and the academic version (Uber ATG's Auto4D, which refines 4D object labels from
 sequential point clouds) describe the same trade.
 
+![The AV data-engine flywheel](../assets/figures/part18_av_data_engine_flywheel.png){ width="640" }
+
+A vendor sells stages three through six of that loop. The customer keeps the trigger
+policy and the deployment decision, which is why the interesting conversations with a
+vendor are about which clips to send, not about price per box.
+
 Two failure modes come with it. The first is **anchoring**: a reviewer shown a
 plausible wrong pre-label accepts it more often than they would have produced it. The
 fix is to measure it, by routing a sample of tasks with deliberately perturbed

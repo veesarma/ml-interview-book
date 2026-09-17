@@ -25,10 +25,10 @@
 A model generalises when what it learned about the training set also holds off it.
 Every regulariser in this chapter is one of three moves:
 
-1. **Add noise** so the model cannot rely on any single fragile pathway, dropout,
+1. **Add noise** so the model cannot rely on any single fragile pathway: dropout,
    stochastic depth, data augmentation.
-2. **Shrink the hypothesis** toward something simple, weight decay, early stopping.
-3. **Soften the target** so the model is not pushed to infinite confidence, label
+2. **Shrink the hypothesis** toward something simple: weight decay, early stopping.
+3. **Soften the target** so the model is not pushed to infinite confidence: label
    smoothing, mixup's soft labels.
 
 The concrete picture for dropout: on each minibatch, half the hidden units are

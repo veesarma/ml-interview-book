@@ -209,6 +209,12 @@ The general theory (pseudo-labels from a stronger offline teacher, label-noise
 handling, active selection) lives in
 [Weak supervision & auto-labelling](../part10-self-supervised/03-weak-supervision-and-auto-labeling.md).
 
+![The AV data-engine flywheel](../assets/figures/part18_av_data_engine_flywheel.png){ width="640" }
+
+The two dashed arrows are the part that decides iteration speed: evaluation results
+feed back into both the trigger library and the training set, so a failure found in
+shadow mode becomes a collection campaign rather than a bug report.
+
 **The trade-off.** A large, slow offline model plus reconstruction gives labels no
 annotator could draw (dense geometry, kinematics across occlusion) and a marginal cost
 per clip that falls with automation; the price is systematic errors that propagate

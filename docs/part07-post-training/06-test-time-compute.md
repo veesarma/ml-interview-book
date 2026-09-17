@@ -94,7 +94,7 @@ to leading order. Combining with §2.2, the proxy reward gained per nat of KL sp
 
 This is a statement about the *proxy*. Gao et al.'s measured gold reward for best-of-N follows $d(\alpha - \beta\log d)$ with $d = \sqrt{\KL}$, rising then falling, so past some $N$ the true quality degrades even though the RM score keeps climbing (chapter 2 §2.5).
 
-With a **verifier** rather than an RM, there is no proxy gap. Accuracy is $1 - (1-p)^N$ for a per-sample success rate $p$, monotone in $N$, saturating at 1. The cost of more samples is money and latency, not quality.
+With a **verifier** rather than an RM, there is no proxy gap. Accuracy is $1 - (1-p)^N$ for a per-sample success rate $p$, monotone in $N$, saturating at 1. More samples cost money and latency. They never cost quality.
 
 ### 2.4 Self-consistency
 
@@ -183,7 +183,7 @@ def beam_search(model, prompt, beam_width, max_new_tokens, eos_id):
     return finished[:beam_width]
 ```
 
-Scores are summed log-probabilities, so the search is length-unnormalised and biased toward short sequences; production beam search divides by $|y|^\alpha$ to compensate. Beams that emit EOS move to `finished` and stop expanding. The test compares the top beam against brute-force enumeration of all $V^2$ two-token continuations, which pins the search down exactly rather than checking a property.
+Scores are summed log-probabilities, so the search is length-unnormalised and favours short sequences. Production beam search divides by $|y|^\alpha$ to compensate. Beams that emit EOS move to `finished` and stop expanding. The test compares the top beam against brute-force enumeration of all $V^2$ two-token continuations, which pins the search down exactly rather than checking a property.
 
 **How you'd test it.** Check `bon_kl_bound(1) == 0` and the exact value at $N = 4$. Check the returned best-of-N response really is the argmax of the returned rewards and that prompt tokens are never marked as response. Check the self-consistency winner has the maximum vote count and the votes sum to $N$. Check beam search returns sorted beams and that its top scorer matches exhaustive search to $10^{-4}$. In `tests/test_posttrain_test_time.py`.
 
@@ -210,7 +210,7 @@ The derivation in §2.2 is worth more interview marks than the code, so do it on
 
 **Latency.** Parallel methods (self-consistency, best-of-N) add throughput cost without adding serial latency, as long as you have the capacity to run $N$ streams concurrently. Sequential methods (revision, agentic loops, MCTS rollouts) add latency directly, one full generation per round. For an interactive product that distinction usually decides the design.
 
-**Scoring cost.** Best-of-N with a 70B RM scoring $N=64$ responses of 1k tokens is $64 \times 10^3 \times 2 \times 70\mathrm{B} \approx 9\times10^{15}$ FLOPs per query, which can exceed the generation cost. Use a smaller RM, score only the final answer rather than the whole chain, or prune candidates early.
+**Scoring cost.** Best-of-N with a 70B RM scoring $N=64$ responses of 1k tokens is $64 \times 10^3 \times 2 \times 70\mathrm{B} \approx 9\times10^{15}$ FLOPs per query, which can exceed the generation cost. Options: a smaller RM, scoring only the final answer instead of the whole chain, or pruning candidates early with a cheap filter.
 
 **Failure modes.**
 

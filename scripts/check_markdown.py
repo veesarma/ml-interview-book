@@ -90,7 +90,7 @@ def check(path: Path) -> list[str]:
         #    a display-math block is correct mathematical writing, so flag only a
         #    paragraph-final one that is not a lead-in to $$ or a list.
         # inline code holds slices like [::2, ::2] and paths; not prose
-        raw_prose = re.sub(r"`[^`]*`", " ", raw)
+        raw_prose = re.sub(r"`[^`]*`", "CODE", raw)
         stripped = raw_prose.strip()
         has_math = "$" in raw
         nxt = lines[i + 1].strip() if i + 1 < len(lines) else ""

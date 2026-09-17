@@ -34,6 +34,13 @@
   Prevention, 2025); the 2020 safety-methodologies paper; the Safety Case approach.
 - Fleet Response gives *guidance*, and explicitly not remote driving (May 2024 blog).
 
+![Publicly announced architecture shifts at Tesla and Waymo](../assets/figures/part18_architecture_timeline.png){ width="720" }
+
+Waymo's public lane on the timeline moves through datasets, prediction papers and
+simulators before it reaches end-to-end research, which is the opposite order from
+Tesla's. Placing a question on this timeline ("that was the Wayformer era, MotionLM
+changed the factorisation") is itself a signal in the room.
+
 ## 1. The business in one paragraph
 
 Waymo, Alphabet's autonomous-driving subsidiary, operates a commercial rider-only

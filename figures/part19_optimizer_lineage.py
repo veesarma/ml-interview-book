@@ -25,7 +25,7 @@ NODES = [
      "one global step size,\nzig-zags along ravines", 3.0, 8.6, GREY),
     ("Momentum", r"$v \leftarrow \beta v + g$",
      "damps the oscillation across\nthe ravine, accelerates along it", 9.6, 8.6, BLUE),
-    ("AdaGrad", r"$\eta\,/\,\sqrt{\textstyle\sum g^2}$",
+    ("AdaGrad", r"$\eta\,/\,\sqrt{\sum g^2}$",
      "per-parameter steps, larger for\nrare features; the sum only grows,\nso the step decays to zero", 3.0, 2.2, ORANGE),
     ("RMSProp", r"$\eta\,/\,\sqrt{\mathrm{EMA}(g^2)}$",
      "an EMA instead of a running sum,\nso the denominator stops growing", 9.6, 2.2, ORANGE),
