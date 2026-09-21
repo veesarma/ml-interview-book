@@ -1,5 +1,6 @@
 """Part XI — perception and autonomy: open-vocabulary heads, BEV, fusion, tracking,
-occupancy, trajectory prediction and latent world models."""
+occupancy, trajectory prediction, latent world models, offboard landing-zone analysis
+and feed-forward pointmaps."""
 
 from mlbook.perception import (
     bev_query,
@@ -8,9 +9,11 @@ from mlbook.perception import (
     fusion,
     hungarian,
     kalman,
+    landing_zone,
     lift_splat,
     occupancy,
     open_vocab,
+    pointmap,
     sort_tracker,
     temporal_bev,
     trajectory_prediction,
@@ -29,6 +32,8 @@ __all__ = [
     "hungarian",
     "sort_tracker",
     "occupancy",
+    "landing_zone",
+    "pointmap",
     "trajectory_prediction",
     "world_model",
 ]
