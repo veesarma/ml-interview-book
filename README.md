@@ -51,6 +51,8 @@ labelled and the web edition has them.
 | XVI | The coding canon: 60 implementations, NumPy ↔ PyTorch fluency drills |
 | XVII | ML system design: framework + 12 canonical designs grounded in company write-ups |
 | XVIII | Company deep dives: Tesla, Waymo, Zoox/Nuro/Aurora, NVIDIA, Meta, Google/YouTube, TikTok, Netflix/Spotify, Pinterest, Uber/DoorDash, Airbnb, Amazon, Apple, Stripe/fintech, frontier labs, Scale AI |
+| XIX–XX | Breadth review, and structuring a deep dive on your own projects |
+| XXI | Zipline offboard perception: a targeted deep dive with metric geometry, SfM/BA, learned 3D and splats, deliverability design, evaluation, coding drills and a mock interview |
 
 Every chapter follows the same skeleton: an interview card, intuition, derivations,
 an explicit implementation with shapes on every line, a systems view, production
