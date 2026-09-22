@@ -1,0 +1,7162 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A first-principles-to-frontier compendium for staff-level ML interviews — math, from-scratch code, systems, and production case studies.">
+      
+      
+      
+        <link rel="canonical" href="https://veesarma.github.io/ml-interview-book/part21-zipline-offboard/04-learned-3d-and-splats/">
+      
+      
+        <link rel="prev" href="../03-sfm-and-bundle-adjustment/">
+      
+      
+        <link rel="next" href="../05-deliverability-system-design/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Learned 3-D and splats - The ML Interview Book</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#learned-3-d-feed-forward-pointmaps-and-gaussian-splats" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="The ML Interview Book" class="md-header__button md-logo" aria-label="The ML Interview Book" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The ML Interview Book
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Learned 3-D and splats
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/veesarma/ml-interview-book" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    veesarma/ml-interview-book
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="The ML Interview Book" class="md-nav__button md-logo" aria-label="The ML Interview Book" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    The ML Interview Book
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/veesarma/ml-interview-book" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    veesarma/ml-interview-book
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Preface
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Preface
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/how-to-use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How to use this book
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/study-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Study plan (6–9 months)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/interview-signal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What staff-level signal looks like
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part01-math/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I. Math
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    I. Math
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/01-linear-algebra/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear algebra
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/02-calculus-matrix-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calculus & matrix calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/03-probability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Probability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/04-statistics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/05-information-theory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Information theory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/06-optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/07-tensor-shapes-broadcasting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tensors, shapes & broadcasting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part02-classical/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    II. Classical ML
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    II. Classical ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/01-linear-regression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear regression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/02-logistic-softmax-regression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logistic & softmax regression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/03-trees-and-ensembles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trees & ensembles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/04-knn-kmeans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KNN & K-means
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/05-probabilistic-models-em/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Probabilistic models & EM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/06-dimensionality-reduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dimensionality reduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/07-kernel-methods-svm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kernel methods & SVMs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part03-neural-nets/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    III. Neural Nets
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    III. Neural Nets
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/01-mlp-and-activations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLPs & activations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/02-backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/03-autograd-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building an autograd engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/04-initialization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/05-normalization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Normalization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/06-regularization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Regularization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part04-vision/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IV. Vision
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IV. Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/01-image-representation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image representation & signal processing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/02-convolutions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Convolutions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/03-cnn-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CNN architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/04-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/05-segmentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Segmentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/06-geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geometry & cameras
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/07-3d-perception/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part05-sequence-transformers/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    V. Sequences & Transformers
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    V. Sequences & Transformers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/01-rnn-lstm-gru/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RNN, LSTM, GRU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/02-seq2seq-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seq2seq & early attention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/03-attention-mathematics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attention mathematics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/04-transformer-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/05-positional-encodings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Positional encodings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/06-tokenization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tokenization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part06-llm-training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VI. LLM Training
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VI. LLM Training
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/01-pretraining-data-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pretraining data & objective
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/02-scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/03-large-model-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Large-model architecture (MoE, GQA, SSMs)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/04-efficient-attention-kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Efficient attention & KV cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/05-quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/06-fine-tuning-lora/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & LoRA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/07-mid-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mid-training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part07-post-training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VII. Post-training
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VII. Post-training
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/01-sft/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervised fine-tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/02-reward-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reward models & preferences
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/03-rlhf-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF with PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/04-dpo-and-friends/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DPO and its relatives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/05-reasoning-rl-grpo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reasoning RL, RLVR & GRPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/06-test-time-compute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test-time compute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part08-multimodal/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VIII. Multimodal
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VIII. Multimodal
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/01-vision-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision Transformers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/02-detr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DETR & set prediction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/03-clip-contrastive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLIP & contrastive learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/04-vlm-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VLM architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/05-multimodal-foundation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal foundation models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/06-video-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part09-generative/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IX. Generative
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_12" id="__nav_12_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IX. Generative
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/01-autoencoders-vae/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autoencoders & VAEs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/02-gans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GANs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/03-diffusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/04-flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part10-self-supervised/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    X. Self-/Semi-/Weak Supervision
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_13" id="__nav_13_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    X. Self-/Semi-/Weak Supervision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/01-self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-supervised learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/02-semi-supervised/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Semi-supervised learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/03-weak-supervision-and-auto-labeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Weak supervision & auto-labeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part11-perception-autonomy/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XI. Perception & Autonomy
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_14" id="__nav_14_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XI. Perception & Autonomy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/01-perception-foundation-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Perception foundation models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/02-multi-camera-bev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-camera & BEV
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/03-sensor-fusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor fusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/04-tracking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tracking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/05-occupancy-temporal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Occupancy & temporal perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/06-prediction-planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prediction & planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/07-world-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    World models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_15" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part12-rl/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XII. Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_15" id="__nav_15_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XII. Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/01-mdp-bellman/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs & Bellman equations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/02-classical-rl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical RL algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/03-deep-rl-dqn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep RL & DQN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/04-policy-gradients-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy gradients, GAE & PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/05-imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/06-agents-tool-use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents & tool use
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_16" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part13-retrieval-eval-reliability/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIII. Retrieval, Eval & Reliability
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_16" id="__nav_16_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIII. Retrieval, Eval & Reliability
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/01-retrieval-and-rag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/02-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/03-uncertainty-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uncertainty & reliability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_17" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part14-systems/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIV. Systems
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_17" id="__nav_17_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_17">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIV. Systems
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/01-distributed-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/02-training-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/03-inference-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inference systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/04-hardware-memory-roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware, memory & roofline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_18" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part15-interpretability-safety/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XV. Interpretability & Safety
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_18" id="__nav_18_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_18">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XV. Interpretability & Safety
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15-interpretability-safety/01-interpretability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpretability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15-interpretability-safety/02-safety-failure-modes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Safety & failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_19" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part16-coding-canon/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVI. Coding Canon
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_19" id="__nav_19_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_19">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVI. Coding Canon
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/01-numpy-torch-cheatsheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NumPy ↔ PyTorch cheat sheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/02-shape-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shape & broadcasting drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/03-timed-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timed coding drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_20" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part19-breadth-review/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIX. Breadth Review
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_20" id="__nav_20_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_20">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIX. Breadth Review
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/01-basics-losses-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basics, losses, models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/02-evaluation-debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation and debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/03-deep-learning-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep learning and Transformers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/04-llms-multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLMs and multimodal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/05-serving-data-engines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serving, data engines, real-world
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/06-rapid-fire/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rapid-fire derivations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_21" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part20-project-deep-dive/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XX. Your Projects
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_21" id="__nav_21_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_21">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XX. Your Projects
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/01-carl-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CARL framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/02-streetsmart-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worked deep dive, StreetSmart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/03-edge-perception-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worked deep dive, edge perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/04-behavioral-leadership/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Behavioral and leadership
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_22" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part17-ml-system-design/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVII. ML System Design
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_22" id="__nav_22_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVII. ML System Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/00-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/01-recommendation-feed-ranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feed & recommendation ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/02-search-ranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/03-ads-ctr-prediction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ads CTR / conversion prediction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/04-fraud-anomaly-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fraud & anomaly detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/05-perception-system-av/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous-vehicle perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/06-visual-search-image-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual search & image retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/07-content-moderation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content moderation & trust
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/08-llm-product-rag-assistant/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM assistant with RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/09-ocr-document-understanding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OCR & document understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/13-novel-object-3d-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Novel-object 3D detection from unlabeled fleet data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/10-forecasting-eta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting & ETA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/11-notifications-uplift-experimentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications, uplift & experimentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/12-ml-platform-feature-store-monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML platform, feature store & monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_23" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part18-company-deep-dives/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVIII. Company Deep Dives
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_23" id="__nav_23_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_23_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_23">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVIII. Company Deep Dives
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/tesla/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tesla (Autopilot / FSD / Optimus)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/waymo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waymo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/zoox-nuro-aurora/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zoox, Nuro, Aurora & robotaxi peers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/nvidia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NVIDIA (DRIVE, Cosmos, Isaac)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/meta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meta (Feed, Reels, Ads, FAIR)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/google-youtube/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Google & YouTube
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/tiktok-bytedance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TikTok / ByteDance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/netflix-spotify/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Netflix & Spotify
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/pinterest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pinterest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/uber-doordash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uber & DoorDash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/airbnb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Airbnb
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/amazon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Amazon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/apple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Apple
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/stripe-fintech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stripe & fintech fraud
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/frontier-labs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAI, Anthropic & DeepMind
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/scale-ai-data-engines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scale AI & data engines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_24" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XXI. Zipline Offboard Perception
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_24" id="__nav_24_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_24_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_24">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XXI. Zipline Offboard Perception
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-frames-and-camera-geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frames and camera geometry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-two-view-geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Two-view geometry and triangulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-sfm-and-bundle-adjustment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SfM and bundle adjustment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learned 3-D and splats
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learned 3-D and splats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-the-interview-card" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR: the interview card
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-intuition-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Intuition first
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-math" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The math
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. The math">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-pointmap-loss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The pointmap loss
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reading-pose-back-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading pose back out
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reading-focal-length-back-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading focal length back out
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gaussian-splatting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gaussian splatting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#where-the-depth-map-from-a-splat-scene-comes-from" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where the depth map from a splat scene comes from
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Implementation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Implementation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-you-would-test-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How you would test it
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#retype-by-hand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retype by hand
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-systems-view-when-to-use-which" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Systems view: when to use which
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Systems view: when to use which">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-hybrid-answer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The hybrid answer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#where-a-learned-reconstruction-hallucinates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where a learned reconstruction hallucinates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. In production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-interview-questions-and-strong-answers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Interview questions and strong answers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Exercises
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-deliverability-system-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deliverability system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-evaluation-and-scaling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation and scaling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../coding-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coding drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mock-interview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mock interview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../story-bank/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Story bank
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cheatsheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cheatsheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../references/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-the-interview-card" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR: the interview card
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-intuition-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Intuition first
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-math" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The math
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. The math">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-pointmap-loss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The pointmap loss
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reading-pose-back-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading pose back out
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reading-focal-length-back-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading focal length back out
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gaussian-splatting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gaussian splatting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#where-the-depth-map-from-a-splat-scene-comes-from" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where the depth map from a splat scene comes from
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Implementation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Implementation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-you-would-test-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How you would test it
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#retype-by-hand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retype by hand
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-systems-view-when-to-use-which" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Systems view: when to use which
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Systems view: when to use which">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-hybrid-answer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The hybrid answer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#where-a-learned-reconstruction-hallucinates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where a learned reconstruction hallucinates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. In production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-interview-questions-and-strong-answers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Interview questions and strong answers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Exercises
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="learned-3-d-feed-forward-pointmaps-and-gaussian-splats">Learned 3-D: feed-forward pointmaps and Gaussian splats<a class="headerlink" href="#learned-3-d-feed-forward-pointmaps-and-gaussian-splats" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Why this matters at staff level.</strong> The role description pairs classical geometry with
+feed-forward multi-view models and splats, which means the interviewer expects you to hold
+both and to have an opinion about where the boundary sits. The weak answer is "deep learning
+is better now". The strong answer names what each method is estimating, what assumption each
+one can violate silently, and how you would validate a learned reconstruction before a
+vehicle acts on it.</p>
+</blockquote>
+<h2 id="tldr-the-interview-card">TL;DR: the interview card<a class="headerlink" href="#tldr-the-interview-card" title="Permanent link">&para;</a></h2>
+<ul>
+<li>A <strong>pointmap</strong> is a dense <span class="arithmatex">\((3, H, W)\)</span> grid giving each pixel's 3-D location, expressed in a
+  <em>chosen reference camera's frame</em>. Predicting both views' pointmaps in one frame means the
+  network has implicitly solved correspondence, relative pose and depth at once.</li>
+<li>From a pointmap you read back geometry with algebra, no second network: <strong>depth</strong> is the
+  <span class="arithmatex">\(z\)</span> channel, <strong>relative pose</strong> is a weighted Umeyama fit (one SVD), <strong>focal length</strong> has a
+  closed form assuming a centred principal point.</li>
+<li>Training uses a <strong>scale-normalised</strong> loss, because a monocular pair cannot observe absolute
+  scale. Punishing a model for an ambiguity it cannot resolve teaches it nothing.</li>
+<li>The <strong>confidence channel</strong> with a <span class="arithmatex">\(-\alpha\log c\)</span> penalty lets the model say "I do not know
+  here". The optimum is <span class="arithmatex">\(c^\star = \alpha / e\)</span>, so confidence is an inverse error prediction.
+  For a safety pipeline this channel is half the value of the model.</li>
+<li>A <strong>3-D Gaussian splat</strong> is <span class="arithmatex">\((\mu, \Sigma, c, \alpha)\)</span>. <span class="arithmatex">\(\Sigma\)</span> is stored as a rotation and
+  per-axis scales, <span class="arithmatex">\(\Sigma = RSS^\top R^\top\)</span>, which keeps it positive semi-definite under
+  gradient descent for free.</li>
+<li><strong>EWA projection</strong>: <span class="arithmatex">\(\Sigma_{2D} = J W \Sigma W^\top J^\top\)</span> with <span class="arithmatex">\(J\)</span> the Jacobian of the
+  projection at the centre. Perspective division is non-linear, so this is a linearisation
+  and it degrades away from the principal point.</li>
+<li>Compositing is the same <strong>over</strong> operator as NeRF:
+  <span class="arithmatex">\(C = \sum_i c_i\alpha_i\prod_{j&lt;i}(1-\alpha_j)\)</span>. Splatting differs in where the samples come
+  from, not how they are combined.</li>
+<li><strong>Photometric loss is local.</strong> A splat that does not overlap its target has numerically zero
+  gradient, which is why real 3DGS depends on splitting, cloning and pruning
+  instead of relying on the position gradient alone.</li>
+<li>The line to remember: <strong>rendering quality is not geometric correctness</strong>. A floating blob
+  that renders correctly from every training view is a perfect photometric solution and not a
+  surface.</li>
+</ul>
+<h2 id="1-intuition-first">1. Intuition first<a class="headerlink" href="#1-intuition-first" title="Permanent link">&para;</a></h2>
+<p>Classical reconstruction is a chain of hand-designed steps, each of which can fail
+independently: detect, describe, match, verify, solve, triangulate, optimise. Each step
+compresses the image into something smaller (a keypoint, a descriptor, a correspondence) and
+throws away everything it did not select.</p>
+<p>The feed-forward alternative asks the network to output the answer directly. Give it two
+images; ask it to say, for every pixel, where that pixel is in 3-D. Do this in a single
+shared coordinate frame, the first camera's.</p>
+<p>Now consider what that output has already decided. If pixel <span class="arithmatex">\((u_1, v_1)\)</span> in image 1 and pixel
+<span class="arithmatex">\((u_2, v_2)\)</span> in image 2 map to the same 3-D location, they are a correspondence. The
+transformation between camera 2's pointmap in its own frame and the same pixels expressed in
+camera 1's frame is the relative pose. The <span class="arithmatex">\(z\)</span> channel is depth. One regression target, and
+the classical outputs are all readable from it with linear algebra.</p>
+<pre class="mermaid"><code>flowchart LR
+  A["Image 1"] --&gt; C["Shared encoder"]
+  B["Image 2"] --&gt; C
+  C --&gt; D["Cross-view attention"]
+  D --&gt; E["Pointmap 1&lt;br/&gt;in frame 1"]
+  D --&gt; F["Pointmap 2&lt;br/&gt;in frame 1"]
+  E --&gt; G["Depth"]
+  F --&gt; H["Relative pose&lt;br/&gt;weighted Umeyama"]
+  E --&gt; I["Focal length&lt;br/&gt;closed form"]
+  E --&gt; J["Correspondence"]</code></pre>
+<p>What it buys, in one sentence: robustness where handcrafted matching fails, because the
+network can use semantic and monocular cues (this is a roof, roofs are planar, that shadow
+implies a raised edge) where a corner detector finds nothing.</p>
+<p>What it costs, in one sentence: the same priors that rescue a textureless roof will
+confidently invent geometry that is not there, and the failure is silent.</p>
+<h2 id="2-the-math">2. The math<a class="headerlink" href="#2-the-math" title="Permanent link">&para;</a></h2>
+<h3 id="the-pointmap-loss">The pointmap loss<a class="headerlink" href="#the-pointmap-loss" title="Permanent link">&para;</a></h3>
+<p>Two ingredients. First, scale normalisation. A two-view prediction cannot determine absolute
+scale, so divide both prediction and target by their own mean distance from the origin:</p>
+<div class="arithmatex">\[z = \frac{1}{|V|}\sum_{i \in V}\|X_i\|, \qquad \hat X = X / z.\]</div>
+<p>Now a prediction that is correct in shape and wrong in metres incurs no loss, which is the
+honest statement of what the input supports.</p>
+<p>Second, the confidence weighting:</p>
+<div class="arithmatex">\[\boxed{\;\mathcal{L} = \frac{1}{|V|}\sum_{i \in V}\Big(c_i\,\|\hat X_i - \hat X^{\text{gt}}_i\| - \alpha\log c_i\Big).\;}\]</div>
+<p>Differentiate the per-pixel term with respect to <span class="arithmatex">\(c_i\)</span> and set to zero:</p>
+<div class="arithmatex">\[e_i - \frac{\alpha}{c_i} = 0 \quad \Longrightarrow \quad c_i^\star = \frac{\alpha}{e_i}.\]</div>
+<p>So the optimal confidence is inversely proportional to the error the model expects to make,
+and the log term is what stops the trivial solution <span class="arithmatex">\(c \to 0\)</span>. Without the confidence channel,
+sky, water and wind-blown vegetation dominate the gradient because their geometry is
+genuinely unpredictable. With it, the model learns to down-weight them and, as a side effect,
+hands you a per-pixel trust map.</p>
+<p>The test that pins this down: fix a known error and optimise confidence alone, then check it
+converges to <span class="arithmatex">\(\alpha/e\)</span>.</p>
+<h3 id="reading-pose-back-out">Reading pose back out<a class="headerlink" href="#reading-pose-back-out" title="Permanent link">&para;</a></h3>
+<p>Camera 2's pointmap in its own frame is <span class="arithmatex">\(\{P_i\}\)</span>; the same pixels in camera 1's frame are
+<span class="arithmatex">\(\{Q_i\}\)</span>. The relative pose is the similarity minimising
+<span class="arithmatex">\(\sum_i w_i \|sRP_i + t - Q_i\|^2\)</span>, which is the weighted Umeyama problem with a closed-form
+solution:</p>
+<div class="arithmatex">\[H = \sum_i w_i (Q_i - \bar Q)(P_i - \bar P)^\top, \quad
+H = U D V^\top, \quad
+R = U\,\mathrm{diag}(1, 1, \det(UV^\top))\,V^\top,\]</div>
+<div class="arithmatex">\[s = \frac{\mathrm{tr}\big(D\,\mathrm{diag}(1,1,\det(UV^\top))\big)}{\sum_i w_i\|P_i - \bar P\|^2},
+\qquad t = \bar Q - sR\bar P.\]</div>
+<p>The <span class="arithmatex">\(\det\)</span> term is the reflection guard. Without it, a mirrored "fit" can have lower error and
+is physically meaningless, and the failure shows up as a reconstruction that is inside out.
+Use the confidence channel as <span class="arithmatex">\(w_i\)</span>: pixels the network distrusts should not steer the pose.</p>
+<h3 id="reading-focal-length-back-out">Reading focal length back out<a class="headerlink" href="#reading-focal-length-back-out" title="Permanent link">&para;</a></h3>
+<p>Every pixel should satisfy <span class="arithmatex">\(u - c_x = f\,x/z\)</span> and <span class="arithmatex">\(v - c_y = f\,y/z\)</span>. One unknown, <span class="arithmatex">\(2HW\)</span>
+equations, weighted least squares:</p>
+<div class="arithmatex">\[f^\star = \frac{\sum_i c_i\big[(u_i - c_x)\tfrac{x_i}{z_i} + (v_i - c_y)\tfrac{y_i}{z_i}\big]}
+{\sum_i c_i\big[(\tfrac{x_i}{z_i})^2 + (\tfrac{y_i}{z_i})^2\big]}.\]</div>
+<p>A property worth noticing, because it is the kind of thing an interviewer probes: this
+estimate depends only on ratios <span class="arithmatex">\(x/z\)</span> and <span class="arithmatex">\(y/z\)</span>, so scaling the whole pointmap leaves it
+unchanged. The focal estimate constrains <em>ray directions</em> and says nothing about scale. Same
+invariance as the loss, for the same reason.</p>
+<h3 id="gaussian-splatting">Gaussian splatting<a class="headerlink" href="#gaussian-splatting" title="Permanent link">&para;</a></h3>
+<p>A splat scene is a set of 3-D Gaussians, each with a centre <span class="arithmatex">\(\mu\)</span>, a covariance <span class="arithmatex">\(\Sigma\)</span>, a
+colour <span class="arithmatex">\(c\)</span> (view-dependent via spherical harmonics in the full method) and an opacity
+<span class="arithmatex">\(\alpha\)</span>.</p>
+<p><strong>Parametrising <span class="arithmatex">\(\Sigma\)</span>.</strong> Storing six free numbers risks a matrix that is not positive
+semi-definite after a gradient step. Storing a quaternion and three scales and building
+<span class="arithmatex">\(\Sigma = RSS^\top R^\top\)</span> means <em>any</em> parameter values give a valid covariance, so the
+optimiser can never leave the feasible set. That is the trick, and it generalises to any
+constrained parameter in a learned system.</p>
+<p><strong>Projecting <span class="arithmatex">\(\Sigma\)</span>.</strong> A Gaussian pushed through a non-linear map is not Gaussian, so take
+the Jacobian of the projection at the centre:</p>
+<div class="arithmatex">\[J = \begin{bmatrix} f_x/z &amp; 0 &amp; -f_x x/z^2 \\ 0 &amp; f_y/z &amp; -f_y y/z^2\end{bmatrix},
+\qquad \Sigma_{2D} = J W \Sigma W^\top J^\top + \epsilon I,\]</div>
+<p>where <span class="arithmatex">\(W\)</span> is the world-to-camera rotation. The <span class="arithmatex">\(\epsilon I\)</span> dilation is a low-pass filter: a
+Gaussian thinner than a pixel aliases into flicker as the camera moves, so every rasteriser
+adds one. Be ready to say that the linearisation degrades far from the principal point and for
+splats that are elongated in depth, which is a real source of artefacts.</p>
+<p><strong>Compositing.</strong> Sort by depth, then apply the over operator:</p>
+<div class="arithmatex">\[C = \sum_i c_i\alpha_i\prod_{j&lt;i}(1-\alpha_j), \qquad T_{\text{final}} = \prod_i(1-\alpha_i).\]</div>
+<p>Identical to NeRF's quadrature. The difference between the two methods is the sampling
+strategy: NeRF queries an MLP at points along a ray, splatting rasterises explicit primitives.
+That is why splatting is fast (rasterisation with tile binning) and NeRF is slow (hundreds of
+network evaluations per ray).</p>
+<h3 id="where-the-depth-map-from-a-splat-scene-comes-from">Where the depth map from a splat scene comes from<a class="headerlink" href="#where-the-depth-map-from-a-splat-scene-comes-from" title="Permanent link">&para;</a></h3>
+<p>Alpha-weight the depths the same way you alpha-weight the colours:
+<span class="arithmatex">\(D = \sum_i z_i \alpha_i \prod_{j&lt;i}(1-\alpha_j) / (1 - T_{\text{final}})\)</span>. This is the
+expected depth under the transmittance distribution, and it is the quantity to be suspicious
+of. Semi-transparent splats, which the optimiser loves because they blend nicely, produce an
+expected depth that sits between two surfaces and corresponds to nothing physical. A view
+through a tree canopy is the canonical case.</p>
+<h2 id="3-implementation">3. Implementation<a class="headerlink" href="#3-implementation" title="Permanent link">&para;</a></h2>
+<p>The confidence loss, and the normalisation it depends on:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">confidence_weighted_loss</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">valid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="sd">"""L = mean over valid pixels of  c * ||X_hat - X_hat_gt||  -  alpha * log c."""</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">pred_n</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">normalise_scale</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">valid</span><span class="p">)</span>            <span class="c1"># (B, 3, H, W)</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">target_n</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">normalise_scale</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">valid</span><span class="p">)</span>        <span class="c1"># (B, 3, H, W)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">err</span> <span class="o">=</span> <span class="p">(</span><span class="n">pred_n</span> <span class="o">-</span> <span class="n">target_n</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># (B, 1, H, W)</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">per_pixel</span> <span class="o">=</span> <span class="n">conf</span> <span class="o">*</span> <span class="n">err</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>     <span class="c1"># (B, 1, H, W)</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="k">if</span> <span class="n">valid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        <span class="k">return</span> <span class="n">per_pixel</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">w</span> <span class="o">=</span> <span class="n">valid</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>                             <span class="c1"># (B, 1, H, W)</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="k">return</span> <span class="p">(</span><span class="n">per_pixel</span> <span class="o">*</span> <span class="n">w</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">w</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Confidence is produced as <code>1.0 + F.softplus(x)</code>, which floors it at 1 and keeps it positive,
+so <span class="arithmatex">\(\log c \ge 0\)</span> and the penalty cannot run away.</p>
+<p>The EWA projection, which is the equation above typed out:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">project_covariance</span><span class="p">(</span><span class="n">mu_cam</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">dilation</span><span class="o">=</span><span class="mf">0.3</span><span class="p">):</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="sd">"""Sigma_2D = J W Sigma W^T J^T + eps I. (B, 3), (B, 3, 3) -&gt; (B, 2, 2)."""</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">fx</span><span class="p">,</span> <span class="n">fy</span> <span class="o">=</span> <span class="n">K</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">K</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">mu_cam</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">mu_cam</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">mu_cam</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>   <span class="c1"># (N,) each</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">J</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mu_cam</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">mu_cam</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">J</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">J</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fx</span> <span class="o">/</span> <span class="n">z</span><span class="p">,</span> <span class="n">fy</span> <span class="o">/</span> <span class="n">z</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">J</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">J</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">fx</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="n">fy</span> <span class="o">*</span> <span class="n">y</span> <span class="o">/</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span>   <span class="c1"># (N, 2, 3)</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">W</span> <span class="o">=</span> <span class="n">J</span> <span class="o">@</span> <span class="n">R</span>                                                  <span class="c1"># (N, 2, 3)</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="k">return</span> <span class="n">W</span> <span class="o">@</span> <span class="n">cov</span> <span class="o">@</span> <span class="n">W</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">dilation</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># (N, 2, 2)</span>
+</span></code></pre></div>
+<p>Front-to-back compositing, written as a loop so the transmittance recursion is visible:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">alpha_composite</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">alphas</span><span class="p">):</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="sd">"""C = sum_i c_i a_i prod_{j&lt;i} (1 - a_j), and the leftover transmittance."""</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">transmittance</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">alphas</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>      <span class="c1"># (...,) starts fully open</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">image</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">colors</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>             <span class="c1"># (C, ...)</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">alphas</span><span class="p">)):</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="n">weight</span> <span class="o">=</span> <span class="n">alphas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">transmittance</span>          <span class="c1"># (...,) contribution of sample i</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="n">image</span> <span class="o">=</span> <span class="n">image</span> <span class="o">+</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">weight</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="n">transmittance</span> <span class="o">=</span> <span class="n">transmittance</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">alphas</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">transmittance</span>
+</span></code></pre></div>
+<h3 id="how-you-would-test-it">How you would test it<a class="headerlink" href="#how-you-would-test-it" title="Permanent link">&para;</a></h3>
+<p>Two tests earn their place because each encodes a fact you should be able to state.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_ewa_projection_shrinks_with_depth_like_one_over_z_squared</span><span class="p">():</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="c1"># on axis, J = diag(f/z, f/z), so Sigma_2D = (f sigma / z)^2 I</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">det</span><span class="p">(</span><span class="n">cov2d_at_5m</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span><span class="p">(</span><span class="n">cov2d_at_10m</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">16.0</span><span class="p">))</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_photometric_fit_stalls_when_the_splat_misses_its_target_entirely</span><span class="p">():</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="sd">"""The local-support failure that densification exists to fix."""</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">losses</span><span class="p">,</span> <span class="n">mu</span> <span class="o">=</span> <span class="n">fit_mu</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">far_away</span><span class="p">,</span> <span class="n">target_mu</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>   <span class="c1"># 25 px apart, sigma ~5 px</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="k">assert</span> <span class="n">losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">losses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>        <span class="c1"># barely moved: the gradient is ~0</span>
+</span></code></pre></div>
+<p>The second one is the more useful test to have written, because it converts "splatting needs
+adaptive density control" from a remembered fact into a demonstrated one. Writing the test
+that <em>fails to converge</em> is how you prove you understand the failure mode.</p>
+<h2 id="retype-by-hand">Retype by hand<a class="headerlink" href="#retype-by-hand" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>File</th>
+<th>Target time</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>normalise_scale</code></td>
+<td><code>src/mlbook/perception/pointmap.py</code></td>
+<td>5 minutes</td>
+<td>Short, and the reasoning behind it is the whole framing.</td>
+</tr>
+<tr>
+<td><code>confidence_weighted_loss</code></td>
+<td><code>src/mlbook/perception/pointmap.py</code></td>
+<td>8 minutes</td>
+<td>Be able to derive <span class="arithmatex">\(c^\star = \alpha/e\)</span> on the spot.</td>
+</tr>
+<tr>
+<td><code>estimate_focal</code></td>
+<td><code>src/mlbook/perception/pointmap.py</code></td>
+<td>10 minutes</td>
+<td>A tidy weighted-least-squares derivation with a memorable invariance.</td>
+</tr>
+<tr>
+<td><code>weighted_umeyama</code></td>
+<td><code>src/mlbook/perception/pointmap.py</code></td>
+<td>15 minutes</td>
+<td>Reflection guard included. Also appears as <code>kabsch_umeyama</code> in <code>geometry/icp.py</code>.</td>
+</tr>
+<tr>
+<td><code>covariance_from_scale_rotation</code></td>
+<td><code>src/mlbook/geometry/splatting.py</code></td>
+<td>6 minutes</td>
+<td>The PSD-by-construction trick.</td>
+</tr>
+<tr>
+<td><code>project_covariance</code></td>
+<td><code>src/mlbook/geometry/splatting.py</code></td>
+<td>10 minutes</td>
+<td>The EWA Jacobian, which is the same <span class="arithmatex">\(J_\pi\)</span> from bundle adjustment.</td>
+</tr>
+<tr>
+<td><code>alpha_composite</code></td>
+<td><code>src/mlbook/geometry/splatting.py</code></td>
+<td>6 minutes</td>
+<td>Five lines, and it is the NeRF rendering equation too.</td>
+</tr>
+</tbody>
+</table>
+<p>Check with <code>python -m pytest tests/test_perception_pointmap.py tests/test_geometry_splatting.py -q</code>.</p>
+<h2 id="4-systems-view-when-to-use-which">4. Systems view: when to use which<a class="headerlink" href="#4-systems-view-when-to-use-which" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Classical SfM / MVS</th>
+<th>Feed-forward pointmaps</th>
+<th>Gaussian splats</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Estimates</strong></td>
+<td>Poses and metric-up-to-scale structure</td>
+<td>Dense per-pixel 3-D, pose, focal</td>
+<td>A radiance field, geometry implicitly</td>
+</tr>
+<tr>
+<td><strong>Needs</strong></td>
+<td>Texture, overlap, baseline</td>
+<td>A trained model, in-distribution input</td>
+<td>Posed images (usually from SfM)</td>
+</tr>
+<tr>
+<td><strong>Fails on</strong></td>
+<td>Textureless, repetitive, moving, specular</td>
+<td>Out-of-distribution scenes; hallucinates plausibly</td>
+<td>Sparse views; semi-transparency; anything it was not trained to see</td>
+</tr>
+<tr>
+<td><strong>Failure is</strong></td>
+<td>Loud (no match, high residual, sparse output)</td>
+<td>Quiet (confident, plausible, wrong)</td>
+<td>Quiet from novel views, loud from training views</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Iterative, minutes to hours</td>
+<td>One forward pass, sub-second</td>
+<td>Minutes of per-scene optimisation</td>
+</tr>
+<tr>
+<td><strong>Uncertainty</strong></td>
+<td>Reprojection residuals, <span class="arithmatex">\(H^{-1}\)</span> covariance, triangulation angle</td>
+<td>A learned confidence channel, trained end to end</td>
+<td>Opacity and transmittance, which are not calibrated uncertainty</td>
+</tr>
+<tr>
+<td><strong>Metric scale</strong></td>
+<td>From GNSS, altimeter, control points</td>
+<td>Not observed; must be supplied</td>
+<td>Inherited from the SfM that posed it</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Decision rule.</strong> Use classical geometry wherever you can validate it, because its failures
+announce themselves and its uncertainty comes from the measurement model instead of from training. Use feed-forward prediction where classical matching produces nothing (textureless
+roofs, fast turnaround, sparse or wide-baseline views) and treat its output as a <em>hypothesis</em>.
+Use splats for appearance, novel-view synthesis, simulation and human review, and do not take
+metric geometry off a splat without independent validation.</p>
+<h3 id="the-hybrid-answer">The hybrid answer<a class="headerlink" href="#the-hybrid-answer" title="Permanent link">&para;</a></h3>
+<p>The version of this answer that reads as staff level refuses the dichotomy and names the
+architecture instead:</p>
+<blockquote>
+<p>I would not treat them as alternatives. I would use the learned model to produce
+correspondences and a dense initialisation where classical matching is weak, and then keep
+the explicit geometric machinery on top: enforce the epipolar constraint, run bundle
+adjustment on the resulting correspondences, and use reprojection error as an independent
+check that the learned geometry is consistent with the images. The learned part earns
+coverage; the geometric part earns trust, because it produces a residual I can threshold.</p>
+</blockquote>
+<p>Then name the concrete validation: reprojection error of the learned pointmap against the
+images, agreement between the learned depth and the triangulated depth where both exist,
+agreement between the learned pose and the GNSS baseline, and multi-view consistency of the
+predicted 3-D point across more views than the model saw.</p>
+<h3 id="where-a-learned-reconstruction-hallucinates">Where a learned reconstruction hallucinates<a class="headerlink" href="#where-a-learned-reconstruction-hallucinates" title="Permanent link">&para;</a></h3>
+<p>Be specific, because "distribution shift" is a phrase and these are the actual cases.</p>
+<ul>
+<li><strong>Textureless surfaces.</strong> The model fills from a prior. A flat roof gets the roof the
+  training set had, including a plausible pitch that is not this roof's pitch.</li>
+<li><strong>Thin structures.</strong> Power lines, guy wires, thin branches. A wire is a sub-pixel object
+  that the prior has little reason to preserve, so it gets smoothed into the background. This
+  is the single most dangerous failure for a tethered delivery.</li>
+<li><strong>Reflective and transparent surfaces.</strong> Water, glass, wet roads. The model predicts the
+  geometry of the reflection.</li>
+<li><strong>Repetitive structure.</strong> The model resolves ambiguity by picking the most common training
+  configuration.</li>
+<li><strong>Scale.</strong> Systematically, because it is not observable. A model trained mostly on indoor
+  scenes will produce plausible indoor-scale geometry for a backyard.</li>
+<li><strong>Novel viewpoints and altitudes.</strong> A model trained on ground-level and handheld imagery
+  applied to 90 m nadir aerial is out of distribution in a way no benchmark number will warn
+  you about.</li>
+</ul>
+<h2 id="5-in-production">5. In production<a class="headerlink" href="#5-in-production" title="Permanent link">&para;</a></h2>
+<div class="admonition production">
+<p class="admonition-title">Naver Labs Europe, DUSt3R, dropping the pipeline</p>
+<p>DUSt3R casts pairwise reconstruction as regression of pointmaps and operates without prior
+information about camera calibration or viewpoint poses, relaxing the hard constraints of
+the usual projective camera model and unifying the monocular and binocular cases. The
+reported outputs include the 3-D model of the scene plus depth, and it can recover pixel
+matches and relative and absolute camera parameters from the same prediction. The
+architecture is standard transformer encoders and decoders, which is the point: the
+novelty lies in the output parametrisation.
+Source: <a href="https://arxiv.org/abs/2312.14132">DUSt3R, arXiv 2312.14132</a> (CVPR 2024).</p>
+</div>
+<div class="admonition production">
+<p class="admonition-title">Meta and Oxford, VGGT, scaling the idea to many views</p>
+<p>VGGT is a feed-forward network that directly infers camera parameters, point maps, depth
+maps and 3-D point tracks from one, a few, or hundreds of views, reconstructing in under a
+second and reported to outperform alternatives that require post-processing with
+optimisation-based visual geometry. It received the CVPR 2025 best paper award. The
+trajectory to notice for an interview: two views (DUSt3R) to many views in one pass, with
+the geometry heads predicted jointly instead of derived one from another.
+Source: <a href="https://openaccess.thecvf.com/content/CVPR2025/html/Wang_VGGT_Visual_Geometry_Grounded_Transformer_CVPR_2025_paper.html">VGGT, CVPR 2025</a>,
+<a href="https://github.com/facebookresearch/vggt">code</a>.</p>
+</div>
+<div class="admonition production">
+<p class="admonition-title">INRIA and MPI, 3D Gaussian Splatting, real time by changing the representation</p>
+<p>Kerbl and colleagues represent the scene with 3-D Gaussians initialised from the sparse
+points that camera calibration already produces, interleave optimisation with density
+control of the Gaussians including anisotropic covariance optimisation, and use a
+visibility-aware rasteriser that supports anisotropic splatting. The reported result is
+state-of-the-art visual quality with real-time rendering at 1080p. The lesson that
+transfers: they kept the volume rendering equation and changed the primitive, which turned
+an MLP-query problem into a rasterisation problem.
+Source: <a href="https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/">3D Gaussian Splatting project page</a>,
+ACM Transactions on Graphics 42(4), July 2023.</p>
+</div>
+<h2 id="6-interview-questions-and-strong-answers">6. Interview questions and strong answers<a class="headerlink" href="#6-interview-questions-and-strong-answers" title="Permanent link">&para;</a></h2>
+<div class="admonition interview">
+<p class="admonition-title">Why use a feed-forward model instead of traditional SfM?</p>
+<p>They estimate different things and fail differently, so I would compare them on those axes
+instead of on benchmark numbers.</p>
+<p>SfM gives interpretable geometry with strong geometric consistency, needs no training
+data, and produces uncertainty derived from the measurement model: reprojection residuals,
+triangulation angles, a covariance from the Hessian. It is iterative and expensive, it
+depends entirely on correspondence, and it is brittle in textureless and repetitive
+regions, which describes a lot of a suburban property.</p>
+<p>A feed-forward model amortises the computation into one forward pass, can exploit semantic
+and monocular priors where handcrafted matching finds nothing, and degrades gracefully
+where SfM returns nothing at all. The costs are distribution shift, hallucination that is
+plausible and therefore hard to detect, no observed metric scale, and uncertainty that is
+learned from data instead of derived from the measurement model.</p>
+<p><strong>Staff-level follow-up.</strong> I would not treat them as mutually exclusive. I would use the
+learned model for correspondence and dense initialisation, retain the explicit geometric
+constraints, and validate with reprojection error. The learned part buys coverage; the
+geometric part buys a residual I can threshold and alert on.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Explain Gaussian splatting. Why not just use a point cloud?</p>
+<p>A splat scene is a set of anisotropic 3-D Gaussians, each with a position, a covariance
+stored as a rotation and three scales, a view-dependent colour and an opacity. Rendering
+projects each one into image space through the Jacobian of the projection, then composites
+front to back with the standard over operator.</p>
+<p>Against a point cloud: a point has no extent, so rendering it requires choosing a splat
+size anyway, and there is no principled way to blend between points, which is why point
+clouds look sparse and holey from novel viewpoints. Gaussians give a continuous,
+differentiable density and appearance field, so the representation can be optimised
+end-to-end against images and can represent soft boundaries such as foliage. A point cloud
+also cannot express view-dependent appearance, so specular surfaces look wrong from every
+angle but one.</p>
+<p>The cost is that a splat scene has no explicit surface. You cannot query "is there
+geometry at this point" without a convention, and the optimiser is free to use
+semi-transparent blobs that reduce photometric loss and do not correspond to matter.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Why not NeRF?</p>
+<p>Both use the same volume rendering equation; they differ in the sampling strategy. NeRF
+queries an MLP at many points along each ray, so rendering cost scales with samples per
+ray times rays, and training and inference are both slow. Splatting rasterises explicit
+primitives with tile binning and depth sorting, so it maps onto a GPU rasteriser and
+reaches real time.</p>
+<p>Splatting is also explicit, which matters operationally. You can inspect, cull, crop and
+edit the primitives, stream them, and reason about where they are. A NeRF is a set of
+weights with the geometry implicit, which is harder to debug and harder to partially
+update. For an offboard system serving per-property assets, that difference in
+operability is worth more than the quality gap.</p>
+<p>In fairness to NeRF, an MLP can be more compact for smooth scenes and generalises
+differently, and the field has converged on hybrids, so I would frame it as a
+representation choice driven by latency, editability and scene type.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Would you use Gaussian splats directly for a safety decision?</p>
+<p>No. The reason is specific, and worth separating from general caution.</p>
+<p>A splat scene is optimised against a photometric loss. That loss is fully satisfied by any
+configuration that renders correctly from the training views, and floating semi-transparent
+blobs do exactly that. The expected depth from alpha compositing can sit between two
+surfaces and correspond to nothing physical, which is exactly the case near a tree canopy
+or a wire. So high render quality is evidence about appearance and weak evidence about
+metric geometry.</p>
+<p>What I would do instead: use splats for what they are good at, which is appearance,
+novel-view synthesis for human review, and simulation. Derive the safety geometry from a
+source with an error model I can validate: multi-view stereo with reprojection residuals,
+a surface model checked against control points, and a triangulation-angle threshold. Then,
+if I want to use the splat reconstruction, validate it against that independent geometry
+and propagate the disagreement into the decision as uncertainty. A site where the splat
+geometry and the photogrammetric geometry disagree by more than a threshold is a site the
+system should decline, rather than one it should guess about.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">You predict a pointmap for a backyard. How do you make it metric?</p>
+<p>The network's output is scale-free by construction, and the loss was scale-normalised, so
+there is no scale hiding in the weights to recover. Scale has to be imported.</p>
+<p>Options, in rough order of how much I would trust them. GNSS baselines between the capture
+positions: fit the similarity that aligns the predicted camera centres to the measured
+ones, which gives scale directly and is free on a commercial airframe. A laser altimeter
+or range finder reading at a known pixel, which is a single direct metric measurement. A
+surveyed ground control point in the scene. And, weakest, a known object dimension such as
+a standard door or a vehicle, which is a fallback with several percent error.</p>
+<p>Then I would validate rather than assume. Hold out some GNSS baselines, apply the recovered
+scale, and check the residual. If scale recovered from the first half of the flight
+disagrees with the second half by more than a few percent, something is wrong with the
+prediction and the site should not be scored.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">How would you detect that a learned reconstruction is hallucinating?</p>
+<p>Four independent checks, because a single one can be fooled.</p>
+<p>Photometric consistency: reproject the predicted geometry into the images it came from and
+into images it did not see. A hallucinated surface often reprojects acceptably into the
+training views and badly into a held-out view.</p>
+<p>Cross-method agreement: run classical MVS where texture allows and compare. Disagreement
+concentrated in textureless regions is the signature of prior-filling.</p>
+<p>Self-consistency: predict the pointmap from different pairs covering the same ground and
+compare in a common frame. A confident model that is confidently different across pairs is
+hallucinating.</p>
+<p>The confidence channel, used properly: it is trained to predict error, so it is a good
+first filter and a poor last one. It is calibrated on the training distribution, which is
+precisely the distribution you are worried about having left.</p>
+<p>On top of those, monitor aggregate statistics per region and per capture condition. A
+sudden change in the fraction of low-confidence pixels after a model update or a weather
+change is the alert that catches the failure before a customer does.</p>
+</div>
+<h2 id="7-exercises">7. Exercises<a class="headerlink" href="#7-exercises" title="Permanent link">&para;</a></h2>
+<p><strong>★ 1.</strong> Show that the confidence loss has optimum <span class="arithmatex">\(c^\star = \alpha/e\)</span> and explain what
+happens without the log term.</p>
+<details class="success">
+<summary>Solution</summary>
+<p><span class="arithmatex">\(\partial/\partial c\,(ce - \alpha\log c) = e - \alpha/c = 0\)</span>, so <span class="arithmatex">\(c^\star = \alpha/e\)</span>. The
+second derivative is <span class="arithmatex">\(\alpha/c^2 &gt; 0\)</span>, so it is a minimum. Without the log term the
+objective is <span class="arithmatex">\(ce\)</span>, decreasing in <span class="arithmatex">\(c\)</span> for any <span class="arithmatex">\(e &gt; 0\)</span>, so the optimum is <span class="arithmatex">\(c = 0\)</span> everywhere
+and the model learns to declare total ignorance, making the loss identically zero and the
+gradient on the geometry vanish.</p>
+</details>
+<p><strong>★ 2.</strong> An isotropic 3-D Gaussian with <span class="arithmatex">\(\sigma = 0.1\)</span> m sits on the optical axis at 5 m, with
+<span class="arithmatex">\(f = 200\)</span> px. What is its 2-D covariance? At 10 m?</p>
+<details class="success">
+<summary>Solution</summary>
+<p>On axis, <span class="arithmatex">\(x = y = 0\)</span>, so <span class="arithmatex">\(J = \mathrm{diag}(f/z, f/z)\)</span> and
+<span class="arithmatex">\(\Sigma_{2D} = (f\sigma/z)^2 I\)</span>. At 5 m: <span class="arithmatex">\((200 \times 0.1 / 5)^2 = 16\)</span> px<span class="arithmatex">\(^2\)</span>, so a standard
+deviation of 4 px. At 10 m: <span class="arithmatex">\((200\times0.1/10)^2 = 4\)</span> px<span class="arithmatex">\(^2\)</span>, 2 px. Doubling depth halves
+the image-space standard deviation and quarters the area, which is the
+<span class="arithmatex">\(1/z^2\)</span> scaling the test checks.</p>
+</details>
+<p><strong>★★ 3.</strong> Derive the closed-form focal estimate and show it is invariant to scaling the
+pointmap.</p>
+<details class="success">
+<summary>Solution</summary>
+<p>Minimise <span class="arithmatex">\(\sum_i c_i[(u_i - c_x - f x_i/z_i)^2 + (v_i - c_y - f y_i/z_i)^2]\)</span> over <span class="arithmatex">\(f\)</span>.
+Differentiating and setting to zero gives the quotient in section 2. Scaling the pointmap
+by <span class="arithmatex">\(\lambda\)</span> sends <span class="arithmatex">\(x \to \lambda x\)</span> and <span class="arithmatex">\(z \to \lambda z\)</span>, so <span class="arithmatex">\(x/z\)</span> is unchanged, and both
+numerator and denominator are unchanged. Geometrically, scaling moves every point along
+its own ray, and a ray through the camera centre is exactly what a pixel measures.</p>
+</details>
+<p><strong>★★ 4 (coding).</strong> Implement <code>weighted_umeyama</code> with the reflection guard and write the test
+that catches a missing guard.</p>
+<details class="success">
+<summary>Solution</summary>
+<p>The implementation is in <code>src/mlbook/perception/pointmap.py</code>. The test that catches a
+missing guard uses data that <em>only</em> a reflection can fit:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">src</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">dst</span> <span class="o">=</span> <span class="n">src</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">])</span>     <span class="c1"># a mirror; no rotation fits it</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">R_hat</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">kabsch_umeyama</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">R_hat</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>   <span class="c1"># stayed in SO(3), so the fit is poor</span>
+</span></code></pre></div>
+<p>Without the guard, <span class="arithmatex">\(R = UV^\top\)</span> has determinant <span class="arithmatex">\(-1\)</span> and fits the mirrored data exactly,
+so the residual is zero and every other test passes. Asserting on the determinant rather
+than on the residual is what makes this test useful.</p>
+</details>
+<p><strong>★★★ 5.</strong> You have a feed-forward model producing pointmaps for 10 million properties and a
+classical MVS pipeline that is 50 times more expensive. Design the system that uses both.</p>
+<details class="success">
+<summary>Solution</summary>
+<p>Treat the learned model as the default path and the classical pipeline as a verifier and a
+fallback, with routing decided by measurable signals instead of a fixed split.</p>
+<p><em>Always run the learned model.</em> One forward pass per property, producing pointmaps, depth,
+confidence and pose. This is the coverage layer and it must be cheap enough to run on
+everything.</p>
+<p><em>Compute a trust score per property</em> from signals available without the expensive path:
+the fraction of low-confidence pixels, disagreement between overlapping pairs, residual
+after aligning predicted camera centres to GNSS, and the fraction of the site's candidate
+landing area that sits in low-confidence regions. Calibrate this score against the
+classical pipeline on a sample, so it predicts disagreement rather than merely correlating
+with it.</p>
+<p><em>Route by consequence, not only by trust.</em> A property whose candidate site has generous
+clearance and unambiguous geometry does not need verification even at moderate trust,
+because the decision is insensitive to the residual error. A property where the decision
+is marginal (clearance close to the threshold, hazards near the site, a descent corridor
+with nearby vertical structure) gets the expensive path regardless of trust. This is
+value-of-information routing, and it is the argument that makes the design defensible:
+spend compute where it can change the decision.</p>
+<p><em>Close the loop.</em> Every property that goes down the expensive path produces a labelled
+comparison, which is training data for both the trust model and the pointmap model. Sample
+a small random fraction through the expensive path regardless of routing, so the
+comparison set is not biased toward cases the trust model already flags, which is the
+standard trap in any selective-verification design.</p>
+<p><em>Budget.</em> If the trust model routes 5% of properties to the classical path plus a 1%
+random audit, the cost is <span class="arithmatex">\(0.94 \times 1 + 0.06 \times 50 \approx 3.9\)</span> units per property
+against 50 for running MVS on everything, a factor of 13, while keeping an unbiased
+estimate of the learned model's error rate.</p>
+</details>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Wang, Leroy, Cabon, Chidlovskii and Revaud, "DUSt3R: Geometric 3D Vision Made Easy",
+  CVPR 2024. <a href="https://arxiv.org/abs/2312.14132">arXiv:2312.14132</a>.</li>
+<li>Wang, Chen, Karaev, Vedaldi, Rupprecht and Novotny, "VGGT: Visual Geometry Grounded
+  Transformer", CVPR 2025.
+  <a href="https://openaccess.thecvf.com/content/CVPR2025/html/Wang_VGGT_Visual_Geometry_Grounded_Transformer_CVPR_2025_paper.html">CVF open access</a>.</li>
+<li>Kerbl, Kopanas, Leimkühler and Drettakis, "3D Gaussian Splatting for Real-Time Radiance
+  Field Rendering", ACM Transactions on Graphics 42(4), 2023.
+  <a href="https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/">Project page</a>.</li>
+<li>Mildenhall, Srinivasan, Tancik, Barron, Ramamoorthi and Ng, "NeRF: Representing Scenes as
+  Neural Radiance Fields for View Synthesis", ECCV 2020.</li>
+<li>Zwicker, Pfister, van Baar and Gross, "EWA Splatting", IEEE TVCG 8(3), 2002. The elliptical
+  weighted average projection that 3DGS uses.</li>
+<li><a href="../../part04-vision/07-3d-perception/">Part IV, 3-D perception</a> and
+  <a href="../../part11-perception-autonomy/05-occupancy-temporal/">Part XI, occupancy</a> for adjacent
+  representations.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../03-sfm-and-bundle-adjustment/" class="md-footer__link md-footer__link--prev" aria-label="Previous: SfM and bundle adjustment">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                SfM and bundle adjustment
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../05-deliverability-system-design/" class="md-footer__link md-footer__link--next" aria-label="Next: Deliverability system design">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Deliverability system design
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.indexes", "navigation.top", "navigation.footer", "navigation.tracking", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

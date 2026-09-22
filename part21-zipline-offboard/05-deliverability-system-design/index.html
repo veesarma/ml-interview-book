@@ -1,0 +1,7280 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A first-principles-to-frontier compendium for staff-level ML interviews — math, from-scratch code, systems, and production case studies.">
+      
+      
+      
+        <link rel="canonical" href="https://veesarma.github.io/ml-interview-book/part21-zipline-offboard/05-deliverability-system-design/">
+      
+      
+        <link rel="prev" href="../04-learned-3d-and-splats/">
+      
+      
+        <link rel="next" href="../06-evaluation-and-scaling/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Deliverability system design - The ML Interview Book</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#designing-the-deliverability-system" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="The ML Interview Book" class="md-header__button md-logo" aria-label="The ML Interview Book" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The ML Interview Book
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Deliverability system design
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/veesarma/ml-interview-book" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    veesarma/ml-interview-book
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="The ML Interview Book" class="md-nav__button md-logo" aria-label="The ML Interview Book" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    The ML Interview Book
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/veesarma/ml-interview-book" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    veesarma/ml-interview-book
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Preface
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Preface
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/how-to-use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How to use this book
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/study-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Study plan (6–9 months)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/interview-signal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What staff-level signal looks like
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part01-math/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I. Math
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    I. Math
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/01-linear-algebra/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear algebra
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/02-calculus-matrix-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calculus & matrix calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/03-probability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Probability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/04-statistics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/05-information-theory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Information theory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/06-optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/07-tensor-shapes-broadcasting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tensors, shapes & broadcasting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part02-classical/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    II. Classical ML
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    II. Classical ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/01-linear-regression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear regression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/02-logistic-softmax-regression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logistic & softmax regression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/03-trees-and-ensembles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trees & ensembles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/04-knn-kmeans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KNN & K-means
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/05-probabilistic-models-em/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Probabilistic models & EM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/06-dimensionality-reduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dimensionality reduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/07-kernel-methods-svm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kernel methods & SVMs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part03-neural-nets/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    III. Neural Nets
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    III. Neural Nets
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/01-mlp-and-activations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLPs & activations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/02-backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/03-autograd-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building an autograd engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/04-initialization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/05-normalization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Normalization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/06-regularization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Regularization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part04-vision/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IV. Vision
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IV. Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/01-image-representation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image representation & signal processing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/02-convolutions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Convolutions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/03-cnn-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CNN architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/04-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/05-segmentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Segmentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/06-geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geometry & cameras
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/07-3d-perception/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part05-sequence-transformers/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    V. Sequences & Transformers
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    V. Sequences & Transformers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/01-rnn-lstm-gru/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RNN, LSTM, GRU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/02-seq2seq-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seq2seq & early attention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/03-attention-mathematics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attention mathematics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/04-transformer-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/05-positional-encodings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Positional encodings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/06-tokenization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tokenization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part06-llm-training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VI. LLM Training
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VI. LLM Training
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/01-pretraining-data-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pretraining data & objective
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/02-scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/03-large-model-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Large-model architecture (MoE, GQA, SSMs)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/04-efficient-attention-kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Efficient attention & KV cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/05-quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/06-fine-tuning-lora/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & LoRA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/07-mid-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mid-training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part07-post-training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VII. Post-training
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VII. Post-training
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/01-sft/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervised fine-tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/02-reward-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reward models & preferences
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/03-rlhf-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF with PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/04-dpo-and-friends/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DPO and its relatives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/05-reasoning-rl-grpo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reasoning RL, RLVR & GRPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/06-test-time-compute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test-time compute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part08-multimodal/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VIII. Multimodal
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VIII. Multimodal
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/01-vision-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision Transformers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/02-detr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DETR & set prediction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/03-clip-contrastive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLIP & contrastive learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/04-vlm-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VLM architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/05-multimodal-foundation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal foundation models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/06-video-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part09-generative/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IX. Generative
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_12" id="__nav_12_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IX. Generative
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/01-autoencoders-vae/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autoencoders & VAEs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/02-gans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GANs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/03-diffusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/04-flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part10-self-supervised/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    X. Self-/Semi-/Weak Supervision
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_13" id="__nav_13_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    X. Self-/Semi-/Weak Supervision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/01-self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-supervised learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/02-semi-supervised/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Semi-supervised learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/03-weak-supervision-and-auto-labeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Weak supervision & auto-labeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part11-perception-autonomy/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XI. Perception & Autonomy
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_14" id="__nav_14_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XI. Perception & Autonomy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/01-perception-foundation-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Perception foundation models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/02-multi-camera-bev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-camera & BEV
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/03-sensor-fusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor fusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/04-tracking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tracking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/05-occupancy-temporal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Occupancy & temporal perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/06-prediction-planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prediction & planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/07-world-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    World models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_15" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part12-rl/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XII. Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_15" id="__nav_15_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XII. Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/01-mdp-bellman/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs & Bellman equations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/02-classical-rl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical RL algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/03-deep-rl-dqn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep RL & DQN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/04-policy-gradients-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy gradients, GAE & PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/05-imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/06-agents-tool-use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents & tool use
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_16" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part13-retrieval-eval-reliability/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIII. Retrieval, Eval & Reliability
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_16" id="__nav_16_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIII. Retrieval, Eval & Reliability
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/01-retrieval-and-rag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/02-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/03-uncertainty-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uncertainty & reliability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_17" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part14-systems/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIV. Systems
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_17" id="__nav_17_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_17">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIV. Systems
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/01-distributed-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/02-training-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/03-inference-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inference systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/04-hardware-memory-roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware, memory & roofline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_18" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part15-interpretability-safety/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XV. Interpretability & Safety
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_18" id="__nav_18_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_18">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XV. Interpretability & Safety
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15-interpretability-safety/01-interpretability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpretability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15-interpretability-safety/02-safety-failure-modes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Safety & failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_19" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part16-coding-canon/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVI. Coding Canon
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_19" id="__nav_19_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_19">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVI. Coding Canon
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/01-numpy-torch-cheatsheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NumPy ↔ PyTorch cheat sheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/02-shape-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shape & broadcasting drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/03-timed-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timed coding drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_20" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part19-breadth-review/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIX. Breadth Review
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_20" id="__nav_20_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_20">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIX. Breadth Review
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/01-basics-losses-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basics, losses, models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/02-evaluation-debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation and debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/03-deep-learning-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep learning and Transformers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/04-llms-multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLMs and multimodal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/05-serving-data-engines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serving, data engines, real-world
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/06-rapid-fire/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rapid-fire derivations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_21" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part20-project-deep-dive/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XX. Your Projects
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_21" id="__nav_21_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_21">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XX. Your Projects
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/01-carl-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CARL framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/02-streetsmart-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worked deep dive, StreetSmart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/03-edge-perception-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worked deep dive, edge perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/04-behavioral-leadership/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Behavioral and leadership
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_22" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part17-ml-system-design/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVII. ML System Design
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_22" id="__nav_22_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVII. ML System Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/00-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/01-recommendation-feed-ranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feed & recommendation ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/02-search-ranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/03-ads-ctr-prediction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ads CTR / conversion prediction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/04-fraud-anomaly-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fraud & anomaly detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/05-perception-system-av/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous-vehicle perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/06-visual-search-image-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual search & image retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/07-content-moderation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content moderation & trust
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/08-llm-product-rag-assistant/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM assistant with RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/09-ocr-document-understanding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OCR & document understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/13-novel-object-3d-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Novel-object 3D detection from unlabeled fleet data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/10-forecasting-eta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting & ETA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/11-notifications-uplift-experimentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications, uplift & experimentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17-ml-system-design/12-ml-platform-feature-store-monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML platform, feature store & monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_23" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part18-company-deep-dives/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVIII. Company Deep Dives
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_23" id="__nav_23_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_23_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_23">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVIII. Company Deep Dives
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/tesla/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tesla (Autopilot / FSD / Optimus)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/waymo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waymo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/zoox-nuro-aurora/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zoox, Nuro, Aurora & robotaxi peers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/nvidia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NVIDIA (DRIVE, Cosmos, Isaac)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/meta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meta (Feed, Reels, Ads, FAIR)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/google-youtube/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Google & YouTube
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/tiktok-bytedance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TikTok / ByteDance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/netflix-spotify/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Netflix & Spotify
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/pinterest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pinterest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/uber-doordash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uber & DoorDash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/airbnb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Airbnb
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/amazon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Amazon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/apple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Apple
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/stripe-fintech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stripe & fintech fraud
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/frontier-labs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAI, Anthropic & DeepMind
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/scale-ai-data-engines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scale AI & data engines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_24" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XXI. Zipline Offboard Perception
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_24" id="__nav_24_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_24_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_24">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XXI. Zipline Offboard Perception
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-frames-and-camera-geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frames and camera geometry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-two-view-geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Two-view geometry and triangulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-sfm-and-bundle-adjustment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SfM and bundle adjustment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-learned-3d-and-splats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learned 3-D and splats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deliverability system design
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deliverability system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-the-interview-card" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR: the interview card
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-intuition-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Intuition first
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Intuition first">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#do-not-answer-yet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Do not answer yet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-shape-of-the-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The shape of the system
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-math" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The math
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. The math">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#perception-outputs-versus-decision-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Perception outputs versus decision policy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-corridor-not-the-patch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The corridor, not the patch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uncertainty-and-which-way-to-be-wrong" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Uncertainty, and which way to be wrong
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-threshold-is-an-economics-question" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The threshold is an economics question
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calibration-is-what-makes-the-threshold-meaningful" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calibration is what makes the threshold meaningful
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Implementation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Implementation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-you-would-test-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How you would test it
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#retype-by-hand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retype by hand
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-systems-view-the-staged-roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Systems view: the staged roadmap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Systems view: the staged roadmap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-0-rules-and-classical-geometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 0: rules and classical geometry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-supervised-semantic-perception" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: supervised semantic perception
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-multi-view-learned-geometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: multi-view learned geometry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-richer-priors-and-foundation-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: richer priors and foundation models
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-continuous-feedback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: continuous feedback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-interfaces-that-make-this-survivable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The interfaces that make this survivable
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. In production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-interview-questions-and-strong-answers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Interview questions and strong answers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Exercises
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-evaluation-and-scaling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation and scaling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../coding-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coding drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mock-interview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mock interview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../story-bank/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Story bank
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cheatsheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cheatsheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../references/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-the-interview-card" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR: the interview card
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-intuition-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Intuition first
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Intuition first">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#do-not-answer-yet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Do not answer yet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-shape-of-the-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The shape of the system
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-math" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The math
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. The math">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#perception-outputs-versus-decision-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Perception outputs versus decision policy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-corridor-not-the-patch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The corridor, not the patch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uncertainty-and-which-way-to-be-wrong" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Uncertainty, and which way to be wrong
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-threshold-is-an-economics-question" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The threshold is an economics question
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calibration-is-what-makes-the-threshold-meaningful" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calibration is what makes the threshold meaningful
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Implementation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Implementation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-you-would-test-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How you would test it
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#retype-by-hand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retype by hand
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-systems-view-the-staged-roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Systems view: the staged roadmap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Systems view: the staged roadmap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-0-rules-and-classical-geometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 0: rules and classical geometry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-supervised-semantic-perception" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: supervised semantic perception
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-multi-view-learned-geometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: multi-view learned geometry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-richer-priors-and-foundation-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: richer priors and foundation models
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-continuous-feedback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: continuous feedback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-interfaces-that-make-this-survivable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The interfaces that make this survivable
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. In production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-interview-questions-and-strong-answers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Interview questions and strong answers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Exercises
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="designing-the-deliverability-system">Designing the deliverability system<a class="headerlink" href="#designing-the-deliverability-system" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Why this matters at staff level.</strong> This is the question the role is built around, and it
+is the one where a strong candidate separates from a good one in the first ninety seconds.
+The good candidate starts training a segmentation model. The strong candidate starts with
+what the vehicle consumes, separates perception outputs from the decision policy, makes the
+safety constraints explicit and auditable, and stages the whole thing as a roadmap with
+promotion criteria. The geometry chapters were the entrance exam; this is the interview.</p>
+</blockquote>
+<h2 id="tldr-the-interview-card">TL;DR: the interview card<a class="headerlink" href="#tldr-the-interview-card" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Start from the product output</strong>, never from the model. The deliverable is a prior the
+  vehicle consumes: a safe region, a clearance radius, a score, and an explicit <em>unknown</em>.</li>
+<li><strong>Separate perception from policy.</strong> The segmentation model answers "what is this pixel".
+  A separate decision layer answers "can we deliver", over geometry, semantics and history.
+  Do not ask the network to predict deliverability end to end in version one.</li>
+<li><strong>Hard constraints are a conjunction</strong>, each independently checkable and individually
+  loggable: <span class="arithmatex">\(\text{safe}(x) = [\text{slope} &lt; \tau_s] \wedge [\text{clearance} &gt; \tau_c] \wedge [P(\text{hazard}) &lt; \tau_o] \wedge \ldots\)</span></li>
+<li><strong>The target is a disk, so measure a radius.</strong> Area is the wrong statistic. The largest
+  inscribed circle is exact from a distance transform.</li>
+<li><strong>The free space is a vertical corridor.</strong> A tethered droid descends from altitude, so
+  the constraint is a vertical cylinder of clear space, and wires are the dominant hazard in
+  it.</li>
+<li><strong>Threshold the upper confidence bound</strong>, <span class="arithmatex">\(p + n\sigma\)</span>, in place of the mean. Uncertainty should
+  cost coverage, never safety.</li>
+<li>The decision threshold is an <strong>economics</strong> question:
+  deliver iff <span class="arithmatex">\(P(\text{unsafe}) &lt; C_{\text{decline}} / C_{\text{incident}}\)</span>.</li>
+<li><strong>Declining is a first-class output.</strong> A system with three actions (deliver here, deliver
+  at an alternate site, decline and escalate) is safer and more useful than one with two.</li>
+<li><strong>Priors go stale.</strong> A trampoline appears in June. Ship a validity horizon and a
+  confidence-decay model with every prior.</li>
+<li>Stage it: rules and classical geometry, then supervised perception, then multi-view learned
+  geometry, then richer priors, then a continuous feedback loop. Each stage needs a
+  <strong>promotion criterion</strong> written before the work starts.</li>
+</ul>
+<h2 id="1-intuition-first">1. Intuition first<a class="headerlink" href="#1-intuition-first" title="Permanent link">&para;</a></h2>
+<h3 id="do-not-answer-yet">Do not answer yet<a class="headerlink" href="#do-not-answer-yet" title="Permanent link">&para;</a></h3>
+<p>The prompt will be something like: <em>we have aerial survey imagery of a customer's property;
+before a drone attempts a delivery, determine whether a location is safe and suitable. Design
+the perception system.</em></p>
+<p>Four questions, sixty seconds, and they are not stalling. Each one changes the design.</p>
+<div class="admonition example">
+<p class="admonition-title">The clarifying exchange</p>
+<p><strong>You.</strong> Before I design this, four things. First, what does the vehicle actually consume?
+Am I producing a binary gate, a ranked set of candidate sites, or a dense prior the
+onboard stack fuses with its own live perception?</p>
+<p><strong>Interviewer.</strong> Assume a prior the onboard system uses. It also has its own downward
+camera on descent.</p>
+<p><strong>You.</strong> Good, that changes the failure model. The onboard system is the last line of
+defence, so my job is to be <em>correctly conservative</em> and to be explicit about where I do
+not know, so the vehicle knows when to rely on itself. Second question: what does the
+delivery physically require? A landing footprint, a hover with a winch, something else?</p>
+<p><strong>Interviewer.</strong> A droid descends on a tether from a few hundred feet and steers itself to
+roughly a one metre target.</p>
+<p><strong>You.</strong> Then the constraint is a vertical corridor, not a ground patch, and thin
+structures in that corridor are my dominant hazard. Third: how fresh is the imagery, and do
+I get repeat passes?</p>
+<p><strong>Interviewer.</strong> Survey imagery, possibly months old. Repeat coverage occasionally.</p>
+<p><strong>You.</strong> So staleness is a first-class problem and the prior needs a validity horizon.
+Last one: what are the relative costs of declining a deliverable site and of attempting an
+undeliverable one?</p>
+<p><strong>Interviewer.</strong> Wildly asymmetric. An incident is catastrophic; a decline is a customer
+inconvenience.</p>
+<p><strong>You.</strong> Then the operating point is essentially fixed by that ratio, and my design should
+make it a tunable number with an owner, not a threshold buried in a model.</p>
+</div>
+<p>Those four answers have already determined: a dense prior with an explicit unknown class, a
+3-D corridor constraint, a staleness model, and a decision layer with an externally owned
+threshold. Now you can design.</p>
+<h3 id="the-shape-of-the-system">The shape of the system<a class="headerlink" href="#the-shape-of-the-system" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>flowchart TB
+  A["Multi-view aerial RGB&lt;br/&gt;camera poses, GNSS/INS"] --&gt; B["Geometric reconstruction&lt;br/&gt;SfM / MVS / learned pointmaps"]
+  A --&gt; C["Semantic perception&lt;br/&gt;segmentation + thin-structure detection"]
+  H["Historical deliveries&lt;br/&gt;outcomes, operator edits"] --&gt; E
+  B --&gt; D["World representation&lt;br/&gt;DSM + DTM + occupancy + semantics + uncertainty"]
+  C --&gt; D
+  D --&gt; E["Decision layer&lt;br/&gt;hard constraints, then ranking"]
+  E --&gt; F["Site polygon, clearance radius,&lt;br/&gt;score, validity horizon, unknown mask"]
+  F --&gt; G["Onboard autonomy"]
+  G --&gt;|"outcome, onboard disagreement"| H</code></pre>
+<p>Three layers, and the boundaries between them are the design.</p>
+<p><strong>Geometry</strong> answers where surfaces are: ground surface, slope, object height above ground,
+clearance, buildings, trees, wires and poles, plus a reconstruction confidence per cell.</p>
+<p><strong>Semantics</strong> answers what things are: grass, driveway, patio, roof, road, water, vehicle,
+person, pool, trampoline, fence, solar panel, wire.</p>
+<p><strong>The decision layer</strong> combines them with history and constraints into the product output.
+Keeping it separate is what makes the system auditable, lets you change a threshold without
+retraining anything, and lets a safety reviewer read the policy as code.</p>
+<h2 id="2-the-math">2. The math<a class="headerlink" href="#2-the-math" title="Permanent link">&para;</a></h2>
+<h3 id="perception-outputs-versus-decision-policy">Perception outputs versus decision policy<a class="headerlink" href="#perception-outputs-versus-decision-policy" title="Permanent link">&para;</a></h3>
+<p>Model the deliverability of a candidate site <span class="arithmatex">\(x\)</span> as</p>
+<div class="arithmatex">\[P(\text{deliverable} \mid G, S, H)\]</div>
+<p>where <span class="arithmatex">\(G\)</span> is geometry, <span class="arithmatex">\(S\)</span> semantics, <span class="arithmatex">\(H\)</span> historical and contextual information. Then, and
+separately, impose the hard constraints:</p>
+<div class="arithmatex">\[\boxed{\;\text{safe}(x) = \big[\text{slope}(x) &lt; \tau_s\big] \wedge \big[\text{clearance}(x) &gt; \tau_c\big] \wedge \big[P(\text{hazard}, x) &lt; \tau_o\big] \wedge \big[\text{corridor clear}\big].\;}\]</div>
+<p>The reason to keep those two objects apart is that they have different owners and different
+change processes. The probability is a model output, retrained monthly, validated
+statistically. The conjunction is a policy, reviewed by whoever owns safety, changed
+deliberately, and traceable in a log: when the system declines, it must be able to say <em>which
+clause failed</em>. A single learned scalar cannot do that.</p>
+<h3 id="the-corridor-not-the-patch">The corridor, not the patch<a class="headerlink" href="#the-corridor-not-the-patch" title="Permanent link">&para;</a></h3>
+<p>The tethered-descent detail changes the geometry of the question. The droid comes down from
+altitude, so the requirement is a clear vertical cylinder:</p>
+<div class="arithmatex">\[\text{corridor}(x, r) = \{(p, z) : \|p - x\| \le r,\; 0 \le z \le h_{\text{release}}\},\]</div>
+<p>and the constraint is that this cylinder contains no occupied voxel. A digital surface model
+answers the ground question and misses an overhanging branch, a power line crossing the yard
+at 8 m, or a gutter. So the representation has to be volumetric in the region above candidate
+sites, even if a 2.5-D surface model is enough elsewhere.</p>
+<p>This is also where the resolution budget gets spent. A 10 mm conductor at 4 cm ground sample
+distance is a quarter of a pixel, so it will not be found by a per-pixel segmentation head
+operating on a single frame. Three things that do work, stated together because the
+combination is the answer: exploit the fact that a wire is long, so a line-structured
+detector integrating evidence along a curve beats per-pixel classification; exploit multi-view
+consistency, since a wire appears in many frames along a predictable epipolar path; and
+exploit context, because wires attach to poles and poles are large, so detect the poles and
+hypothesise the catenary between them.</p>
+<h3 id="uncertainty-and-which-way-to-be-wrong">Uncertainty, and which way to be wrong<a class="headerlink" href="#uncertainty-and-which-way-to-be-wrong" title="Permanent link">&para;</a></h3>
+<p>Given a predictive mean and standard deviation per cell, threshold the pessimistic estimate:</p>
+<div class="arithmatex">\[\text{acceptable}(x) = \big[p(x) + n\sigma(x) \le \tau\big].\]</div>
+<p>A model that says "5% hazard, plus or minus 20%" and one that says "5% hazard, plus or minus
+1%" should not produce the same decision. Using the upper confidence bound means uncertainty
+costs <strong>coverage</strong> rather than <strong>safety</strong>, which is the direction this product wants to be
+wrong in.</p>
+<h3 id="the-threshold-is-an-economics-question">The threshold is an economics question<a class="headerlink" href="#the-threshold-is-an-economics-question" title="Permanent link">&para;</a></h3>
+<p>Two actions, two costs. Let <span class="arithmatex">\(q = P(\text{unsafe} \mid x)\)</span>.</p>
+<div class="arithmatex">\[\mathbb{E}[\text{cost of delivering}] = q\,C_{\text{incident}}, \qquad
+\mathbb{E}[\text{cost of declining}] = C_{\text{decline}}.\]</div>
+<p>Deliver when the first is smaller:</p>
+<div class="arithmatex">\[\boxed{\;q &lt; \frac{C_{\text{decline}}}{C_{\text{incident}}}.\;}\]</div>
+<p>If an incident costs four orders of magnitude more than a decline, the threshold is <span class="arithmatex">\(10^{-4}\)</span>,
+and the entire evaluation problem becomes estimating a probability in that regime. Say this
+number out loud in the interview, because it immediately reframes the evaluation discussion:
+you cannot validate a <span class="arithmatex">\(10^{-4}\)</span> failure rate with a thousand-sample test set, which is why the
+evaluation chapter is about slices, proxies and staged exposure rather than aggregate metrics.</p>
+<p>A third action fixes the worst of this. "Decline" is expensive because it fails the customer.
+"Deliver at an alternate site on the same property" often costs almost nothing and preserves
+the delivery, so the real policy is: pick the best site whose upper-confidence risk is under
+threshold; if none exists, escalate for human review or a different delivery mode. Designing
+three actions instead of two is a small change that moves the coverage-safety frontier.</p>
+<h3 id="calibration-is-what-makes-the-threshold-meaningful">Calibration is what makes the threshold meaningful<a class="headerlink" href="#calibration-is-what-makes-the-threshold-meaningful" title="Permanent link">&para;</a></h3>
+<p><span class="arithmatex">\(q\)</span> has to be a probability, not a score. If the model outputs 0.05 for a set of sites,
+roughly 5% of them must be unsafe. Without calibration, the economic threshold is arbitrary.
+Temperature scaling on a held-out set, isotonic regression, or a conformal wrapper giving
+distribution-free coverage guarantees are all reasonable, and the conformal option has the
+advantage that the guarantee survives moderate distribution shift with a documented
+assumption. See <a href="../../part13-retrieval-eval-reliability/">Part XIII on uncertainty and reliability</a>.</p>
+<h2 id="3-implementation">3. Implementation<a class="headerlink" href="#3-implementation" title="Permanent link">&para;</a></h2>
+<p>The safety mask, as a conjunction that returns its own components:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">safety_mask</span><span class="p">(</span><span class="n">slope</span><span class="p">,</span> <span class="n">relief</span><span class="p">,</span> <span class="n">hag</span><span class="p">,</span> <span class="n">hazard_prob</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="sd">"""Hard constraints, plus the per-constraint masks for debugging."""</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">parts</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="s2">"slope"</span><span class="p">:</span> <span class="n">slope</span> <span class="o">&lt;=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">max_slope_deg</span><span class="p">,</span>                   <span class="c1"># (H, W) bool</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">"relief"</span><span class="p">:</span> <span class="n">relief</span> <span class="o">&lt;=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">max_relief_m</span><span class="p">,</span>                  <span class="c1"># (H, W)</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="s2">"height"</span><span class="p">:</span> <span class="n">hag</span> <span class="o">&lt;=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">max_height_above_ground_m</span><span class="p">,</span>        <span class="c1"># (H, W)</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="s2">"semantic"</span><span class="p">:</span> <span class="n">hazard_prob</span> <span class="o">&lt;=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">max_hazard_prob</span><span class="p">,</span>        <span class="c1"># (H, W)</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="p">}</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">safe</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="s2">"slope"</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">parts</span><span class="p">[</span><span class="s2">"relief"</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">parts</span><span class="p">[</span><span class="s2">"height"</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">parts</span><span class="p">[</span><span class="s2">"semantic"</span><span class="p">]</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">hazard_dilation_m</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="c1"># push the boundary back from every hazard: a buffer around wires and trunks</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="n">margin_px</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">hazard_dilation_m</span> <span class="o">/</span> <span class="n">cfg</span><span class="o">.</span><span class="n">gsd</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="n">safe</span> <span class="o">=</span> <span class="n">safe</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">distance_transform_edt</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="s2">"semantic"</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="n">margin_px</span><span class="p">)</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="k">return</span> <span class="n">safe</span><span class="p">,</span> <span class="n">parts</span>
+</span></code></pre></div>
+<p>Returning <code>parts</code> is a design decision, not a convenience. When the system rejects a yard, the
+first question is always <em>which constraint rejected it</em>, and a single boolean cannot answer
+that. This is the difference between a system you can operate and one you can only rerun.</p>
+<p>Clearance as a radius, which is where the distance transform earns its place:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">largest_inscribed_disk</span><span class="p">(</span><span class="n">mask</span><span class="p">):</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="sd">"""Radius (pixels) and centre of the largest disk fitting inside ``mask``."""</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">dist</span> <span class="o">=</span> <span class="n">distance_transform_edt</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>          <span class="c1"># (H, W) distance to nearest blocked pixel</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dist</span><span class="p">)),</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">dist</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]),</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+</span></code></pre></div>
+<p>The distance transform <em>is</em> the answer: its maximum is the inradius and its argmax is the
+deepest interior point. Two lines, exact, <span class="arithmatex">\(O(HW)\)</span>.</p>
+<p>And the ranking score, which is deliberately transparent:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">site_score</span><span class="p">(</span><span class="n">site</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="sd">"""A weighted product of normalised margins over sites that already passed every constraint."""</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">clearance</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">site</span><span class="o">.</span><span class="n">clearance_m</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">cfg</span><span class="o">.</span><span class="n">min_clearance_m</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">flatness</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">site</span><span class="o">.</span><span class="n">mean_slope_deg</span> <span class="o">/</span> <span class="n">cfg</span><span class="o">.</span><span class="n">max_slope_deg</span><span class="p">)</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">smoothness</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">site</span><span class="o">.</span><span class="n">max_relief_m</span> <span class="o">/</span> <span class="n">cfg</span><span class="o">.</span><span class="n">max_relief_m</span><span class="p">)</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">semantic</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">site</span><span class="o">.</span><span class="n">mean_hazard_prob</span> <span class="o">/</span> <span class="n">cfg</span><span class="o">.</span><span class="n">max_hazard_prob</span><span class="p">)</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">clearance</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.25</span> <span class="o">+</span> <span class="mf">0.75</span> <span class="o">*</span> <span class="n">flatness</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.25</span> <span class="o">+</span> <span class="mf">0.75</span> <span class="o">*</span> <span class="n">smoothness</span><span class="p">)</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>                 <span class="o">*</span> <span class="p">(</span><span class="mf">0.25</span> <span class="o">+</span> <span class="mf">0.75</span> <span class="o">*</span> <span class="n">semantic</span><span class="p">))</span>
+</span></code></pre></div>
+<p>A product rather than a weighted sum, because one near-zero margin should not be averaged away
+by three comfortable ones. This is Phase 0's ranking; it gets replaced by a learned model once
+there are outcome labels from real deliveries, and the transparent version stays as the
+fallback and the sanity check.</p>
+<h3 id="how-you-would-test-it">How you would test it<a class="headerlink" href="#how-you-would-test-it" title="Permanent link">&para;</a></h3>
+<p>The test worth writing first is the one that encodes the design's central claim, that area is
+the wrong statistic:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_clearance_beats_area_on_an_l_shaped_region</span><span class="p">():</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="sd">"""A long thin strip has plenty of area and nowhere to land."""</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">strip</span> <span class="o">=</span> <span class="o">...</span>   <span class="c1"># two 8 px arms forming an L</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">square</span> <span class="o">=</span> <span class="o">...</span>  <span class="c1"># a 20 x 20 px block</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="k">assert</span> <span class="n">strip</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">square</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>        <span class="c1"># the strip has MORE area</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">r_strip</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">largest_inscribed_disk</span><span class="p">(</span><span class="n">strip</span><span class="p">)</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">r_square</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">largest_inscribed_disk</span><span class="p">(</span><span class="n">square</span><span class="p">)</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="k">assert</span> <span class="n">r_strip</span> <span class="o">&lt;</span> <span class="n">r_square</span>                <span class="c1"># and LESS usable clearance</span>
+</span></code></pre></div>
+<p>Then the end-to-end test on a synthetic property with a known answer, which is how you get a
+regression suite for a system whose real labels are scarce:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_find_landing_sites_picks_the_lawn_and_rejects_the_rest</span><span class="p">():</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">dsm</span><span class="p">,</span> <span class="n">dtm</span><span class="p">,</span> <span class="n">hazard</span> <span class="o">=</span> <span class="n">synthetic_yard</span><span class="p">()</span>      <span class="c1"># lawn, 20-degree driveway, tree, fence, path</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">sites</span><span class="p">,</span> <span class="n">safe</span><span class="p">,</span> <span class="n">parts</span> <span class="o">=</span> <span class="n">find_landing_sites</span><span class="p">(</span><span class="n">dsm</span><span class="p">,</span> <span class="n">dtm</span><span class="p">,</span> <span class="n">hazard</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">min_area_m2</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">sites</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">centre_px</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="k">assert</span> <span class="n">hazard</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.05</span>           <span class="c1"># not under the tree</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="k">assert</span> <span class="n">col</span> <span class="o">&lt;</span> <span class="mi">52</span>                          <span class="c1"># not on the driveway</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="n">parts</span><span class="p">[</span><span class="s2">"slope"</span><span class="p">][:,</span> <span class="mi">60</span><span class="p">:]</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>  <span class="c1"># the ramp failed the slope clause specifically</span>
+</span></code></pre></div>
+<p>Asserting on <code>parts["slope"]</code> rather than only on the final mask is what makes the test
+diagnostic: if it fails, you know which constraint moved.</p>
+<p>Each of the four constraints also gets a test that it rejects <em>on its own</em>, with the other
+three satisfied. That is the cheap way to catch the classic bug where a constraint is computed
+and then never used.</p>
+<h2 id="retype-by-hand">Retype by hand<a class="headerlink" href="#retype-by-hand" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>File</th>
+<th>Target time</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>connected_components</code></td>
+<td><code>src/mlbook/perception/landing_zone.py</code></td>
+<td>12 minutes</td>
+<td>The single most likely coding question in this loop. Iterative, 4 and 8 connectivity.</td>
+</tr>
+<tr>
+<td><code>distance_transform_edt</code> and <code>_edt_1d</code></td>
+<td><code>src/mlbook/perception/landing_zone.py</code></td>
+<td>25 minutes</td>
+<td>The Felzenszwalb lower-envelope sweep. Hard, and a genuine differentiator.</td>
+</tr>
+<tr>
+<td><code>largest_inscribed_disk</code></td>
+<td><code>src/mlbook/perception/landing_zone.py</code></td>
+<td>3 minutes</td>
+<td>Trivial once the EDT exists, which is the point to make.</td>
+</tr>
+<tr>
+<td><code>slope_degrees</code>, <code>local_relief</code></td>
+<td><code>src/mlbook/perception/landing_zone.py</code></td>
+<td>10 minutes</td>
+<td>Separable sliding max is a nice complexity answer.</td>
+</tr>
+<tr>
+<td><code>safety_mask</code></td>
+<td><code>src/mlbook/perception/landing_zone.py</code></td>
+<td>8 minutes</td>
+<td>The conjunction plus the buffer.</td>
+</tr>
+<tr>
+<td><code>region_properties</code></td>
+<td><code>src/mlbook/perception/landing_zone.py</code></td>
+<td>10 minutes</td>
+<td>One-pass <code>bincount</code> accumulation instead of a loop over labels.</td>
+</tr>
+<tr>
+<td><code>find_landing_sites</code></td>
+<td><code>src/mlbook/perception/landing_zone.py</code></td>
+<td>15 minutes</td>
+<td>The orchestration. Practise saying it aloud while typing.</td>
+</tr>
+</tbody>
+</table>
+<p>Check with <code>python -m pytest tests/test_perception_landing_zone.py -q</code>.</p>
+<h2 id="4-systems-view-the-staged-roadmap">4. Systems view: the staged roadmap<a class="headerlink" href="#4-systems-view-the-staged-roadmap" title="Permanent link">&para;</a></h2>
+<p>The staff-level distinction in this posting is explicitly about roadmaps, so answer in stages,
+and give each stage a promotion criterion decided before the work starts.</p>
+<h3 id="phase-0-rules-and-classical-geometry">Phase 0: rules and classical geometry<a class="headerlink" href="#phase-0-rules-and-classical-geometry" title="Permanent link">&para;</a></h3>
+<p>Photogrammetry to a digital surface model, a bare-earth model by morphological filtering, and
+hand-written constraints on slope, relief, height above ground and clearance. No learning at
+all beyond whatever the reconstruction uses.</p>
+<p><em>Why first.</em> It is the baseline every later phase is measured against, it produces the
+labelling and review tooling you need for everything else, and it exposes the real
+distribution of yards, which is invariably weirder than anyone's intuition.</p>
+<p><em>Promotion criterion.</em> On a hand-labelled set of a few hundred properties, measure the
+fraction of sites an expert reviewer accepts and the fraction of expert-accepted sites the
+system finds. Promote when the rules are stable enough that the remaining errors are
+<em>semantic</em> (it cannot tell a pond from a lawn) rather than geometric, which is the signal that
+the next phase should be a semantic model.</p>
+<h3 id="phase-1-supervised-semantic-perception">Phase 1: supervised semantic perception<a class="headerlink" href="#phase-1-supervised-semantic-perception" title="Permanent link">&para;</a></h3>
+<p>A segmentation model over the aerial imagery: surface classes plus hazard classes. Fuse its
+output into the same constraint structure, replacing the "unknown" semantic term.</p>
+<p><em>Promotion criterion.</em> Per-class recall on the hazard classes at the operating point, measured
+on held-out properties rather than held-out tiles, because tiles from the same property leak.
+Specifically: recall on the rare hazard classes above some agreed floor, and no regression in
+the rate at which reviewers overturn the system's decisions.</p>
+<h3 id="phase-2-multi-view-learned-geometry">Phase 2: multi-view learned geometry<a class="headerlink" href="#phase-2-multi-view-learned-geometry" title="Permanent link">&para;</a></h3>
+<p>Feed-forward pointmaps or learned MVS, to get geometry where classical matching fails, with
+the confidence channel feeding the uncertainty term. Keep the classical pipeline as the
+verifier on a routed subset, as in the routing design from
+<a href="../04-learned-3d-and-splats/">chapter 4</a>.</p>
+<p><em>Promotion criterion.</em> Agreement with the classical pipeline within a metric tolerance on the
+properties where classical succeeds, plus a measured improvement in coverage on the properties
+where it fails, plus no increase in disagreement with onboard perception at descent time.</p>
+<h3 id="phase-3-richer-priors-and-foundation-models">Phase 3: richer priors and foundation models<a class="headerlink" href="#phase-3-richer-priors-and-foundation-models" title="Permanent link">&para;</a></h3>
+<p>Larger pretrained backbones, open-vocabulary hazard detection for the long tail (a
+trampoline, a marquee, a new pool, a car cover), cross-property priors, and learned
+preferences from historical deliveries.</p>
+<p><em>Promotion criterion.</em> Improvement on the long-tail slices specifically, since aggregate
+metrics will not move. This is the phase where the evaluation infrastructure has to already
+exist, which is why it is Phase 3 and not Phase 1.</p>
+<h3 id="phase-4-continuous-feedback">Phase 4: continuous feedback<a class="headerlink" href="#phase-4-continuous-feedback" title="Permanent link">&para;</a></h3>
+<p>Hard-example mining from onboard disagreement, from operator overrides, from aborted
+deliveries, and from any case where the vehicle's live perception contradicted the prior. That
+last signal is the valuable one and it is free: every delivery is a supervised test of the
+prior.</p>
+<p><em>Promotion criterion.</em> The loop itself is the deliverable, so measure the cycle time from
+"failure observed in the field" to "fix validated in the evaluation set", and the fraction of
+new training data that comes from mined hard examples rather than from random sampling.</p>
+<h3 id="the-interfaces-that-make-this-survivable">The interfaces that make this survivable<a class="headerlink" href="#the-interfaces-that-make-this-survivable" title="Permanent link">&para;</a></h3>
+<p>Three contracts to name unprompted.</p>
+<p><strong>The prior schema is versioned.</strong> Every artefact the vehicle consumes carries a model
+version, a generation timestamp, a validity horizon, and per-cell confidence. When you change
+the meaning of a field, you bump the version and the vehicle knows how to refuse an
+incompatible one.</p>
+<p><strong>Replay is a first-class capability.</strong> Recorded inputs (imagery, poses, metadata) can be run
+through an arbitrary version of the offboard stack, deterministically. Without this, debugging
+a field incident means guessing. With it, you bisect.</p>
+<p><strong>Unknown is a value, not a gap.</strong> Every output raster has an explicit unknown mask, and
+downstream treats unknown as unsafe by default while logging it separately from known-unsafe.
+Conflating "we looked and it is dangerous" with "we could not see" destroys the only signal
+that tells you where to invest.</p>
+<h2 id="5-in-production">5. In production<a class="headerlink" href="#5-in-production" title="Permanent link">&para;</a></h2>
+<div class="admonition production">
+<p class="admonition-title">Zipline, Platform 2, what the physical system asks of the prior</p>
+<p>Public reporting describes the P2 aircraft hovering at roughly 300 feet and lowering a
+delivery droid on a retractable tether, with the droid using a downward-facing camera and
+other onboard sensors plus a shrouded propeller to steer onto a target area of about one
+metre in diameter, compensating for crosswind. Three design consequences for an offboard
+prior. The precision target is metric and tight, so reconstruction accuracy has to be
+argued in metres through ground sample distance. The hazard volume is a tall vertical
+corridor rather than a ground patch. And the droid has its own perception on the way down,
+so the offboard system is a prior with an error bar rather than the final authority, which
+is what makes an explicit unknown class useful instead of merely honest.
+Sources: <a href="https://newatlas.com/drones/droid-zipline-platform-2-drone-delivery/">New Atlas on Platform 2</a>,
+<a href="https://www.cnbc.com/2023/03/15/zipline-unveils-p2-delivery-drones-that-dock-and-recharge-autonomously.html">CNBC, March 2023</a>.</p>
+</div>
+<div class="admonition production">
+<p class="admonition-title">Waymo, the safety case as an artefact</p>
+<p>Waymo's public safety materials frame deployment around a structured safety case with
+stated methodologies and human benchmarks, rather than around a single model metric. The
+transferable idea for a delivery system is that the argument, not the accuracy number, is
+the deliverable: an explicit statement of what could go wrong, what evidence rules each
+one out, and what residual risk remains. Designing your constraint layer so that each
+clause maps to a hazard in that argument is what makes the system reviewable.
+See <a href="../../part18-company-deep-dives/waymo/">the Waymo deep dive</a> for the primary sources.</p>
+</div>
+<h2 id="6-interview-questions-and-strong-answers">6. Interview questions and strong answers<a class="headerlink" href="#6-interview-questions-and-strong-answers" title="Permanent link">&para;</a></h2>
+<div class="admonition interview">
+<p class="admonition-title">Design a system that determines whether a backyard location is safe for autonomous delivery.</p>
+<p>I would start with what the vehicle consumes, because that decides everything else. Assume
+it is a prior the onboard stack fuses with its own perception: a set of candidate sites,
+each with a touchdown point, a clearance radius in metres, a calibrated risk estimate, a
+validity horizon, and an explicit unknown mask.</p>
+<p>The pipeline has three layers. Geometry from multi-view reconstruction: a surface model, a
+bare-earth model, slope, local relief, height above ground, and a volumetric occupancy
+representation above candidate sites, each with per-cell reconstruction confidence.
+Semantics from a segmentation model over the same imagery: surface classes and hazard
+classes, with thin structures handled by a dedicated detector because they are sub-pixel
+at survey resolution. Then a decision layer.</p>
+<p>The decision layer is where I would spend the design time. It is a conjunction of hard
+constraints, each independently checkable and logged: slope under a threshold, a clear
+disk of the required radius, hazard probability under a budget with a spatial buffer, and
+a clear vertical corridor from release altitude. Sites that pass are then <em>ranked</em> by a
+score. I would not have the segmentation network answer "can I deliver" directly, because
+the constraints need to be auditable, changeable without retraining, and able to say which
+clause failed when the system declines.</p>
+<p>Two details I would raise unprompted. Clearance is a radius, not an area, because the
+target is a disk and an L-shaped strip can have large area and no usable circle; the
+largest inscribed circle comes exactly from a distance transform. And I would threshold
+the upper confidence bound of hazard probability rather than the mean, so that model
+uncertainty costs coverage rather than safety.</p>
+<p><strong>Staff-level follow-up.</strong> I would stage it: rules and classical geometry as the baseline,
+then supervised semantics, then learned multi-view geometry, then richer priors, then the
+feedback loop, with a promotion criterion written for each stage before the work starts.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Where do you set the threshold?</p>
+<p>It is an economic decision, so I would write it as one and give it an owner outside the
+model. Deliver when <span class="arithmatex">\(P(\text{unsafe}) &lt; C_{\text{decline}}/C_{\text{incident}}\)</span>. If an
+incident costs four orders of magnitude more than a decline, the threshold is around
+<span class="arithmatex">\(10^{-4}\)</span>.</p>
+<p>Two consequences I would raise. First, that number is only meaningful if the model is
+calibrated, so calibration is a requirement rather than a nice-to-have, and I would
+validate it with reliability diagrams per slice, not just in aggregate. Second, validating
+a <span class="arithmatex">\(10^{-4}\)</span> event rate directly needs far more labelled outcomes than we will have, so the
+evaluation strategy has to be proxies plus staged exposure: evaluate on adversarially
+selected slices, track leading indicators like onboard-offboard disagreement, and ramp
+exposure gradually with pre-declared stopping rules.</p>
+<p>I would also add a third action. Declining a property is expensive; declining a <em>site</em> and
+offering another on the same property is nearly free. Making "alternate site" an explicit
+output moves the whole coverage-safety frontier without touching any model.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">The imagery is six months old. How do you handle staleness?</p>
+<p>Treat the prior as a perishable artefact with an explicit validity horizon, and make that
+horizon a function of what the site is rather than a constant.</p>
+<p>Different things change at different rates. Building footprints and terrain change
+slowly. Vegetation changes seasonally and is the dominant driver of clearance change, so a
+site whose clearance margin depends on a tree canopy should expire faster than one in an
+open lawn. Movable hazards (vehicles, trampolines, furniture, a new pool) change on a
+timescale the prior cannot track at all.</p>
+<p>So: decay confidence over time at a rate conditioned on the site's composition, widen the
+required margin as confidence decays rather than flipping to unsafe, and mark the
+categories the prior fundamentally cannot see as the onboard system's responsibility. I
+would also mine the fleet: every delivery where onboard perception disagreed with the prior
+is a change-detection signal, and aggregating those by neighbourhood tells you where to
+re-fly, which turns resurvey from a calendar into a targeted operation.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">How do you find power lines?</p>
+<p>I would say up front that per-pixel segmentation on a single frame is the wrong tool, and
+justify it with resolution. At 90 m with a 2400 px focal length the ground sample distance
+is under 4 cm, and a typical conductor is a centimetre or two, so a wire is a fraction of a
+pixel wide. No per-pixel head recovers that reliably.</p>
+<p>Three things that do work, and I would use all three. Exploit the geometry of the object:
+a wire is thin but very long, so a line or curve detector that integrates evidence along a
+catenary has orders of magnitude more signal than any single pixel. Exploit multi-view: the
+wire appears in many overlapping frames and its projection follows a predictable epipolar
+path, so consistency across frames separates it from noise and from linear texture on the
+ground. And exploit context: wires terminate at poles and attach to buildings, and poles
+are large and easy to detect, so detect the endpoints and hypothesise the span between
+them, then verify.</p>
+<p>Then the system-level answer: I would not rely on detection alone for safety. I would add a
+structural prior that the corridor near any detected or inferred pole is unsafe by default,
+use utility infrastructure data where it exists, and treat regions where I cannot resolve
+the question as unknown rather than as clear.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Your model is 97% accurate but occasionally misses wires and tree branches. What do you do?</p>
+<p>I would start by rejecting the metric. 97% pixel accuracy on aerial imagery is close to
+what you get by predicting "ground" everywhere, because hazard classes are a tiny fraction
+of pixels. The aggregate number is not measuring the thing that can hurt someone.</p>
+<p>So first, re-instrument. Evaluate per class, at the object and event level rather than per
+pixel: what fraction of wire <em>spans</em> were detected, not what fraction of wire pixels.
+Build safety-weighted slices, and evaluate recall at the operating point that the decision
+layer actually uses.</p>
+<p>Then attack the cause rather than the symptom. Three contributions, and I would measure
+which dominates before choosing. Resolution, which is a sensing and flight-planning problem
+rather than a model problem. Class imbalance and loss weighting, where focal loss or
+explicit hazard oversampling helps. And representation, where a thin-structure-aware
+architecture and multi-view aggregation beat a bigger single-frame model.</p>
+<p>Then mitigate at the system level, because no detector reaches the recall this decision
+needs. Increase the hazard buffer, require larger clearance margins near any detected
+vertical structure, treat unresolved regions as unknown, and lean on the onboard camera for
+the last few metres of descent.</p>
+<p><strong>Staff-level follow-up.</strong> I would also change what gets labelled. Missed wires are exactly
+the examples worth spending annotation budget on, so I would mine candidates by
+disagreement (between models, between passes, between offboard and onboard) and route those
+to labelling, instead of labelling uniformly sampled tiles where 97% of the content is
+already solved.</p>
+</div>
+<h2 id="7-exercises">7. Exercises<a class="headerlink" href="#7-exercises" title="Permanent link">&para;</a></h2>
+<p><strong>★ 1.</strong> An incident costs 50,000 units and a declined delivery costs 3. What is the
+probability threshold? How many deliveries must you observe to estimate that failure rate to
+within a factor of two?</p>
+<details class="success">
+<summary>Solution</summary>
+<p>Threshold <span class="arithmatex">\(q^\star = 3/50{,}000 = 6\times10^{-5}\)</span>.</p>
+<p>To estimate a rate <span class="arithmatex">\(p\)</span> with relative standard error <span class="arithmatex">\(\epsilon\)</span> you need roughly
+<span class="arithmatex">\(n \approx 1/(p\epsilon^2)\)</span> observations. For a factor of two, take <span class="arithmatex">\(\epsilon \approx 0.5\)</span>,
+giving <span class="arithmatex">\(n \approx 1/(6\times10^{-5} \times 0.25) \approx 67{,}000\)</span> deliveries, and that
+assumes the rate is stationary across the whole period. Which is the argument for the
+evaluation chapter: you validate this class of claim through proxies, slices and staged
+exposure, and you treat any direct estimate as a long-run audit rather than a release gate.</p>
+</details>
+<p><strong>★★ 2.</strong> A site has a clear disk of radius 1.6 m. Reconstruction uncertainty on the hazard
+boundary is 0.25 m one sigma. What is the effective clearance at two sigma, and what does that
+imply for the threshold?</p>
+<details class="success">
+<summary>Solution</summary>
+<p>The boundary could be 0.5 m closer at two sigma, so the effective clearance is
+<span class="arithmatex">\(1.6 - 0.5 = 1.1\)</span> m. Against a 1 m target plus any control error, that is thin. The
+implication is that the clearance constraint should be applied to the <em>lower</em> confidence
+bound of the radius, exactly as the hazard constraint is applied to the upper bound of
+probability, and that reconstruction uncertainty should be a per-site number rather than a
+global assumption, since a well-textured yard and a featureless lawn have very different
+sigmas.</p>
+</details>
+<p><strong>★★ 3.</strong> Design the prior schema the vehicle consumes. What fields, and why each one?</p>
+<details class="success">
+<summary>Solution</summary>
+<p>Per property: a schema version, a generation timestamp, the model and pipeline versions
+that produced it, the source imagery identifiers, and a coordinate reference frame with
+the datum stated explicitly.</p>
+<p>Per site: touchdown point in the site frame and in geodetic coordinates, clearance radius
+with a lower confidence bound, the corridor height that was verified, a calibrated risk
+estimate, the ranking score, the constraint margins individually (so the vehicle and the
+debugger can see <em>how</em> it passed), and a validity horizon with a decay rate.</p>
+<p>Per raster: the surface and bare-earth models, semantics, per-cell reconstruction
+confidence, and an explicit unknown mask.</p>
+<p>The two fields people leave out and regret: the individual constraint margins, without
+which you cannot debug a decision after the fact, and the unknown mask, without which you
+cannot distinguish "we looked and it is dangerous" from "we could not see", which are
+different problems with different fixes.</p>
+</details>
+<p><strong>★★★ 4.</strong> The onboard system reports that it disagreed with the offboard prior on 2% of
+descents last week, up from 0.5%. Walk through the investigation.</p>
+<details class="success">
+<summary>Solution</summary>
+<p>First, establish what changed, because a fourfold move is more likely a change than a
+drift. Check in order: an offboard model or pipeline deployment, an onboard deployment, a
+change in the imagery source or capture parameters, a change in the geographic mix of
+deliveries, and a seasonal or weather change. The deployment timeline against the
+disagreement timeline usually answers this in minutes, which is an argument for keeping
+both in the same dashboard.</p>
+<p>Second, characterise the disagreements rather than counting them. Slice by property, by
+region, by prior age, by site composition, by time of day, and by the specific constraint
+that disagreed. A uniform rise across all slices points at a global change; a concentrated
+rise points at a distribution or a data-source change. Check the direction too: onboard
+seeing a hazard the prior missed is a safety issue, and the prior being conservative where
+onboard sees clear space is a coverage issue, and they have opposite responses.</p>
+<p>Third, replay. Take a sample of the disagreeing descents, run the recorded inputs through
+the previous and current offboard versions, and diff the outputs. That isolates whether the
+offboard stack changed its mind or the world changed. This is the step that only exists if
+deterministic replay was designed in.</p>
+<p>Fourth, act with the asymmetry in mind. If the new behaviour is less safe, roll back first
+and investigate second. If it is more conservative, that is not an emergency, but it is a
+coverage regression that should be quantified and owned. Either way, the disagreeing cases
+go into the evaluation set, which is how this incident makes the next one less likely.</p>
+</details>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Zipline Platform 2 coverage:
+  <a href="https://newatlas.com/drones/droid-zipline-platform-2-drone-delivery/">New Atlas</a>,
+  <a href="https://www.cnbc.com/2023/03/15/zipline-unveils-p2-delivery-drones-that-dock-and-recharge-autonomously.html">CNBC, March 2023</a>.</li>
+<li>Felzenszwalb and Huttenlocher, "Distance Transforms of Sampled Functions", <em>Theory of
+  Computing</em> 8, 2012. The linear-time exact transform used for the clearance radius.</li>
+<li><a href="../../part17-ml-system-design/05-perception-system-av/">Part XVII, perception system design</a>,
+  for the generic framework this chapter specialises.</li>
+<li><a href="../../part13-retrieval-eval-reliability/">Part XIII, uncertainty and reliability</a>, for
+  calibration and conformal prediction.</li>
+<li><a href="../06-evaluation-and-scaling/">Chapter 6 of this part</a>, for how to evaluate and how to scale
+  what this chapter designs.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../04-learned-3d-and-splats/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Learned 3-D and splats">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Learned 3-D and splats
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../06-evaluation-and-scaling/" class="md-footer__link md-footer__link--next" aria-label="Next: Evaluation and scaling">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Evaluation and scaling
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.indexes", "navigation.top", "navigation.footer", "navigation.tracking", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

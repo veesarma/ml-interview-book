@@ -1,0 +1,7541 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A first-principles-to-frontier compendium for staff-level ML interviews — math, from-scratch code, systems, and production case studies.">
+      
+      
+      
+        <link rel="canonical" href="https://veesarma.github.io/ml-interview-book/part17-ml-system-design/11-notifications-uplift-experimentation/">
+      
+      
+        <link rel="prev" href="../10-forecasting-eta/">
+      
+      
+        <link rel="next" href="../12-ml-platform-feature-store-monitoring/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Notifications, uplift & experimentation - The ML Interview Book</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#notifications-uplift-experimentation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="The ML Interview Book" class="md-header__button md-logo" aria-label="The ML Interview Book" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The ML Interview Book
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Notifications, uplift & experimentation
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/veesarma/ml-interview-book" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    veesarma/ml-interview-book
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="The ML Interview Book" class="md-nav__button md-logo" aria-label="The ML Interview Book" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    The ML Interview Book
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/veesarma/ml-interview-book" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    veesarma/ml-interview-book
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Preface
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Preface
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/how-to-use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How to use this book
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/study-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Study plan (6–9 months)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preface/interview-signal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What staff-level signal looks like
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part01-math/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I. Math
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    I. Math
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/01-linear-algebra/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear algebra
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/02-calculus-matrix-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calculus & matrix calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/03-probability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Probability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/04-statistics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/05-information-theory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Information theory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/06-optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part01-math/07-tensor-shapes-broadcasting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tensors, shapes & broadcasting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part02-classical/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    II. Classical ML
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    II. Classical ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/01-linear-regression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear regression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/02-logistic-softmax-regression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logistic & softmax regression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/03-trees-and-ensembles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trees & ensembles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/04-knn-kmeans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KNN & K-means
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/05-probabilistic-models-em/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Probabilistic models & EM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/06-dimensionality-reduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dimensionality reduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part02-classical/07-kernel-methods-svm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kernel methods & SVMs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part03-neural-nets/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    III. Neural Nets
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    III. Neural Nets
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/01-mlp-and-activations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLPs & activations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/02-backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/03-autograd-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building an autograd engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/04-initialization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/05-normalization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Normalization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part03-neural-nets/06-regularization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Regularization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part04-vision/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IV. Vision
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IV. Vision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/01-image-representation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image representation & signal processing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/02-convolutions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Convolutions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/03-cnn-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CNN architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/04-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/05-segmentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Segmentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/06-geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geometry & cameras
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part04-vision/07-3d-perception/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3D perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part05-sequence-transformers/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    V. Sequences & Transformers
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    V. Sequences & Transformers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/01-rnn-lstm-gru/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RNN, LSTM, GRU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/02-seq2seq-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seq2seq & early attention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/03-attention-mathematics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attention mathematics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/04-transformer-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/05-positional-encodings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Positional encodings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part05-sequence-transformers/06-tokenization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tokenization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part06-llm-training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VI. LLM Training
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VI. LLM Training
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/01-pretraining-data-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pretraining data & objective
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/02-scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/03-large-model-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Large-model architecture (MoE, GQA, SSMs)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/04-efficient-attention-kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Efficient attention & KV cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/05-quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/06-fine-tuning-lora/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & LoRA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part06-llm-training/07-mid-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mid-training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part07-post-training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VII. Post-training
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_10" id="__nav_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VII. Post-training
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/01-sft/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervised fine-tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/02-reward-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reward models & preferences
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/03-rlhf-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF with PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/04-dpo-and-friends/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DPO and its relatives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/05-reasoning-rl-grpo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reasoning RL, RLVR & GRPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part07-post-training/06-test-time-compute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test-time compute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part08-multimodal/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VIII. Multimodal
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_11" id="__nav_11_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VIII. Multimodal
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/01-vision-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision Transformers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/02-detr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DETR & set prediction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/03-clip-contrastive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLIP & contrastive learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/04-vlm-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VLM architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/05-multimodal-foundation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal foundation models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part08-multimodal/06-video-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part09-generative/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IX. Generative
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_12" id="__nav_12_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IX. Generative
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/01-autoencoders-vae/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autoencoders & VAEs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/02-gans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GANs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/03-diffusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part09-generative/04-flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part10-self-supervised/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    X. Self-/Semi-/Weak Supervision
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_13" id="__nav_13_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    X. Self-/Semi-/Weak Supervision
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/01-self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-supervised learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/02-semi-supervised/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Semi-supervised learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10-self-supervised/03-weak-supervision-and-auto-labeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Weak supervision & auto-labeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part11-perception-autonomy/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XI. Perception & Autonomy
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_14" id="__nav_14_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XI. Perception & Autonomy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/01-perception-foundation-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Perception foundation models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/02-multi-camera-bev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-camera & BEV
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/03-sensor-fusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensor fusion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/04-tracking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tracking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/05-occupancy-temporal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Occupancy & temporal perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/06-prediction-planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prediction & planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11-perception-autonomy/07-world-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    World models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_15" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part12-rl/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XII. Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_15" id="__nav_15_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XII. Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/01-mdp-bellman/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs & Bellman equations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/02-classical-rl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical RL algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/03-deep-rl-dqn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep RL & DQN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/04-policy-gradients-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy gradients, GAE & PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/05-imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12-rl/06-agents-tool-use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents & tool use
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_16" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part13-retrieval-eval-reliability/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIII. Retrieval, Eval & Reliability
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_16" id="__nav_16_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIII. Retrieval, Eval & Reliability
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/01-retrieval-and-rag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/02-evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13-retrieval-eval-reliability/03-uncertainty-reliability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uncertainty & reliability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_17" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part14-systems/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIV. Systems
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_17" id="__nav_17_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_17">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIV. Systems
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/01-distributed-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/02-training-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/03-inference-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inference systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14-systems/04-hardware-memory-roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware, memory & roofline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_18" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part15-interpretability-safety/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XV. Interpretability & Safety
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_18" id="__nav_18_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_18">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XV. Interpretability & Safety
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15-interpretability-safety/01-interpretability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpretability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15-interpretability-safety/02-safety-failure-modes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Safety & failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_19" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part16-coding-canon/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVI. Coding Canon
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_19" id="__nav_19_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_19">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVI. Coding Canon
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/01-numpy-torch-cheatsheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NumPy ↔ PyTorch cheat sheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/02-shape-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shape & broadcasting drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16-coding-canon/03-timed-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timed coding drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_20" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part19-breadth-review/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XIX. Breadth Review
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_20" id="__nav_20_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_20">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XIX. Breadth Review
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/01-basics-losses-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basics, losses, models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/02-evaluation-debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation and debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/03-deep-learning-transformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep learning and Transformers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/04-llms-multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLMs and multimodal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/05-serving-data-engines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serving, data engines, real-world
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19-breadth-review/06-rapid-fire/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rapid-fire derivations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_21" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part20-project-deep-dive/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XX. Your Projects
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_21" id="__nav_21_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_21">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XX. Your Projects
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/01-carl-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The CARL framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/02-streetsmart-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worked deep dive, StreetSmart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/03-edge-perception-deep-dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worked deep dive, edge perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20-project-deep-dive/04-behavioral-leadership/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Behavioral and leadership
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_22" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVII. ML System Design
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_22" id="__nav_22_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_22_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVII. ML System Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-recommendation-feed-ranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feed & recommendation ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-search-ranking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-ads-ctr-prediction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ads CTR / conversion prediction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-fraud-anomaly-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fraud & anomaly detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-perception-system-av/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous-vehicle perception
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-visual-search-image-retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual search & image retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-content-moderation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content moderation & trust
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-llm-product-rag-assistant/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM assistant with RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-ocr-document-understanding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OCR & document understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../13-novel-object-3d-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Novel-object 3D detection from unlabeled fleet data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-forecasting-eta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting & ETA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications, uplift & experimentation
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notifications, uplift & experimentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-the-whiteboard-in-60-seconds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR: the whiteboard in 60 seconds
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-requirements-scoping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Requirements &amp; scoping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-modelling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Modelling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Modelling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Baselines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-uplift-modelling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Uplift modelling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-the-budgeted-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 The budgeted policy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-send-time-and-channel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Send-time and channel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-long-term-effects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 Long-term effects
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-training-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Training &amp; serving
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-evaluation-experimentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Evaluation &amp; experimentation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Evaluation &amp; experimentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-the-ab-basics-stated-precisely" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 The A/B basics, stated precisely
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-variance-reduction-with-cuped" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Variance reduction with CUPED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-interference-and-switchbacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Interference and switchbacks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-sequential-testing-and-peeking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Sequential testing and peeking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-what-else-the-platform-needs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 What else the platform needs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-trade-offs-alternatives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Trade-offs &amp; alternatives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-real-companies-did-it-as-mock-interviews" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How real companies did it: as mock interviews
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. How real companies did it: as mock interviews">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-pinterest-how-many-is-the-right-number" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Pinterest, "how many is the right number"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-microsoft-make-the-test-finish-this-week" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 Microsoft, "make the test finish this week"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-doordash-the-units-are-not-independent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 DoorDash, "the units are not independent"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-netflix-and-the-industry-stop-peeking-wrong" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.4 Netflix and the industry, "stop peeking wrong"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75-the-holdout-what-is-the-whole-system-worth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.5 The holdout, "what is the whole system worth"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-staff-level-follow-ups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Staff-level follow-ups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-scaling-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Scaling &amp; evolution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../12-ml-platform-feature-store-monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML platform, feature store & monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_23" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part18-company-deep-dives/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XVIII. Company Deep Dives
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_23" id="__nav_23_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_23_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_23">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XVIII. Company Deep Dives
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/tesla/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tesla (Autopilot / FSD / Optimus)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/waymo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waymo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/zoox-nuro-aurora/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zoox, Nuro, Aurora & robotaxi peers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/nvidia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NVIDIA (DRIVE, Cosmos, Isaac)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/meta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meta (Feed, Reels, Ads, FAIR)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/google-youtube/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Google & YouTube
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/tiktok-bytedance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TikTok / ByteDance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/netflix-spotify/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Netflix & Spotify
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/pinterest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pinterest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/uber-doordash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Uber & DoorDash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/airbnb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Airbnb
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/amazon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Amazon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/apple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Apple
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/stripe-fintech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stripe & fintech fraud
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/frontier-labs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAI, Anthropic & DeepMind
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18-company-deep-dives/scale-ai-data-engines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scale AI & data engines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_24" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../part21-zipline-offboard/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XXI. Zipline Offboard Perception
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_24" id="__nav_24_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_24_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_24">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XXI. Zipline Offboard Perception
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21-zipline-offboard/01-frames-and-camera-geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frames and camera geometry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21-zipline-offboard/02-two-view-geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Two-view geometry and triangulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21-zipline-offboard/03-sfm-and-bundle-adjustment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SfM and bundle adjustment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21-zipline-offboard/04-learned-3d-and-splats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learned 3-D and splats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21-zipline-offboard/05-deliverability-system-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deliverability system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21-zipline-offboard/06-evaluation-and-scaling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation and scaling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21-zipline-offboard/coding-drills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coding drills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21-zipline-offboard/mock-interview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mock interview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21-zipline-offboard/story-bank/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Story bank
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21-zipline-offboard/cheatsheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cheatsheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../references/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr-the-whiteboard-in-60-seconds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR: the whiteboard in 60 seconds
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-requirements-scoping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Requirements &amp; scoping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-modelling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Modelling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Modelling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Baselines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-uplift-modelling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Uplift modelling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-the-budgeted-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 The budgeted policy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-send-time-and-channel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Send-time and channel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-long-term-effects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 Long-term effects
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-training-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Training &amp; serving
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-evaluation-experimentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Evaluation &amp; experimentation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Evaluation &amp; experimentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-the-ab-basics-stated-precisely" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 The A/B basics, stated precisely
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-variance-reduction-with-cuped" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Variance reduction with CUPED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-interference-and-switchbacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Interference and switchbacks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-sequential-testing-and-peeking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Sequential testing and peeking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-what-else-the-platform-needs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 What else the platform needs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-trade-offs-alternatives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Trade-offs &amp; alternatives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-real-companies-did-it-as-mock-interviews" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How real companies did it: as mock interviews
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. How real companies did it: as mock interviews">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-pinterest-how-many-is-the-right-number" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Pinterest, "how many is the right number"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-microsoft-make-the-test-finish-this-week" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 Microsoft, "make the test finish this week"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-doordash-the-units-are-not-independent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 DoorDash, "the units are not independent"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-netflix-and-the-industry-stop-peeking-wrong" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.4 Netflix and the industry, "stop peeking wrong"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75-the-holdout-what-is-the-whole-system-worth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.5 The holdout, "what is the whole system worth"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-staff-level-follow-ups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Staff-level follow-ups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-scaling-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Scaling &amp; evolution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="notifications-uplift-experimentation">Notifications, uplift &amp; experimentation<a class="headerlink" href="#notifications-uplift-experimentation" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Why this matters / who asks it.</strong> Pinterest, Meta, Duolingo, LinkedIn, DoorDash,
+Booking and Netflix all run this system, and the question comes in two halves that
+belong together: "decide which users to notify about what, and when" and "prove
+that it helped". The business problem is that notifications are a shared, exhaustible
+resource. Each one can bring a user back or push them to disable notifications
+permanently, and the second effect is invisible in a click-through metric. The
+interviewer is checking whether you model the <em>incremental</em> effect of sending rather
+than the probability of a click, whether you can design an experiment when users
+interfere with each other, and whether you know how to detect a small effect without
+waiting six months.</p>
+</blockquote>
+<h2 id="tldr-the-whiteboard-in-60-seconds">TL;DR: the whiteboard in 60 seconds<a class="headerlink" href="#tldr-the-whiteboard-in-60-seconds" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart LR
+  TRIG[Candidate triggers&lt;br/&gt;new content, social events,&lt;br/&gt;reminders, lifecycle] --&gt; CAND[Candidate generation&lt;br/&gt;per user, per channel]
+  CAND --&gt; UPL[Uplift model&lt;br/&gt;tau(x) = P(y|send) - P(y|no send)&lt;br/&gt;per user, per notification type]
+  FAT[User state&lt;br/&gt;recent volume, fatigue,&lt;br/&gt;time since last open,&lt;br/&gt;channel preferences] --&gt; UPL
+  UPL --&gt; BUDG[Budgeted policy&lt;br/&gt;weekly volume budget per user&lt;br/&gt;+ knapsack over uplift]
+  BUDG --&gt; TIME[Send-time model&lt;br/&gt;when is this user reachable]
+  TIME --&gt; CH[Channel choice&lt;br/&gt;push / email / in-app]
+  CH --&gt; SEND[Send]
+  SEND --&gt; OUT[Outcomes&lt;br/&gt;open, session, next-day return,&lt;br/&gt;disable, uninstall]
+  OUT --&gt; LT[Long-term holdout&lt;br/&gt;no notifications for months]
+  OUT --&gt; EXP[Experimentation platform&lt;br/&gt;A/B, switchbacks, CUPED,&lt;br/&gt;sequential testing]
+  EXP --&gt; UPL
+  LT --&gt; EXP</code></pre>
+<ul>
+<li><strong>Model uplift, not response.</strong> <span class="arithmatex">\(\tau(x) = P(y \mid \text{send}) - P(y \mid \text{no
+  send})\)</span>. A user who would have opened the app anyway generates a click and no value.</li>
+<li><strong>Four quadrants.</strong> Persuadables (send), sure things (do not bother), lost causes
+  (do not bother), and sleeping dogs (sending actively hurts, so never send).</li>
+<li><strong>Budget per user, then allocate.</strong> A weekly volume budget per user, filled by
+  choosing the highest-uplift notifications, which is a knapsack rather than a
+  threshold. Pinterest's <a href="https://dl.acm.org/doi/10.1145/3219819.3219906">published system</a> does exactly this.</li>
+<li><strong>The cost of a notification is not zero and not constant.</strong> Fatigue is cumulative,
+  and the worst outcome (disabling notifications or uninstalling) removes the channel
+  forever, so it must be in the objective with a large negative weight.</li>
+<li><strong>Randomised holdouts are the only source of uplift labels.</strong> You cannot learn a
+  treatment effect from observational send logs, because sending was never random.</li>
+<li><strong>Long-term holdouts</strong> (a population that receives nothing for months) measure what
+  a two-week test cannot: whether notifications build or erode the habit.</li>
+<li><strong>Interference breaks user-level A/B</strong> whenever users affect each other (social
+  notifications, shared marketplaces). Switchbacks and cluster randomisation are the
+  answers.</li>
+<li><strong>CUPED</strong> uses pre-experiment data to cut metric variance, which shortens tests
+  substantially for the same power.</li>
+<li><strong>Sequential testing</strong> lets you peek without inflating the false-positive rate, and
+  "peeking with fixed-horizon p-values" is the most common experimentation bug at
+  every company.</li>
+<li><strong>Evidence</strong>: Pinterest's notification volume control system (KDD 2018) and their
+  later notification work, CUPED (WSDM 2013), Netflix, Booking and Microsoft
+  experimentation writing, DoorDash switchback testing, and the uplift-modelling
+  literature.</li>
+</ul>
+<h2 id="1-requirements-scoping">1. Requirements &amp; scoping<a class="headerlink" href="#1-requirements-scoping" title="Permanent link">&para;</a></h2>
+<p><strong>Functional.</strong> For each user, decide what to send, on which channel, at what time,
+subject to a volume budget and to policy constraints. Support many notification types
+(social, content, lifecycle, transactional) with different value and different
+urgency. Provide the experimentation machinery to evaluate any change to any of that.</p>
+<p><strong>Non-functional, with numbers to ask for.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Ask the interviewer</th>
+<th>A defensible assumption</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Users and volume</td>
+<td>"MAU, and notifications sent per user per week?"</td>
+<td>300M MAU, 5 to 10 notifications per user per week</td>
+</tr>
+<tr>
+<td>Channels</td>
+<td>"Push, email, in-app, SMS? Different opt-in rates?"</td>
+<td>All four, with push opt-in around half on one major platform</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>"Real-time triggers or batch scheduling?"</td>
+<td>Both: social events in seconds, content digests scheduled daily</td>
+</tr>
+<tr>
+<td>Decision volume</td>
+<td>"Candidates evaluated per user per day?"</td>
+<td>Hundreds of candidates per user per day, scored in batch</td>
+</tr>
+<tr>
+<td>Experiment scale</td>
+<td>"Concurrent experiments and minimum detectable effect?"</td>
+<td>Hundreds of concurrent tests, MDE around 0.5% on engagement</td>
+</tr>
+<tr>
+<td>Constraints</td>
+<td>"Regulatory limits on messaging? Quiet hours?"</td>
+<td>Quiet hours by timezone, per-channel consent, unsubscribe honoured everywhere</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Success metrics.</strong></p>
+<ul>
+<li><em>North star</em>: incremental sessions or incremental retained users, measured against a
+  holdout. Not opens, not click-through rate, because both are maximised by sending to
+  people who were coming back anyway.</li>
+<li><em>Guardrails</em>: notification disable rate, uninstall rate, unsubscribe rate, complaint
+  rate (email spam reports), and total volume per user. These are the costs that a
+  click-based objective cannot see.</li>
+<li><em>Offline proxies</em>: uplift model quality (Qini or uplift curves, which are the
+  ranking metrics for treatment effects), calibration of the predicted uplift, and
+  send-time model accuracy.</li>
+</ul>
+<p><strong>Questions a staff engineer asks.</strong></p>
+<ol>
+<li>"What do we count as success, an open or a session that would not have happened?
+   The second is harder to measure and is the only one worth optimising."</li>
+<li>"Do we have a permanent holdout today? If not, that is the first thing I would
+   build, because without it none of these numbers mean anything."</li>
+<li>"What fraction of users have already disabled notifications? That is the accumulated
+   cost of past over-sending, and it bounds the upside."</li>
+<li>"Are notifications social? If user A's action triggers user B's notification, my
+   experiment units are not independent."</li>
+<li>"What is the minimum effect worth shipping? That sets the sample size, and it
+   decides whether we need variance reduction to run the test at all."</li>
+</ol>
+<h2 id="2-data">2. Data<a class="headerlink" href="#2-data" title="Permanent link">&para;</a></h2>
+<p><strong>Sources.</strong> Notification send logs (what was sent, when, through which channel,
+under which experiment), delivery and open events, in-app activity, the content that
+triggered each candidate, user state (tenure, activity level, timezone, device,
+notification settings history), and the settings-change events that record a user
+turning notifications off.</p>
+<p><strong>Labels for uplift.</strong> The fundamental problem of causal inference: for a given user
+you observe either the outcome with a notification or the outcome without one, never
+both. The label for uplift is therefore a population quantity, estimated by comparing
+randomised groups.</p>
+<p>This has a hard consequence for the design. <strong>The uplift model can only be trained on
+randomised data.</strong> Send logs from the existing policy are useless for this purpose,
+because the policy chose whom to send to based on predicted response, so the treated
+and untreated populations differ systematically. The practical requirement: a
+permanent randomised holdout, typically a few percent of users or a random subset of
+eligible sends, whose treatment assignment is independent of the model. That holdout
+is both the training data for uplift and the measurement instrument.</p>
+<p><strong>Outcome definitions and their windows.</strong> Open within an hour, session within a day,
+retention over a week, and the negative outcomes (disable, unsubscribe, uninstall)
+which are rare, delayed and irreversible. The negative outcomes are the ones that
+matter most and are hardest to attribute, since a user who disables notifications does
+so after an accumulation, not after one message. Model the cumulative exposure, not the
+single send.</p>
+<p><strong>Biases.</strong></p>
+<ul>
+<li><em>Selection</em>: who has notifications enabled is itself an outcome of past policy, so
+  the population you can send to is the survivors. Improvements measured on survivors
+  overstate the effect on the full population.</li>
+<li><em>Novelty and primacy</em>: a new notification type gets attention because it is new, and
+  the effect decays. Two-week tests over-estimate durable value.</li>
+<li><em>Attribution</em>: a user who opens the app five minutes after a notification may have
+  been opening it anyway. Only the holdout separates the two.</li>
+<li><em>Channel confounding</em>: push opt-in correlates with engagement, so comparing push
+  performance to email performance across users compares different people.</li>
+</ul>
+<p><strong>Features.</strong> User state (activity recency and frequency, tenure, historical response
+rate by type and channel, time since last notification, cumulative volume this week),
+content features (topic, recency, social connection strength to the actor), context
+(day of week, local time, device), and interaction features between user state and
+content type. For send-time optimisation, the per-user distribution of historical
+app-open times is the dominant feature.</p>
+<h2 id="3-modelling">3. Modelling<a class="headerlink" href="#3-modelling" title="Permanent link">&para;</a></h2>
+<h3 id="31-baselines">3.1 Baselines<a class="headerlink" href="#31-baselines" title="Permanent link">&para;</a></h3>
+<p>Rules: send everything, with a global frequency cap. Then a response model that
+predicts <span class="arithmatex">\(P(\text{open} \mid \text{send})\)</span> and sends above a threshold. The response
+model is a real improvement over rules, and it has a specific failure that motivates
+everything below: it concentrates sends on the users most likely to open, who are
+disproportionately the users who would have returned anyway.</p>
+<h3 id="32-uplift-modelling">3.2 Uplift modelling<a class="headerlink" href="#32-uplift-modelling" title="Permanent link">&para;</a></h3>
+<p>Define the individual treatment effect under the potential-outcomes framework: for
+treatment <span class="arithmatex">\(T \in \{0, 1\}\)</span> and outcome <span class="arithmatex">\(Y\)</span>,</p>
+<div class="arithmatex">\[
+\tau(x) = \mathbb{E}[Y(1) - Y(0) \mid X = x],
+\]</div>
+<p>which is what you want to rank by. Estimators, in the order to present them:</p>
+<p><strong>Two-model (T-learner).</strong> Fit <span class="arithmatex">\(\mu_1(x) = \mathbb{E}[Y \mid X=x, T=1]\)</span> on the treated
+and <span class="arithmatex">\(\mu_0(x)\)</span> on the control, and take <span class="arithmatex">\(\hat\tau = \mu_1 - \mu_0\)</span>. Simple, uses any
+model, and it fails when the two models have independent errors of the same magnitude
+as the effect, which is the normal case, because uplift is usually much smaller than
+the baseline response.</p>
+<p><strong>Single model with treatment as a feature (S-learner).</strong> Fit one model on pooled data
+with <span class="arithmatex">\(T\)</span> as an input, and take the difference of predictions with <span class="arithmatex">\(T=1\)</span> and <span class="arithmatex">\(T=0\)</span>.
+Shares statistical strength, and it can shrink the effect to zero if regularisation
+decides the treatment feature is unimportant.</p>
+<p><strong>Class transformation.</strong> With balanced randomisation (<span class="arithmatex">\(P(T=1) = 1/2\)</span>), define
+<span class="arithmatex">\(Z = Y T + (1 - Y)(1 - T)\)</span> (that is, <span class="arithmatex">\(Z=1\)</span> when a treated user responded or an
+untreated user did not). Then <span class="arithmatex">\(\tau(x) = 2 P(Z = 1 \mid x) - 1\)</span>, so a single standard
+classifier on <span class="arithmatex">\(Z\)</span> estimates uplift directly. Elegant, and it needs the balanced design.</p>
+<p><strong>X-learner and doubly robust learners.</strong> The X-learner (Künzel et al., PNAS 2019)
+imputes the individual effect for each observation using the other group's model, then
+regresses those imputed effects on <span class="arithmatex">\(x\)</span>, with a propensity-weighted combination. It
+performs better than the T-learner when the treated and control groups are very
+different in size, which is the usual situation when the holdout is small.
+Doubly robust and causal-forest approaches (Wager &amp; Athey, JASA 2018; Athey, Tibshirani
+&amp; Wager, Annals of Statistics 2019) give valid inference and confidence intervals on
+the estimated effects.</p>
+<p><img alt="Uplift quadrants and CUPED variance reduction" src="../../assets/figures/part17_uplift_quadrants.png" width="760" /></p>
+<p><em>Left: the four quadrants. Ranking by <span class="arithmatex">\(P(y \mid \text{send})\)</span> sends to the top half,
+which includes the sure things (wasted) and risks the sleeping dogs (harmful). Ranking
+by uplift sends to the left-top quadrant only. Right: CUPED on a simulated test, where
+adjusting the metric by a pre-experiment covariate shrinks the confidence interval
+without biasing the estimate.</em></p>
+<p><strong>Sleeping dogs are real.</strong> For notifications the harmful quadrant is not hypothetical:
+users who would have returned on their own, but who receive an ill-timed message and
+disable notifications, have strongly negative uplift on the long-run outcome. A model
+that only estimates a positive effect cannot represent them, which is the strongest
+argument for uplift over response modelling.</p>
+<p><strong>Evaluating uplift offline.</strong> You cannot compute per-user accuracy, because the
+individual effect is unobservable. Use the <strong>Qini curve</strong> or uplift curve: order the
+randomised population by predicted uplift, and at each depth compute the difference in
+outcome rate between treated and control among the top-<span class="arithmatex">\(k\)</span> ranked users, scaled by
+group size. A model with no signal gives the diagonal; a good model bows above it. The
+area between the curve and the diagonal (the Qini coefficient) is the summary number.</p>
+<h3 id="33-the-budgeted-policy">3.3 The budgeted policy<a class="headerlink" href="#33-the-budgeted-policy" title="Permanent link">&para;</a></h3>
+<p>Uplift per candidate is not the decision; the decision is which subset to send under a
+budget. Two coupled problems:</p>
+<p><strong>The budget itself.</strong> How many notifications should this user receive this week? This
+is a per-user quantity: a heavy user tolerates and benefits from more than a dormant
+one, and the optimal number depends on their state. Pinterest's <a href="https://medium.com/pinterest-engineering/user-state-based-notification-volume-optimization-7764118f73ff">published system</a> treats
+notification budgeting as computing an optimal weekly volume per user with a model,
+then filling that budget.</p>
+<p><strong>Filling the budget.</strong> Given a budget <span class="arithmatex">\(b_u\)</span> and candidates with predicted uplift
+<span class="arithmatex">\(\tau_{u,i}\)</span> and cost <span class="arithmatex">\(c_i\)</span>, choose the subset maximising total uplift subject to the
+budget, which is a knapsack. In practice a greedy fill by uplift per unit cost is
+close enough, with constraints layered on: no two notifications of the same type in a
+day, quiet hours, channel-specific caps, and a minimum uplift floor below which
+sending is never worth the fatigue.</p>
+<p>The objective should net out the fatigue cost explicitly:</p>
+<div class="arithmatex">\[
+\text{value}(u, S) = \sum_{i \in S} \tau_{u,i} \;-\; \lambda\, \text{fatigue}(u, |S|),
+\]</div>
+<p>where the fatigue term is superlinear in volume and <span class="arithmatex">\(\lambda\)</span> is calibrated against
+the measured disable rate. Without that term the optimiser will spend the entire
+budget every week on every user.</p>
+<h3 id="34-send-time-and-channel">3.4 Send-time and channel<a class="headerlink" href="#34-send-time-and-channel" title="Permanent link">&para;</a></h3>
+<p><strong>Send time.</strong> Model the per-user probability of being reachable and receptive by time
+of day and day of week, from their historical app-open pattern, and schedule inside
+the highest-probability window that respects quiet hours. The gain is usually a
+meaningful relative improvement in open rate and is one of the cheapest wins in the
+system, since it requires no new content.</p>
+<p><strong>Channel.</strong> Push is immediate and expensive in fatigue terms, email is tolerant of
+volume and slow, in-app is free but only reaches users who already came back. Model
+the uplift per channel rather than assuming a global ordering, and respect that
+disabling push is an irreversible loss while ignoring an email is not.</p>
+<h3 id="35-long-term-effects">3.5 Long-term effects<a class="headerlink" href="#35-long-term-effects" title="Permanent link">&para;</a></h3>
+<p>Two weeks of A/B measures the immediate response and misses habit formation and
+erosion. Two instruments:</p>
+<ul>
+<li><strong>Long-term holdout</strong>: a population that receives no notifications (or a fixed
+  reduced set) for months, refreshed rarely. It measures the total causal contribution
+  of the whole notification system, which is the number leadership actually wants, and
+  it is the only way to detect slow erosion.</li>
+<li><strong>Surrogate metrics</strong>: short-term measurements that predict the long-term outcome,
+  validated by regressing long-run retention on short-run signals across past
+  experiments. Useful, and only as trustworthy as that validation.</li>
+</ul>
+<h2 id="4-training-serving">4. Training &amp; serving<a class="headerlink" href="#4-training-serving" title="Permanent link">&para;</a></h2>
+<p><strong>Pipeline.</strong> Randomised holdout sends generate the training data for the uplift
+models; response models train on all sends; the budget model trains on the outcome of
+volume experiments. Retrain weekly. The important architectural point is that the
+randomisation infrastructure is upstream of the models, not a feature of the
+experiment platform bolted on later.</p>
+<p><strong>Serving.</strong> Mostly batch with a real-time path:</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Cadence</th>
+<th>Work</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Batch candidate scoring</td>
+<td>Daily or hourly</td>
+<td>Score all candidates for all eligible users, solve the budget allocation, schedule sends</td>
+</tr>
+<tr>
+<td>Real-time triggers</td>
+<td>Seconds</td>
+<td>Social events that must arrive promptly, scored against the remaining budget</td>
+</tr>
+<tr>
+<td>Delivery</td>
+<td>Continuous</td>
+<td>Per-channel delivery with retry, quiet-hour enforcement, and per-user rate limiting as a final safety net</td>
+</tr>
+</tbody>
+</table>
+<p>The final rate limiter deserves a mention as a defensive design: whatever the models
+decide, a hard cap per user per day prevents a bug in the allocator from sending a
+hundred notifications to somebody, which is the kind of incident that costs a
+permanent channel.</p>
+<p><strong>Cost.</strong> The scoring is large batch work (hundreds of candidates times hundreds of
+millions of users), which is a data-processing problem rather than a serving one.
+Delivery costs money per message on some channels (SMS especially), which belongs in
+the knapsack's cost term.</p>
+<h2 id="5-evaluation-experimentation">5. Evaluation &amp; experimentation<a class="headerlink" href="#5-evaluation-experimentation" title="Permanent link">&para;</a></h2>
+<p>This section is the second half of the chapter's subject, and it generalises to every
+other chapter in this part.</p>
+<h3 id="51-the-ab-basics-stated-precisely">5.1 The A/B basics, stated precisely<a class="headerlink" href="#51-the-ab-basics-stated-precisely" title="Permanent link">&para;</a></h3>
+<p>Randomise at the right unit, pre-register the metric, compute the required sample
+size, and do not stop early on a fixed-horizon test. The sample size for detecting a
+relative effect <span class="arithmatex">\(\delta\)</span> on a metric with coefficient of variation <span class="arithmatex">\(c\)</span> at 80% power
+and 5% significance is approximately <span class="arithmatex">\(n \approx 16 c^2 / \delta^2\)</span> per arm, which for
+sessions per user (with <span class="arithmatex">\(c\)</span> around 2 to 3) and a 1% effect means millions of users per
+arm.</p>
+<h3 id="52-variance-reduction-with-cuped">5.2 Variance reduction with CUPED<a class="headerlink" href="#52-variance-reduction-with-cuped" title="Permanent link">&para;</a></h3>
+<p>Metric variance is what makes tests slow. CUPED (Deng, Xu, Kohavi &amp; Walker,
+"Improving the Sensitivity of Online Controlled Experiments by Utilizing Pre-Experiment
+Data", WSDM 2013) uses a pre-experiment covariate <span class="arithmatex">\(X\)</span> (typically the same metric
+measured before the experiment) to build an adjusted metric:</p>
+<div class="arithmatex">\[
+Y^{\text{cuped}} = Y - \theta\,(X - \bar X), \qquad
+\theta = \frac{\operatorname{Cov}(Y, X)}{\operatorname{Var}(X)},
+\]</div>
+<p>which is unbiased because <span class="arithmatex">\(X\)</span> is pre-treatment (so its mean is equal in expectation
+across arms) and has variance <span class="arithmatex">\(\operatorname{Var}(Y)(1 - \rho^2)\)</span> where <span class="arithmatex">\(\rho\)</span> is the
+correlation between <span class="arithmatex">\(Y\)</span> and <span class="arithmatex">\(X\)</span>. With <span class="arithmatex">\(\rho = 0.7\)</span> the variance halves, which halves
+the required sample size or the required runtime. The method is practical and easy to
+implement, which is why it is now standard across the industry.</p>
+<p>Two conditions to state: the covariate must be strictly pre-treatment (using a
+during-experiment covariate reintroduces bias), and the gain is entirely determined by
+<span class="arithmatex">\(\rho\)</span>, so choosing the covariate well is the whole game. For users with no
+pre-experiment data (new users), <span class="arithmatex">\(\theta\)</span> adjustment does nothing, so stratify them
+separately.</p>
+<h3 id="53-interference-and-switchbacks">5.3 Interference and switchbacks<a class="headerlink" href="#53-interference-and-switchbacks" title="Permanent link">&para;</a></h3>
+<p>User-level randomisation assumes one user's treatment does not affect another's
+outcome (SUTVA). Notifications break it whenever they are social: if I am in treatment
+and get notified about your post, I comment, and you get a notification about my
+comment even though you are in control. Marketplaces break it through shared supply.</p>
+<p>Remedies, in order of increasing cost:</p>
+<ul>
+<li><strong>Cluster randomisation</strong>: randomise connected components of the social graph, or
+  geographic regions. Reduces interference at the cost of a much smaller effective
+  sample size (the unit is now the cluster, so the variance is driven by cluster count).</li>
+<li><strong>Switchback (time-based) randomisation</strong>: assign the whole region or market to
+  treatment or control in alternating time windows. Standard for marketplaces where
+  supply is shared, and used at <a href="https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/">DoorDash</a> and <a href="https://eng.lyft.com/experimentation-in-a-ridesharing-marketplace-b39db027a66e">Lyft</a> for pricing and dispatch changes. The
+  costs are carry-over effects between windows (handled with burn-in periods that are
+  discarded) and heavy temporal correlation, which must be in the variance estimate.</li>
+<li><strong>Ego-cluster or graph-cluster designs</strong>: randomise a user together with their
+  immediate neighbourhood, which captures most first-order spillover.</li>
+</ul>
+<p>Whichever you choose, say what it does and does not measure. A switchback measures the
+total market effect including equilibrium response; a user-level test measures the
+direct effect on the individual and mismeasures the total.</p>
+<h3 id="54-sequential-testing-and-peeking">5.4 Sequential testing and peeking<a class="headerlink" href="#54-sequential-testing-and-peeking" title="Permanent link">&para;</a></h3>
+<p>Computing a fixed-horizon p-value repeatedly and stopping when it crosses 0.05 inflates
+the false-positive rate badly, and it is the single most common experimentation error
+in industry. Two correct alternatives: group-sequential designs with spending functions
+(pre-specified interim analyses with adjusted boundaries), and always-valid inference
+based on sequential probability ratios or confidence sequences, which provide
+anytime-valid p-values so any stopping rule is safe. Companies including Optimizely and
+Netflix have published on always-valid approaches for exactly this reason. The practical
+system requirement: the experiment dashboard must show anytime-valid intervals, because
+if it shows fixed-horizon p-values, people will peek regardless of policy.</p>
+<h3 id="55-what-else-the-platform-needs">5.5 What else the platform needs<a class="headerlink" href="#55-what-else-the-platform-needs" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Sample ratio mismatch checks.</strong> If the assignment is 50/50 and the observed split
+  is 50.4/49.6 with millions of users, something is broken and every result from that
+  test is suspect. This is the highest-value automated check in an experiment platform.</li>
+<li><strong>Layered or overlapping experiments</strong> so hundreds of tests run concurrently without
+  colliding, with orthogonal randomisation across layers.</li>
+<li><strong>Pre-registration</strong> of the primary metric and the analysis, so that the fifteenth
+  metric that happened to move is reported as exploratory.</li>
+<li><strong>Guardrail metrics</strong> applied automatically to every experiment, including latency,
+  crash rate, and the notification disable rate here.</li>
+<li><strong>Heterogeneous effect analysis</strong>, with the caveat that slicing by twenty segments
+  guarantees a significant one by chance, so correction or a pre-registered slice list
+  is required.</li>
+</ul>
+<h2 id="6-trade-offs-alternatives">6. Trade-offs &amp; alternatives<a class="headerlink" href="#6-trade-offs-alternatives" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Chosen</th>
+<th>Alternative</th>
+<th>When you'd flip</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Target</td>
+<td>Uplift</td>
+<td>Response probability</td>
+<td>Transactional notifications where the send is obligatory, so uplift is irrelevant</td>
+</tr>
+<tr>
+<td>Uplift estimator</td>
+<td>X-learner or causal forest on randomised data</td>
+<td>T-learner</td>
+<td>Balanced groups and plenty of data, where the T-learner is simpler and adequate</td>
+</tr>
+<tr>
+<td>Policy</td>
+<td>Per-user budget filled by knapsack</td>
+<td>Global threshold on uplift</td>
+<td>Very homogeneous users, or when the budget model cannot be trained</td>
+</tr>
+<tr>
+<td>Fatigue</td>
+<td>Explicit cost term calibrated to disable rate</td>
+<td>Frequency cap only</td>
+<td>A cap is the safety net; it should exist regardless</td>
+</tr>
+<tr>
+<td>Holdout</td>
+<td>Permanent randomised holdout, plus a long-term holdout</td>
+<td>Occasional experiments</td>
+<td>Never skip the permanent holdout; it is the training data and the measurement</td>
+</tr>
+<tr>
+<td>Experiment unit</td>
+<td>User, unless there is interference</td>
+<td>Always user-level</td>
+<td>Social or marketplace effects, where clusters or switchbacks are required</td>
+</tr>
+<tr>
+<td>Variance reduction</td>
+<td>CUPED with a pre-period covariate</td>
+<td>Larger sample</td>
+<td>New products with no pre-period data; stratification instead</td>
+</tr>
+<tr>
+<td>Stopping</td>
+<td>Always-valid sequential inference</td>
+<td>Fixed horizon</td>
+<td>Fixed horizon is fine if nobody peeks, which is not a real condition</td>
+</tr>
+<tr>
+<td>Long-term</td>
+<td>Long-term holdout</td>
+<td>Surrogate metrics validated against it</td>
+<td>Surrogates only after validation against the holdout</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Failure modes.</strong></p>
+<ul>
+<li><em>Optimising opens</em>: the system sends to users who were returning anyway, the metric
+  improves, and incremental sessions do not move. The holdout is the detector.</li>
+<li><em>Fatigue accumulation</em>: each experiment looks positive, and the disable rate climbs
+  slowly across quarters. Detect with a long-term holdout and with disable rate as a
+  standing guardrail on every experiment.</li>
+<li><em>Interference invalidating results</em>: social notifications leak treatment into control
+  and shrink the measured effect toward zero, so genuinely good changes look flat.
+  Detect by comparing a user-level test to a cluster-level one on the same change.</li>
+<li><em>Peeking</em>: a stream of false positives that fail to replicate. Fix in the platform,
+  not in the process documentation.</li>
+<li><em>Sample ratio mismatch</em>: a broken assignment or a logging bug. Automated check on
+  every experiment.</li>
+<li><em>Novelty effects</em>: the two-week win decays. Re-measure at four and eight weeks for
+  anything that changes user habits.</li>
+</ul>
+<h2 id="7-how-real-companies-did-it-as-mock-interviews">7. How real companies did it: as mock interviews<a class="headerlink" href="#7-how-real-companies-did-it-as-mock-interviews" title="Permanent link">&para;</a></h2>
+<h3 id="71-pinterest-how-many-is-the-right-number">7.1 Pinterest, "how many is the right number"<a class="headerlink" href="#71-pinterest-how-many-is-the-right-number" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "We send hundreds of millions of notifications a week. Some
+users get too many and turn them off. Some get too few and never come back. Decide the
+volume per user, not just the ranking."</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the decision is a budget per user per week, not
+a per-message threshold, because the cost of a message depends on how many others that
+user already received. <em>Metrics</em>: site engagement and notification click-through,
+with volume itself as an explicit control variable. <em>Data</em>: send logs, engagement,
+and notification setting changes; randomised variation in volume to learn the response.
+<em>Model</em>: predict, for each user, the volume that maximises their long-run engagement,
+then fill that budget with the highest-value candidates. <em>Serve</em>: batch decision per
+user per week with real-time adjustment. <em>Evaluate</em>: online experiments comparing the
+budgeting system to the previous ML approach.</p>
+<p><strong>What the source says.</strong> Zhao, Narita, Orten &amp; Egan, <a href="https://dl.acm.org/doi/10.1145/3219819.3219906">"Notification Volume Control and Optimization
+System at Pinterest"</a> (KDD 2018) describes their deployed system for controlling
+notification volume per user; the associated <a href="https://medium.com/pinterest-engineering/user-state-based-notification-volume-optimization-7764118f73ff">Pinterest engineering writing</a> describes
+notification budgeting as computing an optimal number of weekly notifications per
+person with a trained model, and reports that the system deployed in mid-2017 reduced
+notification volume while improving notification click-through and site engagement
+compared with their previous machine learning approach.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: budget per user, then fill it</p>
+<p>"I'd make the primary decision a weekly volume budget per user, and only then
+decide what fills it. Pinterest published this design at <a href="https://dl.acm.org/doi/10.1145/3219819.3219906">KDD 2018</a> as their
+notification volume control and optimisation system, and their engineering posts
+describe training a model to pick the optimal number of weekly notifications per
+person. They report that the deployed system reduced volume and improved both
+notification click-through and site engagement compared with their previous ML
+approach, which is the counterintuitive result worth quoting: sending less made
+the metrics better. The alternative is a global threshold on predicted value per
+message, which is simpler and treats every user's tolerance as identical. The
+trade-off is that a budget model needs randomised variation in volume to learn
+the response curve, so I'd need a holdout that receives more and less than the
+policy would choose, which costs some engagement in the short run."</p>
+</div>
+<h3 id="72-microsoft-make-the-test-finish-this-week">7.2 Microsoft, "make the test finish this week"<a class="headerlink" href="#72-microsoft-make-the-test-finish-this-week" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "Our engagement metric is so noisy that a 1% effect needs six
+weeks. We cannot iterate at that speed. Without changing the metric, make the tests
+faster."</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: we cannot reduce the effect size we care about
+or increase the user base, so the only lever is variance. <em>Model</em>: adjust the metric
+using pre-experiment data, which is correlated with the outcome and independent of the
+treatment by construction. <em>Evaluate</em>: verify unbiasedness on A/A tests and measure the
+realised variance reduction, which is determined by the correlation between the
+pre-period and in-period metric.</p>
+<p><strong>What the source says.</strong> Deng, Xu, Kohavi &amp; Walker, <a href="https://dl.acm.org/doi/10.1145/2433396.2433413">"Improving the Sensitivity of
+Online Controlled Experiments by Utilizing Pre-Experiment Data"</a> (WSDM 2013) introduces
+CUPED, which uses pre-experiment data to reduce metric variability and improve
+sensitivity, and describes it as applicable to a wide variety of key business metrics
+and practical to implement.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: CUPED before more traffic</p>
+<p>"Before asking for more traffic I'd apply CUPED, from the Microsoft <a href="https://dl.acm.org/doi/10.1145/2433396.2433413">WSDM 2013
+paper</a>: subtract theta times the centred pre-experiment covariate from the metric,
+where theta is the covariance over the variance. It stays unbiased because the
+covariate is pre-treatment, and the variance drops by one minus rho squared, so a
+correlation of 0.7 between the pre-period and in-period metric halves the variance
+and halves the runtime. The alternative is to run longer or ramp to more users,
+which costs calendar time and exposure. The trade-off is that all of the benefit
+comes from rho, so picking the covariate matters more than the method: the same
+metric measured over the prior two weeks is usually the best one, and users with
+no pre-period, which means new users, get no benefit at all, so I'd stratify them
+out rather than let them dilute the adjustment."</p>
+</div>
+<h3 id="73-doordash-the-units-are-not-independent">7.3 DoorDash, "the units are not independent"<a class="headerlink" href="#73-doordash-the-units-are-not-independent" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "We want to test a dispatch change. Couriers are shared between
+treatment and control, so a change that assigns couriers faster in treatment starves
+control. How do you run this experiment?"</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the interference is through a shared resource, so
+no user-level or order-level randomisation can be valid. <em>Design</em>: randomise time
+windows within a region, so the whole market runs one policy at a time, alternating.
+Discard a burn-in period after each switch to let the system reach steady state.
+<em>Analysis</em>: the unit of analysis is the region-window, so the effective sample size is
+the number of windows, and the variance estimate must account for temporal correlation.
+<em>Evaluate</em>: the measured effect is the total market effect including the equilibrium
+response, which is the quantity the business wants for a dispatch change.</p>
+<p><strong>What the sources say.</strong> DoorDash's <a href="https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/">engineering writing on switchback testing</a>
+describes using time-based randomisation within regions to handle network effects in
+their marketplace, including the treatment of carry-over between windows; the general
+statistical treatment of experiments under interference is covered in the
+causal-inference literature.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: switchbacks buy validity and cost power</p>
+<p>"For a dispatch or pricing change I'd run a switchback: randomise time windows
+within each region so the whole market runs one policy at a time, with a burn-in
+after each switch that I throw away. DoorDash has <a href="https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/">written about using exactly this</a>
+design for marketplace changes where couriers are shared and a user-level or
+order-level split would contaminate both arms. The alternative, order-level
+randomisation, gives me huge sample size and measures the wrong estimand: the
+treatment's effect partly comes from how it reallocates a shared resource, and
+splitting orders hides that. The trade-off is power. My unit of analysis becomes
+the region-window, so instead of millions of orders I have a few hundred windows,
+and the variance calculation has to handle temporal correlation. In practice that
+means switchback tests run for weeks and detect much larger effects, so I'd use
+them for changes that genuinely have marketplace spillover and stay with user-level
+tests for everything else."</p>
+</div>
+<h3 id="74-netflix-and-the-industry-stop-peeking-wrong">7.4 Netflix and the industry, "stop peeking wrong"<a class="headerlink" href="#74-netflix-and-the-industry-stop-peeking-wrong" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "Our teams watch the dashboard every day and ship when the
+p-value crosses 0.05. Tell me what is wrong and what you would build."</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: the p-value is computed for a fixed sample size,
+and evaluating it repeatedly means the probability of crossing the threshold at some
+point far exceeds the nominal rate. <em>Fix</em>: either pre-specify interim analyses with
+group-sequential boundaries that spend the error budget, or use always-valid inference
+so that the reported interval is correct under any stopping rule. <em>Serve</em>: the change
+belongs in the platform's dashboard, not in a process rule, because people will look at
+whatever the dashboard shows. <em>Evaluate</em>: run A/A tests through the new machinery and
+confirm the false-positive rate matches the nominal level.</p>
+<p><strong>What the sources say.</strong> The group-sequential literature (Pocock; O'Brien and Fleming;
+Lan and DeMets spending functions) gives the classical solution, and industry work on
+always-valid inference and confidence sequences for continuous monitoring has been
+published by Optimizely (Johari, Pekelis and Walsh on always-valid inference) and
+discussed in Netflix's experimentation writing on sequential testing.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: fix the dashboard, not the policy</p>
+<p>"The problem is that a fixed-horizon p-value is only valid if you look once, and
+everyone looks every day, so the real false-positive rate is several times the
+nominal five percent. I'd fix it in the platform by reporting always-valid
+confidence sequences instead, which stay correct under any stopping rule, and
+that line of work is published, including Optimizely's always-valid inference and
+Netflix's writing on sequential testing. The classical alternative is a
+group-sequential design with pre-specified interim looks and spending functions,
+which is tighter statistically and requires people to commit to a look schedule in
+advance. I'd choose always-valid for an industrial platform precisely because it
+survives contact with how people actually behave. The cost is honest: anytime-valid
+intervals are wider at any fixed sample size, so a team that genuinely would look
+once pays a power penalty."</p>
+</div>
+<h3 id="75-the-holdout-what-is-the-whole-system-worth">7.5 The holdout, "what is the whole system worth"<a class="headerlink" href="#75-the-holdout-what-is-the-whole-system-worth" title="Permanent link">&para;</a></h3>
+<p><strong>Interviewer prompt.</strong> "Every notification experiment we run is positive. Our
+notification volume has tripled in two years. Is the system actually creating value?"</p>
+<p><strong>Candidate walkthrough.</strong> <em>Clarify</em>: a sequence of positive local tests does not imply
+a positive total effect, because each test measures a marginal change against a
+background that keeps growing, and the cumulative cost (fatigue, disables) is slow and
+never attributed to any one test. <em>Design</em>: a long-term holdout, a randomly chosen
+population that receives no notifications for months, refreshed rarely, with the
+difference in retention and sessions measured against the treated population.
+<em>Metrics</em>: incremental sessions and retained users attributable to the whole system,
+plus the disable rate trajectory. <em>Evaluate</em>: report the holdout gap quarterly, and use
+it to validate any short-term surrogate metric before trusting that surrogate.</p>
+<p><strong>What the sources say.</strong> Long-term holdouts and the limits of short-horizon
+experiments are discussed in the experimentation literature, including Kohavi, Tang and
+Xu's "Trustworthy Online Controlled Experiments" (2020), which covers long-term effects,
+novelty and primacy, and the practice of holdback groups; Netflix and other companies
+have written about measuring long-term member value rather than short-term engagement.</p>
+<div class="admonition tip">
+<p class="admonition-title">How to say it in the interview: a permanent holdout is the only honest number</p>
+<p>"I'd keep a permanent holdout that receives no notifications for months and report
+the gap as the value of the whole system. A run of positive two-week experiments
+does not add up to a positive system, because each test measures a marginal change
+against a background that is itself growing, and the cumulative cost shows up as a
+slowly rising disable rate that no individual test is ever charged for. Kohavi,
+Tang and Xu's book on trustworthy online controlled experiments covers exactly
+this, including holdback groups, novelty effects and long-term measurement. The
+alternative is to trust short-term surrogates, which is fine once they have been
+validated against the holdout and not before. The cost is real: the holdout users
+get a worse product for months and we forgo their engagement, so I'd keep it small,
+make it a stable random sample so it is not resampled into uselessness, and treat
+the number it produces as the one leadership sees."</p>
+</div>
+<h2 id="8-staff-level-follow-ups">8. Staff-level follow-ups<a class="headerlink" href="#8-staff-level-follow-ups" title="Permanent link">&para;</a></h2>
+<div class="admonition interview">
+<p class="admonition-title">Your notification model has 0.8 AUC on predicting opens. Why is that not enough?</p>
+<p>Because predicting opens and predicting incremental value are different problems,
+and the model with the higher AUC is usually the one that has learned to identify
+users who were coming back anyway. Those users open the notification, the
+click-through metric improves, and nothing changes in their behaviour. What I want
+is the treatment effect, which is a difference between two counterfactual worlds
+and cannot be scored with AUC on observational data at all. So the evaluation has
+to change alongside the model: a Qini curve computed on a randomised holdout,
+which ranks by predicted uplift and measures the treated-versus-control gap at each
+depth. It is a much noisier metric than AUC, which is the honest cost of measuring
+the right thing.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">How do you get training data for an uplift model?</p>
+<p>From randomisation, and only from randomisation. The existing send logs cannot
+support it, because the current policy decided whom to send to on the basis of
+predicted response, so the treated and untreated populations differ in exactly the
+way that would confound the estimate. I would carve out a permanent randomised
+stream: a small percentage of eligible send opportunities where the decision is a
+coin flip independent of any model. That stream is simultaneously the training set
+for uplift, the evaluation set for the Qini curve, and the measurement instrument
+for the system's total value. The cost is some lost engagement on the randomised
+slice, and I'd size it from the precision I need on the uplift estimate rather than
+picking a round number.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">What is a sleeping dog and why should I care?</p>
+<p>A user with negative uplift: they would have come back on their own, and the
+notification makes them less likely to, usually because it annoys them into
+disabling notifications or uninstalling. They matter because a response model
+cannot represent them at all. Ranking by <span class="arithmatex">\(P(\text{open})\)</span> or <span class="arithmatex">\(P(\text{return})\)</span>
+produces a non-negative score for everyone, so the model's only mistake is wasting
+a send, whereas the real cost is losing a channel permanently. Uplift modelling
+makes the harm expressible, and the corresponding operational change is that the
+policy has a floor: below a threshold uplift, do not send, even if the budget is
+unspent.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">You want to test a change to social notifications. Users are connected. What do you do?</p>
+<p>A user-level A/B is invalid here, because a treated user's activity generates
+notifications for control users, so treatment leaks and the measured effect is
+biased toward zero. The options are cluster randomisation on the social graph
+(assign connected components, which contains most first-order spillover at the cost
+of far fewer effective units and clusters of wildly varying size), ego-cluster
+designs that randomise a user with their immediate neighbourhood, or a switchback
+if the effect is market-level rather than graph-level. I'd also run the user-level
+test in parallel: the gap between the user-level and cluster-level estimates is
+itself a measurement of how much interference there is, which tells me whether to
+keep paying for cluster designs on this class of change.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">The test has been running two weeks and the p-value is 0.04. Ship?</p>
+<p>Only if two weeks was the pre-registered horizon and this is the pre-registered
+primary metric. If the team has been watching daily and this is the day it crossed,
+then the nominal 0.04 is not the real error rate, and the honest response is either
+to run the pre-planned duration or to re-analyse with an anytime-valid method. I
+would also check the mechanics before the statistics: sample ratio mismatch,
+whether the effect is stable across days or driven by one spike, whether guardrails
+moved, and whether the effect is concentrated in a segment in a way that suggests a
+bug. For a notification change specifically, I would want at least four weeks
+regardless of significance, because novelty effects decay and the disable-rate cost
+accumulates slowly.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Two teams each measured a 2% win. Total engagement moved 1%. Explain.</p>
+<p>Several mechanisms, and they are worth distinguishing. Overlap: both changes affect
+the same users through the same channel, so their effects are not additive, which
+is the usual answer. Interference between the concurrent tests if they were not
+orthogonally randomised across layers. Regression to the mean, if both were
+launched on the strength of a lucky significant result and neither effect was as
+large as measured. Novelty decay on one or both. And a measurement boundary issue:
+each team measured its own metric on its own population, while total engagement is
+a different aggregate over a different denominator. The systematic fix is a
+holdback: keep a population that receives none of the quarter's launches and
+measure the total, which is the only way to reconcile the sum of the parts with the
+whole.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">How would you decide the volume budget without running a volume experiment?</p>
+<p>I would not, and I'd say so. The response of a user's long-run engagement to
+notification volume is a causal curve, and observational data cannot identify it
+because volume was assigned by a policy correlated with engagement. The minimum
+viable experiment is a randomised volume assignment across a few levels for a
+sample of users, run long enough to see the disable-rate response, which is slower
+than the engagement response. If the cost of that is unacceptable, the fallback is
+a bandit over volume levels per user segment, which learns the curve gradually
+while limiting the exposure of any one user to a bad level, at the cost of much
+slower learning and a harder analysis.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">What breaks first at 10x users?</p>
+<p>The batch scoring job, because it is users times candidates and both grow. The fix
+is candidate pruning before scoring, since most candidates fall below the uplift
+floor on cheap features alone. Second is the experimentation platform: at ten times the users you
+run far more concurrent experiments, which forces proper layering, and the analysis
+jobs over larger metric tables become the slow step in the iteration loop. Third,
+and least expected, is the holdout: as the number of holdouts multiplies (a
+permanent uplift holdout, a long-term system holdout, per-team holdbacks), the
+fraction of users receiving a degraded product grows, and somebody has to own the
+total holdout budget as a single number.</p>
+</div>
+<div class="admonition interview">
+<p class="admonition-title">Give me the one number you would show leadership.</p>
+<p>Incremental sessions per user from the long-term holdout, with the notification
+disable rate on the same chart. The holdout number is the system's actual
+contribution rather than the sum of its experiments, and the disable rate is the
+balance of the account it is drawing on. If the first is flat and the second is
+rising, the system is spending a permanent asset to buy nothing, and that is the
+conversation worth having.</p>
+</div>
+<h2 id="9-scaling-evolution">9. Scaling &amp; evolution<a class="headerlink" href="#9-scaling-evolution" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Early product.</strong> Rules, a global frequency cap, a response model, and one thing
+  that matters more than any of them: a permanent randomised holdout, built before it
+  seems necessary, because retrofitting one costs a quarter of lost measurement.</li>
+<li><strong>Growth stage.</strong> Uplift modelling on the randomised stream, per-user volume budgets,
+  send-time optimisation, an experiment platform with sample-ratio checks, CUPED and
+  standard guardrails.</li>
+<li><strong>Scale.</strong> Knapsack allocation across channels with an explicit fatigue cost,
+  cluster and switchback designs where interference exists, always-valid sequential
+  inference in the dashboard, long-term holdouts, and surrogate metrics validated
+  against them.</li>
+<li><strong>Batch to real-time.</strong> Triggered notifications scored in seconds against the
+  remaining budget, which requires the budget state to be online and consistent, and
+  makes the final rate limiter load-bearing.</li>
+<li><strong>From notifications to a policy over all touchpoints.</strong> The same machinery (uplift,
+  budget, fatigue, holdout) applies to emails, in-app messages, promotions and
+  discounts. The end state is one contact policy per user across every channel, with a
+  single budget, because the user experiences them as one stream even when the company
+  organises them as four teams.</li>
+</ul>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Zhao, B., Narita, K., Orten, B., Egan, J. "Notification Volume Control and Optimization System at Pinterest." KDD 2018 (<a href="https://dl.acm.org/doi/10.1145/3219819.3219906">dl.acm.org</a>).</li>
+<li>Pinterest Engineering. "User state-based notification volume optimization," 2020 (<a href="https://medium.com/pinterest-engineering/user-state-based-notification-volume-optimization-7764118f73ff">medium.com/pinterest-engineering</a>); "NEP: Notification System and Relevance" (<a href="https://medium.com/pinterest-engineering/nep-notification-system-and-relevance-a7fff21986c7">medium.com/pinterest-engineering</a>).</li>
+<li>Deng, A., Xu, Y., Kohavi, R., Walker, T. "Improving the Sensitivity of Online Controlled Experiments by Utilizing Pre-Experiment Data" (CUPED). WSDM 2013 (<a href="https://dl.acm.org/doi/10.1145/2433396.2433413">dl.acm.org</a>).</li>
+<li>Kohavi, R., Tang, D., Xu, Y. "Trustworthy Online Controlled Experiments: A Practical Guide to A/B Testing." Cambridge University Press, 2020.</li>
+<li>Künzel, S. R. et al. "Metalearners for estimating heterogeneous treatment effects using machine learning." PNAS 2019 (<a href="https://arxiv.org/abs/1706.03461">arXiv:1706.03461</a>).</li>
+<li>Wager, S., Athey, S. "Estimation and Inference of Heterogeneous Treatment Effects using Random Forests." JASA 2018 (<a href="https://arxiv.org/abs/1510.04342">arXiv:1510.04342</a>).</li>
+<li>Athey, S., Tibshirani, J., Wager, S. "Generalized Random Forests." Annals of Statistics 2019 (<a href="https://arxiv.org/abs/1610.01271">arXiv:1610.01271</a>).</li>
+<li>Radcliffe, N. J., Surry, P. D. "Real-World Uplift Modelling with Significance-Based Uplift Trees." Stochastic Solutions white paper, 2011.</li>
+<li>Johari, R., Pekelis, L., Walsh, D. J. "Always Valid Inference: Bringing Sequential Analysis to A/B Testing." 2015 (<a href="https://arxiv.org/abs/1512.04922">arXiv:1512.04922</a>).</li>
+<li>Lan, K. K. G., DeMets, D. L. "Discrete Sequential Boundaries for Clinical Trials." Biometrika 1983.</li>
+<li>DoorDash Engineering. "Switchback Tests and Randomized Experimentation Under Network Effects at DoorDash" (<a href="https://careersatdoordash.com/blog/switchback-tests-and-randomized-experimentation-under-network-effects-at-doordash/">careersatdoordash.com</a>).</li>
+<li>Chamandy, N. "Experimentation in a Ridesharing Marketplace." Lyft Engineering, 2016 (<a href="https://eng.lyft.com/experimentation-in-a-ridesharing-marketplace-b39db027a66e">eng.lyft.com</a>).</li>
+<li>Ugander, J. et al. "Graph Cluster Randomization: Network Exposure to Multiple Universes." KDD 2013.</li>
+<li>Book cross-references: <a href="../10-forecasting-eta/">forecasting &amp; ETA (switchbacks in marketplaces)</a>, <a href="../01-recommendation-feed-ranking/">feed ranking (long-term holdouts)</a>, <a href="../../part13-retrieval-eval-reliability/02-evaluation/">evaluation</a>.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../10-forecasting-eta/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Forecasting &amp; ETA">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Forecasting & ETA
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../12-ml-platform-feature-store-monitoring/" class="md-footer__link md-footer__link--next" aria-label="Next: ML platform, feature store &amp; monitoring">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                ML platform, feature store & monitoring
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.indexes", "navigation.top", "navigation.footer", "navigation.tracking", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
