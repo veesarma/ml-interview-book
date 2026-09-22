@@ -1,4 +1,4 @@
-.PHONY: install test style fix-style serve build figures references book deploy
+.PHONY: install test style fix-style serve build figures references contents book deploy
 
 install:
 	pip install -r requirements.txt && pip install -e .
@@ -22,6 +22,9 @@ build:
 
 references:
 	python scripts/build_references.py
+
+contents:
+	python scripts/build_contents.py
 
 figures:
 	@for f in figures/*.py; do echo "→ $$f"; python $$f || exit 1; done

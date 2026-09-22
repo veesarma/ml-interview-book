@@ -2,6 +2,8 @@
 
 **From first principles to the frontier, for staff-level ML interviews.**
 
+**[Full table of contents](contents.md)**: every part and chapter on one page.
+
 This book is organised as a compendium rather than a syllabus. Every chapter connects one topic downward to
 its mathematics and upward to the modern foundation-model stack, until you can move
 freely between

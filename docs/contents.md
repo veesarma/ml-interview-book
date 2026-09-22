@@ -1,0 +1,213 @@
+# Contents
+
+Every part and every chapter, on one page. The same tree lives in the left sidebar,
+where each part expands in place.
+
+## [Home](index.md)
+
+## [Contents](contents.md)
+
+## Preface
+
+- [How to use this book](preface/how-to-use.md)
+- [Study plan (6–9 months)](preface/study-plan.md)
+- [What staff-level signal looks like](preface/interview-signal.md)
+
+## [I. Math](part01-math/index.md)
+
+- [Linear algebra](part01-math/01-linear-algebra.md)
+- [Calculus & matrix calculus](part01-math/02-calculus-matrix-calculus.md)
+- [Probability](part01-math/03-probability.md)
+- [Statistics](part01-math/04-statistics.md)
+- [Information theory](part01-math/05-information-theory.md)
+- [Optimization](part01-math/06-optimization.md)
+- [Tensors, shapes & broadcasting](part01-math/07-tensor-shapes-broadcasting.md)
+
+## [II. Classical ML](part02-classical/index.md)
+
+- [Linear regression](part02-classical/01-linear-regression.md)
+- [Logistic & softmax regression](part02-classical/02-logistic-softmax-regression.md)
+- [Trees & ensembles](part02-classical/03-trees-and-ensembles.md)
+- [KNN & K-means](part02-classical/04-knn-kmeans.md)
+- [Probabilistic models & EM](part02-classical/05-probabilistic-models-em.md)
+- [Dimensionality reduction](part02-classical/06-dimensionality-reduction.md)
+- [Kernel methods & SVMs](part02-classical/07-kernel-methods-svm.md)
+
+## [III. Neural Nets](part03-neural-nets/index.md)
+
+- [MLPs & activations](part03-neural-nets/01-mlp-and-activations.md)
+- [Backpropagation](part03-neural-nets/02-backpropagation.md)
+- [Building an autograd engine](part03-neural-nets/03-autograd-engine.md)
+- [Initialization](part03-neural-nets/04-initialization.md)
+- [Normalization](part03-neural-nets/05-normalization.md)
+- [Regularization](part03-neural-nets/06-regularization.md)
+
+## [IV. Vision](part04-vision/index.md)
+
+- [Image representation & signal processing](part04-vision/01-image-representation.md)
+- [Convolutions](part04-vision/02-convolutions.md)
+- [CNN architectures](part04-vision/03-cnn-architectures.md)
+- [Object detection](part04-vision/04-detection.md)
+- [Segmentation](part04-vision/05-segmentation.md)
+- [Geometry & cameras](part04-vision/06-geometry.md)
+- [3D perception](part04-vision/07-3d-perception.md)
+
+## [V. Sequences & Transformers](part05-sequence-transformers/index.md)
+
+- [RNN, LSTM, GRU](part05-sequence-transformers/01-rnn-lstm-gru.md)
+- [Seq2seq & early attention](part05-sequence-transformers/02-seq2seq-attention.md)
+- [Attention mathematics](part05-sequence-transformers/03-attention-mathematics.md)
+- [Transformer architectures](part05-sequence-transformers/04-transformer-architectures.md)
+- [Positional encodings](part05-sequence-transformers/05-positional-encodings.md)
+- [Tokenization](part05-sequence-transformers/06-tokenization.md)
+
+## [VI. LLM Training](part06-llm-training/index.md)
+
+- [Pretraining data & objective](part06-llm-training/01-pretraining-data-objective.md)
+- [Scaling laws](part06-llm-training/02-scaling-laws.md)
+- [Large-model architecture (MoE, GQA, SSMs)](part06-llm-training/03-large-model-architecture.md)
+- [Efficient attention & KV cache](part06-llm-training/04-efficient-attention-kv-cache.md)
+- [Quantization](part06-llm-training/05-quantization.md)
+- [Fine-tuning & LoRA](part06-llm-training/06-fine-tuning-lora.md)
+- [Mid-training](part06-llm-training/07-mid-training.md)
+
+## [VII. Post-training](part07-post-training/index.md)
+
+- [Supervised fine-tuning](part07-post-training/01-sft.md)
+- [Reward models & preferences](part07-post-training/02-reward-models.md)
+- [RLHF with PPO](part07-post-training/03-rlhf-ppo.md)
+- [DPO and its relatives](part07-post-training/04-dpo-and-friends.md)
+- [Reasoning RL, RLVR & GRPO](part07-post-training/05-reasoning-rl-grpo.md)
+- [Test-time compute](part07-post-training/06-test-time-compute.md)
+
+## [VIII. Multimodal](part08-multimodal/index.md)
+
+- [Vision Transformers](part08-multimodal/01-vision-transformers.md)
+- [DETR & set prediction](part08-multimodal/02-detr.md)
+- [CLIP & contrastive learning](part08-multimodal/03-clip-contrastive.md)
+- [VLM architecture](part08-multimodal/04-vlm-architecture.md)
+- [Multimodal foundation models](part08-multimodal/05-multimodal-foundation.md)
+- [Video models](part08-multimodal/06-video-models.md)
+
+## [IX. Generative](part09-generative/index.md)
+
+- [Autoencoders & VAEs](part09-generative/01-autoencoders-vae.md)
+- [GANs](part09-generative/02-gans.md)
+- [Diffusion](part09-generative/03-diffusion.md)
+- [Flow matching](part09-generative/04-flow-matching.md)
+
+## [X. Self-/Semi-/Weak Supervision](part10-self-supervised/index.md)
+
+- [Self-supervised learning](part10-self-supervised/01-self-supervised-learning.md)
+- [Semi-supervised learning](part10-self-supervised/02-semi-supervised.md)
+- [Weak supervision & auto-labeling](part10-self-supervised/03-weak-supervision-and-auto-labeling.md)
+
+## [XI. Perception & Autonomy](part11-perception-autonomy/index.md)
+
+- [Perception foundation models](part11-perception-autonomy/01-perception-foundation-models.md)
+- [Multi-camera & BEV](part11-perception-autonomy/02-multi-camera-bev.md)
+- [Sensor fusion](part11-perception-autonomy/03-sensor-fusion.md)
+- [Tracking](part11-perception-autonomy/04-tracking.md)
+- [Occupancy & temporal perception](part11-perception-autonomy/05-occupancy-temporal.md)
+- [Prediction & planning](part11-perception-autonomy/06-prediction-planning.md)
+- [World models](part11-perception-autonomy/07-world-models.md)
+
+## [XII. Reinforcement Learning](part12-rl/index.md)
+
+- [MDPs & Bellman equations](part12-rl/01-mdp-bellman.md)
+- [Classical RL algorithms](part12-rl/02-classical-rl.md)
+- [Deep RL & DQN](part12-rl/03-deep-rl-dqn.md)
+- [Policy gradients, GAE & PPO](part12-rl/04-policy-gradients-ppo.md)
+- [Imitation learning](part12-rl/05-imitation-learning.md)
+- [Agents & tool use](part12-rl/06-agents-tool-use.md)
+
+## [XIII. Retrieval, Eval & Reliability](part13-retrieval-eval-reliability/index.md)
+
+- [Retrieval & RAG](part13-retrieval-eval-reliability/01-retrieval-and-rag.md)
+- [Evaluation](part13-retrieval-eval-reliability/02-evaluation.md)
+- [Uncertainty & reliability](part13-retrieval-eval-reliability/03-uncertainty-reliability.md)
+
+## [XIV. Systems](part14-systems/index.md)
+
+- [Distributed training](part14-systems/01-distributed-training.md)
+- [Training systems](part14-systems/02-training-systems.md)
+- [Inference systems](part14-systems/03-inference-systems.md)
+- [Hardware, memory & roofline](part14-systems/04-hardware-memory-roofline.md)
+
+## [XV. Interpretability & Safety](part15-interpretability-safety/index.md)
+
+- [Interpretability](part15-interpretability-safety/01-interpretability.md)
+- [Safety & failure modes](part15-interpretability-safety/02-safety-failure-modes.md)
+
+## [XVI. Coding Canon](part16-coding-canon/index.md)
+
+- [NumPy ↔ PyTorch cheat sheet](part16-coding-canon/01-numpy-torch-cheatsheet.md)
+- [Shape & broadcasting drills](part16-coding-canon/02-shape-drills.md)
+- [Timed coding drills](part16-coding-canon/03-timed-drills.md)
+
+## [XIX. Breadth Review](part19-breadth-review/index.md)
+
+- [Basics, losses, models](part19-breadth-review/01-basics-losses-models.md)
+- [Evaluation and debugging](part19-breadth-review/02-evaluation-debugging.md)
+- [Deep learning and Transformers](part19-breadth-review/03-deep-learning-transformers.md)
+- [LLMs and multimodal](part19-breadth-review/04-llms-multimodal.md)
+- [Serving, data engines, real-world](part19-breadth-review/05-serving-data-engines.md)
+- [Rapid-fire derivations](part19-breadth-review/06-rapid-fire.md)
+
+## [XX. Your Projects](part20-project-deep-dive/index.md)
+
+- [The CARL framework](part20-project-deep-dive/01-carl-framework.md)
+- [Worked deep dive, StreetSmart](part20-project-deep-dive/02-streetsmart-deep-dive.md)
+- [Worked deep dive, edge perception](part20-project-deep-dive/03-edge-perception-deep-dive.md)
+- [Behavioral and leadership](part20-project-deep-dive/04-behavioral-leadership.md)
+
+## [XVII. ML System Design](part17-ml-system-design/index.md)
+
+- [The framework](part17-ml-system-design/00-framework.md)
+- [Feed & recommendation ranking](part17-ml-system-design/01-recommendation-feed-ranking.md)
+- [Search ranking](part17-ml-system-design/02-search-ranking.md)
+- [Ads CTR / conversion prediction](part17-ml-system-design/03-ads-ctr-prediction.md)
+- [Fraud & anomaly detection](part17-ml-system-design/04-fraud-anomaly-detection.md)
+- [Autonomous-vehicle perception](part17-ml-system-design/05-perception-system-av.md)
+- [Visual search & image retrieval](part17-ml-system-design/06-visual-search-image-retrieval.md)
+- [Content moderation & trust](part17-ml-system-design/07-content-moderation.md)
+- [LLM assistant with RAG](part17-ml-system-design/08-llm-product-rag-assistant.md)
+- [OCR & document understanding](part17-ml-system-design/09-ocr-document-understanding.md)
+- [Novel-object 3D detection from unlabeled fleet data](part17-ml-system-design/13-novel-object-3d-detection.md)
+- [Forecasting & ETA](part17-ml-system-design/10-forecasting-eta.md)
+- [Notifications, uplift & experimentation](part17-ml-system-design/11-notifications-uplift-experimentation.md)
+- [ML platform, feature store & monitoring](part17-ml-system-design/12-ml-platform-feature-store-monitoring.md)
+
+## [XVIII. Company Deep Dives](part18-company-deep-dives/index.md)
+
+- [Tesla (Autopilot / FSD / Optimus)](part18-company-deep-dives/tesla.md)
+- [Waymo](part18-company-deep-dives/waymo.md)
+- [Zoox, Nuro, Aurora & robotaxi peers](part18-company-deep-dives/zoox-nuro-aurora.md)
+- [NVIDIA (DRIVE, Cosmos, Isaac)](part18-company-deep-dives/nvidia.md)
+- [Meta (Feed, Reels, Ads, FAIR)](part18-company-deep-dives/meta.md)
+- [Google & YouTube](part18-company-deep-dives/google-youtube.md)
+- [TikTok / ByteDance](part18-company-deep-dives/tiktok-bytedance.md)
+- [Netflix & Spotify](part18-company-deep-dives/netflix-spotify.md)
+- [Pinterest](part18-company-deep-dives/pinterest.md)
+- [Uber & DoorDash](part18-company-deep-dives/uber-doordash.md)
+- [Airbnb](part18-company-deep-dives/airbnb.md)
+- [Amazon](part18-company-deep-dives/amazon.md)
+- [Apple](part18-company-deep-dives/apple.md)
+- [Stripe & fintech fraud](part18-company-deep-dives/stripe-fintech.md)
+- [OpenAI, Anthropic & DeepMind](part18-company-deep-dives/frontier-labs.md)
+- [Scale AI & data engines](part18-company-deep-dives/scale-ai-data-engines.md)
+
+## [XXI. Zipline Offboard Perception](part21-zipline-offboard/index.md)
+
+- [Frames and camera geometry](part21-zipline-offboard/01-frames-and-camera-geometry.md)
+- [Two-view geometry and triangulation](part21-zipline-offboard/02-two-view-geometry.md)
+- [SfM and bundle adjustment](part21-zipline-offboard/03-sfm-and-bundle-adjustment.md)
+- [Learned 3-D and splats](part21-zipline-offboard/04-learned-3d-and-splats.md)
+- [Deliverability system design](part21-zipline-offboard/05-deliverability-system-design.md)
+- [Evaluation and scaling](part21-zipline-offboard/06-evaluation-and-scaling.md)
+- [Coding drills](part21-zipline-offboard/coding-drills.md)
+- [Mock interview](part21-zipline-offboard/mock-interview.md)
+- [Story bank](part21-zipline-offboard/story-bank.md)
+- [Cheatsheet](part21-zipline-offboard/cheatsheet.md)
+
+## [References](references.md)
