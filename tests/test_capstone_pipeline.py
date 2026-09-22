@@ -8,6 +8,8 @@ seconds on one core.
 
 from __future__ import annotations
 
+import math
+
 import pytest
 import torch
 
@@ -83,17 +85,29 @@ def test_reward_model_ranks_preferences(report):
 
 
 def test_post_training_does_not_reduce_accuracy(report):
-    """Neither preference stage may fall below the SFT policy.
+    """Neither preference stage may fall materially below the SFT policy.
 
-    Across five seeds of this configuration the change against SFT ranged from
-    -0.005 to +0.026 for GRPO and -0.005 to +0.047 for DPO, so 0.02 is a real
-    bound rather than a shrug: it is four examples out of 192, about half the
-    standard error of an accuracy near 0.5 at that sample size.
+    The bound is two standard errors of a binomial proportion at the SFT accuracy,
+    about 0.07 at this ``n_eval``. The previous fixed bound of 0.02 was tighter than
+    the measurement itself: 192 evaluation examples put one standard error near an
+    accuracy of 0.55 at 0.036, so 0.02 asked the test to resolve a difference half
+    the size of its own noise. It duly failed on CI, where a different torch build
+    draws a different RNG stream and DPO landed 0.031 under SFT, which is inside
+    one standard error and therefore not evidence of a regression.
+
+    Widening the band alone would weaken the test, so the floor against the majority
+    baseline is asserted too. Together they still catch what this test exists for: a
+    preference stage that collapses toward the 0.22 baseline is a drop of over 0.3,
+    which is more than eight standard errors.
     """
     acc = report["accuracy"]
-    tolerance = 0.02
+    p = acc["sft"]
+    n_eval = smoke_config().n_eval
+    tolerance = 2.0 * math.sqrt(p * (1.0 - p) / n_eval)  # ~0.07 at n_eval = 192
     assert acc["dpo"] >= acc["sft"] - tolerance
     assert acc["grpo"] >= acc["sft"] - tolerance
+    assert acc["dpo"] > acc["majority_baseline"]
+    assert acc["grpo"] > acc["majority_baseline"]
     assert report["dpo"]["margin_before"] == pytest.approx(0.0, abs=1e-5)
     assert report["dpo"]["margin_after"] > report["dpo"]["margin_before"]
 
