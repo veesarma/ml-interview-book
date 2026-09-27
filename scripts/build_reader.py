@@ -52,7 +52,9 @@ body{
   font-size:1.0625rem; line-height:1.66;
   -webkit-font-smoothing:antialiased;
 }
-.shell{display:grid; grid-template-columns:19rem minmax(0,1fr); min-height:100%}
+.shell{display:grid; grid-template-columns:20rem minmax(0,1fr); min-height:100%}
+.shell.hid{grid-template-columns:0 minmax(0,1fr)}
+.shell.hid .rail{display:none}
 /* ---- sidebar ---- */
 .rail{
   background:var(--rail); border-right:1px solid var(--line);
@@ -72,14 +74,26 @@ body{
 .filter:focus{outline:2px solid var(--accent); outline-offset:1px}
 .count{color:var(--ink-3); font-size:.6875rem; margin:0 0 .8rem}
 .rail nav ol{list-style:none; margin:0; padding:0}
-.part{margin-bottom:.55rem}
-.part > a{
-  display:block; text-decoration:none; color:var(--ink-2);
-  font-weight:600; font-size:.75rem; letter-spacing:.055em; text-transform:uppercase;
-  padding:.3rem 0;
+.part{margin-bottom:.15rem}
+.part > summary{
+  cursor:pointer; list-style:none; color:var(--ink-2);
+  font-weight:600; font-size:.75rem; letter-spacing:.05em; text-transform:uppercase;
+  padding:.4rem .3rem .4rem 1.1rem; border-radius:4px; position:relative;
+  display:flex; align-items:baseline; gap:.5rem;
 }
-.part > a:hover{color:var(--accent)}
-.part ol{border-left:1px solid var(--line); margin-left:.15rem}
+.part > summary::-webkit-details-marker{display:none}
+.part > summary::before{
+  content:""; position:absolute; left:.25rem; top:.72rem;
+  border:3.5px solid transparent; border-left-color:var(--ink-3);
+  transition:transform .12s ease; transform-origin:1.5px 50%;
+}
+.part[open] > summary::before{transform:rotate(90deg)}
+.part > summary:hover{background:var(--surface); color:var(--accent)}
+.part > summary .n{
+  margin-left:auto; font-size:.6875rem; font-weight:400;
+  letter-spacing:0; color:var(--ink-3); font-variant-numeric:tabular-nums;
+}
+.part ol{border-left:1px solid var(--line); margin:.1rem 0 .5rem .55rem}
 .part li a{
   display:block; text-decoration:none; color:var(--ink-2);
   padding:.22rem .55rem; margin-left:-1px; border-left:2px solid transparent;
@@ -90,15 +104,29 @@ body{
 /* ---- main ---- */
 main{min-width:0}
 .bar{
-  display:none; position:sticky; top:0; z-index:20;
-  padding:.55rem 1rem; padding-top:calc(.55rem + env(safe-area-inset-top,0px));
+  display:flex; gap:.85rem; align-items:center;
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:20;
+  padding:.5rem 1rem;
   background:var(--ground); border-bottom:1px solid var(--line);
   font-family:"IBM Plex Sans",system-ui,sans-serif;
 }
 .bar button{
-  font:inherit; font-size:.8125rem; padding:.35rem .7rem; cursor:pointer;
+  font:inherit; font-size:.8125rem; padding:.35rem .65rem; cursor:pointer;
+  display:inline-flex; align-items:center; gap:.45rem;
   color:var(--ink); background:var(--surface);
   border:1px solid var(--line-2); border-radius:5px;
+}
+.bar button:hover{border-color:var(--accent); color:var(--accent)}
+.bar button:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+.bar .ic{width:13px; height:9px; position:relative; display:inline-block}
+.bar .ic::before,.bar .ic::after{
+  content:""; position:absolute; left:0; right:0; height:1.5px; background:currentColor;
+}
+.bar .ic::before{top:0; box-shadow:0 3.75px 0 currentColor}
+.bar .ic::after{bottom:0}
+.where{
+  color:var(--ink-3); font-size:.8125rem; overflow:hidden;
+  text-overflow:ellipsis; white-space:nowrap;
 }
 /* Prose stays at a readable measure; code, tables and figures break out of it,
    because a line like `x = x.view(B, T, H, d_head).transpose(1, 2)  # (B,H,T,d)`
@@ -179,11 +207,12 @@ mjx-container{overflow-x:auto; overflow-y:hidden; max-width:100%}
 .landing-parts b{display:block; color:var(--ink); font-size:.9375rem; font-weight:600}
 .landing-parts span{display:block; color:var(--ink-3); font-size:.78rem; margin-top:.2rem}
 @media (max-width:900px){
-  .shell{grid-template-columns:1fr}
-  .rail{position:fixed; inset:0 auto 0 0; width:min(21rem,86vw); z-index:30;
+  .shell,.shell.hid{grid-template-columns:1fr}
+  .rail,.shell.hid .rail{display:block;
+    position:fixed; inset:0 auto 0 0; width:min(21rem,86vw); z-index:30;
     transform:translateX(-100%); transition:transform .18s ease}
   .rail.open{transform:none}
-  .bar{display:flex; gap:.6rem; align-items:center}
+  .where{display:none}
   article{padding:1.4rem 1rem 4rem; grid-template-columns:1fr}
   article > *, article > pre, article > .table-wrap, article > img{grid-column:1; width:100%}
   h1{font-size:1.7rem}
@@ -198,13 +227,52 @@ mjx-container{overflow-x:auto; overflow-y:hidden; max-width:100%}
 
 JS = """
 (function(){
-  var rail=document.getElementById('rail'), scrim=document.getElementById('scrim'),
-      btn=document.getElementById('navbtn'), f=document.getElementById('filter');
+  var shell=document.getElementById('shell'), rail=document.getElementById('rail'),
+      scrim=document.getElementById('scrim'), btn=document.getElementById('navbtn'),
+      label=document.getElementById('navlabel'), f=document.getElementById('filter');
+  var phone=function(){return window.matchMedia('(max-width:900px)').matches;};
+
+  function get(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+  function set(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+
+  // Desktop: the rail collapses and the choice sticks. Phone: it slides over.
+  function paint(){
+    var hidden=shell.classList.contains('hid');
+    btn.setAttribute('aria-expanded', hidden?'false':'true');
+    label.textContent = phone() ? 'Contents' : (hidden?'Show contents':'Hide contents');
+  }
+  if(get('rail')==='hidden'){shell.classList.add('hid');}
+  paint();
+  window.addEventListener('resize',paint);
+
+  btn.addEventListener('click',function(){
+    if(phone()){
+      var open=rail.classList.toggle('open');
+      scrim.classList.toggle('on',open);
+    }else{
+      var hid=shell.classList.toggle('hid');
+      set('rail',hid?'hidden':'shown');
+      paint();
+    }
+  });
   function close(){rail.classList.remove('open');scrim.classList.remove('on');}
-  if(btn){btn.addEventListener('click',function(){
-    rail.classList.toggle('open');scrim.classList.toggle('on');});}
-  if(scrim){scrim.addEventListener('click',close);}
-  rail.addEventListener('click',function(e){if(e.target.tagName==='A')close();});
+  scrim.addEventListener('click',close);
+  rail.addEventListener('click',function(e){if(e.target.tagName==='A'&&phone())close();});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape')close();
+  });
+
+  // Remember which parts the reader left folded open.
+  var openParts=(get('parts')||'').split(',');
+  document.querySelectorAll('.part').forEach(function(d){
+    if(openParts.indexOf(d.dataset.file)>-1)d.open=true;
+    d.addEventListener('toggle',function(){
+      var now=[];
+      document.querySelectorAll('.part').forEach(function(x){if(x.open)now.push(x.dataset.file);});
+      set('parts',now.join(','));
+    });
+  });
+
   if(f){
     f.addEventListener('input',function(){
       var q=f.value.trim().toLowerCase();
@@ -214,15 +282,19 @@ JS = """
           var hit=!q||li.textContent.toLowerCase().indexOf(q)>-1;
           li.hidden=!hit; if(hit)any=true;
         });
-        var head=p.querySelector(':scope > a');
+        var head=p.querySelector('summary');
         var headHit=!q||head.textContent.toLowerCase().indexOf(q)>-1;
         p.hidden=!(any||headHit);
-        if(headHit&&q)p.querySelectorAll('li').forEach(function(li){li.hidden=false;});
+        if(q){p.open=true; if(headHit)p.querySelectorAll('li').forEach(function(li){li.hidden=false;});}
       });
     });
     document.addEventListener('keydown',function(e){
-      if(e.key==='/'&&document.activeElement!==f){e.preventDefault();
-        rail.classList.add('open');scrim.classList.add('on');f.focus();}
+      if(e.key==='/'&&document.activeElement!==f){
+        e.preventDefault();
+        shell.classList.remove('hid'); set('rail','shown'); paint();
+        if(phone()){rail.classList.add('open');scrim.classList.add('on');}
+        f.focus();
+      }
     });
   }
   var cur=rail.querySelector('a[aria-current="page"]');
@@ -258,40 +330,56 @@ def main() -> int:
     total_chapters = sum(len(v) for v in chapters.values())
 
     def sidebar(active_file: str) -> str:
-        out = ['<nav aria-label="Book contents"><ol>']
+        """Parts fold with <details> so 128 chapters are not dumped at once."""
+        out = ['<nav aria-label="Book contents">']
         for fname, title, _c in files:
-            out.append('<li class="part">')
-            out.append(f'<a href="{fname}">{html.escape(title)}</a><ol>')
+            here = fname == active_file
+            open_attr = " open" if here else ""
+            out.append(f'<details class="part" data-file="{fname}"{open_attr}>')
+            out.append(f'<summary>{html.escape(title)}'
+                       f'<span class="n">{len(chapters[fname])}</span></summary>')
+            out.append("<ol>")
             for ch, anchor in chapters[fname]:
-                cur = ' aria-current="page"' if fname == active_file else ""
+                cur = ' aria-current="page"' if here else ""
                 out.append(f'<li><a href="{fname}#{anchor}"{cur}>{html.escape(ch)}</a></li>')
-            out.append("</ol></li>")
-        out.append("</ol></nav>")
+            out.append("</ol></details>")
+        out.append("</nav>")
         return "".join(out)
 
-    def shell(title: str, inner: str, active: str) -> str:
-        return f"""<title>{html.escape(title)}</title>
+    def shell(title: str, inner: str, active: str, whole: bool = True) -> str:
+        """whole=False for index.html, which the host wraps in its own skeleton."""
+        top = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
+               '<meta name="viewport" content="width=device-width,initial-scale=1">\n'
+               if whole else "")
+        return top + f"""<title>{html.escape(title)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 <style>{CSS}</style>
 <script src="{MATHJAX}"></script>
-<div class="shell">
+{"</head>" if whole else ""}
+{"<body>" if whole else ""}
+<div class="shell" id="shell">
   <aside class="rail" id="rail"><div class="rail-inner">
     <a class="brand" href="index.html"><b>The ML Interview Book</b>
       <span>{total_chapters} chapters, {len(files)} parts</span></a>
     <input class="filter" id="filter" type="search" placeholder="Filter chapters &nbsp; /" aria-label="Filter chapters">
-    <p class="count">Type to filter. Press / from anywhere.</p>
+    <p class="count">Type to filter. Press / anywhere.</p>
     {sidebar(active)}
   </div></aside>
   <main>
-    <div class="bar"><button id="navbtn" type="button">Contents</button></div>
+    <div class="bar">
+      <button id="navbtn" type="button" aria-expanded="true" aria-controls="rail">
+        <span class="ic" aria-hidden="true"></span><span id="navlabel">Hide contents</span>
+      </button>
+      <span class="where">{html.escape(title)}</span>
+    </div>
     <article>{inner}</article>
   </main>
 </div>
 <div class="scrim" id="scrim"></div>
 <script>{JS}</script>
-"""
+""" + ("</body>\n</html>\n" if whole else "")
 
     OUT.mkdir(parents=True, exist_ok=True)
     for old in OUT.glob("*.html"):
@@ -331,7 +419,8 @@ implementations with every tensor shape written down, the systems trade-offs, ML
 system design, and what companies actually published about how they built it.</p>
 <p>Use the sidebar to jump to any chapter. Press <code>/</code> to filter by name.</p>
 <div class="landing-parts">{cards}</div>"""
-    (OUT / "index.html").write_text(shell("The ML Interview Book", landing, ""), encoding="utf-8")
+    (OUT / "index.html").write_text(
+        shell("The ML Interview Book", landing, "", whole=False), encoding="utf-8")
     tmp.unlink()
 
     figs = OUT / "figures"
