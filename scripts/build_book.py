@@ -244,7 +244,15 @@ def convert_blocks(text: str) -> str:
     return "\n".join(out)
 
 
+SITE_ONLY_LINE = re.compile(
+    r"^.*\]\(contents\.md\).*$\n?", re.M)
+
+
 def rewrite_links(text: str, path: Path) -> str:
+    # contents.md is site navigation only. The book has pandoc's own
+    # generated table of contents, so a link to it would dangle.
+    text = SITE_ONLY_LINE.sub("", text)
+
     def img(m: re.Match) -> str:
         alt, src = m.group(1), m.group(2)
         resolved = (path.parent / src).resolve() if src.startswith("..") else (DOCS / src).resolve()
@@ -290,6 +298,11 @@ def assemble(only: str | None) -> str:
         # every chapter heading drops one level so the part heading owns the level above
         text = re.sub(r"^(#{1,5})\s", r"#\1 ", text, flags=re.M)
         anchor = chapter_id(path)
+        # several chapters number their own questions {#q1}, {#q2}, ... . One file
+        # per chapter on the site, one file for the whole book here, so they have
+        # to be namespaced or every "jump to Q1" link lands in the first chapter.
+        text = re.sub(r"\{#(q\d+)\}", rf"{{#{anchor}-\1}}", text)
+        text = re.sub(r"\]\(#(q\d+)\)", rf"](#{anchor}-\1)", text)
         first = re.search(r"^##[ \t]+(.+?)[ \t]*$", text, flags=re.M)
         if first:
             text = (text[: first.start()]
